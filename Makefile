@@ -1,6 +1,11 @@
+CC = g++
+
 testParser: testParser.o circuitParser.o
-	gcc $^ -o $@
-test.o: testParser.cpp
-	gcc -c $<
+	${CC} $^ -o $@
+testParser.o: testParser.cpp
+	${CC} -c $<
 circuitParser.o: circuitParser.cpp
-	gcc -c $<
+	${CC} -c $<
+
+clean:
+	rm *.o

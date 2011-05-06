@@ -9,7 +9,7 @@ using namespace std;
 
 class Circuit {
   public:
-  vector <vector<Gate> >  gateColumn;
+  vector <Gate>           gates;
   vector <string>         lNames;
   vector <string>         outputLabels;
   vector <int>            inputs;

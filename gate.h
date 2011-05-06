@@ -8,8 +8,8 @@ using namespace std;
 
 class Gate{
   public:
-    std::string name; 
-    std::vector <int> inputs;
+    string name; 
+    vector <int> inputs;
 };
 
 #endif
