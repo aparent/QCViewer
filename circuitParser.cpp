@@ -11,33 +11,29 @@ using namespace std;
 
 //TODO: Why is there an error with mod5d4.tfc if I do not clean up the strings?
 
-void tokenize(string str, vector<string>& tokens, const char* delimiters = " ")
-{
-  tokens.clear();
-  char* tok;
-  tok = strtok(const_cast<char*>(str.c_str()),delimiters);
-  while (tok != NULL){
-        tokens.push_back(string(tok));
-        tok = strtok (NULL,delimiters);
-    } 
+void tokenize(const string& str,vector<string>& tokens,const string& delimiters = " "){
+  string::size_type lastPos = str.find_first_not_of(delimiters, 0);// Skip delimiters at beginning. 
+  string::size_type pos     = str.find_first_of(delimiters, lastPos); // Find first "non-delimiter".
+  while (string::npos != pos || string::npos != lastPos){
+    tokens.push_back(str.substr(lastPos, pos - lastPos));// Found a token, add it to the vector. 
+    lastPos = str.find_first_not_of(delimiters, pos);// Skip delimiters.  Note the "not_of"
+    pos = str.find_first_of(delimiters, lastPos); // Find next "non-delimiter"
+  }
 }
 
-string popFristToken(string str, string& retTok, const char* delimiters = " ")
-{
-  char *tok;
-  string result;
-  tok = strtok(const_cast<char*>(str.c_str()),delimiters);
-  result = str.substr(strlen(tok));
-  while(!result.empty()&&isspace(result.at(0))){
-    result.erase(result.begin());
-  }
-  retTok = string(tok);
-  return result;
+string popFristToken(string str, string& retTok, const char* delimiters = " "){
+  string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+  string::size_type pos     = str.find_first_of(delimiters, lastPos);
+  retTok = str.substr(lastPos, pos - lastPos);
+  if (string::npos != pos) return str.substr(pos);
+  return "";
 }
 
 void cleanVars(string& vars){
   for(int i = 0; i < vars.size(); i++){
-    if ( vars.at(i) != ','&& vars.at(i) != '.' && !isalnum(vars.at(i))) vars.erase(vars.begin()+i); 
+    if ( vars.at(i) != ','&& vars.at(i) != '.' && !isalnum(vars.at(i))){
+      vars.erase(vars.begin()+i); 
+    }
   } 
 }
 

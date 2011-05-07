@@ -6,8 +6,8 @@
 using namespace std;
 
 int main(){
-  Circuit c = parseCircuit("testCircuits/veryLargeTest.tfc");
-  /*cout << "Line Names: ";
+  Circuit c = parseCircuit("testCircuits/largeTest.tfc");
+  cout << "Line Names: ";
   for(int i = 0; i < c.lNames.size(); i++){
     cout << c.lNames.at(i) << " ";
   } 
@@ -35,6 +35,6 @@ int main(){
       cout << c.gates.at(i).inputs.at(j) << " ";
     }
     cout << endl;
-  }*/
+  }
   return 0;
 }
