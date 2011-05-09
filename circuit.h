@@ -7,13 +7,18 @@
 
 using namespace std;
 
+class Input {
+public:
+  string inLabel;
+  string outLabel;
+  bool constant;
+  bool garbage;
+  int value;
+};
+
 class Circuit {
   public:
-    vector <string>         lNames;
-    vector <string>         outputLabels;
-    vector <int>            inputs;
-    vector <int>            outputs;
-    vector <int>            constants;
+    vector <Input> inputs;
 
     int QCost();
     void addGate(Gate newGate); //appends to end

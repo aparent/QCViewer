@@ -6,11 +6,25 @@
 
 using namespace std;
 
-class Gate{
+class Control {
   public:
-    string name; 
-    vector <int> inputs;
-    int QCost();
+    int wire;
+    bool polarity;
+};
+
+class Gate {
+  public:
+    string name;
+
+    vector <Control> controls;
+
+    virtual int QCost() = 0;
+};
+
+class CNOTGate : public Gate {
+  public:
+    vector <int> targets
+    int QCost () { return 0; }
 };
 
 #endif
