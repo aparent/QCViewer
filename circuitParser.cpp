@@ -1,6 +1,5 @@
 #include <fstream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <iostream> //TODO: FOR TESTING
@@ -76,7 +75,7 @@ void addGate (Circuit &circ, string first, string line){
   Gate newGate;
   newGate.name = first;
   parseLineNumbers(line,newGate.inputs,circ);
-  circ.gates.push_back(newGate);
+  circ.addGate(newGate);
 }
 
 void parseGates(ifstream& in, Circuit& circ){

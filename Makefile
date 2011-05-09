@@ -1,11 +1,18 @@
-CC = g++
+CC = clang++
+FLAGS = -g -O0 
+#FLAGS = -O3
 
-testParser: testParser.o circuitParser.o
-	${CC} $^ -o $@
+testParser: testParser.o circuitParser.o gate.o circuit.o 
+	${CC} ${FLAGS} $^ -o $@
 testParser.o: testParser.cpp
-	${CC} -c $<
-circuitParser.o: circuitParser.cpp gate.cpp
-	${CC} -c $<
+	${CC} ${FLAGS} -c $<
+circuitParser.o: circuitParser.cpp 
+	${CC} ${FLAGS} -c $<
+gate.o: gate.cpp 
+	${CC} ${FLAGS} -c $<
+circuit.o: circuit.cpp
+	${CC} ${FLAGS} -c $<
+
 
 clean:
 	rm *.o

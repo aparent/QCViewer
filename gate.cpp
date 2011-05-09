@@ -1,5 +1,5 @@
 #include "gate.h"
 
-int Gate::getQauntumCost() {
-  return 1
+int Gate::QCost() {
+  return 1;
 }

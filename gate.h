@@ -10,7 +10,7 @@ class Gate{
   public:
     string name; 
     vector <int> inputs;
-    int getQuantumCost();
+    int QCost();
 };
 
 #endif
