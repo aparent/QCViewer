@@ -36,24 +36,40 @@ void cleanVars(string& vars){
   } 
 }
 
-bool parseNames(string str, vector<string>& names){
+bool parseLineNames(string str, Circuit& circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens,",");
   for(int i = 0; i < tokens.size(); i++){
-    names.push_back(tokens.at(i));  
+    circ.addLine(tokens.at(i));
   }
   return true;
 }
 
-bool parseLineNumbers(string str, vector<int>& nums, Circuit& circ){
+
+bool parseInputs(string str, Circuit& circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
   for(int i = 0; i < tokens.size(); i++){
-    for(int j = 0; j < circ.lNames.size(); j++){
-      if (tokens.at(i).compare(circ.lNames.at(j))==0){
-        nums.push_back(j);
+    for(int j = 0; j < circ.numLines(); j++){
+      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
+        circ.getLine(i)->constant=false;
+        continue; 
+      }
+    }
+  }
+  return true;
+}
+
+bool parseOutputs(string str, Circuit& circ){
+  cleanVars(str);
+  vector <string> tokens;
+  tokenize(str,tokens, ",");
+  for(int i = 0; i < tokens.size(); i++){
+    for(int j = 0; j < circ.numLines(); j++){
+      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
+        circ.getLine(i)->garbage=false;
         continue; 
       }
     }
@@ -65,16 +81,53 @@ bool parseConstants(string str, Circuit& circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
+  for(int i=0,j=0; i < tokens.size() && j < circ.numLines() ; j++ ){
+    if (circ.getLine(j)->constant){
+      circ.getLine(j)->initValue = atoi(tokens.at(i).c_str());
+      i++;
+    }
+  }
+  return true;
+}
+
+bool parseOutputNames(string str, Circuit& circ){
+  cleanVars(str);
+  vector <string> tokens;
+  tokenize(str,tokens,",");
+  for(int i=0,j=0; i < tokens.size() && j < circ.numLines() ; j++ ){
+    if (!circ.getLine(j)->garbage){
+      circ.getLine(j)->outLabel = tokens.at(i);
+      i++;
+    }
+  }
+  return true;
+}
+
+bool parseGateInputs(string str, Gate& gate, Circuit& circ){
+  cleanVars(str);
+  vector <string> tokens;
+  tokenize(str,tokens, ",");
+  bool target = true;
   for(int i = 0; i < tokens.size(); i++){
-    circ.constants.push_back(atoi(tokens.at(i).c_str()));  
+    for(int j = 0; j < circ.numLines(); j++){
+      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
+        if (target){
+          gate.targets.push_back(j);
+        }
+        else {
+          gate.controls.push_back(Control(j,false)); 
+        }
+        continue; 
+      }
+    }
   }
   return true;
 }
 
 void addGate (Circuit &circ, string first, string line){
-  Gate newGate;
+  CNOTGate newGate;
   newGate.name = first;
-  parseLineNumbers(line,newGate.inputs,circ);
+  parseGateInputs(line,newGate,circ);
   circ.addGate(newGate);
 }
 
@@ -107,23 +160,23 @@ Circuit parseCircuit (string file){
     line = popFristToken(line,ident);
     cleanVars(ident);
     if (ident.compare(".v")==0){
-      lNamesDone = parseNames(line,circ.lNames); 
-      continue;
-    }
-    if (ident.compare(".ol")==0){
-      parseNames(line,circ.outputLabels); 
+      lNamesDone = parseLineNames(line,circ); 
       continue;
     }
     if (ident.compare(".i")==0){
-      parseLineNumbers(line,circ.inputs,circ);
+      parseInputs(line,circ);
       continue;
     }
     if (ident.compare(".o")==0){
-      parseLineNumbers(line,circ.outputs,circ);
+      parseOutputs(line,circ);
       continue;
     }
     if (ident.compare(".c")==0){
       parseConstants(line,circ);
+      continue;
+    }
+    if (ident.compare(".ol")==0){
+      parseOutputNames(line,circ); 
       continue;
     }
     if (ident.compare("BEGIN")==0){

@@ -1,3 +1,4 @@
+#include <sstream>
 #include "circuit.h"
 
 void Circuit::addGate(Gate newGate){
@@ -23,4 +24,46 @@ int Circuit::QCost(){
     totalCost = totalCost + getGate(i).QCost();
   } 
   return totalCost;
+}
+
+string Line::intToString(int i){
+  stringstream ss;
+  ss << i;
+  return ss.str();
+}
+
+string Line::getInputLabel(){
+  if (constant){
+    return intToString(initValue);
+  }
+  return lineName;
+}
+    
+string  Line::getOutputLabel(){
+  if (garbage){ 
+    return "Garbage";
+  }
+  if (outLabel.compare("")==0){ 
+    return lineName;
+  }
+  return outLabel;
+}
+
+int Circuit::numLines(){
+  return lines.size();
+}
+
+Line* Circuit::getLine(int pos){
+  return &lines.at(pos);
+}
+
+Line::Line(string name){
+  lineName  = name;
+  garbage   = true;
+  constant  = true;
+  initValue = 0;
+}
+
+void Circuit::addLine(string lineName){
+  lines.push_back(Line(lineName));
 }

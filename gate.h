@@ -8,6 +8,7 @@ using namespace std;
 
 class Control {
   public:
+    Control (int,bool);
     int wire;
     bool polarity;
 };
@@ -17,13 +18,13 @@ class Gate {
     string name;
 
     vector <Control> controls;
+    vector <int> targets;
 
-    virtual int QCost() = 0;
+    int QCost() { return 0; }
 };
 
 class CNOTGate : public Gate {
   public:
-    vector <int> targets
     int QCost () { return 0; }
 };
 

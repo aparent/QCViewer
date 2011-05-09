@@ -1,5 +1,6 @@
 #include "gate.h"
 
-int Gate::QCost() {
-  return 1;
-}
+Control::Control(int setWire, bool setPol){
+  wire = setWire;
+  polarity = setPol;
+}   
