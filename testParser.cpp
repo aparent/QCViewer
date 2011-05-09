@@ -6,8 +6,9 @@
 using namespace std;
 
 int main(){
-  Circuit c = parseCircuit("testCircuits/largeTest.tfc");
-  cout << "Line Names: ";
+  Circuit c = parseCircuit("testCircuits/mod5d4.tfc");
+  cout << "QCost: " << c.QCost() << endl;
+  cout << "Line Names: " ;
   for(int i = 0; i < c.lNames.size(); i++){
     cout << c.lNames.at(i) << " ";
   } 
@@ -28,11 +29,11 @@ int main(){
     cout << c.outputLabels.at(i) << " ";
   }
   cout << endl;
-  for(int i = 0; i < c.gates.size(); i++){
-    cout << "Gate Name: "<< c.gates.at(i).name << " " <<endl;
-    cout << "Gate varibles: ";
-    for(int j = 0; j < c.gates.at(i).inputs.size(); j++){
-      cout << c.gates.at(i).inputs.at(j) << " ";
+  for(int i = 0; i < c.numGates(); i++){
+    cout << "Gate Name: "<< c.getGate(i).name << " ";
+    cout << " Varibles: ";
+    for(int j = 0; j < c.getGate(i).inputs.size(); j++){
+      cout << c.getGate(i).inputs.at(j) << " ";
     }
     cout << endl;
   }
