@@ -8,28 +8,27 @@
 using namespace std;
 
 class Line {
-  
-public:
-  Line (string);
-  string getInputLabel ();
-  string getOutputLabel();
-  string intToString( int i);
-  string lineName;
-  string outLabel;
-  bool constant;
-  bool garbage;
-  int initValue;
+  public:
+    Line (string);
+    string getInputLabel ();
+    string getOutputLabel();
+    string intToString( int i);
+    string lineName;
+    string outLabel;
+    bool constant;
+    bool garbage;
+    int initValue;
 };
 
 class Circuit {
   public:
 
     int QCost();
-   
-    void   addLine       (string line); 
-    Line*   getLine       (int pos);  
+
+    void   addLine       (string line);
+    Line*   getLine       (int pos);
     int    numLines();
-    
+
     void addGate(Gate newGate); //appends to end
     void addGate(Gate newGate,int pos); //inserts at pos
     Gate getGate(int pos);
