@@ -69,7 +69,7 @@ bool parseOutputs(string str, Circuit& circ){
   for(int i = 0; i < tokens.size(); i++){
     for(int j = 0; j < circ.numLines(); j++){
       if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
-        circ.getLine(i)->garbage=false;
+        circ.getLine(j)->garbage=false;
         continue; 
       }
     }
@@ -103,22 +103,25 @@ bool parseOutputNames(string str, Circuit& circ){
   return true;
 }
 
+
+//TODO Make more general this just works for single target cnot gates
 bool parseGateInputs(string str, Gate& gate, Circuit& circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
   bool target = true;
-  for(int i = 0; i < tokens.size(); i++){
+  for(int i = 0; i < tokens.size()-1; i++){
     for(int j = 0; j < circ.numLines(); j++){
-      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
-        if (target){
-          gate.targets.push_back(j);
-        }
-        else {
-          gate.controls.push_back(Control(j,false)); 
-        }
+      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){ 
+        gate.controls.push_back(Control(j,false)); 
         continue; 
       }
+    }
+  }
+  for(int j = 0; j < circ.numLines(); j++){
+    if (tokens.at(tokens.size()-1).compare(circ.getLine(j)->lineName)==0){ 
+      gate.targets.push_back(j); 
+      continue; 
     }
   }
   return true;
