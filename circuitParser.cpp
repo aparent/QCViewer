@@ -1,24 +1,8 @@
-#include <fstream>
-#include <cstdlib>
-#include <string>
-#include <vector>
-#include <iostream> //TODO: FOR TESTING
 #include "circuitParser.h"
-#include "circuit.h"
 
 using namespace std;
 
 //TODO: Why is there an error with mod5d4.tfc if I do not clean up the strings?
-
-void tokenize(const string& str,vector<string>& tokens,const string& delimiters = " "){
-  string::size_type lastPos = str.find_first_not_of(delimiters, 0);// Skip delimiters at beginning. 
-  string::size_type pos     = str.find_first_of(delimiters, lastPos); // Find first "non-delimiter".
-  while (string::npos != pos || string::npos != lastPos){
-    tokens.push_back(str.substr(lastPos, pos - lastPos));// Found a token, add it to the vector. 
-    lastPos = str.find_first_not_of(delimiters, pos);// Skip delimiters.  Note the "not_of"
-    pos = str.find_first_of(delimiters, lastPos); // Find next "non-delimiter"
-  }
-}
 
 string popFristToken(string str, string& retTok, const char* delimiters = " "){
   string::size_type lastPos = str.find_first_not_of(delimiters, 0);
@@ -105,7 +89,7 @@ bool parseOutputNames(string str, Circuit& circ){
 
 
 //TODO Make more general this just works for single target cnot gates
-bool parseGateInputs(string str, Gate& gate, Circuit& circ){
+bool parseGateInputs(string str, Gate *gate, Circuit& circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
@@ -113,14 +97,14 @@ bool parseGateInputs(string str, Gate& gate, Circuit& circ){
   for(int i = 0; i < tokens.size()-1; i++){
     for(int j = 0; j < circ.numLines(); j++){
       if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){ 
-        gate.controls.push_back(Control(j,false)); 
+        gate->controls.push_back(Control(j,false)); 
         continue; 
       }
     }
   }
   for(int j = 0; j < circ.numLines(); j++){
     if (tokens.at(tokens.size()-1).compare(circ.getLine(j)->lineName)==0){ 
-      gate.targets.push_back(j); 
+      gate->targets.push_back(j); 
       continue; 
     }
   }
@@ -128,8 +112,8 @@ bool parseGateInputs(string str, Gate& gate, Circuit& circ){
 }
 
 void addGate (Circuit &circ, string first, string line){
-  CNOTGate newGate;
-  newGate.name = first;
+  CNOTGate *newGate = new CNOTGate;
+  newGate->name = first;
   parseGateInputs(line,newGate,circ);
   circ.addGate(newGate);
 }
