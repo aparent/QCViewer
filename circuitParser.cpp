@@ -128,7 +128,7 @@ bool parseGateInputs(string str, Gate& gate, Circuit& circ){
 }
 
 void addGate (Circuit &circ, string first, string line){
-  CNOTGate newGate;
+  NOTGate newGate;
   newGate.name = first;
   parseGateInputs(line,newGate,circ);
   circ.addGate(newGate);

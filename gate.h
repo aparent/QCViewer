@@ -23,9 +23,9 @@ class Gate {
     int QCost() { return 0; }
 };
 
-class CNOTGate : public Gate {
+class NOTGate : public Gate {
   public:
-    int QCost () { return 0; }
+    virtual int QCost () { return 0; }
 };
 
 #endif
