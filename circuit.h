@@ -23,11 +23,11 @@ class Circuit {
   public:
 
     int QCost();
-   
-    void   addLine(string line); 
-    Line*  getLine(int pos);  
+
+    void   addLine(string line);
+    Line*  getLine(int pos);
     int    numLines();
-    
+
     void addGate(Gate *newGate); //appends to end
     void addGate(Gate *newGate,int pos); //inserts at pos
     Gate* getGate(int pos);

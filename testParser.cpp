@@ -4,14 +4,14 @@
 #include <vector>
 
 using namespace std;
-
+void draw (Circuit*);
 int main(){
-  Circuit c = parseCircuit("testCircuits/mod5d4.tfc");
+  Circuit c = parseCircuit("testCircuits/foo.tfc");
   cout << "QCost: " << c.QCost() << endl;
   cout << "Line Names: " ;
   for(int i = 0; i < c.numLines(); i++){
     cout << c.getLine(i)->lineName << " ";
-  } 
+  }
   cout << endl << "Inputs: ";
   for(int i = 0; i < c.numLines(); i++){
     cout << c.getLine(i)->getInputLabel() <<  " ";

@@ -1,10 +1,7 @@
 #include "gate.h"
 #include "utility.h"
 
-Control::Control(int setWire, bool setPol){
-  wire = setWire;
-  polarity = setPol;
-}   
+Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
 int Gate::numCont(){
   return controls.size();
@@ -18,13 +15,13 @@ int Gate::numNegCont(){
   return count;
 }
 
-int CNOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
+int NOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
   int c  = numCont(); //m
   int nc = numNegCont(); //v
   int l  = numLines; //n
   if ( c == 0 || (c == 1 && nc == 0)) return 1; //NOT & CNOT
 	switch (c) {
-    case 1:  
+    case 1:
       if (nc == 1) return 3;
     case 2:  //Toffoli
 			if(nc==2) return 6;
@@ -50,7 +47,7 @@ int CNOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
 				  if(nc==5)return 54;
 					else     return 52;
 				}
-        else { 
+        else {
 				  if(nc==5)return 63;
 					else     return 61;
 				}
@@ -117,10 +114,11 @@ int CNOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
 				    else   return 24*c-64;
 			    }
           else {//no garbage
-			     if(nc==c) return (int)ipow(2,c+1)-1;		
-           else      return (int)ipow(2,c+1)-3;                              
+			     if(nc==c) return (int)ipow(2,c+1)-1;
+           else      return (int)ipow(2,c+1)-3;
           }
        }
   }
   return 0;
 }
+

@@ -21,7 +21,7 @@ int Circuit::QCost(){
   int totalCost =0;
   for(int i = 0; i < numGates(); i++){
     totalCost = totalCost + getGate(i)->QCost(numLines());
-  } 
+  }
   return totalCost;
 }
 
@@ -31,12 +31,12 @@ string Line::getInputLabel(){
   }
   return lineName;
 }
-    
+
 string  Line::getOutputLabel(){
-  if (garbage){ 
+  if (garbage){
     return "Garbage";
   }
-  if (outLabel.compare("")==0){ 
+  if (outLabel.compare("")==0){
     return lineName;
   }
   return outLabel;

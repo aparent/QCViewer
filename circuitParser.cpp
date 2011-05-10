@@ -15,9 +15,9 @@ string popFristToken(string str, string& retTok, const char* delimiters = " "){
 void cleanVars(string& vars){
   for(int i = 0; i < vars.size(); i++){
     if ( vars.at(i) != ','&& vars.at(i) != '.' && !isalnum(vars.at(i))){
-      vars.erase(vars.begin()+i); 
+      vars.erase(vars.begin()+i);
     }
-  } 
+  }
 }
 
 bool parseLineNames(string str, Circuit& circ){
@@ -39,7 +39,7 @@ bool parseInputs(string str, Circuit& circ){
     for(int j = 0; j < circ.numLines(); j++){
       if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
         circ.getLine(i)->constant=false;
-        continue; 
+        continue;
       }
     }
   }
@@ -54,7 +54,7 @@ bool parseOutputs(string str, Circuit& circ){
     for(int j = 0; j < circ.numLines(); j++){
       if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
         circ.getLine(j)->garbage=false;
-        continue; 
+        continue;
       }
     }
   }
@@ -112,7 +112,7 @@ bool parseGateInputs(string str, Gate *gate, Circuit& circ){
 }
 
 void addGate (Circuit &circ, string first, string line){
-  CNOTGate *newGate = new CNOTGate;
+  NOTGate *newGate = new NOTGate;
   newGate->name = first;
   parseGateInputs(line,newGate,circ);
   circ.addGate(newGate);
