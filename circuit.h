@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class Line {  
+class Line {
   public:
     Line (string);
     string getInputLabel ();

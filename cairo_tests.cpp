@@ -104,7 +104,7 @@ void drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> 
   }
 }
 
-int main (int argc, char *argv[]) {
+void draw (Circuit *c) {
   cairo_surface_t *surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 640, 480);
   cairo_t *cr = cairo_create (surface);
   cairo_rectangle (cr, 0,0,640,480);
