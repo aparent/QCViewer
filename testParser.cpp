@@ -23,6 +23,15 @@ int main(){
   cout << endl;
   for(int i = 0; i < c.numGates(); i++){
     cout << "Gate Name: "<< c.getGate(i).name << " ";
+    cout << " Controls: ";
+    for(int j = 0; j < c.getGate(i).controls.size(); j++){
+      cout << " " <<c.getGate(i).controls.at(j).wire;
+    }
+    cout << " Targets: ";
+    for(int j = 0; j < c.getGate(i).targets.size(); j++){
+      cout << " " << c.getGate(i).targets.at(j);
+    }
+    cout << endl;
   }
   return 0;
 }
