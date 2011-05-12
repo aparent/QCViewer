@@ -4,7 +4,7 @@
 #include <vector>
 
 using namespace std;
-void draw (Circuit*);
+void makepicture (Circuit*);
 int main(){
   Circuit c = parseCircuit("testCircuits/foo.tfc");
   cout << "QCost: " << c.QCost() << endl;
@@ -33,6 +33,6 @@ int main(){
     }
     cout << endl;
   }
-	draw (&c);
+	makepicture (&c);
   return 0;
 }
