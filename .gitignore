@@ -1,0 +1,6 @@
+*.o
+*.png
+viewer
+Makefile
+ui_viewer.h
+moc_viewer.cpp
