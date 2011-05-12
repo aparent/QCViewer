@@ -3,6 +3,7 @@
 
 
 #include "ui_viewer.h"
+#include "thread.h"
 #include <circuitParser.h>
 
 class QCViewer : public QMainWindow
@@ -13,12 +14,18 @@ Q_OBJECT
 
   private slots:
 		void openFile();
+		void quit ();
+		void loadImage ();
 
-  private:
+//  private:
+  public:
 		Circuit 					  *currentCirc;
 		QGraphicsScene 			*mainScene;
 		QGraphicsPixmapItem *currentCircImage;
     Ui::QCViewer ui;
+		Thread* openthread;
+		QString fileName;
+		bool opening;
 };
 
 #endif

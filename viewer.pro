@@ -7,9 +7,10 @@ CONFIG +=   qt \
   debug
 FORMS       += viewer.ui
 SOURCES     += main.cpp \
+  thread.cpp \
   viewer.cpp
-HEADERS     += viewer.h
-unix:LIBS += `pkg-config --libs --static cairo`  -L/home/aparent/IQC/Code/QCLib -lQC
-INCLUDEPATH +=   /home/aparent/IQC/Code/QCLib
+HEADERS     += viewer.h thread.h
+unix:LIBS += `pkg-config --libs --static cairo`  -L../QCLib -lQC
+INCLUDEPATH +=   ../QCLib
 QMAKE_LFLAGS += -Bstatic
 QMAKE_CXXFLAGS += `pkg-config --cflags cairo`
