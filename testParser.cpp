@@ -33,5 +33,6 @@ int main(){
     }
     cout << endl;
   }
+	draw(&c);
   return 0;
 }

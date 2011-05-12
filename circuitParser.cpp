@@ -20,25 +20,25 @@ void cleanVars(string& vars){
   }
 }
 
-bool parseLineNames(string str, Circuit& circ){
+bool parseLineNames(string str, Circuit *circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens,",");
   for(int i = 0; i < tokens.size(); i++){
-    circ.addLine(tokens.at(i));
+    circ->addLine(tokens.at(i));
   }
   return true;
 }
 
 
-bool parseInputs(string str, Circuit& circ){
+bool parseInputs(string str, Circuit *circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
   for(int i = 0; i < tokens.size(); i++){
-    for(int j = 0; j < circ.numLines(); j++){
-      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
-        circ.getLine(i)->constant=false;
+    for(int j = 0; j < circ->numLines(); j++){
+      if (tokens.at(i).compare(circ->getLine(j)->lineName)==0){
+        circ->getLine(i)->constant=false;
         continue;
       }
     }
@@ -46,14 +46,14 @@ bool parseInputs(string str, Circuit& circ){
   return true;
 }
 
-bool parseOutputs(string str, Circuit& circ){
+bool parseOutputs(string str, Circuit *circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
   for(int i = 0; i < tokens.size(); i++){
-    for(int j = 0; j < circ.numLines(); j++){
-      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){
-        circ.getLine(j)->garbage=false;
+    for(int j = 0; j < circ->numLines(); j++){
+      if (tokens.at(i).compare(circ->getLine(j)->lineName)==0){
+        circ->getLine(j)->garbage=false;
         continue;
       }
     }
@@ -61,26 +61,26 @@ bool parseOutputs(string str, Circuit& circ){
   return true;
 }
 
-bool parseConstants(string str, Circuit& circ){
+bool parseConstants(string str, Circuit *circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
-  for(int i=0,j=0; i < tokens.size() && j < circ.numLines() ; j++ ){
-    if (circ.getLine(j)->constant){
-      circ.getLine(j)->initValue = atoi(tokens.at(i).c_str());
+  for(int i=0,j=0; i < tokens.size() && j < circ->numLines() ; j++ ){
+    if (circ->getLine(j)->constant){
+      circ->getLine(j)->initValue = atoi(tokens.at(i).c_str());
       i++;
     }
   }
   return true;
 }
 
-bool parseOutputNames(string str, Circuit& circ){
+bool parseOutputNames(string str, Circuit *circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens,",");
-  for(int i=0,j=0; i < tokens.size() && j < circ.numLines() ; j++ ){
-    if (!circ.getLine(j)->garbage){
-      circ.getLine(j)->outLabel = tokens.at(i);
+  for(int i=0,j=0; i < tokens.size() && j < circ->numLines() ; j++ ){
+    if (!circ->getLine(j)->garbage){
+      circ->getLine(j)->outLabel = tokens.at(i);
       i++;
     }
   }
@@ -89,36 +89,36 @@ bool parseOutputNames(string str, Circuit& circ){
 
 
 //TODO Make more general this just works for single target cnot gates
-bool parseGateInputs(string str, Gate *gate, Circuit& circ){
+bool parseGateInputs(string str, Gate *gate, Circuit *circ){
   cleanVars(str);
   vector <string> tokens;
   tokenize(str,tokens, ",");
   bool target = true;
   for(int i = 0; i < tokens.size()-1; i++){
-    for(int j = 0; j < circ.numLines(); j++){
-      if (tokens.at(i).compare(circ.getLine(j)->lineName)==0){ 
-        gate->controls.push_back(Control(j,false)); 
-        continue; 
+    for(int j = 0; j < circ->numLines(); j++){
+      if (tokens.at(i).compare(circ->getLine(j)->lineName)==0){
+        gate->controls.push_back(Control(j,false));
+        continue;
       }
     }
   }
-  for(int j = 0; j < circ.numLines(); j++){
-    if (tokens.at(tokens.size()-1).compare(circ.getLine(j)->lineName)==0){ 
-      gate->targets.push_back(j); 
-      continue; 
+  for(int j = 0; j < circ->numLines(); j++){
+    if (tokens.at(tokens.size()-1).compare(circ->getLine(j)->lineName)==0){
+      gate->targets.push_back(j);
+      continue;
     }
   }
   return true;
 }
 
-void addGate (Circuit &circ, string first, string line){
+void addGate (Circuit *circ, string first, string line){
   NOTGate *newGate = new NOTGate;
   newGate->name = first;
   parseGateInputs(line,newGate,circ);
-  circ.addGate(newGate);
+  circ->addGate(newGate);
 }
 
-void parseGates(ifstream& in, Circuit& circ){
+void parseGates(ifstream& in, Circuit *circ){
   vector <string> tokens;
   string line,first;
   while(!in.eof()){
@@ -134,9 +134,9 @@ void parseGates(ifstream& in, Circuit& circ){
   }
 }
 
-Circuit parseCircuit (string file){ 
+Circuit *parseCircuit (string file){
   ifstream in(file.data());
-  Circuit circ;
+  Circuit *circ = new Circuit;
   vector <string> tokens;
   string line,ident;
   bool lNamesDone = false;
@@ -147,7 +147,7 @@ Circuit parseCircuit (string file){
     line = popFristToken(line,ident);
     cleanVars(ident);
     if (ident.compare(".v")==0){
-      lNamesDone = parseLineNames(line,circ); 
+      lNamesDone = parseLineNames(line,circ);
       continue;
     }
     if (ident.compare(".i")==0){
@@ -163,7 +163,7 @@ Circuit parseCircuit (string file){
       continue;
     }
     if (ident.compare(".ol")==0){
-      parseOutputNames(line,circ); 
+      parseOutputNames(line,circ);
       continue;
     }
     if (ident.compare("BEGIN")==0){
