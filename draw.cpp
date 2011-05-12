@@ -17,15 +17,15 @@ float wireToY (int x) {
 
 void drawDot (cairo_t *cr, float xc, float yc, float radius, float thickness, bool negative) {
   if (negative) {
-    cairo_set_source_rgba (cr, 1, 1, 1, 1);
+    cairo_set_source_rgb (cr, 1, 1, 1);
     cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_fill (cr);
-    cairo_set_source_rgba (cr, 0, 0, 0, 1);
+    cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_set_line_width(cr, thickness);
     cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_stroke (cr);
   } else {
-    cairo_set_source_rgba (cr, 0, 0, 0, 1);
+    cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_fill (cr);
   }
@@ -37,15 +37,15 @@ void drawBox (cairo_t *cr, string name, float xc, float yc, float height, float 
   // get width of this box
   cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 35);
-  cairo_set_source_rgba (cr, 0, 0, 0, 1);
+  cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_text_extents_t extents;
   cairo_text_extents(cr, name.c_str(), &extents);
 
   cairo_rectangle (cr, xc-extents.width/2-minpad, yc-(height+0*extents.height)/2, extents.width+2*minpad, height);
-  cairo_set_source_rgba (cr, 1, 1, 1, 1);
+  cairo_set_source_rgb (cr, 1, 1, 1);
   cairo_fill(cr);
   cairo_rectangle (cr, xc-extents.width/2-minpad, yc-(height+0*extents.height)/2, extents.width+2*minpad, height);
-  cairo_set_source_rgba (cr, 0, 0, 0, 1);
+  cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_set_line_width (cr, thickness);
   cairo_stroke(cr);
 
@@ -58,12 +58,12 @@ void drawBox (cairo_t *cr, string name, float xc, float yc, float height, float 
 void drawNOT (cairo_t *cr, float xc, float yc, float radius, float thickness) {
   // Draw white background
   cairo_set_line_width (cr, thickness);
-  cairo_set_source_rgba (cr, 1, 1, 1, 1);
+  cairo_set_source_rgb (cr, 1, 1, 1);
   cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
   cairo_fill (cr);
 
   // Draw black border
-  cairo_set_source_rgba (cr, 0,0,0,1);
+  cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
   cairo_stroke (cr);
 
@@ -78,7 +78,7 @@ void drawNOT (cairo_t *cr, float xc, float yc, float radius, float thickness) {
 
 void drawWire (cairo_t *cr, float x1, float y1, float x2, float y2, float thickness) {
   cairo_set_line_width (cr, thickness);
-  cairo_set_source_rgba (cr, 0, 0, 0, 1);
+  cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_move_to (cr, x1, y1);
   cairo_line_to (cr, x2, y2);
   cairo_stroke (cr);
@@ -100,11 +100,12 @@ void drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> 
   if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw), thickness);
 }
 
-void drawbase (cairo_surface_t *surface, Circuit *c, float w, float h, float wirestart, float wireend) {
+void drawbase (cairo_surface_t *surface, Circuit *c, float w, float h, float wirestart, float wireend, double scale) {
   cairo_t *cr = cairo_create (surface);
+	cairo_scale (cr, scale, scale);
 	cairo_set_source_surface (cr, surface, 0, 0);
-	cairo_set_source_rgba (cr, 1, 1, 1, 1);
-	cairo_rectangle (cr, 0, 0, w, h);
+	cairo_set_source_rgb (cr, 1, 1, 1);
+	cairo_rectangle (cr, 0, 0, w/scale, h/scale);
 	cairo_fill (cr);
 
   for (int i = 0; i < c->numLines(); i++) {
@@ -114,13 +115,14 @@ void drawbase (cairo_surface_t *surface, Circuit *c, float w, float h, float wir
 	cairo_destroy (cr);
 }
 
-void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wireend, bool forreal) {
+void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wireend, bool forreal, double scale) {
 	cairo_t *cr = cairo_create (surface);
+	cairo_scale (cr, scale, scale);
 	cairo_set_source_surface (cr, surface, 0.0, 0.0);
 
 	cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(cr, 18);
-	cairo_set_source_rgba (cr, 0, 0, 0, 1);
+  cairo_set_font_size(cr, scale*18);
+	cairo_set_source_rgb (cr, 0, 0, 0);
 
   // input labels
 	double xinit = 0.0;
@@ -165,20 +167,24 @@ void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wire
   cairo_destroy (cr);
 }
 
-void makepicture (Circuit *c) {
+void makepicture (Circuit *c, double scale) {
 	double wirestart, wireend;
 	// First, find out how big our circuit drawing will be.
-	cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR_ALPHA, NULL);
-	draw (unbounded_rec_surface, c, &wirestart, &wireend, false);
+	cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
+	cout << "Drawing fake cairo image... " << flush;
+	draw (unbounded_rec_surface, c, &wirestart, &wireend, false, scale);
+	cout << "ding!\nDrawing wires and labels... " << flush;
 
 	// Now, draw to png (XXX) with the right dimensions.
 	cairo_rectangle_t ext;
 	cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
-  cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, ext.width+ext.x, ext.height+ext.y);
-	drawbase (img_surface, c, ext.width+ext.x, ext.height+ext.y, wirestart+xoffset, wireend);
-	draw (img_surface, c, &wirestart, &wireend, true);
+  cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, ext.height+ext.y);
+	drawbase (img_surface, c, ext.width+ext.x, ext.height+scale*ext.y, wirestart+xoffset, wireend, scale);
+	cout << "ding!\nDrawing... " << flush;
+	draw (img_surface, c, &wirestart, &wireend, true, scale);
+	cout << "ding!\nsaving... " << flush;
   cairo_surface_write_to_png(img_surface, "circuit.png");
-
+  cout << "ding!\n" << flush;
   cairo_surface_destroy (unbounded_rec_surface);
 	cairo_surface_destroy (img_surface);
 }
