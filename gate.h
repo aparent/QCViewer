@@ -20,12 +20,14 @@ class Gate {
     vector <Control> controls;
     vector <int> targets;
 
-    int QCost() { return 0; }
+    virtual int QCost(int numLines) = 0;
+    int numCont();//total number of negative and positive controls
+    int numNegCont();
 };
 
 class NOTGate : public Gate {
   public:
-    virtual int QCost () { return 0; }
+    int QCost(int numLines);
 };
 
 #endif

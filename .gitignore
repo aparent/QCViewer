@@ -4,3 +4,4 @@ a.out
 .nfs*
 *.png
 testParser
+libQC.a
