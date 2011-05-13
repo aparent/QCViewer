@@ -4,35 +4,41 @@
 #include <vector>
 
 using namespace std;
-void makepicture (Circuit*);
 int main(){
-  Circuit c = parseCircuit("testCircuits/foo.tfc");
-  cout << "QCost: " << c.QCost() << endl;
+  Circuit *c = parseCircuit("testCircuits/largeTest.tfc");
+  cout << "QCost: " << c->QCost() << endl;
   cout << "Line Names: " ;
-  for(int i = 0; i < c.numLines(); i++){
-    cout << c.getLine(i)->lineName << " ";
+  for(int i = 0; i < c->numLines(); i++){
+    cout << c->getLine(i)->lineName << " ";
   }
   cout << endl << "Inputs: ";
-  for(int i = 0; i < c.numLines(); i++){
-    cout << c.getLine(i)->getInputLabel() <<  " ";
+  for(int i = 0; i < c->numLines(); i++){
+    cout << c->getLine(i)->getInputLabel() <<  " ";
   }
   cout << endl << "Outputs: ";
-  for(int i = 0; i < c.numLines(); i++){
-    cout << c.getLine(i)->getOutputLabel() << " ";
+  for(int i = 0; i < c->numLines(); i++){
+    cout << c->getLine(i)->getOutputLabel() << " ";
   }
   cout << endl;
-  for(int i = 0; i < c.numGates(); i++){
-    cout << "Gate Name: "<< c.getGate(i)->name << " ";
+  for(int i = 0; i < c->numGates(); i++){
+    cout << "Gate Name: "<< c->getGate(i)->name << " ";
     cout << " Controls: ";
-    for(int j = 0; j < c.getGate(i)->controls.size(); j++){
-      cout << " " <<c.getGate(i)->controls.at(j).wire;
+    for(int j = 0; j < c->getGate(i)->controls.size(); j++){
+      cout << " " <<c->getGate(i)->controls.at(j).wire;
     }
     cout << " Targets: ";
-    for(int j = 0; j < c.getGate(i)->targets.size(); j++){
-      cout << " " << c.getGate(i)->targets.at(j);
+    for(int j = 0; j < c->getGate(i)->targets.size(); j++){
+      cout << " " << c->getGate(i)->targets.at(j);
+		cout << endl;
     }
-    cout << endl;
+	}	
+	vector<int> pLines = c->getParallel();
+	cout << endl << "Number of pLines: "<< pLines.size();
+	cout << endl << "Paralellism lines:";
+  for(int j = 0; j < pLines.size(); j++){
+    cout << " " << pLines.at(j);
   }
-	makepicture (&c);
+	cout << endl;
+	//makepicture (c);
   return 0;
 }

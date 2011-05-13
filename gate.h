@@ -6,6 +6,8 @@
 
 using namespace std;
 
+enum gateType {NOT, H};
+
 class Control {
   public:
     Control (int,bool);
@@ -16,6 +18,7 @@ class Control {
 class Gate {
   public:
     string name;
+		int gateType;
 
     vector <Control> controls;
     vector <int> targets;
@@ -28,6 +31,13 @@ class Gate {
 class NOTGate : public Gate {
   public:
     int QCost(int numLines);
+    NOTGate();
+};
+
+class HGate : public Gate {//hadamard gate
+  public:
+    int QCost(int numLines);
+		HGate();
 };
 
 #endif

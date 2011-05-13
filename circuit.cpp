@@ -1,5 +1,7 @@
 #include "circuit.h"
 #include "utility.h"
+#include <iostream> // TODO: Used for testing: note may want to git grep to remove these at some point
+#include <map>
 
 void Circuit::addGate(Gate *newGate){
   gates.push_back(newGate);
@@ -59,4 +61,30 @@ Line::Line(string name){
 
 void Circuit::addLine(string lineName){
   lines.push_back(Line(lineName));
+}
+
+vector<int> Circuit::getParallel(){
+	vector<int>	returnValue;
+	map<int,int> linesUsed;
+	int test;
+	for(int i = 0; i<numGates(); i++){
+		start:
+		for(int j = 0; j < getGate(i)->controls.size(); j++){
+			if (linesUsed.find(getGate(i)->controls.at(j).wire) != linesUsed.end()){
+				returnValue.push_back(i-1); //Push back the gate number before this one
+				linesUsed.clear();
+				goto start; //Go back to begining of main loop (redo this iteration because this gate is in the next block)
+			}
+			linesUsed[getGate(i)->controls.at(j).wire];
+		}
+		for(int j = 0; j < getGate(j)->targets.size(); j++){
+			if (linesUsed.find(getGate(i)->targets.at(j)) != linesUsed.end()){
+				returnValue.push_back(i-1); 
+				linesUsed.clear();
+				goto start;
+			}
+			linesUsed[getGate(i)->targets.at(j)];
+		}
+	}
+	return returnValue;
 }

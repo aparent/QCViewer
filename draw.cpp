@@ -2,6 +2,7 @@
 #include <cairo.h>
 #include <cmath>
 #include <iostream>
+#include <vector>
 using namespace std;
 
 float radius = 15.0;
@@ -84,6 +85,16 @@ void drawWire (cairo_t *cr, float x1, float y1, float x2, float y2, float thickn
   cairo_stroke (cr);
 }
 
+//for parallism wires
+void drawPWire (cairo_t *cr, float x, int numLines, float thickness) {
+  cairo_set_line_width (cr, thickness);
+  cairo_set_source_rgb (cr, 255, 0, 0);
+  cairo_move_to (cr, x, wireToY(0));
+  cairo_line_to (cr, x, wireToY(numLines-1));
+  cairo_stroke (cr);
+  cairo_set_source_rgb (cr, 0, 0, 0);
+}
+
 void drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
 	int maxw = (*targ)[0];
 	int minw = (*targ)[0];
@@ -149,12 +160,17 @@ void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wire
 		Gate* g = c->getGate (i);
     drawCNOT (cr, 50*(i+1)+xinit, &g->controls, &g->targets);
 	}
-
   *wireend = 50*(c->numGates()+1) + xinit;
+	//Parallism Lines
+	vector<int> pLines = c->getParallel();
+	for (int i = 0; i < pLines.size(); i++) {
+    drawPWire (cr,50*(pLines.at(i)+1)+xinit+25,c->numLines(),thickness);
+	}
+
   // output labels
 	for (int i = 0; i < c->numLines (); i++) {
     Line *line = c->getLine (i);
-		string label = line->getInputLabel();
+		string label = line->getOutputLabel();
 		cairo_text_extents_t extents;
 		cairo_text_extents (cr, label.c_str(), &extents);
 

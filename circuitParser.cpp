@@ -112,7 +112,13 @@ bool parseGateInputs(string str, Gate *gate, Circuit *circ){
 }
 
 void addGate (Circuit *circ, string first, string line){
-  NOTGate *newGate = new NOTGate;
+	Gate *newGate;
+	if (first.compare("H") == 1 || first.compare("h") == 1){
+  	newGate = new HGate();
+	}
+	else{
+  	newGate = new NOTGate();
+	}
   newGate->name = first;
   parseGateInputs(line,newGate,circ);
   circ->addGate(newGate);

@@ -33,6 +33,8 @@ class Circuit {
     Gate* getGate(int pos);
     int numGates(); //Returns the number of gates
 
+		vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
+
   private:
     vector <Gate*>           gates;
     vector <Line>            lines;

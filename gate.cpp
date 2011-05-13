@@ -15,6 +15,7 @@ int Gate::numNegCont(){
   return count;
 }
 
+//NOTGate -----------------------------------------------------
 int NOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
   int c  = numCont(); //m
   int nc = numNegCont(); //v
@@ -122,3 +123,15 @@ int NOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
   return 0;
 }
 
+//HGate -----------------------------------------------------
+int HGate::QCost(int numLines){ //TODO: Check for Pres Gates
+	return 0;
+}
+
+NOTGate::NOTGate(){
+	gateType = NOT;
+}
+
+HGate::HGate(){
+	gateType = H;
+}
