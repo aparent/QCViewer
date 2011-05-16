@@ -1,5 +1,7 @@
 #include "circuitParser.h"
 
+int gateCount = 0;
+
 using namespace std;
 
 //TODO: Why is there an error with mod5d4.tfc if I do not clean up the strings?
@@ -11,6 +13,10 @@ string removeQuotes(string str){
 	}
 	return str;
 }
+
+//NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator, 
+//*(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
+//the vector location where it points now
 
 void parseLineNames(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
@@ -84,6 +90,7 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
   		newGate = new NOTGate();
 		}
   	newGate->name = ((**it).value);
+		cout << gateCount++ << endl;
   	parseGateInputs(newGate,circ,it);
   	circ->addGate(newGate);
   }
@@ -102,7 +109,10 @@ void parseConstants(Circuit * circ, vector<TFCToken>::iterator * it){
 }
 
 Circuit *parseCircuit (string file){
+	cout << "Lexing...";
 	vector<TFCToken> *tokens = lexCircuit(file);
+	cout << "done" << endl; 
+	cout << "Parseing..." << endl;
 	vector<TFCToken>::iterator tempIt = tokens->begin();
 	vector<TFCToken>::iterator * it = &tempIt;
   Circuit *circ = new Circuit;
@@ -117,7 +127,7 @@ Circuit *parseCircuit (string file){
 			if (((**it).value).compare("O")     == 0){
 				parseOutputs(circ,it);
 			}
-			if (((**it).value).compare("OL")     == 0){
+			if (((**it).value).compare("OL")    == 0){
 				parseOutputLabels(circ,it);
 			}
 			if (((**it).value).compare("C")     == 0){

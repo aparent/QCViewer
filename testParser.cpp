@@ -5,7 +5,7 @@
 
 using namespace std;
 int main(){
-  Circuit *c = parseCircuit("testCircuits/foo.tfc");
+  Circuit *c = parseCircuit("testCircuits/huge.tfc");
   cout << "QCost: " << c->QCost() << endl;
   cout << "Line Names: " ;
   for(int i = 0; i < c->numLines(); i++){
