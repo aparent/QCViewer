@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -g -O0 `pkg-config --define-variable=prefix=/home/aparent/local --cflags cairo`
-LDFLAGS = `pkg-config --define-variable=prefix=/home/aparent/local --libs cairo` -Wl,-rpath,/home/aparent/local/lib
+CFLAGS = -g -O0 `pkg-config --cflags cairo`
+LDFLAGS = `pkg-config --libs cairo` -Wl,-rpath,/home/aparent/local/lib
 #FLAGS = -O3
 
 LIB_FILES = circuitParser.cpp gate.cpp circuit.cpp utility.cpp draw.cpp
@@ -19,8 +19,8 @@ libQC.a:	$(LIBOFILES)
 	rm -f $@
 	ar cq $@ $(LIBOFILES)
 
-testParser: testParser.o circuitParser.o gate.o circuit.o utility.o 
-	${CC} ${CFLAGS} $^ -o  $@
+testParser: draw.o testParser.o circuitParser.o gate.o circuit.o utility.o 
+	${CC} ${LDFLAGS} $^ -o  $@
 testParser.o: testParser.cpp
 	${CC} ${CFLAGS} -c  $<
 circuitParser.o: circuitParser.cpp
