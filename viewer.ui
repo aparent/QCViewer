@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
-    <height>826</height>
+    <width>512</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,14 +20,17 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QGraphicsView" name="mainView">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
       </property>
       <property name="interactive">
        <bool>false</bool>
@@ -44,7 +47,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>631</width>
+     <width>512</width>
      <height>21</height>
     </rect>
    </property>
@@ -59,7 +62,26 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuArchitecture">
+    <property name="title">
+     <string>Architecture</string>
+    </property>
+    <widget class="QMenu" name="menuType">
+     <property name="title">
+      <string>Type</string>
+     </property>
+     <addaction name="actionComplete"/>
+     <addaction name="actionLinear_nearest_neighbour"/>
+     <addaction name="actionCircular_nearest_neighbour"/>
+     <addaction name="separator"/>
+     <addaction name="actionCustom"/>
+    </widget>
+    <addaction name="actionDraw_warnings"/>
+    <addaction name="separator"/>
+    <addaction name="menuType"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuArchitecture"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -81,6 +103,46 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionLinear_nearest_neighbour">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Linear Nearest Neighbour</string>
+   </property>
+  </action>
+  <action name="actionCircular_nearest_neighbour">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Circular Nearest Neighbour</string>
+   </property>
+  </action>
+  <action name="actionCustom">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Custom...</string>
+   </property>
+  </action>
+  <action name="actionDraw_warnings">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Draw warnings</string>
+   </property>
+  </action>
+  <action name="actionComplete">
+   <property name="text">
+    <string>Complete</string>
    </property>
   </action>
  </widget>

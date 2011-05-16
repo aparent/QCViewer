@@ -3,7 +3,6 @@
 
 
 #include "ui_viewer.h"
-#include "thread.h"
 #include <circuitParser.h>
 
 class QCViewer : public QMainWindow
@@ -15,7 +14,11 @@ Q_OBJECT
   private slots:
 		void openFile();
 		void quit ();
-		void loadImage ();
+		void redraw ();
+		void drawArchToggle ();
+
+		void archComplete ();
+		void archLNN ();
 
 //  private:
   public:
@@ -23,9 +26,8 @@ Q_OBJECT
 		QGraphicsScene 			*mainScene;
 		QGraphicsPixmapItem *currentCircImage;
     Ui::QCViewer ui;
-		Thread* openthread;
-		QString fileName;
-		bool opening;
+		QString filename;
+		bool drawArch;
 };
 
 #endif
