@@ -4,8 +4,9 @@
 #include <vector>
 
 using namespace std;
+void makepicture (Circuit*, double);
 int main(){
-  Circuit *c = parseCircuit("testCircuits/huge.tfc");
+  Circuit *c = parseCircuit("testCircuits/4b15g_5.tfc");
   cout << "QCost: " << c->QCost() << endl;
   cout << "Line Names: " ;
   for(int i = 0; i < c->numLines(); i++){
@@ -31,7 +32,7 @@ int main(){
       cout << " " << c->getGate(i)->targets.at(j);
 		cout << endl;
     }
-	}	
+	}
 	vector<int> pLines = c->getParallel();
 	cout << endl << "Number of pLines: "<< pLines.size();
 	cout << endl << "Paralellism lines:";
@@ -39,6 +40,11 @@ int main(){
     cout << " " << pLines.at(j);
   }
 	cout << endl;
-	//makepicture (c);
+	c->arch = new QArch (c->numLines());
+	for (int i = 0; i < c->numLines ()-1; i++) {
+	  c->arch->set(i,i+1);
+	}
+		c->arch->foof ();
+	makepicture (c, 1.0);
   return 0;
 }

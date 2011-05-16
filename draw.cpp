@@ -11,6 +11,19 @@ float thickness = 2.0;
 float xoffset = 10.0;
 float yoffset = 10.0;
 float wireDist = 40.0;
+float gatePad = 18.0;
+
+struct gateRect {
+  float x0, y0;
+	float width, height;
+};
+
+class Colour {
+  public:
+	  Colour () {}
+		Colour (float rr, float gg, float bb, float aa) : r(rr), b(bb), g(gg), a(aa) {}
+		float r, g, b, a;
+};
 
 float wireToY (int x) {
   return yoffset+(x+1)*wireDist;
@@ -88,14 +101,14 @@ void drawWire (cairo_t *cr, float x1, float y1, float x2, float y2, float thickn
 //for parallism wires
 void drawPWire (cairo_t *cr, float x, int numLines, float thickness) {
   cairo_set_line_width (cr, thickness);
-  cairo_set_source_rgb (cr, 255, 0, 0);
+  cairo_set_source_rgba (cr, 0.4, 0.4, 0.4,0.4);
   cairo_move_to (cr, x, wireToY(0));
   cairo_line_to (cr, x, wireToY(numLines-1));
   cairo_stroke (cr);
   cairo_set_source_rgb (cr, 0, 0, 0);
 }
 
-void drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
+gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
 	int maxw = (*targ)[0];
 	int minw = (*targ)[0];
   for (int i = 0; i < ctrl->size(); i++) {
@@ -109,6 +122,12 @@ void drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> 
     drawNOT (cr, xc, wireToY((*targ)[i]), radius, thickness);
   }
   if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw), thickness);
+	gateRect rect;
+	rect.x0 = xc - (radius + thickness);
+	rect.y0 = wireToY(minw) - (radius+thickness);
+  rect.width = 2.0*(thickness+radius);
+  rect.height = wireToY(maxw) - wireToY(minw) + 2.0*(radius+thickness);
+	return rect;
 }
 
 void drawbase (cairo_surface_t *surface, Circuit *c, float w, float h, float wirestart, float wireend, double scale) {
@@ -126,7 +145,9 @@ void drawbase (cairo_surface_t *surface, Circuit *c, float w, float h, float wir
 	cairo_destroy (cr);
 }
 
-void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wireend, bool forreal, double scale) {
+vector<gateRect> draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wireend, bool forreal, double scale) {
+	vector <gateRect> rects;
+
 	cairo_t *cr = cairo_create (surface);
 	cairo_scale (cr, scale, scale);
 	cairo_set_source_surface (cr, surface, 0.0, 0.0);
@@ -156,16 +177,14 @@ void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wire
 	if (!forreal) *wirestart = xinit;
 
   // gates
+	float xcurr = xinit+2.0*gatePad;
 	for (int i = 0; i < c->numGates (); i++) {
 		Gate* g = c->getGate (i);
-    drawCNOT (cr, 50*(i+1)+xinit, &g->controls, &g->targets);
+	  gateRect r = drawCNOT (cr, xcurr, &g->controls, &g->targets);
+		xcurr += r.width + gatePad;
+		rects.push_back(r);
 	}
-  *wireend = 50*(c->numGates()+1) + xinit;
-	//Parallism Lines
-	vector<int> pLines = c->getParallel();
-	for (int i = 0; i < pLines.size(); i++) {
-    drawPWire (cr,50*(pLines.at(i)+1)+xinit+25,c->numLines(),thickness);
-	}
+  *wireend = xcurr-gatePad;
 
   // output labels
 	for (int i = 0; i < c->numLines (); i++) {
@@ -181,26 +200,77 @@ void draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wire
 		cairo_show_text (cr, label.c_str());
 	}
   cairo_destroy (cr);
+
+	return rects;
 }
 
-void makepicture (Circuit *c, double scale) {
-	double wirestart, wireend;
-	// First, find out how big our circuit drawing will be.
+void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill) {
+  cairo_set_source_rgba (cr, fill.r, fill.g, fill.b, fill.a);
+	cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+	cairo_fill (cr);
+	cairo_set_source_rgba (cr, outline.r, outline.g, outline.b, outline.a);
+	cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+	cairo_stroke (cr);
+}
+
+void drawArchitectureWarnings (cairo_surface_t* surface, vector<gateRect> rects, vector<int> badGates, double scale) {
+	cairo_t *cr = cairo_create (surface);
+	cairo_scale (cr, scale, scale);
+	cairo_set_source_surface (cr, surface, 0.0, 0.0);
+  for (int i = 0; i < badGates.size(); i++) {
+    drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
+	}
+	cairo_destroy (cr);
+}
+
+void drawParallelSectionMarkings (cairo_surface_t* surface, vector<gateRect> rects, int numLines, vector<int> pLines, double scale) {
+	cairo_t *cr = cairo_create (surface);
+	cairo_scale (cr, scale, scale);
+	cairo_set_source_surface (cr, surface, 0.0, 0.0);
+	for (int i = 0; i < pLines.size(); i++) {
+		int gateNum = pLines[i];
+		float x = rects[gateNum].x0 + rects[gateNum].width + gatePad/2;
+    drawPWire (cr, x, numLines,thickness);
+	}
+  cairo_destroy (cr);
+}
+
+cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
+  cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
+  return img_surface;
+}
+
+cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend, double scale) {
 	cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
 	cout << "Drawing fake cairo image... " << flush;
-	draw (unbounded_rec_surface, c, &wirestart, &wireend, false, scale);
+	draw (unbounded_rec_surface, c, wirestart, wireend, false, scale);
 	cout << "ding!\nDrawing wires and labels... " << flush;
-
-	// Now, draw to png (XXX) with the right dimensions.
 	cairo_rectangle_t ext;
 	cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
-  cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, ext.height+ext.y);
-	drawbase (img_surface, c, ext.width+ext.x, ext.height+scale*ext.y, wirestart+xoffset, wireend, scale);
-	cout << "ding!\nDrawing... " << flush;
-	draw (img_surface, c, &wirestart, &wireend, true, scale);
-	cout << "ding!\nsaving... " << flush;
-  cairo_surface_write_to_png(img_surface, "circuit.png");
-  cout << "ding!\n" << flush;
   cairo_surface_destroy (unbounded_rec_surface);
-	cairo_surface_destroy (img_surface);
+	return ext;
+}
+
+void write_to_png (cairo_surface_t* surf, string filename) {
+	cout << "Saving to \"" << filename << "\"..." << flush;
+	cairo_surface_write_to_png (surf, filename.c_str());
+	cout << "done." << endl << flush;
+}
+
+cairo_surface_t* makepicture (Circuit *c, bool drawArch, double scale) {
+	vector<gateRect> rects;
+	double wirestart, wireend;
+
+  cairo_rectangle_t ext = get_circuit_size (c, &wirestart, &wireend, scale);
+	cairo_surface_t* surf = make_png_surface (ext);
+	drawbase (surf, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart+xoffset, wireend, scale);
+	rects = draw (surf, c, &wirestart, &wireend, true, scale);
+  drawParallelSectionMarkings (surf, rects, c->numLines(),c->getParallel(), scale);
+  if (drawArch) drawArchitectureWarnings (surf, rects, c->getArchWarnings(), scale);
+
+  write_to_png (surf, "circuit.png");
+	cairo_surface_destroy (surf);
+
+	//////////////////(XXX)= c->getParallel();
+
 }
