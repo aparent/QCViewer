@@ -3,7 +3,7 @@ CFLAGS = -g -O0 `pkg-config --define-variable=prefix=/home/aparent/local --cflag
 LDFLAGS = `pkg-config --define-variable=prefix=/home/aparent/local --libs cairo` -Wl,-rpath,/home/aparent/local/lib
 #FLAGS = -O3
 
-LIB_FILES = circuitParser.cpp gate.cpp circuit.cpp utility.cpp draw.cpp
+LIB_FILES = circuitParser.cpp gate.cpp circuit.cpp utility.cpp draw.cpp TFCLexer.o
 
 
 
@@ -19,7 +19,7 @@ libQC.a:	$(LIBOFILES)
 	rm -f $@
 	ar cq $@ $(LIBOFILES)
 
-testParser: testParser.o circuitParser.o gate.o circuit.o utility.o 
+testParser: testParser.o circuitParser.o gate.o circuit.o utility.o TFCLexer.o 
 	${CC} ${CFLAGS} $^ -o  $@
 testParser.o: testParser.cpp
 	${CC} ${CFLAGS} -c  $<
@@ -33,6 +33,11 @@ utility.o: utility.cpp
 	${CC} ${CFLAGS} -c  $<
 draw.o: draw.cpp
 	${CC} ${CFLAGS} -c  $<
+TFCLexer.o: TFCLexer.cpp
+	${CC} ${CFLAGS} -c  $<
+TFCLexer.cpp: TFCLexer.l
+	flex  $<
+
 
 clean:
 	rm *.o *.a
