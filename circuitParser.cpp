@@ -4,8 +4,6 @@ int gateCount = 0;
 
 using namespace std;
 
-//TODO: Why is there an error with mod5d4.tfc if I do not clean up the strings?
-
 string removeQuotes(string str){
 	if (str[0] == '"'){
 		str.erase(str.begin());
@@ -14,7 +12,7 @@ string removeQuotes(string str){
 	return str;
 }
 
-//NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator, 
+//NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator,
 //*(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
 //the vector location where it points now
 
