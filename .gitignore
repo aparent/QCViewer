@@ -7,3 +7,5 @@ TFCLexer.cpp
 testCircuits/huge.tfc
 testParser
 libQC.a
+diracParser.cpp
+diracParser.h

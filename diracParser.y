@@ -1,14 +1,18 @@
 %{
 	#include <string>	
 	#include <iostream>
+  #include <stdio.h>
+  #include <string.h>
 	#include "parseNode.h"
 	#define YYSTYPE parseNode*
 	using namespace std;
 	string printTree(parseNode *node);
 	void yyerror(const char *s);
 	int yylex();
+  parseNode *final;
 %}
 %error-verbose
+%defines "diracParser.h"
 %start input
 %token NUM KET
 %left '-' '+'
@@ -22,10 +26,10 @@ input:			 /*empty*/
      ;
 
      line:   '\n'
-             | exp '\n'  {cout << printTree($1) << endl; }
+             | exp '\n'  {final = $1; }
      ;
 
-     exp:      subex                     { $$ = $1; }
+     exp:      subex                     { $$ = $1;}
 		 				 | exp '+' exp  				     {
 																					parseNode * val = new parseNode;
 																					val->value = "+"; val->left = $1; val->right=$3;
@@ -58,15 +62,17 @@ input:			 /*empty*/
 %%
 
 
-int main( int argc, char *argv[] ){
+parseNode *parseDirac(string input){
 	extern FILE * yyin;
-	++argv; --argc;
-	yyin = fopen( argv[0], "r" );
+  char *in = (char*)malloc(input.length() + 1);
+  strcpy(in,input.c_str());
+  yyin = fmemopen (in, strlen (in), "r");
 	yyparse ();
+  return final;
 }
 
 string printTree(parseNode *node){
-	if (node->left == NULL && node->left == NULL ) return node->value;
+	if (node->left == NULL && node->right == NULL ) return node->value;
 	return "("+printTree(node->left)+ " " +node->value + " " + printTree(node->right)+")";
 }
 

@@ -1,8 +1,9 @@
 %option noyywrap
+%option outfile="diracLexer.cpp"
 %{
 	#include "parseNode.h"
 	#define YYSTYPE parseNode*
-	#include "diracParser.tab.h"
+	#include "diracParser.h"
 	#include <iostream>
 	using namespace std;
 %}
