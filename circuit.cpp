@@ -96,7 +96,7 @@ vector<int> Circuit::getParallel(){
 		}
 		for(int j = 0; j < getGate(j)->targets.size(); j++){
 			if (linesUsed.find(getGate(i)->targets.at(j)) != linesUsed.end()){
-				returnValue.push_back(i-1); 
+				returnValue.push_back(i-1);
 				linesUsed.clear();
 				goto start;
 			}

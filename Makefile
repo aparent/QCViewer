@@ -1,38 +1,33 @@
 CC = g++
 CFLAGS = -g -O0 `pkg-config --cflags cairo`
-LDFLAGS = `pkg-config --libs cairo` -Wl,-rpath,/home/aparent/local/lib
+LDFLAGS = `pkg-config --libs cairo` 
 #FLAGS = -O3
 
-LIB_FILES = circuitParser.cpp gate.cpp circuit.cpp utility.cpp draw.cpp
+HEADERS := dirac/parseNode.h 
+OBJDIR := obj
+OBJS := $(addprefix $(OBJDIR)/,circuitParser.o gate.o circuit.o utility.o draw.o TFCLexer.o diracParser.o)
+LIBOFILES	:= $(OBJS)
 
-
-
-# All source files have associated object files
-LIBOFILES		= $(LIB_FILES:%.cpp=%.o)
-
-# all is the default rule
 all	: libQC.a
-
-# remove the old tapestry library and remake the new one
 
 libQC.a:	$(LIBOFILES)
 	rm -f $@
 	ar cq $@ $(LIBOFILES)
 
-testParser: draw.o testParser.o circuitParser.o gate.o circuit.o utility.o 
+$(OBJDIR)/%.o: %.cpp 
+	${CC} -c ${CFLAGS}  $< -o $@
+TFCLexer.cpp: TFCLexer.l
+	flex  $<
+diracLexer.cpp: diracLexer.l 
+	flex  -o $@ $<
+diracParser.cpp: diracParser.y 
+	bison -d -o $@ $<
+
+$(OBJDIR):
+	mkdir $(OBJDIR)
+
+testParser: draw.o testParser.o circuitParser.o gate.o circuit.o utility.o TFCLexer.o
 	${CC} ${LDFLAGS} $^ -o  $@
-testParser.o: testParser.cpp
-	${CC} ${CFLAGS} -c  $<
-circuitParser.o: circuitParser.cpp
-	${CC} ${CFLAGS} -c  $<
-gate.o: gate.cpp
-	${CC} ${CFLAGS} -c  $<
-circuit.o: circuit.cpp
-	${CC} ${CFLAGS} -c  $<
-utility.o: utility.cpp
-	${CC} ${CFLAGS} -c  $<
-draw.o: draw.cpp
-	${CC} ${CFLAGS} -c  $<
 
 clean:
-	rm *.o *.a
+	rm obj/*.o *.a TFCLexer.cpp diracLexer.cpp diracParser.cpp diracParser.h

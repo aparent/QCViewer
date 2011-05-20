@@ -7,6 +7,7 @@
 #include <iostream> //TODO: FOR TESTING
 #include "circuit.h"
 #include "utility.h"
+#include "TFCLexer.h"
 
 using namespace std;
 
