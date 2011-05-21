@@ -2,6 +2,7 @@
 #include "utility.h"
 #include <iostream> // TODO: Used for testing: note may want to git grep to remove these at some point
 #include <map>
+#include <algorithm> // for sort, which we should probably cut out
 
 Circuit::Circuit() : arch(0) {}
 
@@ -85,24 +86,68 @@ vector<int> Circuit::getParallel(){
 	map<int,int> linesUsed;
 	int test;
 	for(int i = 0; i<numGates(); i++){
+		Gate *g = getGate(i);
 		start:
-		for(int j = 0; j < getGate(i)->controls.size(); j++){
-			if (linesUsed.find(getGate(i)->controls.at(j).wire) != linesUsed.end()){
-				returnValue.push_back(i-1); //Push back the gate number before this one
+		for(int j = 0; j < g->controls.size(); j++){
+			if (linesUsed.find(g->controls[j].wire) != linesUsed.end()){
+				returnValue.push_back(i - 1); //Push back the gate number before this one
 				linesUsed.clear();
 				goto start; //Go back to begining of main loop (redo this iteration because this gate is in the next block)
 			}
-			linesUsed[getGate(i)->controls.at(j).wire];
+			linesUsed[g->controls[j].wire];
 		}
-		for(int j = 0; j < getGate(j)->targets.size(); j++){
-			if (linesUsed.find(getGate(i)->targets.at(j)) != linesUsed.end()){
-				returnValue.push_back(i-1);
+		for(int j = 0; j < g->targets.size(); j++) {
+			if (linesUsed.find(g->targets[j]) != linesUsed.end()) {
+				returnValue.push_back(i - 1);
 				linesUsed.clear();
 				goto start;
 			}
-			linesUsed[getGate(i)->targets.at(j)];
+			linesUsed[g->targets[j]];
 		}
 	}
+	returnValue.push_back (numGates()-1); // for convenience.
+	return returnValue;
+}
+
+void minmaxWire (vector<Control>*, vector<int>*, int*, int*); // XXX: forward declaration. hobo.
+
+vector<int> Circuit::getGreedyParallel(){
+	vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
+	sort (parallel.begin (), parallel.end ());
+	vector<int>	returnValue;
+	map<int,int> linesUsed;
+	int test;
+	int maxw, minw;
+	int k = 0;
+	for(int i = 0; i < numGates(); i++){
+		start:
+		if (i == parallel[k]) { // into next parallel group, move to next column
+			returnValue.push_back(i);
+			k++;
+			linesUsed.clear ();
+		} else {
+		  Gate *g = getGate(i);
+		  minmaxWire (&g->controls, &g->targets, &minw, &maxw);
+		  for (int j = minw; j <= maxw; j++) {
+        if (linesUsed.find(j) != linesUsed.end()) {
+          returnValue.push_back(i - 1);
+				  linesUsed.clear ();
+				  goto start;
+			  }
+		    linesUsed[j];
+			}
+		}
+	}
+	for (; k < parallel.size(); k++) {
+		returnValue.push_back (k);
+	}
+	sort (returnValue.begin (), returnValue.end ());
+//	returnValue.push_back (numGates()-1); // for convenience.
+  cout << "parallel sections:";
+	for (int i=0;i<parallel.size(); i++) cout << " " << parallel[i];
+	cout << endl << "greedy:";
+	for (int i=0;i<returnValue.size(); i++) cout << " " << returnValue[i];
+	cout <<endl;
 	return returnValue;
 }
 

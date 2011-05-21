@@ -51,6 +51,7 @@ class Circuit {
 		void removeArch ();
 
 		vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
+		vector<int> getGreedyParallel (); // used for drawing gates in the same column
 		vector<int> getArchWarnings ();
 
     QArch *arch;

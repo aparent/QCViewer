@@ -1,22 +1,11 @@
-# (c) Copyright 2011 Mfoobarrek Szyprowski foobarnd Pfoobarwel Kerntopf
-# Distributing this file without foobarn express written permission or erfoobarsing this note is prohibited.
-.v foobar,b,c,d
-.i foobar,b,c,d
-.o foobar,b,c,d
+.v a,b,c,d,e
+.i a,b,c,d
+.o e
+.c 1
 BEGIN
-t2 foobar,d
-t2 c,foobar
-t2 d,c
-t3 foobar,c,b
-t2 b,foobar
-t2 foobar,c
-t3 c,d,b
+t2 a,c
+t2 b,d
+t3 c,d,e
 t2 c,d
-t2 b,c
-t3 foobar,b,d
-t2 foobar,b
-t2 d,b
-t1 foobar
-t3 b,c,foobar
-t4 foobar,b,c,d
+t2 d,e
 END
