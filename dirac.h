@@ -1,27 +1,13 @@
-#include <armadillo>
-#include <iostream>//for error messages
+#ifndef  DIRAC
+#define  DIRAC
+
 #include <string>
-#include <string.h>
-#include <cmath>
-#include "diracParser.h"
-#include "parseNode.h"
-
-using namespace std;
-using namespace arma;
-
-struct diracTerm{
-	int type;
-	cx_mat vecValue; 
-	cx_double numValue; 
-};
+#include <complex>
 
 struct stateVec {
 	unsigned int dim;
-  complex<float> *data;
-}
+  std::complex<float> *data;
+};
 
-parseNode *parseDirac(string input); //Defined in diracParser.y
-string printTree(parseNode *node);
-diracTerm evalTree(parseNode *node);
-
-stateVec getStateVec (string input);
+stateVec getStateVec (std::string input);
+#endif

@@ -25,10 +25,11 @@
 
 %%
 input:			 /*empty*/
-             | exp {final = $1; }
+             | exp                      { final = $1; }
      ;
-		 exp:      subex                     { $$ = $1;}
-		 				 | exp '+' exp  				     {
+		 exp:      subex                    { $$ = $1;    }
+             | error                    { cout << "E3" <<endl; }
+		 				 | exp '+' exp  				    {
 																					parseNode * val = new parseNode;
 																					val->value = "+"; val->left = $1; val->right=$3;
 																					val->type = PLUS;
@@ -52,8 +53,6 @@ input:			 /*empty*/
 																					val->type = DIV;
 							 														$$ = val;
 						 														}
-						 
-             | '(' exp ')'              { $$ = $2;}
 		 ;
 		 subex: term
 		 				| subex subex	%prec high    {
@@ -64,14 +63,17 @@ input:			 /*empty*/
 						 											 		  }
 					  |  SQRT '(' exp ')' 				{
 							 														$1->right = $3;
-																					$$ = $1; 
+																					$$ = $1;
 						 														}
-             | '(' exp ')'            	{ $$ = $2;}
+             | '(' exp ')'            	{ $$ = $2; }
+             |     error                { cout << "E0" <<endl; }
+             | '(' error ')'            { cout << "E1" <<endl; }
 		 ;
 
 		 term: 		KET												{ $$ = $1; }
 		 				 |NUM                       { $$ = $1; }
 		 				 |CNUM                      { $$ = $1; }
+		 				 |error 										{ cout << "E2" <<endl; }					 
 		 ;
 
 %%

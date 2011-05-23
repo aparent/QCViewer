@@ -1,4 +1,37 @@
 #include "dirac.h"
+#include <cmath>
+#include <string.h>
+#include <armadillo>
+#include "diracParser.h"
+#include "parseNode.h"
+#include <iostream>//for error messages
+
+using namespace std;
+using namespace arma;
+
+struct diracTerm{
+	int type;
+	cx_mat vecValue;
+	cx_double numValue;
+};
+
+parseNode *parseDirac(std::string input); //Defined in diracParser.y
+string printTree(parseNode *node);
+diracTerm evalTree(parseNode *node);
+
+
+stateVec getStateVec (std::string input){
+	parseNode *node = parseDirac(input); 
+	diracTerm term = evalTree(node);
+	stateVec result;
+	cx_mat ket = term.vecValue;
+	result.dim = ket.n_rows;
+	result.data = new complex<float>[ket.n_rows];
+	for(int i=0;i<ket.n_rows;i++){
+		result.data[i] = ket(i,0);
+	}
+	return result;
+}
 
 string printTree(parseNode *node){
 	if (node->type==SQRT) return node->value + "(" + printTree(node->right)+")";
@@ -89,7 +122,14 @@ diracTerm evalTree(parseNode *node){
 		return stringToKet(node->value);
 	}
 
-	diracTerm right = evalTree(node->right);
+	diracTerm left;
+	diracTerm right;
+
+	if(node->right == NULL){
+		cout << "ERROR right is NULL."<<endl;
+		return ret;
+	}
+	else right = evalTree(node->right);
 
 	if (node->type == SQRT){
 		if (right.type == NUM){
@@ -98,18 +138,22 @@ diracTerm evalTree(parseNode *node){
 			return ret;
 		}
  		else{
-			cout << "ERROR cannot subtract vector and a number";
+			cout << "ERROR cannot subtract vector and a number"<<endl;
 			return ret;
 		}
 	}
 
-	diracTerm left = evalTree(node->left);
+	if(node->right == NULL){
+		cout << "ERROR left is NULL."<<endl;
+		return ret;
+	}
+	else left = evalTree(node->left);
 
 	if (node->type == PLUS){
 		if      (left.type == NUM && right.type == NUM) return constAdd(left,right);
 		else if (left.type == KET && right.type == KET) return ketAdd(left,right);
 		else{
-			cout << "ERROR cannot add vector and a number";
+			cout << "ERROR cannot add vector and a number"<<endl;
 			return ret;
 		}
 	}
@@ -117,7 +161,7 @@ diracTerm evalTree(parseNode *node){
 		if      (left.type == NUM && right.type == NUM) return constSub(left,right);
 		else if (left.type == KET && right.type == KET) return ketSub(left,right);
 		else{
-			cout << "ERROR cannot subtract vector and a number";
+			cout << "ERROR cannot subtract vector and a number"<<endl;
 			return ret;
 		}
 	}

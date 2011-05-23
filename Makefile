@@ -21,8 +21,9 @@ diracLexer.cpp: diracLexer.l
 	flex  -o $@ $<
 diracParser.cpp: diracParser.y
 	bison -d -o $@ $<
-diracParser.h: diracParser.y
-	bison -d -o $@ $<
+diracParser.h: diracParser.cpp
+	bison -d -o $< diracParser.y
+
 
 $(OBJDIR):
 	mkdir $(OBJDIR)
@@ -30,7 +31,7 @@ $(OBJDIR):
 testParser: draw.o testParser.o circuitParser.o gate.o circuit.o utility.o TFCLexer.o
 	${CC} ${LDFLAGS} $^ -o  $@
 
-testDirac: diracTest.o dirac.o diracParser.o diracLexer.o
+diracTest: $(addprefix $(OBJDIR)/,diracTest.o dirac.o diracParser.o diracLexer.o)
 	${CC} ${LDFLAGS} $^ -o  $@
 
 clean:
