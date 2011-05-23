@@ -1,8 +1,8 @@
 %{
-	#include <string>	
-	#include <iostream>
   #include <stdio.h>
   #include <string.h>
+	#include <iostream>
+	#include <string>
 	#include "parseNode.h"
 	#define YYSTYPE parseNode*
 	using namespace std;
@@ -14,49 +14,64 @@
 %error-verbose
 %defines "diracParser.h"
 %start input
-%token NUM KET
+%token CNUM NUM KET PLUS MINUS TIMES DIV SQRT /* CNUM is for complex numbers  */
+%left low
 %left '-' '+'
-%left '*'
+%left '*' '/'
+%left SQRT
+%right high
 %initial-action {
 };
 
 %%
 input:			 /*empty*/
-             | input line
+             | exp {final = $1; }
      ;
-
-     line:   '\n'
-             | exp '\n'  {final = $1; }
-     ;
-
-     exp:      subex                     { $$ = $1;}
+		 exp:      subex                     { $$ = $1;}
 		 				 | exp '+' exp  				     {
 																					parseNode * val = new parseNode;
 																					val->value = "+"; val->left = $1; val->right=$3;
+																					val->type = PLUS;
 							 														$$ = val;
 							 													}
 		 				 | exp '-' exp  				    {
 																					parseNode * val = new parseNode;
 																					val->value = "-"; val->left = $1; val->right=$3;
+																					val->type = MINUS;
 							 														$$ = val;
 							 													}
+						 | exp '*' exp           	  {
+																					parseNode * val = new parseNode;
+																					val->value = "*"; val->left = $1; val->right=$3;
+																					val->type = TIMES;
+							 														$$ = val;
+						 														}
+						 | exp '/' exp           	  {
+																					parseNode * val = new parseNode;
+																					val->value = "/"; val->left = $1; val->right=$3;
+																					val->type = DIV;
+							 														$$ = val;
+						 														}
+						 
              | '(' exp ')'              { $$ = $2;}
 		 ;
 		 subex: term
-		 				| subex subex	%prec '*'     {
+		 				| subex subex	%prec high    {
 																					parseNode * val = new parseNode;
 																					val->value = "*"; val->left = $1; val->right=$2;
+																					val->type = TIMES;
 							 														$$ = val;
-						 													  }
-						| subex '*' subex           {
-																					parseNode * val = new parseNode;
-																					val->value = "*"; val->left = $1; val->right=$3;
-							 														$$ = val;
+						 											 		  }
+					  |  SQRT '(' exp ')' 				{
+							 														$1->right = $3;
+																					$$ = $1; 
 						 														}
              | '(' exp ')'            	{ $$ = $2;}
 		 ;
+
 		 term: 		KET												{ $$ = $1; }
 		 				 |NUM                       { $$ = $1; }
+		 				 |CNUM                      { $$ = $1; }
 		 ;
 
 %%
@@ -69,11 +84,6 @@ parseNode *parseDirac(string input){
   yyin = fmemopen (in, strlen (in), "r");
 	yyparse ();
   return final;
-}
-
-string printTree(parseNode *node){
-	if (node->left == NULL && node->right == NULL ) return node->value;
-	return "("+printTree(node->left)+ " " +node->value + " " + printTree(node->right)+")";
 }
 
 void yyerror (const char *s){ /* Called by yyparse on error */
