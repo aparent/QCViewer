@@ -127,7 +127,7 @@ gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctr
 	// (XXX) need to do a  check in here re: target wires intermixed with not targets.
 
 	float dw = wireToY(1)-wireToY(0);
-	float yc = wireToY (minw);//-dw/2.0;
+	float yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
 	float height = dw*(maxw-minw+Upad);
 
   // get width of this box
@@ -138,10 +138,10 @@ gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctr
   if (width < dw*Upad) {
     width = dw*Upad;
 	}
-  cairo_rectangle (cr, xc-width/2, yc-(height+0*extents.height)/2, width, height);
+  cairo_rectangle (cr, xc-width/2, yc-height/2, width, height);
   cairo_set_source_rgb (cr, 1, 1, 1);
   cairo_fill(cr);
-  cairo_rectangle (cr, xc-width/2, yc-(height+0*extents.height)/2, width, height);
+  cairo_rectangle (cr, xc-width/2, yc-height/2, width, height);
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_set_line_width (cr, thickness);
   cairo_stroke(cr);
@@ -237,7 +237,7 @@ vector<gateRect> draw (cairo_surface_t *surface, Circuit* c, double *wirestart, 
 			x = *wirestart - extents.width;
 			y = wireToY(i) - (extents.height/2 + extents.y_bearing);
 		}
-		cairo_move_to(cr, x, y);
+		cairo_move_to (cr, x, y);
     cairo_show_text (cr, label.c_str());
 		xinit = max (xinit, extents.width);
   }
@@ -258,13 +258,33 @@ vector<gateRect> draw (cairo_surface_t *surface, Circuit* c, double *wirestart, 
 	    Gate* g = c->getGate (i);
 	    gateRect r;
 	    minmaxWire (&g->controls, &g->targets, &mingw, &maxgw);
+			int count = 1; // hack
 		  switch (g->gateType) {
         case NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
-		    default: r = drawCU (cr, xcurr, g->name, &g->controls, &g->targets); break;
+		    default:
+				  // XXX: this needs to be generalized!
+					if (g->name.compare ("H") == 0) { // if hadamard
+            vector<Control> ctrl;
+						vector<int> targ;
+						do {
+							count++;
+							g = c->getGate (i);
+              ctrl.insert(ctrl.end(), g->controls.begin(), g->controls.end());
+							targ.insert(targ.end(), g->targets.begin(), g->targets.end());
+							i++;
+						} while (i <= parallels[j] && c->getGate(i)->name.compare("H") == 0);
+						i--; // restore
+            count--;
+					  // draw hadamards together. this isn't really cool. proof of concept.
+						r = drawCU (cr, xcurr, g->name, &ctrl, &targ);
+					} else {
+				    r = drawCU (cr, xcurr, g->name, &g->controls, &g->targets);
+					}
+					break;
 	 	  }
-		  rects.push_back(r);
+		  for (int i = 0; i < count; i++) rects.push_back(r);
 			maxwidth = max (maxwidth, r.width);
-		  //drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
+		//  drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
 	  }
     xcurr += maxwidth + gatePad;
   }
@@ -319,9 +339,7 @@ cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
 
 cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend, double scale) {
 	cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
-	cout << "Drawing fake cairo image... " << flush;
 	draw (unbounded_rec_surface, c, wirestart, wireend, false, scale); // XXX fix up these inefficienies!!
-	cout << "ding!\nDrawing wires and labels... " << flush;
 	cairo_rectangle_t ext;
 	cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
   cairo_surface_destroy (unbounded_rec_surface);
@@ -329,9 +347,13 @@ cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wiree
 }
 
 void write_to_png (cairo_surface_t* surf, string filename) {
-	cout << "Saving to \"" << filename << "\"..." << flush;
-	cairo_surface_write_to_png (surf, filename.c_str());
-	cout << "done." << endl << flush;
+	cout << "writing... ";
+	cairo_status_t status = cairo_surface_write_to_png (surf, filename.c_str());
+  if (status != CAIRO_STATUS_SUCCESS) {
+    cout << "Error saving to png." << endl;
+		return;
+	}
+	cout << "success." << endl;
 }
 
 cairo_surface_t* makepicture (Circuit *c, bool drawArch, double scale) {
@@ -339,6 +361,7 @@ cairo_surface_t* makepicture (Circuit *c, bool drawArch, double scale) {
 	double wirestart, wireend;
   cairo_rectangle_t ext = get_circuit_size (c, &wirestart, &wireend, scale);
 	cairo_surface_t* surf = make_png_surface (ext);
+	if (surf == NULL) return NULL;
 	drawbase (surf, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart+xoffset, wireend, scale);
 	rects = draw (surf, c, &wirestart, &wireend, true, scale);
   drawParallelSectionMarkings (surf, rects, c->numLines(),c->getParallel(), scale);

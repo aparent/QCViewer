@@ -1,6 +1,5 @@
 #include "circuit.h"
 #include "utility.h"
-#include <iostream> // TODO: Used for testing: note may want to git grep to remove these at some point
 #include <map>
 #include <algorithm> // for sort, which we should probably cut out
 
@@ -52,7 +51,7 @@ string Line::getInputLabel(){
   return lineName;
 }
 
-string  Line::getOutputLabel(){
+string Line::getOutputLabel(){
   if (garbage){
     return "Garbage";
   }
@@ -111,6 +110,7 @@ vector<int> Circuit::getParallel(){
 
 void minmaxWire (vector<Control>*, vector<int>*, int*, int*); // XXX: forward declaration. hobo.
 
+// TODO: this is pretty akward to have outside the drawing code. Reorganize?
 vector<int> Circuit::getGreedyParallel(){
 	vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
 	sort (parallel.begin (), parallel.end ());
@@ -121,33 +121,27 @@ vector<int> Circuit::getGreedyParallel(){
 	int k = 0;
 	for(int i = 0; i < numGates(); i++){
 		start:
-		if (i == parallel[k]) { // into next parallel group, move to next column
-			returnValue.push_back(i);
-			k++;
-			linesUsed.clear ();
-		} else {
-		  Gate *g = getGate(i);
-		  minmaxWire (&g->controls, &g->targets, &minw, &maxw);
-		  for (int j = minw; j <= maxw; j++) {
-        if (linesUsed.find(j) != linesUsed.end()) {
-          returnValue.push_back(i - 1);
-				  linesUsed.clear ();
-				  goto start;
-			  }
-		    linesUsed[j];
+		Gate *g = getGate(i);
+		minmaxWire (&g->controls, &g->targets, &minw, &maxw);
+		for (int j = minw; j <= maxw; j++) {
+      if (linesUsed.find(j) != linesUsed.end()) {
+        returnValue.push_back(i - 1);
+		    linesUsed.clear ();
+			  goto start;
 			}
+		  linesUsed[j];
+	  }
+		if (i == parallel[k]) { // into next parallel group, so force a column move
+      returnValue.push_back (i);
+		  k++;
+			linesUsed.clear ();
 		}
 	}
 	for (; k < parallel.size(); k++) {
 		returnValue.push_back (k);
 	}
-	sort (returnValue.begin (), returnValue.end ());
+	sort (returnValue.begin (), returnValue.end ()); // TODO: needed?
 //	returnValue.push_back (numGates()-1); // for convenience.
-  cout << "parallel sections:";
-	for (int i=0;i<parallel.size(); i++) cout << " " << parallel[i];
-	cout << endl << "greedy:";
-	for (int i=0;i<returnValue.size(); i++) cout << " " << returnValue[i];
-	cout <<endl;
 	return returnValue;
 }
 
@@ -169,5 +163,4 @@ vector<int> Circuit::getArchWarnings () {
 		}
 		if (badgate) warnings.push_back(g);
   }
-	cout << "THERE were " << warnings.size () << " warnings.\n";
 }

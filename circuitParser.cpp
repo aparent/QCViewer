@@ -1,7 +1,5 @@
 #include "circuitParser.h"
 
-int gateCount = 0;
-
 using namespace std;
 
 string removeQuotes(string str){
@@ -88,7 +86,6 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
   		newGate = new NOTGate();
 		}
   	newGate->name = ((**it).value);
-		cout << gateCount++ << endl;
   	parseGateInputs(newGate,circ,it);
   	circ->addGate(newGate);
   }
@@ -107,10 +104,8 @@ void parseConstants(Circuit * circ, vector<TFCToken>::iterator * it){
 }
 
 Circuit *parseCircuit (string file){
-	cout << "Lexing...";
 	vector<TFCToken> *tokens = lexCircuit(file);
-	cout << "done" << endl; 
-	cout << "Parseing..." << endl;
+	if (tokens == NULL) return NULL;
 	vector<TFCToken>::iterator tempIt = tokens->begin();
 	vector<TFCToken>::iterator * it = &tempIt;
   Circuit *circ = new Circuit;
@@ -137,8 +132,10 @@ Circuit *parseCircuit (string file){
 		}
 		else if((**it).type == SEC_END){
 			break;
+		} else {
+			delete circ;
+			return NULL; // TODO: do it better
 		}
-		//else ...  TODO: Error?
 	}
 	return circ;
 }

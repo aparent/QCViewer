@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-#include <iostream> //TODO: FOR TESTING
 #include "circuit.h"
 #include "utility.h"
 #include "TFCLexer.h"

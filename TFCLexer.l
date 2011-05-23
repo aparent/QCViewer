@@ -4,7 +4,6 @@
 %{
 	#include "TFCLexer.h"
 	vector<TFCToken> *tokens = new vector<TFCToken>;
-	int gate = 0;
 %}
 
 %x lineNames
@@ -41,8 +40,11 @@ using namespace std;
 
 vector<TFCToken> * lexCircuit(string fileName){
 	ifstream * file = new ifstream(fileName.c_str());
+	if (!file->good ()) return NULL;
 
 	yyFlexLexer* lexer = new yyFlexLexer(file);
+	if (!lexer) return NULL;
+	tokens->clear ();
 	while(lexer->yylex() != 0){
 		;
 	}
