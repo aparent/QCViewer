@@ -7,7 +7,7 @@ CONFIG +=   qt \
   debug
 FORMS       += viewer.ui
 SOURCES     += main.cpp \
-  viewer.cpp
+  viewer.cpp prompt.cpp
 HEADERS     += viewer.h
 unix:LIBS += `pkg-config --libs --static cairo`  -L../QCLib -lQC
 INCLUDEPATH +=   ../QCLib

@@ -2,12 +2,12 @@
 #include <cmath>
 #include <QtGui>
 #include <iostream>
-
-using namespace std;
+#include "prompt.h"
 
 QCViewer::QCViewer(QWidget *parent) : QMainWindow(parent), drawArch (false) {
   ui.setupUi(this);
 	connect(ui.fileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(ui.parseCommandLine, SIGNAL(triggered()), this, SLOT(parseCommandLine ()));
 	connect(ui.actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
 	connect(ui.actionDraw_warnings, SIGNAL(triggered()), this, SLOT(drawArchToggle()));
 	connect(ui.actionComplete, SIGNAL(triggered()), this, SLOT(archComplete()));
@@ -16,6 +16,15 @@ QCViewer::QCViewer(QWidget *parent) : QMainWindow(parent), drawArch (false) {
 	currentCirc = NULL;
 	currentCircImage = NULL;
 	ui.mainView->setScene(mainScene);
+}
+
+void QCViewer::parseCommandLine () {
+	QString cmd = ui.lineEdit->text ();
+	ui.lineEdit->clear ();
+	string out = "> ";
+	out.append (cmd.toStdString());
+	ui.plainTextEdit->appendPlainText (QString::fromStdString(out));
+	ui.plainTextEdit->appendPlainText (QString::fromStdString(prompt.parse (cmd.toStdString())));
 }
 
 void QCViewer::archComplete () {
@@ -40,8 +49,9 @@ void QCViewer::openFile(){
 	filename = QFileDialog::getOpenFileName(this,
 	 	tr("open circuit file"), "",
 		tr("circuit (*.tfc);;all files (*)"));
+	if (filename == "") return;
+	cout << filename.toStdString () << endl << flush;
 	free (currentCirc);
-
 	currentCirc = parseCircuit(filename.toStdString());
 	if (currentCirc == NULL) {
 		cout << "error: could not load file " << filename.toStdString() << endl;
@@ -53,7 +63,7 @@ void QCViewer::openFile(){
 void QCViewer::redraw () {
 	if (currentCircImage != NULL) {
 		mainScene->removeItem (currentCircImage);
-	  free (currentCircImage);
+	  delete currentCircImage;
 	}
 
 	mainScene->clear();
@@ -63,9 +73,7 @@ void QCViewer::redraw () {
 	ui.mainView->setScene (mainScene);
 	makepicture(currentCirc, drawArch, 1.0);
 
-	cout << "loading image... " << flush;
 	currentCircImage = new QGraphicsPixmapItem(QPixmap("./circuit.png"));
-	cout << "ding!\n" << flush;
 	if (currentCircImage == NULL) {
 		cout << "error: could not create image for file " << filename.toStdString() << endl;
 		return;

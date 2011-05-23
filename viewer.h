@@ -4,6 +4,7 @@
 
 #include "ui_viewer.h"
 #include <circuitParser.h>
+#include "prompt.h"
 
 class QCViewer : public QMainWindow
 {
@@ -16,12 +17,14 @@ Q_OBJECT
 		void quit ();
 		void redraw ();
 		void drawArchToggle ();
+		void parseCommandLine ();
 
 		void archComplete ();
 		void archLNN ();
 
 //  private:
   public:
+	  Prompt prompt;
 		Circuit 					  *currentCirc;
 		QGraphicsScene 			*mainScene;
 		QGraphicsPixmapItem *currentCircImage;
