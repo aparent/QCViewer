@@ -35,7 +35,7 @@ add_custom_command (
 	COMMAND flex ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.l
 )
 add_custom_command (
-	OUTPUT ${CMAKE_SOURCE_DIR}/diracParser.cpp
+	OUTPUT ${CMAKE_SOURCE_DIR}/diracParser.cpp ${CMAKE_SOURCE_DIR}/diracParser.h
 	COMMAND bison -d -o diracParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/diracParser.y
 )
 
