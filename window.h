@@ -23,6 +23,9 @@ protected:
   void on_menu_save_svg ();
   void on_menu_options_parallel ();
   void on_menu_options_arch ();
+  void on_menu_zoom_in ();
+  void on_menu_zoom_out ();
+  void on_menu_zoom_100 ();
   void unimplemented ();
 
 //  void on_architecture_load ();

@@ -19,6 +19,10 @@ public:
 
   void savepng (std::string);
   void savesvg (std::string);
+
+  void set_scale (double);
+  double get_scale ();
+  
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -31,6 +35,7 @@ private:
   cairo_rectangle_t ext;
   double wirestart, wireend;
   void force_redraw ();
+  double scale;
 };
 
 #endif
