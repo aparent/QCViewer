@@ -197,31 +197,21 @@ gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<i
 	return rect;
 }
 
-void drawbase (cairo_surface_t *surface, Circuit *c, float w, float h, float wirestart, float wireend, double scale) {
-  cairo_t *cr = cairo_create (surface);
-	cairo_scale (cr, scale, scale);
-	cairo_set_source_surface (cr, surface, 0, 0);
+void drawbase (cairo_t *cr, Circuit *c, float w, float h, double wirestart, double wireend) {
 	cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_rectangle (cr, 0, 0, w/scale, h/scale);
+	cairo_rectangle (cr, 0, 0, w, h);
 	cairo_fill (cr);
 
   for (int i = 0; i < c->numLines(); i++) {
 		float y = wireToY (i);
     drawWire (cr, wirestart, y, wireend, y, thickness);
 	}
-	cairo_destroy (cr);
 }
 
 
-vector<gateRect> draw (cairo_surface_t *surface, Circuit* c, double *wirestart, double *wireend, bool forreal, double scale) {
+vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wireend, bool forreal) {
 	vector <gateRect> rects;
 
-	cairo_t *cr = cairo_create (surface);
-	cairo_scale (cr, scale, scale);
-	cairo_set_source_surface (cr, surface, 0.0, 0.0);
-
-	cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(cr, scale*18);
 	cairo_set_source_rgb (cr, 0, 0, 0);
 
   // input labels
@@ -304,32 +294,23 @@ vector<gateRect> draw (cairo_surface_t *surface, Circuit* c, double *wirestart, 
 	  cairo_move_to (cr, x, y);
 		cairo_show_text (cr, label.c_str());
 	}
-  cairo_destroy (cr);
 
 	return rects;
 }
 
 
-void drawArchitectureWarnings (cairo_surface_t* surface, vector<gateRect> rects, vector<int> badGates, double scale) {
-	cairo_t *cr = cairo_create (surface);
-	cairo_scale (cr, scale, scale);
-	cairo_set_source_surface (cr, surface, 0.0, 0.0);
+void drawArchitectureWarnings (cairo_t* cr, vector<gateRect> rects, vector<int> badGates) {
   for (int i = 0; i < badGates.size(); i++) {
     drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
 	}
-	cairo_destroy (cr);
 }
 
-void drawParallelSectionMarkings (cairo_surface_t* surface, vector<gateRect> rects, int numLines, vector<int> pLines, double scale) {
-	cairo_t *cr = cairo_create (surface);
-	cairo_scale (cr, scale, scale);
-	cairo_set_source_surface (cr, surface, 0.0, 0.0);
+void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLines, vector<int> pLines) {
 	for (int i = 0; i < pLines.size() - 1; i++) {
 		int gateNum = pLines[i];
 		float x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
     drawPWire (cr, x, numLines,thickness);
 	}
-  cairo_destroy (cr);
 }
 
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
@@ -337,39 +318,36 @@ cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
   return img_surface;
 }
 
-cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend, double scale) {
+cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend) {
 	cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
-	draw (unbounded_rec_surface, c, wirestart, wireend, false, scale); // XXX fix up these inefficienies!!
+	cairo_t *cr = cairo_create(unbounded_rec_surface);
+	cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
+	cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(cr, 18);
+	draw (cr, c, wirestart, wireend, false); // XXX fix up these inefficienies!!
 	cairo_rectangle_t ext;
 	cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
-  cairo_surface_destroy (unbounded_rec_surface);
+  cairo_destroy (cr);
+	cairo_surface_destroy (unbounded_rec_surface);
 	return ext;
 }
 
 void write_to_png (cairo_surface_t* surf, string filename) {
-	cout << "writing... ";
 	cairo_status_t status = cairo_surface_write_to_png (surf, filename.c_str());
   if (status != CAIRO_STATUS_SUCCESS) {
     cout << "Error saving to png." << endl;
 		return;
 	}
-	cout << "success." << endl;
 }
 
-cairo_surface_t* makepicture (Circuit *c, bool drawArch, double scale) {
+cairo_surface_t* draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale) {
+	cairo_scale (cr, scale, scale);
+	cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(cr, scale*18);
+
 	vector<gateRect> rects;
-	double wirestart, wireend;
-  cairo_rectangle_t ext = get_circuit_size (c, &wirestart, &wireend, scale);
-	cairo_surface_t* surf = make_png_surface (ext);
-	if (surf == NULL) return NULL;
-	drawbase (surf, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart+xoffset, wireend, scale);
-	rects = draw (surf, c, &wirestart, &wireend, true, scale);
-  drawParallelSectionMarkings (surf, rects, c->numLines(),c->getParallel(), scale);
-  if (drawArch) drawArchitectureWarnings (surf, rects, c->getArchWarnings(), scale);
-
-  write_to_png (surf, "circuit.png");
-	cairo_surface_destroy (surf);
-
-	//////////////////(XXX)= c->getParallel();
-
+	drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart+xoffset, wireend);
+	rects = draw (cr, c, &wirestart, &wireend, true);
+  if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
+  if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
 }

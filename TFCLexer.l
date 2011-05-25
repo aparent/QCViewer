@@ -1,6 +1,9 @@
 %option outfile="TFCLexer.cpp"
 %option c++
 %option noyywrap
+%option noyyalloc
+%option noyyrealloc
+%option noyyfree
 %{
 	#include "TFCLexer.h"
 	vector<TFCToken> *tokens = new vector<TFCToken>;

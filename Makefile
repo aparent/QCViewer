@@ -6,7 +6,7 @@ LDFLAGS = `pkg-config --libs cairo`
 HEADERS := dirac/parseNode.h
 OBJDIR := obj
 OBJS := $(addprefix $(OBJDIR)/,circuitParser.o gate.o circuit.o utility.o draw.o TFCLexer.o dirac.o diracParser.o diracLexer.o)
-LIBOFILES	:= $(addprefix $(OBJDIR)/,circuitParser.o gate.o circuit.o utility.o draw.o TFCLexer.o dirac.o)
+LIBOFILES	:= $(addprefix $(OBJDIR)/,circuitParser.o gate.o circuit.o utility.o draw.o TFCLexer.o dirac.o diracParser.o diracLexer.o)
 
 all	:$ $(OBJDIR) libQC.a
 libQC.a:	$(LIBOFILES)
