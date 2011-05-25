@@ -78,8 +78,8 @@ input:			 /*empty*/
 
 %%
 
-extern int yy_scan_string(const char*);
-extern void yy_delete_buffer(void);
+int yy_scan_string(const char*);
+void yy_delete_buffer(void);
 
 parseNode *parseDirac(string input){
 	//extern FILE * yyin;

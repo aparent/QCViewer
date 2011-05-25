@@ -473,7 +473,7 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
-#line 6 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 7 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 	#include "parseNode.h"
 	#include <string>
   #include <iostream>
@@ -541,8 +541,6 @@ extern int yywrap (void );
 #endif
 #endif
 
-    static void yyunput (int c,char *buf_ptr  );
-    
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -669,9 +667,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 16 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 17 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 
-#line 675 "diracLexer.cpp"
+#line 673 "diracLexer.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -752,7 +750,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 17 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 18 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 { 
 											parseNode * val = new parseNode;
 											val->value = "SQRT"; val->left = NULL; val->right=NULL;
@@ -763,7 +761,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 25 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 { 
 											parseNode * val = new parseNode;
 											val->value = "1"; val->left = NULL; val->right=NULL;
@@ -774,7 +772,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 31 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 32 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 {
 											parseNode * val = new parseNode;
 											val->value = string(yytext); val->left = NULL; val->right=NULL;
@@ -785,12 +783,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 38 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 39 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 {BEGIN(ket);}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 39 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 40 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 {
 											parseNode * val = new parseNode;
 											val->value = string(yytext); val->left = NULL; val->right=NULL;
@@ -801,26 +799,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 46 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 47 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 47 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 48 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 /* eat whitespace */
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 48 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 49 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 {return(yytext[0]);}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 51 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 52 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 ECHO;
 	YY_BREAK
-#line 824 "diracLexer.cpp"
+#line 822 "diracLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ket):
 	yyterminate();
@@ -1149,43 +1147,6 @@ static int yy_get_next_buffer (void)
 	yy_is_jam = (yy_current_state == 22);
 
 	return yy_is_jam ? 0 : yy_current_state;
-}
-
-    static void yyunput (int c, register char * yy_bp )
-{
-	register char *yy_cp;
-    
-    yy_cp = (yy_c_buf_p);
-
-	/* undo effects of setting up yytext */
-	*yy_cp = (yy_hold_char);
-
-	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-		{ /* need to shift things up to make room */
-		/* +2 for EOB chars. */
-		register int number_to_move = (yy_n_chars) + 2;
-		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
-					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-		register char *source =
-				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
-
-		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
-			*--dest = *--source;
-
-		yy_cp += (int) (dest - source);
-		yy_bp += (int) (dest - source);
-		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
-
-		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-			YY_FATAL_ERROR( "flex scanner push-back overflow" );
-		}
-
-	*--yy_cp = (char) c;
-
-	(yytext_ptr) = yy_bp;
-	(yy_hold_char) = *yy_cp;
-	(yy_c_buf_p) = yy_cp;
 }
 
 #ifndef YY_NO_INPUT
@@ -1816,7 +1777,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 51 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
+#line 52 "/home/aparent/IQC/Code/QCLib/diracLexer.l"
 
 
 
