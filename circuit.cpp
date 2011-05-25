@@ -2,6 +2,7 @@
 #include "utility.h"
 #include <map>
 #include <algorithm> // for sort, which we should probably cut out
+#include <fstream>
 
 Circuit::Circuit() : arch(0) {}
 
@@ -162,4 +163,24 @@ vector<int> Circuit::getArchWarnings () {
 		if (badgate) warnings.push_back(g);
   }
 	return warnings;
+}
+
+// TODO: check for errors
+void Circuit::parseArch (const string filename) {
+  ifstream file;
+  file.open (filename.c_str(), ios::in);
+  if (!file.is_open()) return;
+  unsigned int n;
+  file >> n;
+  arch = new QArch(n);
+  for (unsigned int i = 0; i < n; i++) {
+    int m;
+    file >> m;
+    for (int j = 0; j < m; j++) {
+      int q;
+      file >> q;
+      arch->set (i, q);
+    }
+  }
+  file.close ();
 }
