@@ -24,30 +24,28 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
 
 //    double scale = min (width/ext.width, height/ext.height);
     double scale = width/ext.width;
-		cout << "Scale: " << scale << endl;
     Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
     cr->rectangle(event->area.x, event->area.y,
-            event->area.width, event->area.height);
+                  event->area.width, event->area.height);
     cr->clip();
-		if (circuit != NULL) draw_circuit (circuit, cr->cobj(), true, true,  ext, wirestart, wireend, scale);
+    if (circuit != NULL) draw_circuit (circuit, cr->cobj(), true, true,  ext, wirestart, wireend, scale);
   }
   return true;
 }
 
 void CircuitWidget::load (string file) {
-	cout << "Opening " << file << endl;
-	if (circuit != NULL) delete circuit;
+  if (circuit != NULL) delete circuit;
   circuit = parseCircuit(file);
   if (circuit == NULL) {
     cout << "Error loading circuit" << endl;
-		return;
-	}
-	ext = get_circuit_size (circuit, &wirestart, &wireend);
+    return;
+  }
+  ext = get_circuit_size (circuit, &wirestart, &wireend);
   win->resize (ext.width, yoffset+ext.height);
 
-	cairo_surface_t* surface = make_png_surface (ext);
-	cairo_t* cr = cairo_create (surface);
+  cairo_surface_t* surface = make_png_surface (ext);
+  cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-	draw_circuit (circuit, cr, true, true,  ext, wirestart, wireend, 1.0);
-	write_to_png (surface, "image.png");
+  draw_circuit (circuit, cr, true, true,  ext, wirestart, wireend, 1.0);
+  write_to_png (surface, "image.png");
 }
