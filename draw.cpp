@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+#define M_PI 3.141592
+
 using namespace std;
 
 // XXX organize this!!

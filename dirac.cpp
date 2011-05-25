@@ -1,7 +1,7 @@
 #include "dirac.h"
 #include <cmath>
 #include <string.h>
-#include <armadillo>
+#include "armadillo/include/armadillo"
 #include "diracParser.h"
 #include "parseNode.h"
 #include <iostream>//for error messages
@@ -180,8 +180,12 @@ diracTerm evalTree(parseNode *node){
 			return ret;
 		}
 		else{
-			cout << "ERROR cannot divide a vector";
+			cout << "ERROR cannot divide a vector"<< endl;
 			return ret;
 		}
+	}
+	else{
+			cout << "ERROR unrecognized type: "<< node->type << endl;
+			return ret;
 	}
 }

@@ -4,6 +4,8 @@
 %option noyyalloc
 %option noyyrealloc
 %option noyyfree
+%option never-interactive
+%option unistd
 %{
 	#include "TFCLexer.h"
 	vector<TFCToken> *tokens = new vector<TFCToken>;

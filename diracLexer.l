@@ -1,4 +1,6 @@
 %option noyywrap
+%option never-interactive
+%option unistd
 %option outfile="diracLexer.cpp"
 %{
 	#include "parseNode.h"
