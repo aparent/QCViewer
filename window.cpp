@@ -9,34 +9,34 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
   add(m_vbox);
 
   m_refActionGroup = Gtk::ActionGroup::create();
-  m_refActionGroup->add(Gtk::Action::create("FileMenu", "File"));
-  m_refActionGroup->add(Gtk::Action::create("FileNew", Gtk::Stock::NEW));
-  m_refActionGroup->add(Gtk::Action::create("FileOpen", Gtk::Stock::OPEN));
-  m_refActionGroup->add(Gtk::Action::create("FileSave", Gtk::Stock::SAVE));
+  m_refActionGroup->add(Gtk::Action::create("File", "File"));
+  m_refActionGroup->add(Gtk::Action::create("Circuit", "Circuit"));
+  m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
+  m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
 
-  m_refActionGroup->add(Gtk::Action::create("FileNewCircuit", "_Circuit", "Create new circuit"),
+  m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
-  m_refActionGroup->add(Gtk::Action::create("FileNewArch", "_Architecture", "Create new architecture"),
+  m_refActionGroup->add(Gtk::Action::create("ArchNew", Gtk::Stock::NEW, "New", "Create new architecture"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
 
-  m_refActionGroup->add(Gtk::Action::create("FileOpenCircuit", "_Circuit", "Open a circuit file"),
+  m_refActionGroup->add(Gtk::Action::create("CircuitOpen", Gtk::Stock::OPEN, "Open", "Open a circuit file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_open_circuit));
-  m_refActionGroup->add(Gtk::Action::create("FileOpenArch", "_Architecture", "Open an architecture file"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create("ArchOpen", Gtk::Stock::OPEN, "Open", "Open an architecture file"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
 
-  m_refActionGroup->add(Gtk::Action::create("FileSaveImage", "_Diagram", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Diagram", 
                                             "Save the circuit diagram to an image file"));
-  m_refActionGroup->add(Gtk::Action::create("FileSaveCircuit", "_Circuit", "Save circuit"),
+  m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
-  m_refActionGroup->add(Gtk::Action::create("FileSaveArchitecture", "_Architecture", "Save architecture"),
+  m_refActionGroup->add(Gtk::Action::create("ArchSave", Gtk::Stock::SAVE, "Save", "Save architecture"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
-  m_refActionGroup->add(Gtk::Action::create("FileSaveImagePng", "P_NG", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSavePng", "P_NG", 
                                             "Save circuit diagram as a Portable Network Graphics file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_save_png));
-  m_refActionGroup->add(Gtk::Action::create("FileSaveImageSvg", "S_VG", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSaveSvg", "S_VG", 
                                             "Save circuit diagram as a Scalable Vector Graphics file"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
-  m_refActionGroup->add(Gtk::Action::create("FileSaveImagePs", "_Postscript", "Save circuit diagram as a Postscript file"),
+  m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
 
 
@@ -45,11 +45,21 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
 
   m_refActionGroup->add(Gtk::Action::create("EditMenu", "Edit"));
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
-  m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
-  m_refActionGroup->add(Gtk::Action::create("OptionsMenu", "Options"));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("OptionsParallel", "Parallel section guides"),
+  m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", "Load state"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateRun", Gtk::Stock::GOTO_LAST, "Run", "Simulate the entire circuit"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateStep", Gtk::Stock::GO_FORWARD, "Step", "Advance the simulation through a single gate"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("OptionsArch", "Architecture warnings"),
+
+  m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramParallel", "Show parallel guides"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
 
   m_refUIManager = Gtk::UIManager::create();
@@ -61,39 +71,50 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
   Glib::ustring ui_info =
         "<ui>"
         "  <menubar name='MenuBar'>"
-        "    <menu action='FileMenu'>"
-        "      <menu action='FileNew'>"
-        "        <menuitem action='FileNewCircuit'/>"
-        "        <menuitem action='FileNewArch'/>"
+        "    <menu action='File'>"
+        "        <menuitem action='FileQuit'/>"
+        "    </menu>"
+        "    <menu action='Circuit'>"
+        "        <menuitem action='CircuitNew'/>"
+        "        <menuitem action='CircuitOpen'/>"
+        "        <menuitem action='CircuitSave'/>"
+        "    </menu>"
+        "    <menu action='Arch'>"
+        "      <menuitem action='ArchNew'/>"
+        "      <menuitem action='ArchOpen'/>"
+        "      <menuitem action='ArchSave'/>"
+        "    </menu>"
+        "    <menu action='Diagram'>"
+        "      <menu action='DiagramSave'>"
+        "        <menuitem action='DiagramSavePng'/>"
+        "        <menuitem action='DiagramSaveSvg'/>"
+        "        <menuitem action='DiagramSavePs'/>"
+        "        <separator/>"
         "      </menu>"
-        "      <menu action='FileOpen'>"
-        "        <menuitem action='FileOpenCircuit'/>"
-        "        <menuitem action='FileOpenArch'/>"
-        "      </menu>"
-        "      <menu action='FileSave'>"
-        "        <menu action='FileSaveImage'>"
-        "          <menuitem action='FileSaveImagePng'/>"
-        "          <menuitem action='FileSaveImageSvg'/>"
-        "          <menuitem action='FileSaveImagePs'/>"
-        "        </menu>"
-        "        <menuitem action='FileSaveCircuit'/>"
-        "        <menuitem action='FileSaveArchitecture'/>"
-        "      </menu>"
-        "      <separator/>"
-        "      <menuitem action='FileQuit'/>"
+        "      <menuitem action='DiagramParallel'/>"
+        "      <menuitem action='DiagramArch'/>" 
         "    </menu>"
         "    <menu action='EditMenu'>"
         "    </menu>"
         "    <menu action='SimulateMenu'>"
-        "    </menu>"
-        "    <menu action='OptionsMenu'>"
-        "      <menuitem action='OptionsParallel'/>"
-        "      <menuitem action='OptionsArch'/>"
+        "      <menuitem action='SimulateLoad'/>"
+        "      <menuitem action='SimulateRun'/>"
+        "      <menuitem action='SimulateStep'/>"
+        "      <menuitem action='SimulateReset'/>"
+        "      <separator/>"
+        "      <menuitem action='SimulateDisplay'/>"
         "    </menu>"
         "  </menubar>"
-      //  "  <toolbar  name='ToolBar'>"
-      //  "    <toolitem action='FileOpenCircuit'/>"
-      //  "  </toolbar>"
+        "  <toolbar  name='ToolBar'>"
+        "    <toolitem action='CircuitOpen'/>"
+        "    <separator/>"
+        "    <toolitem action='SimulateLoad'/>"
+        "    <toolitem action='SimulateRun'/>"
+        "    <toolitem action='SimulateStep'/>"
+        "    <toolitem action='SimulateReset'/>"
+        "    <separator/>"
+        "    <toolitem action='DiagramArch'/>"
+        "  </toolbar>"
         "</ui>";
 
   try
@@ -107,6 +128,11 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
   Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
   if(pMenubar)
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
+
+  Gtk::Widget* pToolbar = m_refUIManager->get_widget("/ToolBar") ;
+  if(pToolbar)
+    m_vbox.pack_start(*pToolbar, Gtk::PACK_SHRINK);
+
   c.set_window (this);
   c.show();
   m_vbox.pack_start(c);
@@ -146,9 +172,21 @@ void QCViewer::on_menu_file_open_circuit () {
   int result = dialog.run();
   if (result == Gtk::RESPONSE_OK) {
     c.load (dialog.get_filename ());
+    c.set_drawparallel (drawparallel);
+    c.set_drawarch (drawarch);
   }
-  c.set_drawparallel (drawparallel);
-  c.set_drawarch (drawarch);
+}
+
+void QCViewer::on_menu_file_open_arch () {
+  Gtk::FileChooserDialog dialog ("Please choose an architecture file",
+                                 Gtk::FILE_CHOOSER_ACTION_OPEN);
+  dialog.set_transient_for (*this);
+  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+  int result = dialog.run ();
+  if (result == Gtk::RESPONSE_OK) {
+    c.loadArch (dialog.get_filename ());
+  }
 }
 
 void QCViewer::on_menu_file_quit () {

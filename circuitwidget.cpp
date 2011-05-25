@@ -51,6 +51,10 @@ void CircuitWidget::load (string file) {
  // write_to_png (surface, "image.png");
 }
 
+void CircuitWidget::loadArch (string file) {
+  if (circuit) circuit->parseArch (file);
+}
+
 void CircuitWidget::force_redraw () {
   Glib::RefPtr<Gdk::Window> win = get_window();
   if (win) {
