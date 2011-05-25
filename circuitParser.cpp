@@ -57,7 +57,6 @@ void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator * it){
 }
 
 void parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it){
-  bool target = true;
   while((*(++(*it))).type == VAR_VALUE){
     for(int j = 0; j < circ->numLines(); j++){
       if (removeQuotes(((**it).value)).compare(circ->getLine(j)->lineName)==0){

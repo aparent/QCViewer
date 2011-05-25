@@ -6,7 +6,6 @@ ADD_DEFINITIONS( "-W -Wall -ansi -pedantic" )
 SET(QCLIB_SRC_FILES
 	circuit.cpp
 	diracLexer.cpp
-	draw.cpp
 	TFCLexer.cpp
 	utility.cpp
 	circuitParser.cpp

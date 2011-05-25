@@ -83,11 +83,10 @@ void Circuit::addLine(string lineName){
 vector<int> Circuit::getParallel(){
 	vector<int>	returnValue;
 	map<int,int> linesUsed;
-	int test;
 	for(int i = 0; i<numGates(); i++){
 		Gate *g = getGate(i);
 		start:
-		for(int j = 0; j < g->controls.size(); j++){
+		for(unsigned int j = 0; j < g->controls.size(); j++){
 			if (linesUsed.find(g->controls[j].wire) != linesUsed.end()){
 				returnValue.push_back(i - 1); //Push back the gate number before this one
 				linesUsed.clear();
@@ -95,7 +94,7 @@ vector<int> Circuit::getParallel(){
 			}
 			linesUsed[g->controls[j].wire];
 		}
-		for(int j = 0; j < g->targets.size(); j++) {
+		for(unsigned int j = 0; j < g->targets.size(); j++) {
 			if (linesUsed.find(g->targets[j]) != linesUsed.end()) {
 				returnValue.push_back(i - 1);
 				linesUsed.clear();
@@ -116,7 +115,6 @@ vector<int> Circuit::getGreedyParallel(){
 	sort (parallel.begin (), parallel.end ());
 	vector<int>	returnValue;
 	map<int,int> linesUsed;
-	int test;
 	int maxw, minw;
 	int k = 0;
 	for(int i = 0; i < numGates(); i++){
@@ -137,7 +135,7 @@ vector<int> Circuit::getGreedyParallel(){
 			linesUsed.clear ();
 		}
 	}
-	for (; k < parallel.size(); k++) {
+	for (; k < (int)parallel.size(); k++) {
 		returnValue.push_back (k);
 	}
 	sort (returnValue.begin (), returnValue.end ()); // TODO: needed?
@@ -149,18 +147,19 @@ vector<int> Circuit::getArchWarnings () {
   vector<int> warnings;
 	vector<int> wires;
   if (arch == 0) return warnings; // Assume "no" architecture by default.
-  for (int g = 0; g < gates.size(); g++) {
+  for (unsigned int g = 0; g < gates.size(); g++) {
 		wires = getGate(g)->targets;
 		Gate* gg = getGate (g);
-		for (int i = 0; i < gg->controls.size(); i++) {
+		for (unsigned int i = 0; i < gg->controls.size(); i++) {
       wires.push_back (gg->controls[i].wire);
 		}
 		bool badgate = false;
-		for (int i = 0; i < wires.size () && !badgate; i++) {
-      for (int j = i + 1; j < wires.size () && !badgate; j++) {
+		for (unsigned int i = 0; i < wires.size () && !badgate; i++) {
+      for (unsigned int j = i + 1; j < wires.size () && !badgate; j++) {
 				if (!arch->query (wires[i],wires[j])) badgate = true;
 			}
 		}
 		if (badgate) warnings.push_back(g);
   }
+	return warnings;
 }
