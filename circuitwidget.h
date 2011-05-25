@@ -9,6 +9,7 @@ public:
   CircuitWidget ();
   virtual ~CircuitWidget ();
   void load (string);
+  void loadArch (string);
 
   void set_window (Gtk::Window *);
   void set_offset (int);

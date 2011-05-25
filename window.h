@@ -16,6 +16,7 @@ protected:
   // Our new improved on_button_clicked(). (see below)
   void on_button_clicked(Glib::ustring data);
   void on_menu_file_open_circuit ();
+  void on_menu_file_open_arch ();
 //  void on_menu_file_save ();
   void on_menu_file_quit ();
   void on_menu_save_png ();
