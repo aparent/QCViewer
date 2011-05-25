@@ -1,12 +1,15 @@
-#include <QApplication>
-#include <circuitParser.h>
-#include "viewer.h"
+#include "circuit.h"
+#include "window.h"
+#include <gtkmm/main.h>
+#include <gtkmm/window.h>
 
-int main(int argc,char *argv[])
-{
-  QApplication app(argc, argv);
-  QCViewer mainWindow;
+int main (int argc, char *argv[]) {
+	Gtk::Main kit(argc, argv);
 
-  mainWindow.show();
-  return app.exec();
+  QCViewer window;
+  window.set_default_size (400,300);
+	Gtk::Main::run(window);
+
+
+	return EXIT_SUCCESS;
 }
