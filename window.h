@@ -20,6 +20,7 @@ protected:
 //  void on_menu_file_save ();
   void on_menu_file_quit ();
   void on_menu_save_png ();
+  void on_menu_save_svg ();
   void on_menu_options_parallel ();
   void on_menu_options_arch ();
   void unimplemented ();

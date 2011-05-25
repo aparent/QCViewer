@@ -1,5 +1,6 @@
 #include "circuit.h"
 #include <cairo.h>
+#include <cairo-svg.h> 
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -318,6 +319,11 @@ void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLi
 
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
   cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
+  return img_surface;
+}
+
+cairo_surface_t* make_svg_surface (string file, cairo_rectangle_t ext) {
+  cairo_surface_t *img_surface = cairo_svg_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y); // these measurements should be in points, w/e.
   return img_surface;
 }
 
