@@ -1,4 +1,5 @@
 %option noyywrap
+%option nounput
 %option never-interactive
 %option unistd
 %option outfile="diracLexer.cpp"

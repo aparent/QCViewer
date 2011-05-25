@@ -6,7 +6,6 @@ ADD_DEFINITIONS( "-W -Wall -ansi -pedantic" )
 SET(QCLIB_SRC_FILES
 	circuit.cpp
 	diracLexer.cpp
-	draw.cpp
 	TFCLexer.cpp
 	utility.cpp
 	circuitParser.cpp
@@ -51,11 +50,11 @@ LINK_DIRECTORIES(${CAIRO_LIBRARY_DIRS} )
 SOURCE_GROUP("Header Files" FILES ${QCLIB_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${QCLIB_SRC_FILES})
 
-ADD_LIBRARY(QCLib STATIC ${QCLIB_HEADER_FILES} ${QCLIB_SRC_FILES})
-target_link_libraries(QCLib cairo)
-install (TARGETS QCLib  DESTINATION lib)
+ADD_LIBRARY(QC STATIC ${QCLIB_HEADER_FILES} ${QCLIB_SRC_FILES})
+target_link_libraries(QC cairo)
+install (TARGETS QC  DESTINATION lib)
 
 add_executable (diracTest  diracTest.cpp )
-target_link_libraries(diracTest QCLib )
+target_link_libraries(diracTest QC )
 #add_executable (testParser testParser.cpp)
 #target_link_libraries(testParser QCLib)

@@ -9,7 +9,7 @@ int Gate::numCont(){
 
 int Gate::numNegCont(){
   int count = 0;
-  for(int i=0; i<controls.size(); i++){
+  for(unsigned int i=0; i<controls.size(); i++){
     if (controls.at(i).polarity) count++; //increment if true (negative control)
   }
   return count;
@@ -125,6 +125,7 @@ int NOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
 
 //HGate -----------------------------------------------------
 int HGate::QCost(int numLines){ //TODO: Check for Pres Gates
+  (void)numLines; // placate the compiler for now
 	return 0;
 }
 

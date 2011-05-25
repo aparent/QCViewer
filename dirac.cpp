@@ -27,7 +27,7 @@ stateVec getStateVec (std::string input){
 	cx_mat ket = term.vecValue;
 	result.dim = ket.n_rows;
 	result.data = new complex<float>[ket.n_rows];
-	for(int i=0;i<ket.n_rows;i++){
+	for(unsigned int i=0;i<ket.n_rows;i++){
 		result.data[i] = ket(i,0);
 	}
 	return result;
@@ -49,7 +49,7 @@ diracTerm stringToKet(string value){
 	if      (value[0] == '0') ret.vecValue = zero;
 	else if (value[0] == '1') ret.vecValue = one;
 	else    cout << "ERROR BAD CHAR IN KET: " << value[0] << endl;
-	for(int i = 1;i<value.size();i++){
+	for(unsigned int i = 1;i<value.size();i++){
 		if      (value[i] == '0') ret.vecValue = kron(ret.vecValue,zero);
 		else if (value[i] == '1') ret.vecValue = kron(ret.vecValue,one);
 		else    cout << "ERROR BAD CHAR IN KET: " << value[i] << endl;

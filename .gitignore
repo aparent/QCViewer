@@ -1,4 +1,6 @@
 *.o
+CMakeCache.txt
+CMakeFiles/*
 a.out
 .*swp
 .nfs*
@@ -6,3 +8,6 @@ a.out
 testCircuits/huge.tfc
 testParser
 libQC.a
+cmake_install.cmake
+diracTest
+Makefile
