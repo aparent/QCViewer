@@ -215,7 +215,6 @@ void drawbase (cairo_t *cr, Circuit *c, float w, float h, double wirestart, doub
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wireend, bool forreal) {
 	vector <gateRect> rects;
-
 	cairo_set_source_rgb (cr, 0, 0, 0);
 
   // input labels
@@ -322,10 +321,11 @@ cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
   return img_surface;
 }
 
-cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend) {
+cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend, double scale) {
 	cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
 	cairo_t *cr = cairo_create(unbounded_rec_surface);
 	cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
+	cairo_scale (cr, scale, scale);
 	cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
 	draw (cr, c, wirestart, wireend, false); // XXX fix up these inefficienies!!

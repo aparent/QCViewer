@@ -24,6 +24,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
 
 //    double scale = min (width/ext.width, height/ext.height);
     double scale = width/ext.width;
+		scale = 2.0;
 		cout << "Scale: " << scale << endl;
     Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
     cr->rectangle(event->area.x, event->area.y,
@@ -42,7 +43,7 @@ void CircuitWidget::load (string file) {
     cout << "Error loading circuit" << endl;
 		return;
 	}
-	ext = get_circuit_size (circuit, &wirestart, &wireend);
+	ext = get_circuit_size (circuit, &wirestart, &wireend,2.0);
   win->resize (ext.width, yoffset+ext.height);
 
 	cairo_surface_t* surface = make_png_surface (ext);
