@@ -81,10 +81,11 @@
 	void yyerror(const char *s);
 	int yylex();
   parseNode *final;
+	int yy_scan_string(const char*);
 
 
 /* Line 189 of yacc.c  */
-#line 88 "diracParser.cpp"
+#line 89 "diracParser.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -138,7 +139,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 142 "diracParser.cpp"
+#line 143 "diracParser.cpp"
 
 #ifdef short
 # undef short
@@ -426,8 +427,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    27,    27,    28,    30,    31,    32,    38,    44,    50,
-      57,    58,    64,    68,    69,    70,    73,    74,    75,    76
+       0,    28,    28,    29,    31,    32,    33,    39,    45,    51,
+      58,    59,    65,    69,    70,    71,    74,    75,    76,    77
 };
 #endif
 
@@ -1175,12 +1176,12 @@ yyparse ()
 /* User initialization code.  */
 
 /* Line 1242 of yacc.c  */
-#line 23 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 24 "/home/aparent/IQC/Code/QCLib/diracParser.y"
 {
 }
 
 /* Line 1242 of yacc.c  */
-#line 1184 "diracParser.cpp"
+#line 1185 "diracParser.cpp"
 
   goto yysetstate;
 
@@ -1361,28 +1362,28 @@ yyreduce:
         case 3:
 
 /* Line 1455 of yacc.c  */
-#line 28 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 29 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { final = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 30 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 31 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { (yyval) = (yyvsp[(1) - (1)]);    ;}
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 31 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 32 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { cout << "E3" <<endl; ;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 32 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 33 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     {
 																					parseNode * val = new parseNode;
 																					val->value = "+"; val->left = (yyvsp[(1) - (3)]); val->right=(yyvsp[(3) - (3)]);
@@ -1394,7 +1395,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 38 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 39 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     {
 																					parseNode * val = new parseNode;
 																					val->value = "-"; val->left = (yyvsp[(1) - (3)]); val->right=(yyvsp[(3) - (3)]);
@@ -1406,7 +1407,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 44 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 45 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     {
 																					parseNode * val = new parseNode;
 																					val->value = "*"; val->left = (yyvsp[(1) - (3)]); val->right=(yyvsp[(3) - (3)]);
@@ -1418,7 +1419,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 50 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 51 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     {
 																					parseNode * val = new parseNode;
 																					val->value = "/"; val->left = (yyvsp[(1) - (3)]); val->right=(yyvsp[(3) - (3)]);
@@ -1430,7 +1431,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 58 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 59 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     {
 																					parseNode * val = new parseNode;
 																					val->value = "*"; val->left = (yyvsp[(1) - (2)]); val->right=(yyvsp[(2) - (2)]);
@@ -1442,7 +1443,7 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 64 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 65 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     {
 							 														(yyvsp[(1) - (4)])->right = (yyvsp[(3) - (4)]);
 																					(yyval) = (yyvsp[(1) - (4)]);
@@ -1452,56 +1453,56 @@ yyreduce:
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 68 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 69 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { (yyval) = (yyvsp[(2) - (3)]); ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 69 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 70 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { cout << "E0" <<endl; ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 70 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 71 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { cout << "E1" <<endl; ;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 73 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 74 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { (yyval) = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 74 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 75 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { (yyval) = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 75 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 76 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { (yyval) = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 76 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 77 "/home/aparent/IQC/Code/QCLib/diracParser.y"
     { cout << "E2" <<endl; ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1505 "diracParser.cpp"
+#line 1506 "diracParser.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1713,11 +1714,9 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 79 "/home/aparent/IQC/Code/QCLib/diracParser.y"
+#line 80 "/home/aparent/IQC/Code/QCLib/diracParser.y"
 
 
-int yy_scan_string(const char*);
-void yy_delete_buffer(void);
 
 parseNode *parseDirac(string input){
 	//extern FILE * yyin;

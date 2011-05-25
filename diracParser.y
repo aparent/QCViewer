@@ -9,6 +9,7 @@
 	string printTree(parseNode *node);
 	void yyerror(const char *s);
 	int yylex();
+	int yy_scan_string(const char*);
   parseNode *final;
 %}
 %error-verbose
@@ -78,8 +79,6 @@ input:			 /*empty*/
 
 %%
 
-int yy_scan_string(const char*);
-void yy_delete_buffer(void);
 
 parseNode *parseDirac(string input){
 	//extern FILE * yyin;
