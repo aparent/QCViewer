@@ -73,17 +73,20 @@ input:			 /*empty*/
 		 term: 		KET												{ $$ = $1; }
 		 				 |NUM                       { $$ = $1; }
 		 				 |CNUM                      { $$ = $1; }
-		 				 |error 										{ cout << "E2" <<endl; }					 
+		 				 |error 										{ cout << "E2" <<endl; }
 		 ;
 
 %%
 
+extern int yy_scan_string(const char*);
+extern void yy_delete_buffer(void);
 
 parseNode *parseDirac(string input){
-	extern FILE * yyin;
+	//extern FILE * yyin;
   char *in = (char*)malloc(input.length() + 1);
   strcpy(in,input.c_str());
-  yyin = fmemopen (in, strlen (in), "r");
+  //yyin = fmemopen (in, strlen (in), "r");
+	yy_scan_string(in);
 	yyparse ();
   return final;
 }

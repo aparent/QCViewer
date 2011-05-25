@@ -342,7 +342,7 @@ void write_to_png (cairo_surface_t* surf, string filename) {
 	}
 }
 
-cairo_surface_t* draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale) {
+void draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale) {
 	cairo_scale (cr, scale, scale);
 	cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, scale*18);
