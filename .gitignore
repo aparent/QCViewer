@@ -1,4 +1,6 @@
 *.o
+CMakeCache.txt
+CMakeFiles/*
 a.out
 .*swp
 .nfs*
@@ -9,3 +11,7 @@ testParser
 libQC.a
 diracParser.cpp
 diracParser.h
+cmake_install.cmake
+diracTest
+diracLexer.cpp
+Makefile
