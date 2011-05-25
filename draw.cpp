@@ -30,7 +30,7 @@ public:
 class Colour {
   public:
     Colour () {}
-    Colour (float rr, float gg, float bb, float aa) : r(rr), b(bb), g(gg), a(aa) {}
+    Colour (float rr, float gg, float bb, float aa) : r(rr), g(gg), b(bb), a(aa) {}
     float r, g, b, a;
 };
 
@@ -59,12 +59,12 @@ void drawPWire (cairo_t *cr, float x, int numLines, float thickness) {
 void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax) {
   int minw = (*targ)[0];
   int maxw = (*targ)[0];
-  for (int i = 1; i < targ->size (); i++) {
+  for (unsigned int i = 1; i < targ->size (); i++) {
     minw = min (minw, (*targ)[i]);
     maxw = max (maxw, (*targ)[i]);
   }
 
-  for (int i = 0; i < ctrl->size (); i++) {
+  for (unsigned int i = 0; i < ctrl->size (); i++) {
     minw = min (minw, (*ctrl)[i].wire);
     maxw = max (maxw, (*ctrl)[i].wire);
   }
@@ -110,7 +110,7 @@ void drawDot (cairo_t *cr, float xc, float yc, float radius, float thickness, bo
 gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
   int minw, maxw;
   minmaxWire (ctrl, targ, &minw, &maxw);
-  for (int i = 0; i < ctrl->size(); i++) {
+  for (unsigned int i = 0; i < ctrl->size(); i++) {
     drawDot (cr, xc, wireToY((*ctrl)[i].wire), dotradius, thickness, (*ctrl)[i].polarity);
   }
   if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw), thickness);
@@ -194,7 +194,7 @@ gateRect drawNOT (cairo_t *cr, float xc, float yc, float radius, float thickness
 
 gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
-  for (int i = 0; i < targ->size(); i++) {
+  for (unsigned int i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawNOT (cr, xc, wireToY((*targ)[i]), radius, thickness);
     rect = combine_gateRect(rect, recttmp);
   }
@@ -240,12 +240,12 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
   // gates
   float xcurr = xinit+2.0*gatePad;
   int mingw, maxgw;
-  int minw = -1;
+// TODO ?? int minw = -1;
   vector <int> parallels = c->getGreedyParallel ();
 
   // Draw them in parallel using the greedy strategy.
   int i = 0;
-  for (int j = 0; j < parallels.size(); j++) {
+  for (unsigned int j = 0; j < parallels.size(); j++) {
     float maxwidth = 0;
     for (; i <= parallels[j]; i++) {
       Gate* g = c->getGate (i);
@@ -303,13 +303,13 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
 
 
 void drawArchitectureWarnings (cairo_t* cr, vector<gateRect> rects, vector<int> badGates) {
-  for (int i = 0; i < badGates.size(); i++) {
+  for (unsigned int i = 0; i < badGates.size(); i++) {
     drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
   }
 }
 
 void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLines, vector<int> pLines) {
-  for (int i = 0; i < pLines.size() - 1; i++) {
+  for (unsigned int i = 0; i < pLines.size() - 1; i++) {
     int gateNum = pLines[i];
     float x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
     drawPWire (cr, x, numLines,thickness);

@@ -2,7 +2,7 @@
 #include <gtkmm/stock.h>
 #include <iostream>
 
-QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(false), drawparallel (false) {
+QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
   set_title("QCViewer");
   set_border_width(0);
 

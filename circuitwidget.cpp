@@ -8,7 +8,7 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() : circuit (NULL), drawarch (false), drawparallel (false) {}
+CircuitWidget::CircuitWidget() :  drawarch (false), drawparallel (false), circuit (NULL) {}
 void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
 void CircuitWidget::set_offset (int y) { yoffset = y; }
 
@@ -20,7 +20,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
   if(window) {
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
-    const int height = allocation.get_height();
+ //   const int height = allocation.get_height();
 
 //    double scale = min (width/ext.width, height/ext.height);
     double scale = width/ext.width;
