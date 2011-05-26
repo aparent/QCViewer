@@ -2,7 +2,7 @@
 #include <gtkmm/stock.h>
 #include <iostream>
 
-QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(false), drawparallel (false) {
+QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
   set_title("QCViewer");
   set_border_width(0);
 
@@ -24,7 +24,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
   m_refActionGroup->add(Gtk::Action::create("ArchOpen", Gtk::Stock::OPEN, "Open", "Open an architecture file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
 
-  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Diagram", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save", 
                                             "Save the circuit diagram to an image file"));
   m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
@@ -35,17 +35,22 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
                         sigc::mem_fun(*this, &QCViewer::on_menu_save_png));
   m_refActionGroup->add(Gtk::Action::create("DiagramSaveSvg", "S_VG", 
                                             "Save circuit diagram as a Scalable Vector Graphics file"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_save_svg));
   m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
 
 
-  m_refActionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
+  m_refActionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT, "Quit"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_quit));
+  m_refActionGroup->add(Gtk::Action::create("ZoomIn", Gtk::Stock::ZOOM_IN, "Zoom In"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create("ZoomOut", Gtk::Stock::ZOOM_OUT, "Zoom Out"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
 
-  m_refActionGroup->add(Gtk::Action::create("EditMenu", "Edit"));
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
-  m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", "Load state"),
+  m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
   m_refActionGroup->add(Gtk::Action::create ("SimulateRun", Gtk::Stock::GOTO_LAST, "Run", "Simulate the entire circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
@@ -61,6 +66,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
+  
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
@@ -94,8 +100,6 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
         "      <menuitem action='DiagramParallel'/>"
         "      <menuitem action='DiagramArch'/>" 
         "    </menu>"
-        "    <menu action='EditMenu'>"
-        "    </menu>"
         "    <menu action='SimulateMenu'>"
         "      <menuitem action='SimulateLoad'/>"
         "      <menuitem action='SimulateRun'/>"
@@ -112,6 +116,10 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
         "    <toolitem action='SimulateRun'/>"
         "    <toolitem action='SimulateStep'/>"
         "    <toolitem action='SimulateReset'/>"
+        "    <separator/>"
+        "    <toolitem action='ZoomIn'/>"
+        "    <toolitem action='ZoomOut'/>"
+        "    <toolitem action='Zoom100'/>"
         "    <separator/>"
         "    <toolitem action='DiagramArch'/>"
         "  </toolbar>"
@@ -146,7 +154,6 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawarch(fa
   m_vbox.show();
 
   show_all_children ();
-  cout << m_vbox.get_height () << endl;
 }
 
 QCViewer::~QCViewer() {}
@@ -158,7 +165,11 @@ void QCViewer::on_button_clicked(Glib::ustring data) {
 }
 
 void QCViewer::unimplemented () {
-  std::cout << "Sorry bro\n";
+  Gtk::MessageDialog dialog(*this, "Feature Unimplemented");
+  dialog.set_secondary_text(
+          "This feature doesn't exist yet/is currently disabled.");
+
+  dialog.run();
 }
 
 void QCViewer::on_menu_file_open_circuit () {
@@ -194,7 +205,26 @@ void QCViewer::on_menu_file_quit () {
 }
 
 void QCViewer::on_menu_save_png () {
-
+  Gtk::FileChooserDialog dialog ("Please choose a png file to save to",
+                                 Gtk::FILE_CHOOSER_ACTION_SAVE);
+  dialog.set_transient_for (*this);
+  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+  int result = dialog.run ();
+  if (result == Gtk::RESPONSE_OK) {
+    c.savepng (dialog.get_filename ());
+  }
+}
+void QCViewer::on_menu_save_svg () {
+  Gtk::FileChooserDialog dialog ("Please choose a svg file to save to",
+                                 Gtk::FILE_CHOOSER_ACTION_SAVE);
+  dialog.set_transient_for (*this);
+  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+  int result = dialog.run ();
+  if (result == Gtk::RESPONSE_OK) {
+    c.savesvg (dialog.get_filename ());
+  }
 }
 
 void QCViewer::on_menu_options_parallel () {
