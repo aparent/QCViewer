@@ -80,8 +80,8 @@
 	string printTree(parseNode *node);
 	void yyerror(const char *s);
 	int yylex();
-  parseNode *final;
 	int yy_scan_string(const char*);
+  parseNode *final;
 
 
 /* Line 189 of yacc.c  */
