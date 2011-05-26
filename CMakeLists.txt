@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (QCViewer)
 
-ADD_DEFINITIONS( "-W -Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 
 SET(QCVIEWER_SRC_FILES
 	draw.cpp
@@ -20,9 +20,8 @@ SET(QCVIEWER_HEADER_FILES
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-FIND_PACKAGE(PkgConfig REQUIRED)
-pkg_check_modules(GTKMM gtkmm-2.4)
 
+find_package(GTK2 2.10 REQUIRED gtkmm)
 
 include_directories(${GTKMM_INCLUDE_DIRS}  ${CMAKE_SOURCE_DIR}/../QCLib)
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS} ${CMAKE_SOURCE_DIR}/../QCLib)
