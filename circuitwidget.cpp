@@ -73,7 +73,11 @@ void CircuitWidget::toggle_selection (int id) {
 }*/
 
 bool CircuitWidget::onScrollEvent (GdkEventScroll *event) {
-  cout << "scroll!" << endl << flush;
+  double s;
+  if (event->direction == 1) s = get_scale()/1.25;
+  else s = get_scale()*1.25;
+  set_scale(s);
+  force_redraw ();
   return true;
 }
 
