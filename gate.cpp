@@ -124,7 +124,7 @@ int NOTGate::QCost(int numLines){ //TODO: Check for Pres Gates
 }
 
 //HGate -----------------------------------------------------
-int HGate::QCost(int numLines){ //TODO: Check for Pres Gates
+int HGate::QCost(int numLines){ 
   (void)numLines; // placate the compiler for now
 	return 0;
 }
@@ -135,4 +135,27 @@ NOTGate::NOTGate(){
 
 HGate::HGate(){
 	gateType = H;
+}
+
+void UGate::setQCost(int QCost){
+	cost = QCost;
+}
+
+int UGate::QCost(int numLines){ 
+  (void)numLines; 
+	return cost;
+}
+
+UGate::UGate(int QCost){
+	cost  = QCost;
+	gateType = U;
+}
+
+int FredGate::QCost(int numLines){ 
+  (void)numLines; 
+	return 1;
+}
+
+FredGate::FredGate(){
+	gateType = FRED;
 }

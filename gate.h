@@ -6,7 +6,7 @@
 
 using namespace std;
 
-enum gateType {NOT, H};
+enum gateType {NOT, H, FRED, U};
 
 class Control {
   public:
@@ -40,4 +40,18 @@ class HGate : public Gate {//hadamard gate
 		HGate();
 };
 
+class FredGate : public Gate {//hadamard gate
+  public:
+    int QCost(int numLines);
+		FredGate();
+};
+
+class UGate : public Gate {//hadamard gate
+  public:
+    int QCost(int numLines);
+    void setQCost(int QCost);
+		UGate(int QCost = 0);
+	private:
+		int cost; //stores quantum cosst
+};
 #endif
