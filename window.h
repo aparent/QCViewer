@@ -46,6 +46,7 @@ protected:
 
   Gtk::Button m_button1, m_button2;
   CircuitWidget c;
+	Gtk::Statusbar m_statusbar; 
 private:
   bool drawparallel;
   bool drawarch;

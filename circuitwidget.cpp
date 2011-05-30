@@ -99,3 +99,6 @@ void CircuitWidget::savesvg (string filename) {
 void CircuitWidget::set_scale (double x) { scale = x; force_redraw (); ext = get_circuit_size (circuit, &wirestart, &wireend, scale); }
 
 double CircuitWidget::get_scale () { return scale; }
+int CircuitWidget::get_QCost () { return circuit->QCost(); }
+int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
+int CircuitWidget::get_NumGates () { return circuit->numGates(); }
