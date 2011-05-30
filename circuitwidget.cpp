@@ -45,7 +45,7 @@ void CircuitWidget::load (string file) {
     cout << "Error loading circuit" << endl;
     return;
   }
-  win->resize (ext.width+50, 50+ext.height);
+  //win->resize (ext.width+50, 50+ext.height);
 
  // cairo_surface_t* surface = make_png_surface (ext);
  // cairo_t* cr = cairo_create (surface);
