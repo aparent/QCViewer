@@ -43,11 +43,11 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
   m_refActionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT, "Quit"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_quit));
   m_refActionGroup->add(Gtk::Action::create("ZoomIn", Gtk::Stock::ZOOM_IN, "Zoom In"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_in));
   m_refActionGroup->add(Gtk::Action::create("ZoomOut", Gtk::Stock::ZOOM_OUT, "Zoom Out"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
   m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -185,6 +185,7 @@ void QCViewer::on_menu_file_open_circuit () {
     c.load (dialog.get_filename ());
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
+    c.set_scale (1);
   }
 }
 
@@ -235,4 +236,18 @@ void QCViewer::on_menu_options_parallel () {
 void QCViewer::on_menu_options_arch () {
   drawarch = !drawarch;
   c.set_drawarch (drawarch);
+}
+
+void QCViewer::on_menu_zoom_in () {
+  double scale = c.get_scale ();
+  c.set_scale (scale*1.25);
+}
+
+void QCViewer::on_menu_zoom_out () {
+  double scale = c.get_scale ();
+  c.set_scale (scale/1.25);
+}
+
+void QCViewer::on_menu_zoom_100 () {
+  c.set_scale (1);
 }
