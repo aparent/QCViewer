@@ -5,7 +5,7 @@
 
 using namespace std;
 
-enum TFCType {SEC_START, SEC_END, VAR_NAME, VAR_VALUE};
+enum TFCType {SEC_START, SEC_END, VAR_NAME, GATE_INPUT, GATE_INPUT_N};
 
 struct TFCToken{
 	TFCType		type;

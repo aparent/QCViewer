@@ -5,4 +5,4 @@
 #include <circuitParser.h>
 #include <gate.h>
 
-#endif // QCLUB__INCLUDED
+#endif // QCLIB__INCLUDED

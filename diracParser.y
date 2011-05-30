@@ -17,42 +17,31 @@
 %start input
 %token CNUM NUM KET PLUS MINUS TIMES DIV SQRT /* CNUM is for complex numbers  */
 %left low
-%left '-' '+'
-%left '*' '/'
+%left MINUS PLUS
+%left TIMES '/'
 %left SQRT
 %right high
-%initial-action {
-};
 
 %%
 input:			 /*empty*/
              | exp                      { final = $1; }
      ;
 		 exp:      subex                    { $$ = $1;    }
-             | error                    { cout << "E3" <<endl; }
-		 				 | exp '+' exp  				    {
-																					parseNode * val = new parseNode;
-																					val->value = "+"; val->left = $1; val->right=$3;
-																					val->type = PLUS;
-							 														$$ = val;
+		 				 | exp PLUS exp  				    {
+																					$2->left = $1; $2->right=$3;
+							 														$$ = $2;
 							 													}
-		 				 | exp '-' exp  				    {
-																					parseNode * val = new parseNode;
-																					val->value = "-"; val->left = $1; val->right=$3;
-																					val->type = MINUS;
-							 														$$ = val;
+		 				 | exp MINUS exp  				  {
+																					$2->left = $1; $2->right=$3;
+							 														$$ = $2;
 							 													}
-						 | exp '*' exp           	  {
-																					parseNode * val = new parseNode;
-																					val->value = "*"; val->left = $1; val->right=$3;
-																					val->type = TIMES;
-							 														$$ = val;
+						 | exp TIMES exp           	{
+							 														$2->left = $1; $2->right=$3;
+							 														$$ = $2;
 						 														}
-						 | exp '/' exp           	  {
-																					parseNode * val = new parseNode;
-																					val->value = "/"; val->left = $1; val->right=$3;
-																					val->type = DIV;
-							 														$$ = val;
+						 | exp DIV exp           	  {
+							 														$2->left = $1; $2->right=$3;
+							 														$$ = $2;
 						 														}
 		 ;
 		 subex: term
@@ -67,24 +56,19 @@ input:			 /*empty*/
 																					$$ = $1;
 						 														}
              | '(' exp ')'            	{ $$ = $2; }
-             |     error                { cout << "E0" <<endl; }
-             | '(' error ')'            { cout << "E1" <<endl; }
 		 ;
 
 		 term: 		KET												{ $$ = $1; }
 		 				 |NUM                       { $$ = $1; }
 		 				 |CNUM                      { $$ = $1; }
-		 				 |error 										{ cout << "E2" <<endl; }
 		 ;
 
 %%
 
 
 parseNode *parseDirac(string input){
-	//extern FILE * yyin;
   char *in = (char*)malloc(input.length() + 1);
   strcpy(in,input.c_str());
-  //yyin = fmemopen (in, strlen (in), "r");
 	yy_scan_string(in);
 	yyparse ();
   return final;

@@ -2,28 +2,20 @@
 
 using namespace std;
 
-string removeQuotes(string str){
-	if (str[0] == '"'){
-		str.erase(str.begin());
-		str.erase(str.end());
-	}
-	return str;
-}
-
 //NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator,
 //*(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
 //the vector location where it points now
 
 void parseLineNames(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
-    circ->addLine(removeQuotes((**it).value));
+    circ->addLine((**it).value);
 	}
 }
 
 void parseInputs(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
 		for(int j = 0; j < circ->numLines(); j++){
-      if (removeQuotes((**it).value).compare(circ->getLine(j)->lineName)==0){
+      if ((**it).value.compare(circ->getLine(j)->lineName)==0){
         circ->getLine(j)->constant=false;
         break;
       }
@@ -35,7 +27,7 @@ void parseInputs(Circuit * circ, vector<TFCToken>::iterator * it){
 void parseOutputs(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
 		for(int j = 0; j < circ->numLines(); j++){
-      if (removeQuotes((**it).value).compare(circ->getLine(j)->lineName)==0){
+      if ((**it).value.compare(circ->getLine(j)->lineName)==0){
         circ->getLine(j)->garbage=false;
         break;
       }
@@ -48,7 +40,7 @@ void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
 		for(int j = 0; j < circ->numLines(); j++){
       if (!circ->getLine(j)->garbage){
-      	circ->getLine(j)->outLabel = removeQuotes((**it).value);
+      	circ->getLine(j)->outLabel = (**it).value;
         break;
       }
     }
@@ -57,18 +49,24 @@ void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator * it){
 }
 
 void parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it){
-  while((*(++(*it))).type == VAR_VALUE){
+  while((*(++(*it))).type == GATE_INPUT || (**it).type == GATE_INPUT_N){
     for(int j = 0; j < circ->numLines(); j++){
-      if (removeQuotes(((**it).value)).compare(circ->getLine(j)->lineName)==0){
-        gate->controls.push_back(Control(j,false));
-        break;
+      if (((**it).value).compare(circ->getLine(j)->lineName)==0){
+				if ((**it).type == GATE_INPUT_N){
+        	gate->controls.push_back(Control(j,true));
+        	break;
+				}
+				else{
+        	gate->controls.push_back(Control(j,false));
+        	break;
+				}
       }
     }
   }
 	gate->controls.pop_back();
 	--(*it);
   for(int j = 0; j < circ->numLines(); j++){
-    if (removeQuotes((**it).value).compare(circ->getLine(j)->lineName)==0){
+    if ((**it).value.compare(circ->getLine(j)->lineName)==0){
       gate->targets.push_back(j);
       continue;
     }

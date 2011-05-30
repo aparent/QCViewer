@@ -9,8 +9,8 @@ using namespace std;
 
 int ipow(int base, int exp);
 
-void tokenize(const string&, 
-              vector<string>&, 
+void tokenize(const string&,
+              vector<string>&,
               const string&);
 
 string intToString(int i);

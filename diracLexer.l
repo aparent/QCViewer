@@ -10,38 +10,43 @@
 	#define YYSTYPE parseNode*
 	#include "diracParser.h"
 	using namespace std;
+	parseNode *setupNode(int type, string value);
 %}
 
 %x ket
 
 %%
-sqrt                { 
-											parseNode * val = new parseNode;
-											val->value = "SQRT"; val->left = NULL; val->right=NULL;
-											val->type=SQRT;
-											yylval = val;
+sqrt                {
+											yylval = setupNode(SQRT,"SQRT");
 											return SQRT;
 										}
-i										{ 
-											parseNode * val = new parseNode;
-											val->value = "1"; val->left = NULL; val->right=NULL;
-											val->type=CNUM;
-											yylval = val;
+\+                  {
+											yylval = setupNode(PLUS,"+");
+											return PLUS;
+										}
+\-                  {
+											yylval = setupNode(MINUS,"-");
+											return MINUS;
+										}
+\*                  {
+											yylval = setupNode(TIMES,"*");
+											return TIMES;
+										}
+\/                  {
+											yylval = setupNode(DIV,"/");
+											return DIV;
+										}
+i										{
+											yylval = setupNode(CNUM,"1");
 											return CNUM;
 										}
 [0-9]+	      	    {
-											parseNode * val = new parseNode;
-											val->value = string(yytext); val->left = NULL; val->right=NULL;
-											val->type=NUM;
-											yylval = val;
+											yylval = setupNode(NUM,string(yytext));
 											return NUM;
 										}
 \|									{BEGIN(ket);}
 <ket>[0-1]+    	    {
-											parseNode * val = new parseNode;
-											val->value = string(yytext); val->left = NULL; val->right=NULL;
-											val->type = KET;
-											yylval = val;
+											yylval = setupNode(KET,string(yytext));
 											return KET;
 										}
 <ket>\>							{BEGIN(INITIAL);}
@@ -50,4 +55,11 @@ i										{
 
 
 %%
+
+parseNode *setupNode(int type, string value){
+	parseNode * val = new parseNode;
+	val->value = value; val->left = NULL; val->right=NULL;
+	val->type=type;
+	return val;
+}
 
