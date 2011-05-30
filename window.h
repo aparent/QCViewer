@@ -1,5 +1,5 @@
-#ifndef GTKMM_EXAMPLE_HELLOWORLD_H
-#define GTKMM_EXAMPLE_HELLOWORLD_H
+#ifndef WINDOW__INCLUDED
+#define WINDOW__INCLUDED
 
 #include <gtkmm.h>
 #include "circuitwidget.h"
@@ -51,4 +51,4 @@ private:
   bool drawarch;
 };
 
-#endif // GTKMM_EXAMPLE_HELLOWORLD_H
+#endif

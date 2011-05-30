@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include "draw.h"
 
 #ifndef M_PI
 #define M_PI 3.141592
@@ -21,12 +22,6 @@ float wireDist = 40.0;
 float gatePad = 18.0;
 float textPad = 5.0;
 float Upad = 0.9;
-
-class gateRect {
-public:
-  float x0, y0;
-  float width, height;
-};
 
 class Colour {
   public:
@@ -213,6 +208,12 @@ void drawbase (cairo_t *cr, Circuit *c, float w, float h, double wirestart, doub
   }
 }
 
+int pickRect (vector<gateRect> rects, double x, double y) {
+  for (int i = 0; i < (int)rects.size (); i++) {
+    if (rects[i].x0 <= x && rects[i].x0+rects[i].width >= x && rects[i].y0 <= y && rects[i].y0 + rects[i].height >= y) return i;
+  }
+  return -1;
+}
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wireend, bool forreal) {
   vector <gateRect> rects;
@@ -256,8 +257,8 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
       switch (g->gateType) {
         case NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
         default:
-          // XXX: this needs to be generalized!
-          if (g->name.compare ("H") == 0) { // if hadamard
+          // XXX: maybe expose as a setting? 
+          /*if (g->name.compare ("H") == 0) { // if hadamard
             vector<Control> ctrl;
             vector<int> targ;
             do {
@@ -271,9 +272,9 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
             count--;
             // draw hadamards together. this isn't really cool. proof of concept.
             r = drawCU (cr, xcurr, g->name, &ctrl, &targ);
-          } else {
+          } else {*/
             r = drawCU (cr, xcurr, g->name, &g->controls, &g->targets);
-          }
+          //}
           break;
        }
       for (int i = 0; i < count; i++) rects.push_back(r);
@@ -317,6 +318,10 @@ void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLi
   }
 }
 
+void drawSelections (cairo_t* cr, vector<gateRect> rects, int selection) {
+  drawRect (cr, rects[selection], Colour (0.1,0.2,0.7,0.7), Colour (0.1,0.2,0.7,0.3));
+}
+
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
   cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
   return img_surface;
@@ -350,7 +355,7 @@ void write_to_png (cairo_surface_t* surf, string filename) {
   }
 }
 
-void draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale) {
+vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
   cairo_scale (cr, scale, scale);
   cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
@@ -360,4 +365,6 @@ void draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, ca
   rects = draw (cr, c, &wirestart, &wireend, true);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
+  if (selection != -1) drawSelections (cr, rects, selection);
+  return rects;
 }

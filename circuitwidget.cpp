@@ -8,13 +8,78 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() :  drawarch (false), drawparallel (false), circuit (NULL) {}
+CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel (false), circuit (NULL), selection (-1) {
+  add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);
+  signal_button_press_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_press_event));
+  signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
+  signal_scroll_event().connect( sigc::mem_fun( *this, &CircuitWidget::onScrollEvent ) );
+  signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
+}
+
 void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
 void CircuitWidget::set_offset (int y) { yoffset = y; }
 
 CircuitWidget::~CircuitWidget () {}
 
+bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
+  if (event->button == 1) {
+    panning = true;
+    oldmousex = event->x;
+    oldmousey = event->y;
+  }
+  return true;
+}
+
+bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
+  if (panning) {
+    cx -= (event->x - oldmousex);
+    cy -= (event->y - oldmousey); 
+    oldmousex = event->x;
+    oldmousey = event->y;
+    force_redraw ();
+  }
+  return true;
+}
+
+bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
+  if(event->button == 1 && panning) {
+    panning = false;
+  } else if (event->button == 3) {
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+    // translate mouse click coords into circuit diagram coords
+    double x = (event->x - width/2.0) + ext.width/2.0 + cx;
+    double y = (event->y - height/2.0) + ext.height/2.0 + cy;
+  
+    cout << "click! at (" << event->x << ", " << event->y << ") ";
+    cout << "which translates to (" << x << ", "<< y << ")" << endl << flush;
+    int i = pickRect (rects, x, y);
+    if (i == -1) cout << "no gate clicked..." << endl << flush;
+    else cout << "clicked gate " << i << endl << flush;
+
+    selection = i;
+    force_redraw ();
+  }
+  return true;
+}
+/* used to be able to select multiple gates. deemed silly.
+void CircuitWidget::toggle_selection (int id) {
+  set <int>::iterator it;
+  it = selections.find(id);
+  if (it != selections.end()) selections.erase (it);
+  else selections.insert (id);
+  force_redraw ();
+}*/
+
+bool CircuitWidget::onScrollEvent (GdkEventScroll *event) {
+  cout << "scroll!" << endl << flush;
+  return true;
+}
+
 bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
+  (void)event; // placate compiler..
+
   // This is where we draw on the window
   Glib::RefPtr<Gdk::Window> window = get_window();
   if(window) {
@@ -22,8 +87,8 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     const int width = allocation.get_width();
     const int height = allocation.get_height();
 
-    double xc = width/2;
-    double yc = height/2;
+    double xc = width/2.0;
+    double yc = height/2.0;
 
     Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
 //    cr->rectangle(event->area.x, event->area.y,
@@ -31,9 +96,9 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1,1,1);
     cr->fill ();
-    cr->translate (xc-ext.width/2, yc-ext.height/2);
+    cr->translate (xc-ext.width/2-cx, yc-ext.height/2-cy);
     //cr->clip();
-    if (circuit != NULL) draw_circuit (circuit, cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale);
+    if (circuit != NULL) rects = draw_circuit (circuit, cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
   }
   return true;
 }
@@ -45,13 +110,6 @@ void CircuitWidget::load (string file) {
     cout << "Error loading circuit" << endl;
     return;
   }
-  //win->resize (ext.width+50, 50+ext.height);
-
- // cairo_surface_t* surface = make_png_surface (ext);
- // cairo_t* cr = cairo_create (surface);
- // cairo_set_source_surface (cr, surface, 0, 0);
- // draw_circuit (circuit, cr, true, true,  ext, wirestart, wireend, 1.0);
- // write_to_png (surface, "image.png");
 }
 
 void CircuitWidget::loadArch (string file) {
@@ -78,7 +136,7 @@ void CircuitWidget::savepng (string filename) {
   cairo_surface_t* surface = make_png_surface (ext);
   cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-  draw_circuit (circuit, cr, drawarch, drawparallel,  ext, wirestart, wireend, 1.0);
+  draw_circuit (circuit, cr, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, -1);
   write_to_png (surface, filename);
   cairo_destroy (cr);
   cairo_surface_destroy (surface);
@@ -91,11 +149,15 @@ void CircuitWidget::savesvg (string filename) {
   cairo_surface_t* surface = make_svg_surface (filename, ext);
   cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-  draw_circuit (circuit, cr, drawarch, drawparallel, ext, wirestart, wireend, 1.0);
+  draw_circuit (circuit, cr, drawarch, drawparallel, ext, wirestart, wireend, 1.0, -1);
   cairo_destroy (cr);
   cairo_surface_destroy (surface);
 }
 
-void CircuitWidget::set_scale (double x) { scale = x; force_redraw (); ext = get_circuit_size (circuit, &wirestart, &wireend, scale); }
+void CircuitWidget::set_scale (double x) { 
+  scale = x; 
+  ext = get_circuit_size (circuit, &wirestart, &wireend, scale);
+  force_redraw ();
+}
 
 double CircuitWidget::get_scale () { return scale; }
