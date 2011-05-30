@@ -1,12 +1,14 @@
 #include "window.h"
 #include <gtkmm/stock.h>
 #include <iostream>
+#include <string>
 
 QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
   set_title("QCViewer");
   set_border_width(0);
 
   add(m_vbox);
+ 	m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
 
   m_refActionGroup = Gtk::ActionGroup::create();
   m_refActionGroup->add(Gtk::Action::create("File", "File"));
@@ -186,6 +188,9 @@ void QCViewer::on_menu_file_open_circuit () {
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
     c.set_scale (1);
+		std::stringstream ss;
+		ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
+    m_statusbar.push(ss.str());
   }
 }
 

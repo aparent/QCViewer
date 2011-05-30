@@ -23,6 +23,9 @@ public:
 
   void set_scale (double);
   double get_scale ();
+	int get_QCost ();
+  int get_Depth ();
+  int get_NumGates ();
   
 protected:
   //Override default signal handler:

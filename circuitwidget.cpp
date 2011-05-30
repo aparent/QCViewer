@@ -165,3 +165,6 @@ void CircuitWidget::set_scale (double x) {
 }
 
 double CircuitWidget::get_scale () { return scale; }
+int CircuitWidget::get_QCost () { return circuit->QCost(); }
+int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
+int CircuitWidget::get_NumGates () { return circuit->numGates(); }

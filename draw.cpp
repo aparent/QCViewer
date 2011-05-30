@@ -187,11 +187,38 @@ gateRect drawNOT (cairo_t *cr, float xc, float yc, float radius, float thickness
   return r;
 }
 
+gateRect drawX (cairo_t *cr, float xc, float yc, float radius, float thickness) {
+  // Draw cross
+	radius = radius*sqrt(2)/2;
+  cairo_move_to (cr, xc-radius, yc-radius);
+  cairo_line_to (cr, xc+radius, yc+radius);
+  cairo_stroke (cr);
+  cairo_move_to (cr, xc+radius, yc-radius);
+  cairo_line_to (cr, xc-radius, yc+radius);
+  cairo_stroke (cr);
+
+  gateRect r;
+  r.x0 = xc-radius-thickness;
+  r.y0 = yc-radius-thickness;
+  r.width = 2*(radius+thickness);
+  r.height = r.width;
+  return r;
+}
+
 
 gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
   for (unsigned int i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawNOT (cr, xc, wireToY((*targ)[i]), radius, thickness);
+    rect = combine_gateRect(rect, recttmp);
+  }
+  return rect;
+}
+
+gateRect drawFred (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
+  gateRect rect = drawControls (cr, xc, ctrl, targ);
+  for (unsigned int i = 0; i < targ->size(); i++) {
+    gateRect recttmp = drawX (cr, xc, wireToY((*targ)[i]), radius, thickness);
     rect = combine_gateRect(rect, recttmp);
   }
   return rect;
@@ -256,6 +283,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
       int count = 1; // hack
       switch (g->gateType) {
         case NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
+        case FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
         default:
           // XXX: maybe expose as a setting? 
           /*if (g->name.compare ("H") == 0) { // if hadamard

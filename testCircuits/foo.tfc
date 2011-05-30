@@ -21,6 +21,7 @@ t1 first,second
 t1 second,third
 t1 third,fourth
 t1 first,fourth
+f  first,second,fourth
 H second
 H third
 t0 first
