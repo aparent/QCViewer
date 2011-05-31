@@ -4,36 +4,31 @@
 
 using namespace std;
 
-template <class IndexType, class NumType>
-State<IndexType, NumType>::State () {}
+State::State () {}
 
-template <class IndexType, class NumType>
-State<IndexType, NumType>::State (complex<NumType> amp, IndexType bits) {
+State::State (complex<float_t> amp, index_t bits) {
   data[bits] = amp;
 }
 
-template <class IndexType, class NumType>
-State<IndexType, NumType>::State (stateVec &v) {
-  //assert (v.dim <= sizeof(indexType)*8);
-  for (IndexType i = 0; i < (IndexType)ipow(2,v.dim); i++) {
-    if (v.data[i] != 0) {
+State::State (stateVec &v) {
+  //assert (v.dim <= sizeof(index_t)*8);
+  for (index_t i = 0; i < (index_t)ipow(2,v.dim); i++) {
+    if (v.data[i] != complex<float_t>(0)) {
       data[i] = v.data[i];
     }
   }
 }
 
-template <class IndexType, class NumType>
-complex<NumType> State<IndexType, NumType>::getAmplitude (IndexType bits) {
-  if (data.find(bits) == map<IndexType, complex<NumType> >::end)
+complex<float_t> State::getAmplitude (index_t bits) {
+  if (data.find(bits) == data.end())
      return 0;
   else
      return data[bits];
 }
 
-template <class IndexType, class NumType>
-State<IndexType, NumType>& State<IndexType, NumType>::operator+= (const State<IndexType, NumType> &r) {
-  typename map<IndexType, complex<NumType> >::iterator it;
-  for (it = r.begin(); it != r.end(); it++) {
+const State& State::operator+= (const State& r) {
+  map<index_t, complex<float_t> >::const_iterator it;
+  for (it = r.data.begin(); it != r.data.end(); it++) {
     data[it->first] += it->second;
   }
   return *this;

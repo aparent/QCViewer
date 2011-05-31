@@ -3,19 +3,24 @@
 #include <map>
 #include <complex>
 #include "dirac.h"
+#include <stdint.h>
 
-template <class IndexType, class NumType> 
+// If it is desired to up the accuracy later, or change the maximum
+// qubit size, change this.
+// Templates were removed because they made the code ugly.
+#define float_t float
+#define index_t uint32_t
+
 class State {
 public:
   State ();
-  State (std::complex<NumType> amp, IndexType bits);
+  State (std::complex<float_t> amp, index_t bits);
   State (stateVec &v);
 
-  std::complex<NumType> getAmplitude (IndexType bits);
-  State<IndexType, NumType>& operator+= (const State<IndexType, NumType> &r);
+  std::complex<float_t> getAmplitude (index_t bits);
+  const State& operator+= (const State &r);
 
-private:
-  std::map<IndexType, std::complex<NumType> > data;
+  std::map<index_t, std::complex<float_t> > data;
 };
 
 #endif // STATE__INCLUDED
