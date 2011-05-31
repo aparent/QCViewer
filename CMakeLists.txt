@@ -12,6 +12,7 @@ SET(QCLIB_SRC_FILES
 	dirac.cpp
 	diracParser.cpp
 	gate.cpp
+        state.cpp
 )
 
 SET(QCLIB_HEADER_FILES
@@ -23,6 +24,7 @@ SET(QCLIB_HEADER_FILES
   parseNode.h
 	TFCLexer.h
 	utility.h
+        state.h
 )
 
 IF(UNIX)
