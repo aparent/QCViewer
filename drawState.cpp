@@ -1,12 +1,10 @@
 #include "drawState.h"
-#include <iostream> //XXX
 using namespace std;
 
 
 void draw_state (Cairo::RefPtr<Cairo::Context> cr, State* state, float width ,float height){
 	map<index_t, complex<float_t> >::const_iterator it;
 	float barWidth = width/((float)state->dim);
-	cout << (float)state->data.size() << endl; 
 	float realScale = 0;
 	float imagScale = 0;
   for (it = state->data.begin(); it != state->data.end(); it++) {
