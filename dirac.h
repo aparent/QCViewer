@@ -9,5 +9,5 @@ struct stateVec {
   std::complex<float> *data;
 };
 
-stateVec getStateVec (std::string input);
+stateVec getStateVec (std::string,bool);
 #endif

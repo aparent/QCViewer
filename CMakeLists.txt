@@ -12,7 +12,7 @@ SET(QCLIB_SRC_FILES
 	dirac.cpp
 	diracParser.cpp
 	gate.cpp
-        state.cpp
+  state.cpp
 )
 
 SET(QCLIB_HEADER_FILES
@@ -24,7 +24,7 @@ SET(QCLIB_HEADER_FILES
   parseNode.h
 	TFCLexer.h
 	utility.h
-        state.h
+  state.h
 )
 
 IF(UNIX)
@@ -40,7 +40,7 @@ IF(UNIX)
 	)
 	add_custom_command (
 		OUTPUT ${CMAKE_SOURCE_DIR}/diracParser.cpp ${CMAKE_SOURCE_DIR}/diracParser.h
-		COMMAND bison -d -o diracParser.cpp ${CMAKE_SOURCE_DIR}/diracParser.y
+		COMMAND bison -d -v -o diracParser.cpp ${CMAKE_SOURCE_DIR}/diracParser.y
 		DEPENDS ${CMAKE_SOURCE_DIR}/diracParser.y
 	)
 ENDIF(UNIX)

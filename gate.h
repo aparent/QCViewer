@@ -8,7 +8,7 @@ using namespace std;
 
 enum gateType {NOT, H, FRED, U};
 
-class Control {
+class Control{
   public:
     Control (int,bool);
     int wire;

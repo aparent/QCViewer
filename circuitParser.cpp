@@ -63,22 +63,14 @@ void parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
       }
     }
   }
-	gate->controls.pop_back();
 	int numTarg;
 	if (gate->gateType==FRED){ 
 		numTarg = 2;
-		gate->controls.pop_back();
 	} 
 	else numTarg = 1;
-	(*it)=(*it) - numTarg;
 	for (int i = 0; i < numTarg; i++){
- 	 for(int j = 0; j < circ->numLines(); j++){
-  	  if ((**it).value.compare(circ->getLine(j)->lineName)==0){
-  	    gate->targets.push_back(j);
-  	    break;
-  	  }
-  	}
-		(*it)++;
+  	gate->targets.push_back(gate->controls.back().wire);
+		gate->controls.pop_back();
 	}
 }
 
@@ -92,11 +84,11 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 		}
 		else if(((**it).value[0]) == 't' ||((**it).value[0]) == 'T'){
   		newGate = new NOTGate();
-  		newGate->name = ((**it).value);
+  		newGate->name = "T";
 		}
 		else if(((**it).value[0]) == 'f' ||((**it).value[0]) == 'F'){
   		newGate = new FredGate();
-  		newGate->name = ((**it).value);
+  		newGate->name = "F";
 		}
 		else{
   		newGate = new UGate();

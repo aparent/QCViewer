@@ -44,6 +44,11 @@ i										{
 											yylval = setupNode(NUM,string(yytext));
 											return NUM;
 										}
+[0-9]+\.[0-9]	      {
+											yylval = setupNode(NUM,string(yytext));
+											return NUM;
+										}
+
 \|									{BEGIN(ket);}
 <ket>[0-1]+    	    {
 											yylval = setupNode(KET,string(yytext));

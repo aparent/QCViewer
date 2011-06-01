@@ -20,9 +20,12 @@ string printTree(parseNode *node);
 diracTerm evalTree(parseNode *node);
 
 
-stateVec getStateVec (std::string input){
+stateVec getStateVec (std::string input, bool normalize = false){
 	parseNode *node = parseDirac(input); 
 	diracTerm term = evalTree(node);
+	if (normalize){
+		term.vecValue = term.vecValue/sqrt(cdot(term.vecValue,term.vecValue));
+	}
 	stateVec result;
 	cx_mat ket = term.vecValue;
 	result.dim = ket.n_rows;
@@ -34,8 +37,8 @@ stateVec getStateVec (std::string input){
 }
 
 string printTree(parseNode *node){
-	if (node->type==SQRT) return node->value + "(" + printTree(node->right)+")";
-	if (node->left == NULL && node->right == NULL && node->type==KET ) return "|" + node->value+">";
+	if (node->type==SQRT) 																							return node->value + "(" + printTree(node->right)+")";
+	if (node->left == NULL && node->right == NULL && node->type==KET ) 	return "|" + node->value+">";
 	if (node->left == NULL && node->right == NULL && node->type==CNUM ) return node->value+"i";
 	if (node->left == NULL && node->right == NULL ) return node->value;
 	return "("+printTree(node->left)+ " " +node->value + " " + printTree(node->right)+")";
