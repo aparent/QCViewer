@@ -57,11 +57,11 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
   m_refActionGroup->add(Gtk::Action::create ("SimulateRun", Gtk::Stock::GOTO_LAST, "Run", "Simulate the entire circuit"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_run));
   m_refActionGroup->add(Gtk::Action::create ("SimulateStep", Gtk::Stock::GO_FORWARD, "Step", "Advance the simulation through a single gate"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_step));
   m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_reset));
   m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
 
@@ -260,4 +260,16 @@ void QCViewer::on_menu_zoom_out () {
 
 void QCViewer::on_menu_zoom_100 () {
   c.set_scale (1);
+}
+
+void QCViewer::on_menu_step () {
+  c.step();
+}
+
+void QCViewer::on_menu_reset () {
+  c.reset ();
+}
+
+void QCViewer::on_menu_run () {
+  while (c.step());
 }

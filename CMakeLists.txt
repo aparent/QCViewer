@@ -37,5 +37,5 @@ LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS} ${CMAKE_SOURCE_DIR}/../QCLib)
 SOURCE_GROUP("Header Files" FILES ${QCVIEWER_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${QCVIEWER_SRC_FILES})
 
-add_executable (QCViewer  ${QCVIEWER_SRC_FILES})
-target_link_libraries(QCViewer ${GTKMM_LIBRARIES} ${CMAKE_SOURCE_DIR}/../QCLib/libQC.a )
+add_executable (viewer  ${QCVIEWER_SRC_FILES})
+target_link_libraries(viewer ${GTKMM_LIBRARIES} ${CMAKE_SOURCE_DIR}/../QCLib/libQC.a )

@@ -28,4 +28,9 @@ t0 first
 H second
 t0 third
 H fourth
+H first
+X first
+Y second
+Z third
+QFT first second third fourth
 END
