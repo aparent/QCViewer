@@ -13,6 +13,7 @@ SET(QCLIB_SRC_FILES
 	diracParser.cpp
 	gate.cpp
         state.cpp
+        simulate.cpp
 )
 
 SET(QCLIB_HEADER_FILES

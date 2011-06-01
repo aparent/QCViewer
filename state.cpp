@@ -33,3 +33,11 @@ const State& State::operator+= (const State& r) {
   }
   return *this;
 }
+  
+const State& State::operator*= (const complex<float_t> x) {
+  map<index_t, complex<float_t> >::const_iterator it;
+  for (it = data.begin(); it != data.end(); it++) {
+    data[it->first] *= x;
+  }
+  return *this;
+}

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "state.h" // float_t
 
 using namespace std;
 
@@ -26,6 +27,8 @@ class Gate {
     virtual int QCost(int numLines) = 0;
     int numCont();//total number of negative and positive controls
     int numNegCont();
+
+    complex<float_t> *matrix;
 };
 
 class NOTGate : public Gate {
