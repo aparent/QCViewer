@@ -9,6 +9,9 @@ SET(QCVIEWER_SRC_FILES
 	main.cpp
 	window.cpp
 	circuitwidget.cpp
+	stateView.cpp
+	drawState.cpp
+	stateWidget.cpp
 )
 
 SET(QCVIEWER_HEADER_FILES
@@ -16,6 +19,9 @@ SET(QCVIEWER_HEADER_FILES
 	main.h
 	window.h
 	circuitwidget.h
+	stateView.h
+	drawState.h
+	stateWidget.h
 )
 
 

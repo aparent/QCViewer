@@ -2,6 +2,8 @@
 #include <gtkmm/stock.h>
 #include <iostream>
 #include <string>
+#include <state.h>
+#include <dirac.h>
 
 QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
   set_title("QCViewer");
@@ -61,7 +63,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
   m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
   m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
 
   m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramParallel", "Show parallel guides"),
@@ -170,7 +172,6 @@ void QCViewer::unimplemented () {
   Gtk::MessageDialog dialog(*this, "Feature Unimplemented");
   dialog.set_secondary_text(
           "This feature doesn't exist yet/is currently disabled.");
-
   dialog.run();
 }
 
@@ -205,7 +206,11 @@ void QCViewer::on_menu_file_open_arch () {
     c.loadArch (dialog.get_filename ());
   }
 }
-
+void QCViewer::on_menu_simulate_show_stateView(){
+	State *s = new State(getStateVec ("(3|0>+1|1>)(2|0> + 4|1>)(|0>+|1>)"));
+	sView.set_state(s);
+	Gtk::Main::run(sView);
+}
 void QCViewer::on_menu_file_quit () {
   hide ();
 }

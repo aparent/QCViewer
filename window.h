@@ -3,6 +3,7 @@
 
 #include <gtkmm.h>
 #include "circuitwidget.h"
+#include "stateView.h"
 
 class QCViewer : public Gtk::Window
 {
@@ -27,7 +28,7 @@ protected:
   void on_menu_zoom_out ();
   void on_menu_zoom_100 ();
   void unimplemented ();
-
+  void on_menu_simulate_show_stateView ();
 //  void on_architecture_load ();
 
 //  void on_menu_simulation_reset ();
@@ -46,6 +47,7 @@ protected:
 
   Gtk::Button m_button1, m_button2;
   CircuitWidget c;
+	stateView sView;
 	Gtk::Statusbar m_statusbar; 
 private:
   bool drawparallel;

@@ -1,0 +1,23 @@
+#include "stateView.h"
+#include <cairomm/context.h>
+#include "drawState.h"
+
+
+stateView::stateView() {
+  set_title("State Graph");
+  set_border_width(0);
+  add(m_vbox);
+  draw.set_window(get_parent_window());
+  draw.show();
+  m_vbox.pack_start(draw);
+	m_vbox.show();
+  show_all_children ();
+}
+
+void stateView::set_state(State *n_state){
+	draw.set_state(n_state);
+}
+
+stateView::~stateView(){
+}
+
