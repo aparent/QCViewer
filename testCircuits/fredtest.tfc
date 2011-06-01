@@ -1,0 +1,29 @@
+.v a,b,c,d,e
+.i a,b,c,d,e
+.o a,b,c,d,e
+BEGIN
+F5 a,d,e,b,c
+F4 d,e,a,c
+F4 b,e,c,d
+F4 c,e,a,d
+F3 e,b,d
+F3 e,a,b
+F5 b,c,d,a,e
+F4 c,d,a,b
+F3 d,c,e
+F3 e,b,d
+F4 a,d,b,c
+F3 d,b,e
+F3 e,c,d
+F3 d,a,e
+F3 e,b,d
+F2 d,e
+F4 b,c,a,d
+F3 b,c,e
+F3 c,a,e
+F3 e,b,c
+F2 c,d
+F3 b,a,d
+F2 b,c
+F2 a,b
+END
