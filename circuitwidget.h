@@ -5,6 +5,7 @@
 #include <circuit.h>
 #include <string>
 #include "draw.h"
+#include <state.h>
 
 class CircuitWidget : public Gtk::DrawingArea {
 public:
@@ -27,6 +28,9 @@ public:
   int get_Depth ();
   int get_NumGates ();
   
+  void load_state (State*);
+  bool step ();
+  void reset ();
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -36,6 +40,9 @@ protected:
   virtual bool on_button_press_event(GdkEventButton* event);
 
 private:
+  bool simulation_enabled;
+  unsigned int NextGateToSimulate;
+
   bool panning;
   double oldmousex, oldmousey;
 

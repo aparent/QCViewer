@@ -8,7 +8,8 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel (false), circuit (NULL), selection (-1) {
+CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel (false), circuit (NULL), selection (-1)  {
+  NextGateToSimulate = 0;
   add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);
   signal_button_press_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_press_event));
   signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
@@ -83,7 +84,6 @@ bool CircuitWidget::onScrollEvent (GdkEventScroll *event) {
 
 bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
   (void)event; // placate compiler..
-
   // This is where we draw on the window
   Glib::RefPtr<Gdk::Window> window = get_window();
   if(window) {
@@ -102,7 +102,12 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->fill ();
     cr->translate (xc-ext.width/2-cx, yc-ext.height/2-cy);
     //cr->clip();
-    if (circuit != NULL) rects = draw_circuit (circuit, cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
+    if (circuit != NULL) {
+      rects = draw_circuit (circuit, cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
+      for (unsigned int i = 0; i < NextGateToSimulate; i++) {
+        drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+      }
+    }
   }
   return true;
 }
@@ -162,6 +167,25 @@ void CircuitWidget::set_scale (double x) {
   scale = x; 
   ext = get_circuit_size (circuit, &wirestart, &wireend, scale);
   force_redraw ();
+}
+
+bool CircuitWidget::step () {
+  if (!circuit) return false;
+  if (NextGateToSimulate < circuit->numGates ()) {
+    // Actually simulate here -> . <-
+    NextGateToSimulate++;
+    force_redraw ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void CircuitWidget::reset () {
+  if (circuit && NextGateToSimulate != 0) {
+    NextGateToSimulate = 0;
+    force_redraw ();
+  }
 }
 
 double CircuitWidget::get_scale () { return scale; }

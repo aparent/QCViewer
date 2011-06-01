@@ -13,7 +13,6 @@ public:
 protected:
 
   // Signal handlers:
-  // Our new improved on_button_clicked(). (see below)
   void on_button_clicked(Glib::ustring data);
   void on_menu_file_open_circuit ();
   void on_menu_file_open_arch ();
@@ -26,6 +25,9 @@ protected:
   void on_menu_zoom_in ();
   void on_menu_zoom_out ();
   void on_menu_zoom_100 ();
+  void on_menu_run ();
+  void on_menu_step();
+  void on_menu_reset();
   void unimplemented ();
 
 //  void on_architecture_load ();
