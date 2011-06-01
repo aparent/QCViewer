@@ -1,20 +1,24 @@
 #include "state.h"
 #include "utility.h" // ipow
 #include <complex>
+#include <iostream>
 
 using namespace std;
 
-State::State () {}
+State::State () {
+	dim = 0;
+}
 
 State::State (complex<float_t> amp, index_t bits) {
   data[bits] = amp;
 }
 
-State::State (stateVec &v) {
-  //assert (v.dim <= sizeof(index_t)*8);
-  for (index_t i = 0; i < (index_t)ipow(2,v.dim); i++) {
-    if (v.data[i] != complex<float_t>(0)) {
-      data[i] = v.data[i];
+State::State (stateVec *v) {
+  //assert (v.dim <= sizeof(index_t)*8)i;
+	dim = v->dim;
+  for (index_t i = 0; i < (index_t)v->dim; i++) {
+    if (v->data[i] != complex<float_t>(0)) {
+      data[i] = v->data[i];
     }
   }
 }

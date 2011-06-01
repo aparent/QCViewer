@@ -20,18 +20,18 @@ string printTree(parseNode *node);
 diracTerm evalTree(parseNode *node);
 
 
-stateVec getStateVec (std::string input, bool normalize = false){
+stateVec *getStateVec (std::string input, bool normalize){
 	parseNode *node = parseDirac(input); 
 	diracTerm term = evalTree(node);
 	if (normalize){
 		term.vecValue = term.vecValue/sqrt(cdot(term.vecValue,term.vecValue));
 	}
-	stateVec result;
+	stateVec *result= new stateVec;
 	cx_mat ket = term.vecValue;
-	result.dim = ket.n_rows;
-	result.data = new complex<float>[ket.n_rows];
+	result->dim = ket.n_rows;
+	result->data = new complex<float>[ket.n_rows];
 	for(unsigned int i=0;i<ket.n_rows;i++){
-		result.data[i] = ket(i,0);
+		result->data[i] = ket(i,0);
 	}
 	return result;
 }
