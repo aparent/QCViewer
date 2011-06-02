@@ -19,7 +19,7 @@ class Control{
 class Gate {
   public:
     string name;
-		int gateType;
+    int gateType;
 
     vector <Control> controls;
     vector <int> targets;
@@ -40,21 +40,21 @@ class NOTGate : public Gate {
 class HGate : public Gate {//hadamard gate
   public:
     int QCost(int numLines);
-		HGate();
+    HGate();
 };
 
 class FredGate : public Gate {//hadamard gate
   public:
     int QCost(int numLines);
-		FredGate();
+    FredGate();
 };
 
 class UGate : public Gate {//hadamard gate
   public:
     int QCost(int numLines);
     void setQCost(int QCost);
-		UGate(int QCost = 0);
-	private:
-		int cost; //stores quantum cosst
+    UGate(int QCost = 0);
+  private:
+    int cost; //stores quantum cosst
 };
 #endif
