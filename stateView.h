@@ -8,6 +8,7 @@ class stateView : public Gtk::Window
 public:
   stateView ();
   stateView (State s);
+	void redraw();
 
 	void set_state(State*);
   virtual ~stateView();

@@ -2,6 +2,7 @@
 #include <cairomm/context.h>
 #include <circuit.h>
 #include <circuitParser.h>
+#include <simulate.h>
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
@@ -172,7 +173,8 @@ void CircuitWidget::set_scale (double x) {
 bool CircuitWidget::step () {
   if (!circuit) return false;
   if (NextGateToSimulate < circuit->numGates ()) {
-    // Actually simulate here -> . <-
+		cout << state->data.size()<< endl;
+    *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
     NextGateToSimulate++;
     force_redraw ();
     return true;
@@ -186,6 +188,10 @@ void CircuitWidget::reset () {
     NextGateToSimulate = 0;
     force_redraw ();
   }
+}
+
+void CircuitWidget::set_state (State* n_state){
+	state = n_state;
 }
 
 double CircuitWidget::get_scale () { return scale; }

@@ -28,7 +28,7 @@ public:
   int get_Depth ();
   int get_NumGates ();
   
-  void load_state (State*);
+  void set_state (State*);
   bool step ();
   void reset ();
 protected:
@@ -48,6 +48,7 @@ private:
 
   void toggle_selection (int);
 
+	State *state;
   bool drawarch, drawparallel;
   Gtk::Window *win;
   int yoffset;

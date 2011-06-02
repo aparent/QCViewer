@@ -8,6 +8,7 @@
 QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
   set_title("QCViewer");
   set_border_width(0);
+	state = NULL;
 
   add(m_vbox);
  	m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
@@ -55,7 +56,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_load_state));
   m_refActionGroup->add(Gtk::Action::create ("SimulateRun", Gtk::Stock::GOTO_LAST, "Run", "Simulate the entire circuit"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_run));
   m_refActionGroup->add(Gtk::Action::create ("SimulateStep", Gtk::Stock::GO_FORWARD, "Step", "Advance the simulation through a single gate"),
@@ -207,8 +208,6 @@ void QCViewer::on_menu_file_open_arch () {
   }
 }
 void QCViewer::on_menu_simulate_show_stateView(){
-	State *s = new State(getStateVec ("(3|0>+1|1>)(2|0> + 4|1>)(|0>+|1>)"));
-	sView.set_state(s);
 	Gtk::Main::run(sView);
 }
 void QCViewer::on_menu_file_quit () {
@@ -262,8 +261,27 @@ void QCViewer::on_menu_zoom_100 () {
   c.set_scale (1);
 }
 
+void QCViewer::on_menu_load_state () {
+	Gtk::Dialog enterState("Enter State");
+	enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  enterState.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	Gtk::Entry stateEntry;
+	stateEntry.set_max_length(50);
+	stateEntry.show();
+	enterState.get_vbox()->pack_start(stateEntry,Gtk::PACK_SHRINK);
+	int result = enterState.run();
+	if (result == Gtk::RESPONSE_OK){
+		if (state!=NULL) delete state;
+		state = new State(getStateVec (stateEntry.get_text(), true));
+		sView.set_state(state);
+		c.set_state(state);
+	}
+  c.reset ();
+}
+
 void QCViewer::on_menu_step () {
   c.step();
+	sView.redraw();	
 }
 
 void QCViewer::on_menu_reset () {

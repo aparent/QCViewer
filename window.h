@@ -31,6 +31,7 @@ protected:
   void on_menu_reset();
   void unimplemented ();
   void on_menu_simulate_show_stateView ();
+	void on_menu_load_state ();
 //  void on_architecture_load ();
 
 //  void on_menu_simulation_reset ();
@@ -52,6 +53,7 @@ protected:
 	stateView sView;
 	Gtk::Statusbar m_statusbar; 
 private:
+	State *state;
   bool drawparallel;
   bool drawarch;
 };
