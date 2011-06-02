@@ -61,5 +61,8 @@ install (TARGETS QC DESTINATION lib)
 
 add_executable (diracTest  diracTest.cpp )
 target_link_libraries(diracTest QC )
+
+add_executable (simTest  simTest.cpp )
+target_link_libraries(simTest QC )
 #add_executable (testParser testParser.cpp)
 #target_link_libraries(testParser QCLib)
