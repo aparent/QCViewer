@@ -263,7 +263,8 @@ void QCViewer::on_menu_zoom_100 () {
 }
 
 void QCViewer::on_menu_step () {
-  c.step();
+  c.insert_gate();
+  //c.step();
 }
 
 void QCViewer::on_menu_reset () {

@@ -18,10 +18,17 @@ class Colour {
     float r, g, b, a;
 };
 
-cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend, double scale);
+class LayoutColumn {
+public:
+  LayoutColumn (unsigned int, double);
+  unsigned int lastGateID;
+  double pad;
+};
+
+cairo_rectangle_t get_circuit_size (Circuit *c, vector<LayoutColumn>&, double* wirestart, double* wireend, double scale);
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext);
 cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
-vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int);
+vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int);
 void write_to_png (cairo_surface_t* surf, string filename);
 int pickRect (vector<gateRect> rects, double x, double y);
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);

@@ -31,6 +31,7 @@ public:
   void load_state (State*);
   bool step ();
   void reset ();
+  void insert_gate ();
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -40,6 +41,8 @@ protected:
   virtual bool on_button_press_event(GdkEventButton* event);
 
 private:
+  vector<LayoutColumn> layout;
+
   bool simulation_enabled;
   unsigned int NextGateToSimulate;
 
@@ -47,6 +50,7 @@ private:
   double oldmousex, oldmousey;
 
   void toggle_selection (int);
+  void fix_layout (unsigned int);
 
   bool drawarch, drawparallel;
   Gtk::Window *win;

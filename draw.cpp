@@ -28,6 +28,8 @@ float wireToY (int x) {
   return yoffset+(x+1)*wireDist;
 }
 
+LayoutColumn::LayoutColumn (unsigned int g, double p) : lastGateID(g), pad(p) {}
+
 void drawWire (cairo_t *cr, float x1, float y1, float x2, float y2, float thickness) {
   cairo_set_line_width (cr, thickness);
   cairo_set_source_rgb (cr, 0, 0, 0);
@@ -236,7 +238,7 @@ int pickRect (vector<gateRect> rects, double x, double y) {
   return -1;
 }
 
-vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wireend, bool forreal) {
+vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) {
   vector <gateRect> rects;
   cairo_set_source_rgb (cr, 0, 0, 0);
 
@@ -264,17 +266,19 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
   float xcurr = xinit+2.0*gatePad;
   int mingw, maxgw;
 // TODO ?? int minw = -1;
-  vector <int> parallels = c->getGreedyParallel ();
+// TODO: remove  vector <int> parallels = c->getGreedyParallel ();
 
   // Draw them in parallel using the greedy strategy.
-  int i = 0;
-  for (unsigned int j = 0; j < parallels.size(); j++) {
+  unsigned int i = 0;
+  cout << "columns size: " << columns.size() << endl << flush; 
+  if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
+  for (unsigned int j = 0; j < columns.size(); j++) {
     float maxwidth = 0;
-    for (; i <= parallels[j]; i++) {
+    for (; i <= columns[j].lastGateID; i++) {
       Gate* g = c->getGate (i);
       gateRect r;
       minmaxWire (&g->controls, &g->targets, &mingw, &maxgw);
-      int count = 1; // hack
+      int count = 1; // hack TODO: not nec. with the H-gate hack disabled
       switch (g->gateType) {
         case NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
         case FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
@@ -299,11 +303,11 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
           //}
           break;
        }
-      for (int i = 0; i < count; i++) rects.push_back(r);
-      maxwidth = max (maxwidth, r.width);
+       for (int i = 0; i < count; i++) rects.push_back(r);
+       maxwidth = max (maxwidth, r.width);
     //  drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
     }
-    xcurr += maxwidth + gatePad;
+    xcurr += maxwidth + gatePad + columns[j].pad;
   }
   *wireend = xcurr - gatePad;
 
@@ -354,14 +358,15 @@ cairo_surface_t* make_svg_surface (string file, cairo_rectangle_t ext) {
   return img_surface;
 }
 
-cairo_rectangle_t get_circuit_size (Circuit *c, double* wirestart, double* wireend, double scale) {
+cairo_rectangle_t get_circuit_size (Circuit *c, vector<LayoutColumn>& columns, double* wirestart, double* wireend, double scale) {
+cout << "hello\n" << flush;
   cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
   cairo_t *cr = cairo_create(unbounded_rec_surface);
   cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
   cairo_scale (cr, scale, scale);
   cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
-  draw (cr, c, wirestart, wireend, false); // XXX fix up these inefficienies!!
+  draw (cr, c, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
   cairo_rectangle_t ext;
   cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
   cairo_destroy (cr);
@@ -377,14 +382,15 @@ void write_to_png (cairo_surface_t* surf, string filename) {
   }
 }
 
-vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
+
+vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
   cairo_scale (cr, scale, scale);
   cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;
   drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart+xoffset, wireend, scale);
-  rects = draw (cr, c, &wirestart, &wireend, true);
+  rects = draw (cr, c, columns, &wirestart, &wireend, true);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
   if (selection != -1) drawSelections (cr, rects, selection);

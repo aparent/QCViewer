@@ -84,7 +84,6 @@ bool CircuitWidget::onScrollEvent (GdkEventScroll *event) {
 
 bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
   (void)event; // placate compiler..
-  // This is where we draw on the window
   Glib::RefPtr<Gdk::Window> window = get_window();
   if(window) {
     Gtk::Allocation allocation = get_allocation();
@@ -103,7 +102,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->translate (xc-ext.width/2-cx, yc-ext.height/2-cy);
     //cr->clip();
     if (circuit != NULL) {
-      rects = draw_circuit (circuit, cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
+      rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
       }
@@ -115,6 +114,10 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
 void CircuitWidget::load (string file) {
   if (circuit != NULL) delete circuit;
   circuit = parseCircuit(file);
+  layout.clear ();
+  vector<int> parallels = circuit->getGreedyParallel ();
+  for (unsigned int i = 0; i < parallels.size(); i++)
+    layout.push_back (LayoutColumn(parallels[i], 20.0));
   if (circuit == NULL) {
     cout << "Error loading circuit" << endl;
     return;
@@ -140,12 +143,12 @@ void CircuitWidget::set_drawparallel (bool foo) { drawparallel = foo; force_redr
 void CircuitWidget::savepng (string filename) {
   if (!circuit) return;
   double wirestart, wireend;
-  cairo_rectangle_t ext = get_circuit_size (circuit, &wirestart, &wireend, 1.0);
+  cairo_rectangle_t ext = get_circuit_size (circuit, layout, &wirestart, &wireend, 1.0);
 
   cairo_surface_t* surface = make_png_surface (ext);
   cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-  draw_circuit (circuit, cr, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, -1);
+  draw_circuit (circuit, cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, -1);
   write_to_png (surface, filename);
   cairo_destroy (cr);
   cairo_surface_destroy (surface);
@@ -154,18 +157,18 @@ void CircuitWidget::savepng (string filename) {
 void CircuitWidget::savesvg (string filename) {
   if (!circuit) return;
   double wirestart, wireend;
-  cairo_rectangle_t ext = get_circuit_size (circuit, &wirestart, &wireend, 1.0);
+  cairo_rectangle_t ext = get_circuit_size (circuit, layout, &wirestart, &wireend, 1.0);
   cairo_surface_t* surface = make_svg_surface (filename, ext);
   cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-  draw_circuit (circuit, cr, drawarch, drawparallel, ext, wirestart, wireend, 1.0, -1);
+  draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, -1);
   cairo_destroy (cr);
   cairo_surface_destroy (surface);
 }
 
 void CircuitWidget::set_scale (double x) { 
   scale = x; 
-  ext = get_circuit_size (circuit, &wirestart, &wireend, scale);
+  ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
 }
 
@@ -192,3 +195,32 @@ double CircuitWidget::get_scale () { return scale; }
 int CircuitWidget::get_QCost () { return circuit->QCost(); }
 int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
 int CircuitWidget::get_NumGates () { return circuit->numGates(); }
+
+void CircuitWidget::insert_gate () {
+  if (!circuit) return;
+  Gate* g = new UGate;
+  g->name = "FOOOOOBAR";
+  g->controls.push_back(Control(0,false));
+  g->targets.push_back(1);
+  circuit->addGate (g, 0+1);
+  fix_layout (0);
+  ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+  force_redraw ();
+}
+
+void CircuitWidget::fix_layout (unsigned int c) {
+  if (c == circuit->numGates () - 1) layout.push_back(LayoutColumn(c, 0));
+  vector<LayoutColumn>::iterator it;
+  for (it = layout.begin(); it != layout.end (); it++) {
+    if ((*it)->lastGateID < c) continue;
+    if ((*it)->lastGateID == c) {
+      if (layout.begin () != it && (*(it-1))->lastGateID != c - 1)
+  }
+
+
+
+  for (it = layout.begin() + 1; it != layout.end () && (*it).lastGateID < c; it++);
+  if ((*it).lastGateID == c) layout.insert(it, LayoutColumn(c, 0));
+  else { layout.insert (it, LayoutColumn (c - 1, 0)); layout.insert(it, LayoutColumn (c, 0)); }
+  for (; it != layout.end (); it++) (*it).lastGateID+=1;
+}
