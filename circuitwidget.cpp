@@ -35,7 +35,7 @@ bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
 bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
   if (panning) {
     cx -= (event->x - oldmousex);
-    cy -= (event->y - oldmousey); 
+    cy -= (event->y - oldmousey);
     oldmousex = event->x;
     oldmousey = event->y;
     force_redraw ();
@@ -164,18 +164,19 @@ void CircuitWidget::savesvg (string filename) {
   cairo_surface_destroy (surface);
 }
 
-void CircuitWidget::set_scale (double x) { 
-  scale = x; 
+void CircuitWidget::set_scale (double x) {
+  scale = x;
   ext = get_circuit_size (circuit, &wirestart, &wireend, scale);
   force_redraw ();
 }
 
 bool CircuitWidget::step () {
   if (!circuit) return false;
+  if (!state) return false;
   if (NextGateToSimulate < circuit->numGates ()) {
-		cout << state->data.size()<< endl;
     *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
     NextGateToSimulate++;
+		state->print();
     force_redraw ();
     return true;
   } else {

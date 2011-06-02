@@ -273,6 +273,7 @@ void QCViewer::on_menu_load_state () {
 	if (result == Gtk::RESPONSE_OK){
 		if (state!=NULL) delete state;
 		state = new State(getStateVec (stateEntry.get_text(), true));
+		state->print();
 		sView.set_state(state);
 		c.set_state(state);
 	}
