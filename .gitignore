@@ -1,3 +1,4 @@
+diracParser.output
 *.o
 CMakeCache.txt
 CMakeFiles/*

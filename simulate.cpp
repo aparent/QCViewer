@@ -1,11 +1,12 @@
-#include "circuit.h"
-#include "gate.h"
-#include "state.h"
+#include "simulate.h"
 #include <string>
+
+complex<float> *getGateMatrix(string gateName);//defined below
 
 /*
  Registers: stored as a bitstring, register i at bit i etc.
 */
+
 unsigned int SetRegister (unsigned int bits, unsigned int reg) {
   return bits | 1<<reg;
 }
@@ -76,7 +77,7 @@ State* ApplyGateToBasis (index_t bitString, Gate *g) {
     }
   }
   if (ctrl) {
-    return ApplyU (bitString, &g->targets, g->matrix);
+    return ApplyU (bitString, &g->targets, getGateMatrix(g->name));
   } else {
     State *answer = new State (bitString, 1); // with amplitude 1 the input bitString is unchanged
     return answer;
@@ -89,37 +90,38 @@ State* ApplyGateToBasis (index_t bitString, Gate *g) {
    the answers (weighed appropriately) into the answer.
    NULL on error (couldn't find a unitary.)
 */
-State* ApplyGate (State* in, Gate* g) {
+State ApplyGate (State* in, Gate* g) {
   map<index_t, complex<float_t> >::iterator it;
-  State* answer = new State;
+  State answer;
   for (it = in->data.begin(); it != in->data.end(); it++) {
     State* tmp = ApplyGateToBasis (it->first, g);
     if (tmp == NULL) return NULL;
     complex<float_t> foo = (*it).second;
     *tmp *= foo;
-    *answer += *tmp;
+    answer += *tmp;
     delete tmp;
   }
   return answer;
 }
 
 complex<float> *getGateMatrix(string gateName){
-	complex<float> * ret;
+	complex<float> * ret = NULL;
 	if (gateName.compare("H")     == 0){
-		ret = new complex<float>[4]
+		ret = new complex<float>[4];
 		ret[0]=  1 ; ret[2]=  1;
 		ret[1]=  1 ; ret[3]= -1;
 	}
-	if (gateName.compare("T")     == 0){
-		ret = new complex<float>[4]
+	else if (gateName.compare("T")     == 0){
+		ret = new complex<float>[4];
 		ret[0]=  0 ; ret[2]=  1;
 		ret[1]=  1 ; ret[3]=  0;
 	}
-	if (gateName.compare("F")     == 0){
-		ret = new complex<float>[16]
+	else if (gateName.compare("F")     == 0){
+		ret = new complex<float>[16];
 		ret[0 ]=  1 ; ret[4 ]=  0; ret[8 ]=  0 ; ret[12]=  0;
 		ret[1 ]=  0 ; ret[5 ]=  0; ret[9 ]=  1 ; ret[13]=  0;
 		ret[2 ]=  0 ; ret[6 ]=  1; ret[10]=  0 ; ret[14]=  0;
 		ret[3 ]=  0 ; ret[7 ]=  0; ret[11]=  0 ; ret[15]=  1;
 	}
+	return ret;
 }

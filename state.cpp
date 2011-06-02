@@ -1,7 +1,6 @@
 #include "state.h"
 #include "utility.h" // ipow
 #include <complex>
-#include <iostream>
 
 using namespace std;
 
