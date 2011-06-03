@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (QCLib)
 
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-g -Wall -ansi -pedantic" )
 
 SET(QCLIB_SRC_FILES
 	circuit.cpp
@@ -64,5 +64,8 @@ target_link_libraries(diracTest QC )
 
 add_executable (simTest  simTest.cpp )
 target_link_libraries(simTest QC )
+
+add_executable (testParser  testParser.cpp )
+target_link_libraries(testParser QC )
 #add_executable (testParser testParser.cpp)
 #target_link_libraries(testParser QCLib)

@@ -1,5 +1,5 @@
-#ifndef  DIRAC
-#define  DIRAC
+#ifndef  DIRAC_INCLUDE
+#define  DIRAC_INCLUDE
 
 #include <string>
 #include <complex>

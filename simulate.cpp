@@ -4,7 +4,13 @@
 #include <iostream>//XXX
 #include "utility.h"
 
-complex<float> *getGateMatrix(string gateName);//defined below
+
+struct gateMatrix{
+	unsigned int dim;
+	complex<float> * data;
+};
+
+gateMatrix getGateMatrix(string gateName);//defined below
 
 /*
  Registers: stored as a bitstring, register i at bit i etc.
@@ -27,19 +33,12 @@ unsigned int GetRegister (unsigned int bits, unsigned int reg) {
 */
 unsigned int ExtractInput (index_t bitString, vector<int>* targetMap) {
   unsigned int input = 0;
-	cout << "\n\n\nExtractOnput(";
-	printIntBin(bitString); cout << ", targets[";
-	for (unsigned int i = 0; i < targetMap->size (); i++) cout << (*targetMap)[i] << ", ";
-	cout << "]):" << endl;
+	for (unsigned int i = 0; i < targetMap->size (); i++)
   for (unsigned int i = 0; i < targetMap->size(); i++) {
     if (GetRegister (bitString, (*targetMap)[i])) {
-			cout << "set bit: " << i << endl;
       input = SetRegister (input, i);
     }
   }
-	cout <<"\t";
-	printIntBin (input);
-	cout << "\n\n\n";
   return input;
 }
 
@@ -49,8 +48,7 @@ unsigned int ExtractInput (index_t bitString, vector<int>* targetMap) {
 index_t BuildBitString (index_t orig, vector<int>* targetMap, unsigned int ans) {
   unsigned int output = orig;
   for (unsigned int i = 0; i < targetMap->size (); i++) {
-    if (GetRegister (ans, i)) {
-      output = SetRegister (output, (*targetMap)[i]);
+    if (GetRegister (ans, i)) {      output = SetRegister (output, (*targetMap)[i]);
     } else {
       output = UnsetRegister (output, (*targetMap)[i]);
     }
@@ -62,21 +60,15 @@ index_t BuildBitString (index_t orig, vector<int>* targetMap, unsigned int ans) 
    the targets, which describe which bits map to which inputs of the matrix.
    It returns a (usually very sparse) quantum state.
 */
-State* ApplyU (index_t bits, vector<int>* targets, complex<float_t>* matrix) {
-	cout << "ApplyU In:";
-	printIntBin(bits);
-	cout << endl;
+State* ApplyU (index_t bits, vector<int>* targets, gateMatrix matrix) {
   unsigned int input = ExtractInput (bits, targets);
   // now, go through all rows of the output from the correct column of U
   State *answer = new State;
-	unsigned int dim = sqrt(sizeof(matrix));
-  for (unsigned int i = 0; i < dim; i++) {
-    if (matrix[input*dim+i] != complex<float_t>(0)){
-			*answer += State(matrix[input*dim+i], BuildBitString (bits, targets, i));
+  for (unsigned int i = 0; i < matrix.dim; i++) {
+    if (matrix.data[input*matrix.dim+i] != complex<float_t>(0)){
+			*answer += State(matrix.data[input*matrix.dim+i], BuildBitString (bits, targets, i));
 		}
   }
-	cout << "Apply U Out:";
-	answer->print();
   return answer;
 }
 
@@ -88,10 +80,8 @@ State* ApplyGateToBasis (index_t bitString, Gate *g) {
   bool ctrl = true;
   for (unsigned int i = 0; i < g->controls.size(); i++) {
     Control c = g->controls[i];
-		cout << "control wire: " << c.wire << endl;
     int check = GetRegister (bitString, c.wire);
     if (!(!c.polarity == check)) {
-			cout << "No Control" << endl;
       ctrl = false; // control line not satisfied.
       break;
     }
@@ -116,7 +106,9 @@ State ApplyGate (State* in, Gate* g) {
 	answer.dim = in->dim;
   for (it = in->data.begin(); it != in->data.end(); it++) {
     State* tmp = ApplyGateToBasis (it->first, g);
-    if (tmp == NULL) return NULL;
+    if (tmp == NULL){
+			 return NULL;
+		}
     complex<float_t> foo = (*it).second;
     *tmp *= foo;
     answer += *tmp;
@@ -125,24 +117,27 @@ State ApplyGate (State* in, Gate* g) {
   return answer;
 }
 
-complex<float> *getGateMatrix(string gateName){
-	complex<float> * ret = NULL;
+gateMatrix getGateMatrix(string gateName){
+	gateMatrix ret;
 	if (gateName.compare("H")     == 0){
-		ret = new complex<float>[4];
-		ret[0]=  1/sqrt(2) ; ret[2]=  1/sqrt(2);
-		ret[1]=  1/sqrt(2) ; ret[3]= -1/sqrt(2);
+		ret.data = new complex<float>[4];
+		ret.data[0]=  1/sqrt(2) ; ret.data[2]=  1/sqrt(2);
+		ret.data[1]=  1/sqrt(2) ; ret.data[3]= -1/sqrt(2);
+		ret.dim = 2;
 	}
 	else if (gateName.compare("T")     == 0){
-		ret = new complex<float>[4];
-		ret[0]=  0 ; ret[2]=  1;
-		ret[1]=  1 ; ret[3]=  0;
+		ret.data = new complex<float>[4];
+		ret.data[0]=  0 ; ret.data[2]=  1;
+		ret.data[1]=  1 ; ret.data[3]=  0;
+		ret.dim = 2;
 	}
 	else if (gateName.compare("F")     == 0){
-		ret = new complex<float>[16];
-		ret[0 ]=  1 ; ret[4 ]=  0; ret[8 ]=  0 ; ret[12]=  0;
-		ret[1 ]=  0 ; ret[5 ]=  0; ret[9 ]=  1 ; ret[13]=  0;
-		ret[2 ]=  0 ; ret[6 ]=  1; ret[10]=  0 ; ret[14]=  0;
-		ret[3 ]=  0 ; ret[7 ]=  0; ret[11]=  0 ; ret[15]=  1;
+		ret.data = new complex<float>[16];
+		ret.data[0 ]=  1 ; ret.data[4 ]=  0; ret.data[8 ]=  0 ; ret.data[12]=  0;
+		ret.data[1 ]=  0 ; ret.data[5 ]=  0; ret.data[9 ]=  1 ; ret.data[13]=  0;
+		ret.data[2 ]=  0 ; ret.data[6 ]=  1; ret.data[10]=  0 ; ret.data[14]=  0;
+		ret.data[3 ]=  0 ; ret.data[7 ]=  0; ret.data[11]=  0 ; ret.data[15]=  1;
+		ret.dim = 4;
 	}
 	return ret;
 }

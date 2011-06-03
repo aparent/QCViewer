@@ -1,7 +1,8 @@
-#include <stdlib.h>
-#include <iostream>
-#include <string>
+#ifndef TFC_LEXER
+#define TFC_LEXER
+
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -14,3 +15,5 @@ struct TFCToken{
 };
 
 vector<TFCToken> *lexCircuit(string fileName);
+
+#endif
