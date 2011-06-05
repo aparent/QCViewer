@@ -26,7 +26,7 @@ void Circuit::addGate(Gate *newGate){
 }
 
 void Circuit::addGate(Gate *newGate, int pos){
-  gates.insert(gates.begin()+pos,newGate);
+  gates.insert(gates.begin()+pos, newGate);
 }
 
 Gate* Circuit::getGate(int pos){
