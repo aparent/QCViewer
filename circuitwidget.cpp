@@ -5,6 +5,7 @@
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
+#include <sstream> // XXX: itoa, remove later
 
 using namespace std;
 
@@ -57,7 +58,8 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
     cout << "which translates to (" << x << ", "<< y << ")" << endl << flush;
     int i = pickRect (rects, x, y);
     if (i == -1) cout << "no gate clicked..." << endl << flush;
-    else cout << "clicked gate " << i << endl << flush;
+    else { cout << "clicked gate " << i << endl << flush;
+           insert_gate(i); }
 
     selection = i;
     force_redraw ();
@@ -196,31 +198,42 @@ int CircuitWidget::get_QCost () { return circuit->QCost(); }
 int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
 int CircuitWidget::get_NumGates () { return circuit->numGates(); }
 
-void CircuitWidget::insert_gate () {
+void CircuitWidget::insert_gate (unsigned int x) {
+  cout << "\n\n\nInserting gate after pos " << x << "...\n";
+  cout << "layout";
+  for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;
+  cout << ".\n";
   if (!circuit) return;
   Gate* g = new UGate;
-  g->name = "FOOOOOBAR";
+  static int id = 0;
+std::stringstream out;
+out << id++;
+  g->name = out.str();
   g->controls.push_back(Control(0,false));
   g->targets.push_back(1);
-  circuit->addGate (g, 0+1);
-  fix_layout (0);
+  unsigned int i;
+  for (i = 0; i < layout.size() && layout[i].lastGateID < x; i++);
+  unsigned int pos = layout[i].lastGateID + 1;
+  cout << "Column " << i << " has lastGateID = " << layout[i].lastGateID << ".\n" << flush;
+  cout << "Will insert gate as gate # "<< pos << ".\n";
+  for (unsigned int j = i + 1; j < layout.size (); j++) { cout << "gate " << layout[j].lastGateID << "++\n"; layout[j].lastGateID += 1; }
+  circuit->addGate (g, pos);
+  cout << "gate[pos].name = " << circuit->getGate(pos)->name << "\n";
+  layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0)); 
+  cout << "layout";
+  for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;
+  cout << ".\n";
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
 }
 
-void CircuitWidget::fix_layout (unsigned int c) {
-  if (c == circuit->numGates () - 1) layout.push_back(LayoutColumn(c, 0));
-  vector<LayoutColumn>::iterator it;
-  for (it = layout.begin(); it != layout.end (); it++) {
-    if ((*it)->lastGateID < c) continue;
-    if ((*it)->lastGateID == c) {
-      if (layout.begin () != it && (*(it-1))->lastGateID != c - 1)
+void CircuitWidget::delete_gate (unsigned int id) {
+  for (unsigned int i = 0; i < layout.size(); i++) {
+    if (layout[i].lastGateID > id) break;
+    if (layout[i].lastGateID < id) continue;
+    // layout[i].lastGateID == id
+    if (i == 0 || layout[i - 1].lastGateID = id - 1) {
+      
+    } else break;
   }
-
-
-
-  for (it = layout.begin() + 1; it != layout.end () && (*it).lastGateID < c; it++);
-  if ((*it).lastGateID == c) layout.insert(it, LayoutColumn(c, 0));
-  else { layout.insert (it, LayoutColumn (c - 1, 0)); layout.insert(it, LayoutColumn (c, 0)); }
-  for (; it != layout.end (); it++) (*it).lastGateID+=1;
 }

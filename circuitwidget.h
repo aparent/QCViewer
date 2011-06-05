@@ -31,7 +31,7 @@ public:
   void load_state (State*);
   bool step ();
   void reset ();
-  void insert_gate ();
+  void insert_gate (unsigned int);
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -50,7 +50,6 @@ private:
   double oldmousex, oldmousey;
 
   void toggle_selection (int);
-  void fix_layout (unsigned int);
 
   bool drawarch, drawparallel;
   Gtk::Window *win;
