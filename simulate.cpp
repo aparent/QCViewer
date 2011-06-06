@@ -5,11 +5,6 @@
 #include "utility.h"
 
 
-struct gateMatrix{
-	unsigned int dim;
-	complex<float> * data;
-};
-
 gateMatrix getGateMatrix(Gate*);//defined below
 
 /*
@@ -126,40 +121,4 @@ State ApplyGate (State* in, Gate* g) {
   return answer;
 }
 
-gateMatrix getGateMatrix(Gate *g){
-	gateMatrix ret;
-	if (g->name.compare("H") == 0){
-		ret.data = new complex<float>[4];
-		ret.data[0]=  1/sqrt(2) ; ret.data[2]=  1/sqrt(2);
-		ret.data[1]=  1/sqrt(2) ; ret.data[3]= -1/sqrt(2);
-		ret.dim = 2;
-	} else if (g->name.compare("T") == 0||g->name.compare("X") == 0){
-		ret.data = new complex<float>[4];
-		ret.data[0]=  0 ; ret.data[2]=  1;
-		ret.data[1]=  1 ; ret.data[3]=  0;
-		ret.dim = 2;
-	} else if (g->name.compare("Y") == 0){
-		ret.data = new complex<float>[4];
-		ret.data[0]=  0                   ; ret.data[2]=  -complex<float>(0,1);
-		ret.data[1]=  complex<float>(0,1) ; ret.data[3]=  0;
-		ret.dim = 2;
-	} else if (g->name.compare("Z") == 0){
-		ret.data = new complex<float>[4];
-		ret.data[0]=  1 ; ret.data[2]=   0;
-		ret.data[1]=  0 ; ret.data[3]=  -1;
-		ret.dim = 2;
-	} else if (g->name.compare("R") == 0){
-		ret.data = new complex<float>[4];
-		ret.data[0]=  1 ; ret.data[2]=   0;
-		ret.data[1]=  0 ; ret.data[3]=  exp(complex<float>(0,g->setting));
-		ret.dim = 2;
-	} else if (g->name.compare("F") == 0){
-		ret.data = new complex<float>[16];
-		ret.data[0 ]=  1 ; ret.data[4 ]=  0; ret.data[8 ]=  0 ; ret.data[12]=  0;
-		ret.data[1 ]=  0 ; ret.data[5 ]=  0; ret.data[9 ]=  1 ; ret.data[13]=  0;
-		ret.data[2 ]=  0 ; ret.data[6 ]=  1; ret.data[10]=  0 ; ret.data[14]=  0;
-		ret.data[3 ]=  0 ; ret.data[7 ]=  0; ret.data[11]=  0 ; ret.data[15]=  1;
-		ret.dim = 4;
-	}
-	return ret;
-}
+
