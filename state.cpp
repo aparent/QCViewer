@@ -17,12 +17,14 @@ State::State (complex<float_t> amp, index_t bits) {
 
 State::State (stateVec *v) {
   //assert (v.dim <= sizeof(index_t)*8)i;
-	dim = v->dim;
-  for (index_t i = 0; i < (index_t)v->dim; i++) {
-    if (v->data[i] != complex<float_t>(0)) {
-      data[i] = v->data[i];
-    }
-  }
+	if ( v != NULL ){
+		dim = v->dim;
+  	for (index_t i = 0; i < (index_t)v->dim; i++) {
+    	if (v->data[i] != complex<float_t>(0)) {
+    	  data[i] = v->data[i];
+    	}
+  	}
+	}
 }
 
 complex<float_t> State::getAmplitude (index_t bits) {

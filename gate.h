@@ -20,6 +20,7 @@ class Gate {
   public:
     string name;
 		int gateType;
+		float setting; //used for R gate theta 
 
     vector <Control> controls;
     vector <int> targets;

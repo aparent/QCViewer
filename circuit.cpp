@@ -108,8 +108,6 @@ vector<int> Circuit::getParallel(){
   return returnValue;
 }
 
-void minmaxWire (vector<Control>*, vector<int>*, int*, int*); // XXX: forward declaration. hobo.
-
 // TODO: this is pretty akward to have outside the drawing code. Reorganize?
 vector<int> Circuit::getGreedyParallel(){
   vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)

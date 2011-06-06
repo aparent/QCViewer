@@ -1,10 +1,13 @@
 #include "circuitParser.h"
+#include <iostream>
 
 using namespace std;
 
-//NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator,
-//*(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
-//the vector location where it points now
+// NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator,
+// *(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
+// the vector location where it points now
+
+//TODO: parseCircuit should return null in the event of a parsing error 
 
 void parseLineNames(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
@@ -64,9 +67,9 @@ void parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
     }
   }
 	int numTarg;
-	if (gate->gateType==FRED){ 
+	if (gate->gateType==FRED){
 		numTarg = 2;
-	} 
+	}
 	else numTarg = 1;
 	for (int i = 0; i < numTarg; i++){
   	gate->targets.push_back(gate->controls.back().wire);
@@ -90,10 +93,32 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
   		newGate = new FredGate();
   		newGate->name = "F";
 		}
+		else if(((**it).value[0]) == 'x' ||((**it).value[0]) == 'X'){
+  		newGate = new UGate();
+  		newGate->name = "X";
+		}
+		else if(((**it).value[0]) == 'y' ||((**it).value[0]) == 'Y'){
+  		newGate = new UGate();
+  		newGate->name = "Y";
+		}
+		else if(((**it).value[0]) == 'z' ||((**it).value[0]) == 'Z'){
+  		newGate = new UGate();
+  		newGate->name = "Z";
+		}
+		else if(((**it).value[0]) == 'r' ||((**it).value[0]) == 'R'){
+  		newGate = new UGate();
+			(*it)++;
+			if ((**it).type != GATE_SET){
+				cout << "ERROR: No setting for R gate."<< endl;
+			}
+			istringstream ss((**it).value); 
+			ss >> newGate->setting; //Set setting for theta
+  		newGate->name = "R";
+		}
 		else{
   		newGate = new UGate();
-  		newGate->name = ((**it).value);	
-		} 
+  		newGate->name = ((**it).value);
+		}
   	parseGateInputs(newGate,circ,it);
   	circ->addGate(newGate);
   }
@@ -137,7 +162,7 @@ Circuit *parseCircuit (string file){
 			if (((**it).value).compare("GATES") == 0){
 				parseGates(circ,it);
 			}
-		}
+		} 
 		else if((**it).type == SEC_END){
 			break;
 		} else {
