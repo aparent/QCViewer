@@ -7,7 +7,7 @@
 
 using namespace std;
 
-enum gateType {NOT, H, FRED, U};
+enum gateType {R, U};
 
 class Control{
   public:
@@ -16,11 +16,10 @@ class Control{
     bool polarity;
 };
 
-class Gate {
+/*class Gate {
   public:
     string name;
 		int gateType;
-		float setting; //used for R gate theta 
 
     vector <Control> controls;
     vector <int> targets;
@@ -30,33 +29,50 @@ class Gate {
     int numNegCont();
 
     complex<float_t> *matrix;
+};*/
+
+/*
+GATE
+---------------
+This is the general gate class from which all gates are derived.
+Name is kept private since in the case of gates like the arbitray
+rotation gate we may want the name to be dependent on the rot amount
+*/
+class Gate {
+	public:
+		virtual string getName(); 
+		virtual void setName(string);
+		virtual State applyGate(State);
+
+		int gateType; //used with enum gateType
+		vector <Control> controls;
+		vector <unsigned int> targets;
 };
 
-class NOTGate : public Gate {
+//A general unitary gate
+class UGate : public Gate {
   public:
-    int QCost(int numLines);
-    NOTGate();
-};
+		string getName(); 
+		void setName(string);
+		State applyGate(State);
 
-class HGate : public Gate {//hadamard gate
-  public:
-    int QCost(int numLines);
-		HGate();
-};
-
-class FredGate : public Gate {//hadamard gate
-  public:
-    int QCost(int numLines);
-		FredGate();
-};
-
-class UGate : public Gate {//hadamard gate
-  public:
-    int QCost(int numLines);
-    void setQCost(int QCost);
-		UGate(int QCost = 0);
+		void setMatrix(complex<float_t>*)
 	private:
-		int cost; //stores quantum cosst
+    complex<float_t> *matrix;
+		string name;
+};
+
+//An arbitrary rotation gate
+class RGate : public Gate {
+  public:
+		string getName(); 
+		void setName(string);
+		State applyGate(State);
+
+		void setRotation(float_t)
+	private:
+    float *matrix;
+		string name;
 };
 
 void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax);
