@@ -81,8 +81,8 @@ void drawDot (cairo_t *cr, float xc, float yc, float radius, float thickness, bo
   }
 }
 
-gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
-  int minw, maxw;
+gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<unsigned int> *targ) {
+  unsigned int minw, maxw;
   minmaxWire (ctrl, targ, &minw, &maxw);
   for (unsigned int i = 0; i < ctrl->size(); i++) {
     drawDot (cr, xc, wireToY((*ctrl)[i].wire), dotradius, thickness, (*ctrl)[i].polarity);
@@ -97,8 +97,8 @@ gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vect
   return rect;
 }
 
-gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctrl, vector<int> *targ) {
-  int minw, maxw;
+gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctrl, vector<unsigned int> *targ) {
+  unsigned int minw, maxw;
   gateRect rect = drawControls (cr, xc, ctrl, targ);
   vector<Control> dummy;
   minmaxWire (&dummy, targ, &minw, &maxw); // only the targets
@@ -184,7 +184,7 @@ gateRect drawX (cairo_t *cr, float xc, float yc, float radius, float thickness) 
 }
 
 
-gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
+gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<unsigned int> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
   for (unsigned int i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawNOT (cr, xc, wireToY((*targ)[i]), radius, thickness);
@@ -193,10 +193,10 @@ gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<i
   return rect;
 }
 
-gateRect drawFred (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
+gateRect drawFred (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<unsigned int> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
-  int minw = (*targ)[0];
-  int maxw = (*targ)[0];
+  unsigned int minw = (*targ)[0];
+  unsigned int maxw = (*targ)[0];
   for (unsigned int i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawX (cr, xc, wireToY((*targ)[i]), radius, thickness);
     rect = combine_gateRect(rect, recttmp);
@@ -251,7 +251,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
 
   // gates
   float xcurr = xinit+2.0*gatePad;
-  int mingw, maxgw;
+  unsigned int mingw, maxgw;
 // TODO ?? int minw = -1;
   vector <int> parallels = c->getGreedyParallel ();
 
@@ -264,7 +264,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
       gateRect r;
       minmaxWire (&g->controls, &g->targets, &mingw, &maxgw);
       int count = 1; // hack
-      switch (g->gateType) {
+      switch (g->drawType) {
         case NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
         case FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
         default:
@@ -284,7 +284,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, double *wirestart, double *wiree
             // draw hadamards together. this isn't really cool. proof of concept.
             r = drawCU (cr, xcurr, g->name, &ctrl, &targ);
           } else {*/
-            r = drawCU (cr, xcurr, g->name, &g->controls, &g->targets);
+            r = drawCU (cr, xcurr, g->getName(), &g->controls, &g->targets);
           //}
           break;
        }
