@@ -48,6 +48,7 @@ void drawPWire (cairo_t *cr, float x, int numLines, float thickness) {
   cairo_set_source_rgb (cr, 0, 0, 0);
 }
 
+/* XXX: remove this next time i scroll by
 void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax) {
   int minw = (*targ)[0];
   int maxw = (*targ)[0];
@@ -63,7 +64,7 @@ void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dst
   *dstmin = minw;
   *dstmax = maxw;
 }
-
+*/
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill) {
   cairo_set_source_rgba (cr, fill.r, fill.g, fill.b, fill.a);
   cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
