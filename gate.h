@@ -8,6 +8,7 @@
 using namespace std;
 
 enum gateType {RGATE, UGATE};
+enum dType {NOT, FRED};
 
 //used to specify a control number and polarity
 class Control{
@@ -33,6 +34,7 @@ class Gate {
 		virtual State *applyToBasis(index_t)=0;
 
 		gateType type; //used with enum gateType
+		dType drawType;
 		vector <Control> controls;
 		vector <unsigned int> targets;
 };
@@ -73,5 +75,5 @@ class RGate : public Gate {
 		string name;
 };
 
-void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, int *dstmin, int *dstmax);
+void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned int *dstmin, unsigned int *dstmax);
 #endif

@@ -110,13 +110,13 @@ vector<int> Circuit::getGreedyParallel(){
   sort (parallel.begin (), parallel.end ());
   vector<int>  returnValue;
   map<int,int> linesUsed;
-  int maxw, minw;
+  unsigned int maxw, minw;
   int k = 0;
   for(unsigned int i = 0; i < numGates(); i++){
     start:
     Gate *g = getGate(i);
     minmaxWire (&g->controls, &g->targets, &minw, &maxw);
-    for (int j = minw; j <= maxw; j++) {
+    for (unsigned int j = minw; j <= maxw; j++) {
       if (linesUsed.find(j) != linesUsed.end()) {
         returnValue.push_back(i - 1);
         linesUsed.clear ();

@@ -90,8 +90,13 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 			float_t rot;
 			ss >>  rot;
   		newGate = new RGate(rot); //sets rotation amount 
-		}
-		else{
+		} else if (((**it).value[0]) == 'T'){
+  		newGate = new UGate("T");
+			newGate->drawType = NOT;
+		} else if (((**it).value[0]) == 'F'){
+  		newGate = new UGate("F");
+			newGate->drawType = FRED;
+		} else {
   		newGate = new UGate((**it).value);
 		}
   	parseGateInputs(newGate,circ,it);

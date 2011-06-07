@@ -5,7 +5,7 @@ Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
 Gate::~Gate(){}
 
-void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, int *dstmin, int *dstmax) {
+void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned *dstmin, unsigned *dstmax) {
   unsigned int minw = (*targ)[0];
   unsigned int maxw = (*targ)[0];
   for (unsigned int i = 1; i < targ->size (); i++) {
