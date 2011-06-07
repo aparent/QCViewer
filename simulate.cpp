@@ -1,16 +1,10 @@
 #include "simulate.h"
 #include <cmath>
 #include <string>
-#include <iostream>//XXX
 #include "utility.h"
 #include "gates/UGateLookup.h"
 
-
 gateMatrix getGateMatrix(Gate*);//defined below
-
-/*
- Registers: stored as a bitstring, register i at bit i etc.
-*/
 
 /*
 	This function takes an input quantum state and a gate.

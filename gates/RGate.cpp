@@ -3,7 +3,7 @@
 #include "utility.h"
 #include <cmath>
 #include <complex>
-#define PI 3.141592
+#define PI 3.14159265
 
 RGate::RGate(float_t n_rot) : rot(n_rot) {
 	drawType = DEFAULT;
