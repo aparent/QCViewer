@@ -6,6 +6,8 @@
 using namespace std;
 
 UGate::UGate(string n_name) : name(n_name) {
+	matrix = NULL;
+	drawType = DEFAULT;
 	type = UGATE;
 }
 
@@ -47,6 +49,7 @@ State *UGate::ApplyU (index_t bits){
   State *answer = new State;
 	if (matrix == NULL){
 		matrix = UGateLookup(name);
+		if (matrix == NULL) return NULL;
 	}
   for (unsigned int i = 0; i < matrix->dim; i++) {
     if (matrix->data[input*matrix->dim+i] != complex<float_t>(0)){

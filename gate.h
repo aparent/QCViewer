@@ -8,7 +8,7 @@
 using namespace std;
 
 enum gateType {RGATE, UGATE};
-enum dType {NOT, FRED};
+enum dType {NOT, FRED, DEFAULT};
 
 //used to specify a control number and polarity
 class Control{

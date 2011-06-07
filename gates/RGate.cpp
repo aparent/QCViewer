@@ -1,6 +1,7 @@
 #include "../gate.h"
 
 RGate::RGate(float_t n_rot) : rot(n_rot) {
+	drawType = DEFAULT;
 	type = RGATE;
 }
 

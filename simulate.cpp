@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>//XXX
 #include "utility.h"
+#include "gates/UGateLookup.h"
 
 
 gateMatrix getGateMatrix(Gate*);//defined below

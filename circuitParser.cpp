@@ -91,7 +91,7 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 			ss >>  rot;
   		newGate = new RGate(rot); //sets rotation amount 
 		} else if (((**it).value[0]) == 'T'){
-  		newGate = new UGate("T");
+  		newGate = new UGate("X");
 			newGate->drawType = NOT;
 		} else if (((**it).value[0]) == 'F'){
   		newGate = new UGate("F");
