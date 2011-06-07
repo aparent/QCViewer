@@ -14,11 +14,21 @@ bool StateWidget::on_expose_event(GdkEventExpose* event) {
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1,1,1);
     cr->fill();
-    draw_state (cr, state,(float)width,(float)height);
+    if (state != NULL)draw_state (cr, state,(float)width,(float)height);
   }
   return true;
 }
 	
 void StateWidget::set_state(State* n_state){
 	state = n_state;
+	force_redraw();
+}
+
+void StateWidget::force_redraw () {
+  Glib::RefPtr<Gdk::Window> win = get_window();
+  if (win) {
+    Gdk::Rectangle r(0, 0, get_allocation().get_width(),
+                     get_allocation().get_height());
+    win->invalidate_rect(r, false);
+  }
 }

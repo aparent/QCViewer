@@ -36,6 +36,7 @@ protected:
   void on_menu_simulate_show_stateView ();
 	void on_menu_pan ();
 	void on_menu_inserttest ();
+	void on_menu_load_state ();
 //  void on_architecture_load ();
 
 //  void on_menu_simulation_reset ();
@@ -60,7 +61,11 @@ protected:
 	Gtk::Widget* m_EditToolbar;
 	Gtk::Widget* m_SimulateToolbar;
 private:
+<<<<<<< HEAD
   enum Mode { EDIT_MODE, SIMULATE_MODE } mode;
+=======
+	State *state;
+>>>>>>> f0cff4326bd20b75dd4db906b3b5b55e7e20aa09
   bool drawparallel;
   bool drawarch;
 };

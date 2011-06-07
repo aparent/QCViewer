@@ -1,6 +1,6 @@
 #include "circuit.h"
 #include <cairo.h>
-#include <cairo-svg.h> 
+#include <cairo-svg.h>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -364,7 +364,7 @@ cout << "hello\n" << flush;
   cairo_t *cr = cairo_create(unbounded_rec_surface);
   cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
   cairo_scale (cr, scale, scale);
-  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
   draw (cr, c, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
   cairo_rectangle_t ext;
@@ -385,7 +385,7 @@ void write_to_png (cairo_surface_t* surf, string filename) {
 
 vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
   cairo_scale (cr, scale, scale);
-  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;

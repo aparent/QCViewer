@@ -2,6 +2,7 @@
 #include <cairomm/context.h>
 #include <circuit.h>
 #include <circuitParser.h>
+#include <simulate.h>
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
@@ -39,7 +40,6 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
   if (panning) {
     cx -= (event->x - oldmousex)/scale;
     cy -= (event->y - oldmousey)/scale;
-		cout << "cx: " << cx << ", cy: " << cy <<endl;
     oldmousex = event->x;
     oldmousey = event->y;
     force_redraw ();
@@ -179,17 +179,19 @@ void CircuitWidget::savesvg (string filename) {
   cairo_surface_destroy (surface);
 }
 
-void CircuitWidget::set_scale (double x) { 
-  scale = x; 
+void CircuitWidget::set_scale (double x) {
+  scale = x;
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
 }
 
 bool CircuitWidget::step () {
   if (!circuit) return false;
+  if (!state) return false;
   if (NextGateToSimulate < circuit->numGates ()) {
-    // Actually simulate here -> . <-
+    *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
     NextGateToSimulate++;
+		state->print();
     force_redraw ();
     return true;
   } else {
@@ -202,6 +204,10 @@ void CircuitWidget::reset () {
     NextGateToSimulate = 0;
     force_redraw ();
   }
+}
+
+void CircuitWidget::set_state (State* n_state){
+	state = n_state;
 }
 
 double CircuitWidget::get_scale () { return scale; }
