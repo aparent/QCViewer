@@ -48,23 +48,6 @@ void drawPWire (cairo_t *cr, float x, int numLines, float thickness) {
   cairo_set_source_rgb (cr, 0, 0, 0);
 }
 
-/* XXX: remove this next time i scroll by
-void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax) {
-  int minw = (*targ)[0];
-  int maxw = (*targ)[0];
-  for (unsigned int i = 1; i < targ->size (); i++) {
-    minw = min (minw, (*targ)[i]);
-    maxw = max (maxw, (*targ)[i]);
-  }
-
-  for (unsigned int i = 0; i < ctrl->size (); i++) {
-    minw = min (minw, (*ctrl)[i].wire);
-    maxw = max (maxw, (*ctrl)[i].wire);
-  }
-  *dstmin = minw;
-  *dstmax = maxw;
-}
-*/
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill) {
   cairo_set_source_rgba (cr, fill.r, fill.g, fill.b, fill.a);
   cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
@@ -214,10 +197,15 @@ gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<i
 
 gateRect drawFred (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
+  int minw = (*targ)[0];
+  int maxw = (*targ)[0];
   for (unsigned int i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawX (cr, xc, wireToY((*targ)[i]), radius, thickness);
     rect = combine_gateRect(rect, recttmp);
+    minw = min (minw, (*targ)[i]);
+    maxw = max (maxw, (*targ)[i]);
   }
+	if (ctrl->size() == 0) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw), thickness);
   return rect;
 }
 
