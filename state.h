@@ -17,6 +17,8 @@ public:
   State (std::complex<float_t> amp, index_t bits);
   State (stateVec *v);
 
+	void print();
+
   std::complex<float_t> getAmplitude (index_t bits);
   const State& operator+= (const State &r);
   const State& operator*= (const std::complex<float_t>);

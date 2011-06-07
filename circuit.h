@@ -4,7 +4,6 @@
 #include "gate.h"
 #include <vector>
 #include <string>
-#include <iostream> // (XXX)
 using namespace std;
 
 class Line {

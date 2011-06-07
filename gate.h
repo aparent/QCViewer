@@ -20,6 +20,7 @@ class Gate {
   public:
     string name;
     int gateType;
+		float setting; //used for R gate theta 
 
     vector <Control> controls;
     vector <int> targets;
@@ -57,4 +58,6 @@ class UGate : public Gate {//hadamard gate
   private:
     int cost; //stores quantum cosst
 };
+
+void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax);
 #endif

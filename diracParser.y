@@ -42,7 +42,7 @@ input:			 /*empty*/
 						 														}
 		 ;
 		 subex: term
-		 				| subex subex	%prec low   {
+		 				| subex subex	%prec low     {
 																					parseNode * val = new parseNode;
 																					val->value = "*"; val->left = $1; val->right=$2;
 																					val->type = TIMES;
