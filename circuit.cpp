@@ -25,8 +25,12 @@ void Circuit::addGate(Gate *newGate){
   gates.push_back(newGate);
 }
 
-void Circuit::addGate(Gate *newGate, int pos){
+void Circuit::addGate(Gate *newGate, unsigned int pos){
   gates.insert(gates.begin()+pos, newGate);
+}
+
+void Circuit::removeGate (unsigned int pos) {
+  gates.erase (gates.begin () + pos);
 }
 
 Gate* Circuit::getGate(int pos){
