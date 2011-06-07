@@ -9,7 +9,7 @@ using namespace std;
 
 enum gateType {R, U};
 
-//used to specify a control number and polarity 
+//used to specify a control number and polarity
 class Control{
   public:
     Control (int,bool);
@@ -27,7 +27,7 @@ rotation gate we may want the name to be dependent on the rot amount
 
 class Gate {
 	public:
-		virtual string getName(); 
+		virtual string getName();
 		virtual State applyGate(State);
 
 		int gateType; //used with enum gateType
@@ -46,7 +46,7 @@ class UGate : public Gate {
   public:
 		UGate();
 
-		string getName(); 
+		string getName();
 		State applyGate(State);
 
 		void setName(string);
@@ -58,14 +58,14 @@ class UGate : public Gate {
 //An arbitrary rotation gate
 class RGate : public Gate {
   public:
-		string getName(); 
+		string getName();
 		State applyGate(State);
 
-		void setRotation(float_t)
+		void setRotation(float_t);
 	private:
     float rot;
 		string name;
 };
 
-void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax);
+void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, int *dstmin, int *dstmax);
 #endif

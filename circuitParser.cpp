@@ -67,7 +67,7 @@ void parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
     }
   }
 	int numTarg;
-	if (gate->gateType==FRED){
+	if (gate->getName().compare("F")==0){
 		numTarg = 2;
 	}
 	else numTarg = 1;
@@ -81,43 +81,20 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 	(*it)++;
   while((**it).type != SEC_END){
   	Gate *newGate;
-		if (((**it).value).compare("H") == 0 || ((**it).value).compare("h") == 0){
-  		newGate = new HGate();
-  		newGate->name = "H";
-		}
-		else if(((**it).value[0]) == 't' ||((**it).value[0]) == 'T'){
-  		newGate = new NOTGate();
-  		newGate->name = "T";
-		}
-		else if(((**it).value[0]) == 'f' ||((**it).value[0]) == 'F'){
-  		newGate = new FredGate();
-  		newGate->name = "F";
-		}
-		else if(((**it).value[0]) == 'x' ||((**it).value[0]) == 'X'){
-  		newGate = new UGate();
-  		newGate->name = "X";
-		}
-		else if(((**it).value[0]) == 'y' ||((**it).value[0]) == 'Y'){
-  		newGate = new UGate();
-  		newGate->name = "Y";
-		}
-		else if(((**it).value[0]) == 'z' ||((**it).value[0]) == 'Z'){
-  		newGate = new UGate();
-  		newGate->name = "Z";
-		}
-		else if(((**it).value[0]) == 'r' ||((**it).value[0]) == 'R'){
-  		newGate = new UGate();
+		if(((**it).value[0]) == 'r' ||((**it).value[0]) == 'R'){
+  		newGate = new RGate();
 			(*it)++;
 			if ((**it).type != GATE_SET){
 				cout << "ERROR: No setting for R gate."<< endl;
 			}
 			istringstream ss((**it).value); 
-			ss >> newGate->setting; //Set setting for theta
-  		newGate->name = "R";
+			float_t rot;
+			ss >>  rot;
+			((RGate*)newGate)->setRotation(rot); //Set setting for theta
 		}
 		else{
   		newGate = new UGate();
-  		newGate->name = ((**it).value);
+  		((UGate*)newGate)->setName((**it).value);
 		}
   	parseGateInputs(newGate,circ,it);
   	circ->addGate(newGate);

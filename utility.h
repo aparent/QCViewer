@@ -28,4 +28,6 @@ void tokenize(const string&,
 
 string intToString(int i);
 
+string sToUpper(string);
+
 #endif

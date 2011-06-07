@@ -6,7 +6,7 @@ UGate::UGate(string n_name,) : name(n_name) {}
 
 
 string UGate::getName(){
-	return name; 
+	return name;
 }
 void UGate::setName(string n_name){
 	name = n_name;

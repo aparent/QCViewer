@@ -38,11 +38,7 @@ unsigned int Circuit::numGates(){
 }
 
 int Circuit::QCost(){
-  int totalCost =0;
-  for(unsigned int i = 0; i < numGates(); i++){
-    totalCost = totalCost + getGate(i)->QCost(numLines());
-  }
-  return totalCost;
+  return 0;
 }
 
 string Line::getInputLabel(){
@@ -144,7 +140,7 @@ vector<int> Circuit::getGreedyParallel(){
 
 vector<int> Circuit::getArchWarnings () {
   vector<int> warnings;
-  vector<int> wires;
+  vector<unsigned int> wires;
   if (arch == 0) return warnings; // Assume "no" architecture by default.
   for (unsigned int g = 0; g < gates.size(); g++) {
     wires = getGate(g)->targets;

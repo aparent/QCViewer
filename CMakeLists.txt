@@ -15,6 +15,8 @@ SET(QCLIB_SRC_FILES
   state.cpp
   state.cpp
   simulate.cpp
+	gates/UGate.cpp
+	gates/UGateLookup.cpp
 )
 
 SET(QCLIB_HEADER_FILES
@@ -27,6 +29,7 @@ SET(QCLIB_HEADER_FILES
 	TFCLexer.h
 	utility.h
   state.h
+	gates/UGateLookup.h
 )
 
 IF(UNIX)
