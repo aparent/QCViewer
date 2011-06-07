@@ -1,8 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
-cmake_policy(SET CMP0011 OLD)
 project (viewer)
 
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-g -Wall -ansi -pedantic" )
 
 SET(QCVIEWER_SRC_FILES
 	draw.cpp

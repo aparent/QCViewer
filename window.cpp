@@ -290,5 +290,7 @@ void QCViewer::on_menu_reset () {
 }
 
 void QCViewer::on_menu_run () {
-  while (c.step());
+  while (c.step()){
+		sView.redraw();
+	}
 }
