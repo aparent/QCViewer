@@ -16,7 +16,6 @@ int main(int argc, char* argv[]){
 	cout << "input Bit: ";
 	printIntBin(bit);
 	cout << endl << "output:";
-	printIntBin(ExtractInput(bit,tMap));
 	cout << endl;
 }
 

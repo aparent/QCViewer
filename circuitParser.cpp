@@ -81,8 +81,7 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 	(*it)++;
   while((**it).type != SEC_END){
   	Gate *newGate;
-		if(((**it).value[0]) == 'r' ||((**it).value[0]) == 'R'){
-  		newGate = new RGate();
+		if(((**it).value).compare("R") == 0){
 			(*it)++;
 			if ((**it).type != GATE_SET){
 				cout << "ERROR: No setting for R gate."<< endl;
@@ -90,11 +89,10 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 			istringstream ss((**it).value); 
 			float_t rot;
 			ss >>  rot;
-			((RGate*)newGate)->setRotation(rot); //Set setting for theta
+  		newGate = new RGate(rot); //sets rotation amount 
 		}
 		else{
-  		newGate = new UGate();
-  		((UGate*)newGate)->setName((**it).value);
+  		newGate = new UGate((**it).value);
 		}
   	parseGateInputs(newGate,circ,it);
   	circ->addGate(newGate);

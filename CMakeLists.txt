@@ -16,6 +16,7 @@ SET(QCLIB_SRC_FILES
   state.cpp
   simulate.cpp
 	gates/UGate.cpp
+	gates/RGate.cpp
 	gates/UGateLookup.cpp
 )
 

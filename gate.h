@@ -7,13 +7,13 @@
 
 using namespace std;
 
-enum gateType {R, U};
+enum gateType {RGATE, UGATE};
 
 //used to specify a control number and polarity
 class Control{
   public:
     Control (int,bool);
-    int wire;
+    unsigned int wire;
     bool polarity;
 };
 
@@ -27,10 +27,12 @@ rotation gate we may want the name to be dependent on the rot amount
 
 class Gate {
 	public:
-		virtual string getName();
-		virtual State applyGate(State);
+		virtual ~Gate();
 
-		int gateType; //used with enum gateType
+		virtual string getName()=0;
+		virtual State *applyToBasis(index_t)=0;
+
+		gateType type; //used with enum gateType
 		vector <Control> controls;
 		vector <unsigned int> targets;
 };
@@ -44,13 +46,16 @@ struct gateMatrix{
 //A general unitary gate
 class UGate : public Gate {
   public:
-		UGate();
+		UGate(string);
 
 		string getName();
-		State applyGate(State);
+		State *applyToBasis(index_t);
 
 		void setName(string);
 	private:
+		unsigned int ExtractInput (index_t);
+		index_t BuildBitString (index_t, unsigned int);
+		State* ApplyU(index_t);
     gateMatrix *matrix;
 		string name;
 };
@@ -58,12 +63,13 @@ class UGate : public Gate {
 //An arbitrary rotation gate
 class RGate : public Gate {
   public:
-		string getName();
-		State applyGate(State);
+		RGate(float_t);
 
-		void setRotation(float_t);
+		string getName();
+		State *applyToBasis(index_t);
+
 	private:
-    float rot;
+    float_t rot;
 		string name;
 };
 

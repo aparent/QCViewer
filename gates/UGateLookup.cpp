@@ -1,23 +1,26 @@
+#include "UGateLookup.h"
 #include "../state.h" //for float_t 
 #include <iostream>
 #include <map>
 
-std::map<string,gateMatrix*> gateLib;
+using namespace std;
 
-complex<float_t> *UGateLookup(string name){
-	if(gateLib.find.(name)==gateLib.end()){ 
+map<string,gateMatrix*> gateLib;
+
+gateMatrix *UGateLookup(string name){
+	if ( gateLib.find(name) == gateLib.end() ){ 
+		cout << "GATE: " << name << " does not exist" << endl;
 		return NULL;
-	} else {
-		return gate[name];
-	}
+	} 
+	return gateLib[name];
 }
 
 void UGateLoad(string name, gateMatrix *mat){
-	if(gateLib.find.(name)==gateLib.end()){
-		gate[name]=mat;
+	if ( gateLib.find(name) == gateLib.end() ) {
+		gateLib[name]=mat;
 	} else {
 		std::cout << "WARNING: This gate already exists overwritting..." << endl;
-		gate[name]=mat;
+		gateLib[name]=mat;
 	}
 }
 
@@ -29,9 +32,9 @@ void UGateSetup(){
 	UGateLoad("H",H);
 	
 	gateMatrix *X = new gateMatrix;
-	T->dim=2;
-	T->data[0] =  0 ; T->data[2] = 1;
-	T->data[1] =  1 ; T->data[3] = 0;
+	X->dim=2;
+	X->data[0] =  0 ; X->data[2] = 1;
+	X->data[1] =  1 ; X->data[3] = 0;
 	UGateLoad("X",X);
 	
 	gateMatrix *Y = new gateMatrix;
@@ -46,8 +49,8 @@ void UGateSetup(){
 	Z->data[1] =  0 ; Z->data[3] = -1;
 	UGateLoad("Z",Z);
 			
-	F->dim = 4;
 	gateMatrix *F = new gateMatrix;
+	F->dim = 4;
 	F->data[0 ]=  1 ; F->data[4 ]=  0; F->data[8 ]=  0 ; F->data[12]=  0;
 	F->data[1 ]=  0 ; F->data[5 ]=  0; F->data[9 ]=  1 ; F->data[13]=  0;
 	F->data[2 ]=  0 ; F->data[6 ]=  1; F->data[10]=  0 ; F->data[14]=  0;

@@ -2,6 +2,7 @@
 #define UGATE_LOOKUP_INC
 
 #include <complex>
+#include <string>
 #include "../gate.h" //for gateMatrix 
 
 //Function for looking up the matrix of a given ugate
