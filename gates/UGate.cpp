@@ -2,7 +2,8 @@
 #include "../gate.h"
 #include "UGateLookup.h"
 #include <iostream>
-#include <utility.h>
+#include "utility.h"
+#include <complex>
 using namespace std;
 
 UGate::UGate(string n_name) : name(n_name) {

@@ -71,6 +71,8 @@ class RGate : public Gate {
 		State *applyToBasis(index_t);
 
 	private:
+		index_t BuildBitString (index_t, unsigned int);
+		State* ApplyU(index_t);
     float_t rot;
 		string name;
 };

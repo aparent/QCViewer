@@ -36,11 +36,12 @@
 <lineQoute>\"											 {BEGIN(lineNames);}
 
 <gates>(?i:end)         					{tokens->push_back(TFCToken(SEC_END,"GATES")); BEGIN(INITIAL); }
-<gates>[[:alnum:]]+								{tokens->push_back(TFCToken(VAR_NAME,sToUpper(yytext))); BEGIN(gateVars);}
+<gates>[[:alnum:]]+								{tokens->push_back(TFCToken(VAR_NAME,sToUpper(yytext)));}
 <gates>\(													{BEGIN(gateSet);}
 <gates>[[:blank:]]								{BEGIN(gateVars);}
 
-<gateSet>[0-9]\.[0-9]							{tokens->push_back(TFCToken(GATE_SET,yytext));}
+<gateSet>[0-9]\.[0-9]							  {tokens->push_back(TFCToken(GATE_SET,yytext));}
+<gateSet>[0-9]		  							  {tokens->push_back(TFCToken(GATE_SET,yytext));}
 <gateSet>\)													{BEGIN(gateVars);}
 
 <gateVars>[[:alnum:]]+/'						{tokens->push_back(TFCToken(GATE_INPUT_N,string(yytext)));}
