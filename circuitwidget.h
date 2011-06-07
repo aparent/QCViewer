@@ -27,11 +27,13 @@ public:
 	int get_QCost ();
   int get_Depth ();
   int get_NumGates ();
-  
+
   void load_state (State*);
   bool step ();
   void reset ();
   void insert_gate (unsigned int);
+	void delete_gate ();
+	void set_insert (bool);
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -45,7 +47,7 @@ private:
 
   bool simulation_enabled;
   unsigned int NextGateToSimulate;
-
+  bool insert;
   bool panning;
   double oldmousex, oldmousey;
 
@@ -58,8 +60,10 @@ private:
   cairo_rectangle_t ext;
   double wirestart, wireend;
   void force_redraw ();
+
   double scale;
   double cx, cy;
+
   vector<gateRect> rects;
   int selection;
 };

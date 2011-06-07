@@ -11,6 +11,7 @@ using namespace std;
 
 CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel (false), circuit (NULL), selection (-1)  {
   NextGateToSimulate = 0;
+	scale = 1.0;
   add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);
   signal_button_press_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_press_event));
   signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
@@ -24,7 +25,8 @@ void CircuitWidget::set_offset (int y) { yoffset = y; }
 CircuitWidget::~CircuitWidget () {}
 
 bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
-  if (event->button == 1) {
+	if (!circuit) return true;
+  if (event->button == 1 && !insert) {
     panning = true;
     oldmousex = event->x;
     oldmousey = event->y;
@@ -33,9 +35,11 @@ bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
 }
 
 bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
+	if (!circuit) return true;
   if (panning) {
-    cx -= (event->x - oldmousex);
-    cy -= (event->y - oldmousey); 
+    cx -= (event->x - oldmousex)/scale;
+    cy -= (event->y - oldmousey)/scale;
+		cout << "cx: " << cx << ", cy: " << cy <<endl;
     oldmousex = event->x;
     oldmousey = event->y;
     force_redraw ();
@@ -44,22 +48,24 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
 }
 
 bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
+	if (!circuit) return true;
+  Gtk::Allocation allocation = get_allocation();
+  const int width = allocation.get_width();
+  const int height = allocation.get_height();
+  // translate mouse click coords into circuit diagram coords
+  double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
+  double y = (event->y - height/2.0 + ext.height)/2.0/scale + cy;// - cy*scale;
   if(event->button == 1 && panning) {
     panning = false;
+  } else if (event->button == 1 && insert) {
+    int i = pickRect (rects, x, y);
+		insert_gate (i);
   } else if (event->button == 3) {
-    Gtk::Allocation allocation = get_allocation();
-    const int width = allocation.get_width();
-    const int height = allocation.get_height();
-    // translate mouse click coords into circuit diagram coords
-    double x = (event->x - width/2.0) + ext.width/2.0 + cx;
-    double y = (event->y - height/2.0) + ext.height/2.0 + cy;
-  
+    int i = pickRect (rects, x, y);
     cout << "click! at (" << event->x << ", " << event->y << ") ";
     cout << "which translates to (" << x << ", "<< y << ")" << endl << flush;
-    int i = pickRect (rects, x, y);
     if (i == -1) cout << "no gate clicked..." << endl << flush;
-    else { cout << "clicked gate " << i << endl << flush;
-           insert_gate(i); }
+    else { cout << "clicked gate " << i << endl << flush; }
 
     selection = i;
     force_redraw ();
@@ -100,8 +106,9 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
 //                  event->area.width, event->area.height);
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1,1,1);
-    cr->fill ();
-    cr->translate (xc-ext.width/2-cx, yc-ext.height/2-cy);
+		cr->fill ();
+    cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
+		cout << "ext.height = " << ext.height << endl;
     //cr->clip();
     if (circuit != NULL) {
       rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
@@ -109,6 +116,10 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
       }
     }
+		/*cr->set_matrix (Cairo::identity_matrix());
+		cr->rectangle (xc-5,yc-5,10,10);
+		cr->set_source_rgb (0,0,1);
+    cr->fill ();*/
   }
   return true;
 }
@@ -227,13 +238,24 @@ out << id++;
   force_redraw ();
 }
 
-void CircuitWidget::delete_gate (unsigned int id) {
-  for (unsigned int i = 0; i < layout.size(); i++) {
-    if (layout[i].lastGateID > id) break;
-    if (layout[i].lastGateID < id) continue;
+void CircuitWidget::delete_gate () {
+	if (selection == -1 || !circuit) return;
+  unsigned int i = 0;
+	for (i = 0; i < layout.size(); i++) {
+    if (layout[i].lastGateID > (unsigned int)selection) break;
+    if (layout[i].lastGateID < (unsigned int)selection) continue;
     // layout[i].lastGateID == id
-    if (i == 0 || layout[i - 1].lastGateID = id - 1) {
-      
+    if (i == 0 || layout[i - 1].lastGateID == (unsigned int)selection - 1) {
+      layout.erase (layout.begin() + i);
     } else break;
   }
+  for (; i < layout.size (); i++) layout[i].lastGateID -= 1;
+	circuit->removeGate (selection);
+	ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+	force_redraw ();
+}
+
+void CircuitWidget::set_insert (bool x) {
+  insert = x;
+	selection = 01;
 }

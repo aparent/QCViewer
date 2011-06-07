@@ -6,6 +6,7 @@
 #include <dirac.h>
 
 QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
+	mode = EDIT_MODE;
   set_title("QCViewer");
   set_border_width(0);
 
@@ -14,9 +15,15 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
 
   m_refActionGroup = Gtk::ActionGroup::create();
   m_refActionGroup->add(Gtk::Action::create("File", "File"));
+	m_refActionGroup->add(Gtk::Action::create("Mode", "Mode"));
   m_refActionGroup->add(Gtk::Action::create("Circuit", "Circuit"));
   m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
   m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
+
+  m_refActionGroup->add(Gtk::Action::create("ModeEdit", "Edit"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_edit));
+	m_refActionGroup->add(Gtk::Action::create("ModeDelete", Gtk::Stock::DELETE, "Delete Gate"), sigc::mem_fun (*this, &QCViewer::on_menu_delete));
+
+	m_refActionGroup->add(Gtk::Action::create("ModeSimulate", "Simulate"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_simulate));
 
   m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
@@ -28,16 +35,16 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
   m_refActionGroup->add(Gtk::Action::create("ArchOpen", Gtk::Stock::OPEN, "Open", "Open an architecture file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
 
-  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save",
                                             "Save the circuit diagram to an image file"));
   m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
   m_refActionGroup->add(Gtk::Action::create("ArchSave", Gtk::Stock::SAVE, "Save", "Save architecture"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
-  m_refActionGroup->add(Gtk::Action::create("DiagramSavePng", "P_NG", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSavePng", "P_NG",
                                             "Save circuit diagram as a Portable Network Graphics file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_save_png));
-  m_refActionGroup->add(Gtk::Action::create("DiagramSaveSvg", "S_VG", 
+  m_refActionGroup->add(Gtk::Action::create("DiagramSaveSvg", "S_VG",
                                             "Save circuit diagram as a Scalable Vector Graphics file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_save_svg));
   m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
@@ -52,6 +59,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
   m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
+	m_refActionGroup->add(Gtk::ToggleAction::create ("Pan", "Pan"), sigc::mem_fun (*this, &QCViewer::on_menu_pan));
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -70,7 +78,9 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
-  
+
+  m_refActionGroup->add(Gtk::ToggleAction::create ("InsertTest", "Insert Hadamard"), sigc::mem_fun(*this, &QCViewer::on_menu_inserttest));
+
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
@@ -82,12 +92,16 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
         "<ui>"
         "  <menubar name='MenuBar'>"
         "    <menu action='File'>"
-        "        <menuitem action='FileQuit'/>"
+        "      <menuitem action='FileQuit'/>"
         "    </menu>"
+				"    <menu action='Mode'>"
+				"      <menuitem action='ModeEdit'/>"
+				"      <menuitem action='ModeSimulate'/>"
+				"    </menu>"
         "    <menu action='Circuit'>"
-        "        <menuitem action='CircuitNew'/>"
-        "        <menuitem action='CircuitOpen'/>"
-        "        <menuitem action='CircuitSave'/>"
+        "      <menuitem action='CircuitNew'/>"
+        "      <menuitem action='CircuitOpen'/>"
+        "      <menuitem action='CircuitSave'/>"
         "    </menu>"
         "    <menu action='Arch'>"
         "      <menuitem action='ArchNew'/>"
@@ -102,7 +116,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
         "        <separator/>"
         "      </menu>"
         "      <menuitem action='DiagramParallel'/>"
-        "      <menuitem action='DiagramArch'/>" 
+        "      <menuitem action='DiagramArch'/>"
         "    </menu>"
         "    <menu action='SimulateMenu'>"
         "      <menuitem action='SimulateLoad'/>"
@@ -113,20 +127,30 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
         "      <menuitem action='SimulateDisplay'/>"
         "    </menu>"
         "  </menubar>"
-        "  <toolbar  name='ToolBar'>"
+        "  <toolbar  name='SimulateToolbar'>"
         "    <toolitem action='CircuitOpen'/>"
-        "    <separator/>"
-        "    <toolitem action='SimulateLoad'/>"
-        "    <toolitem action='SimulateRun'/>"
-        "    <toolitem action='SimulateStep'/>"
-        "    <toolitem action='SimulateReset'/>"
         "    <separator/>"
         "    <toolitem action='ZoomIn'/>"
         "    <toolitem action='ZoomOut'/>"
         "    <toolitem action='Zoom100'/>"
         "    <separator/>"
-        "    <toolitem action='DiagramArch'/>"
+        "    <toolitem action='SimulateLoad'/>"
+        "    <toolitem action='SimulateRun'/>"
+        "    <toolitem action='SimulateStep'/>"
+        "    <toolitem action='SimulateReset'/>"
         "  </toolbar>"
+				"  <toolbar name='EditToolbar'>"
+				"    <toolitem action='CircuitOpen'/>"
+				"    <separator/>"
+				"    <toolitem action='ZoomIn'/>"
+				"    <toolitem action='ZoomOut'/>"
+        "    <toolitem action='Zoom100'/>"
+				"    <toolitem action='Pan'/>"
+        "    <separator/>"
+				"    <toolitem action='ModeDelete'/>"
+        "    <separator/>"
+        "    <toolitem action='DiagramArch'/>"
+				"  </toolbar>"
         "</ui>";
 
   try
@@ -140,10 +164,11 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
   Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
   if(pMenubar)
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
-
-  Gtk::Widget* pToolbar = m_refUIManager->get_widget("/ToolBar") ;
-  if(pToolbar)
-    m_vbox.pack_start(*pToolbar, Gtk::PACK_SHRINK);
+  m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
+	m_EditToolbar = m_refUIManager->get_widget ("/EditToolbar");
+	if (!m_SimulateToolbar || !m_EditToolbar) { cout << "warning failed to create toolbars" << endl; return; }
+  m_vbox.pack_start(*m_SimulateToolbar, Gtk::PACK_SHRINK);
+	m_vbox.pack_start(*m_EditToolbar, Gtk::PACK_SHRINK);
 
   c.set_window (this);
   c.show();
@@ -158,6 +183,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
   m_vbox.show();
 
   show_all_children ();
+	m_SimulateToolbar->hide ();
 }
 
 QCViewer::~QCViewer() {}
@@ -272,4 +298,28 @@ void QCViewer::on_menu_reset () {
 
 void QCViewer::on_menu_run () {
   while (c.step());
+}
+
+void QCViewer::on_menu_mode_edit () {
+	mode = EDIT_MODE;
+	m_SimulateToolbar->hide();
+	m_EditToolbar->show ();
+}
+
+void QCViewer::on_menu_mode_simulate () {
+	mode = SIMULATE_MODE;
+	m_EditToolbar->hide ();
+	m_SimulateToolbar->show();
+}
+
+void QCViewer::on_menu_delete () {
+  c.delete_gate ();
+}
+
+void QCViewer::on_menu_inserttest () {
+  c.set_insert (true);
+}
+
+void QCViewer::on_menu_pan () {
+  c.set_insert (false);
 }

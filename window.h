@@ -17,6 +17,8 @@ protected:
   void on_button_clicked(Glib::ustring data);
   void on_menu_file_open_circuit ();
   void on_menu_file_open_arch ();
+	void on_menu_mode_edit ();
+	void on_menu_mode_simulate ();
 //  void on_menu_file_save ();
   void on_menu_file_quit ();
   void on_menu_save_png ();
@@ -29,8 +31,11 @@ protected:
   void on_menu_run ();
   void on_menu_step();
   void on_menu_reset();
+	void on_menu_delete();
   void unimplemented ();
   void on_menu_simulate_show_stateView ();
+	void on_menu_pan ();
+	void on_menu_inserttest ();
 //  void on_architecture_load ();
 
 //  void on_menu_simulation_reset ();
@@ -50,8 +55,12 @@ protected:
   Gtk::Button m_button1, m_button2;
   CircuitWidget c;
 	stateView sView;
-	Gtk::Statusbar m_statusbar; 
+	Gtk::Statusbar m_statusbar;
+
+	Gtk::Widget* m_EditToolbar;
+	Gtk::Widget* m_SimulateToolbar;
 private:
+  enum Mode { EDIT_MODE, SIMULATE_MODE } mode;
   bool drawparallel;
   bool drawarch;
 };
