@@ -189,6 +189,7 @@ bool CircuitWidget::step () {
   if (!circuit || !state) return false;
   if (NextGateToSimulate < circuit->numGates ()) {
     *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
+		if (!state) return false;
     NextGateToSimulate++;
 		state->print();
     force_redraw ();
