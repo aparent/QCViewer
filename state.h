@@ -22,6 +22,8 @@ public:
   std::complex<float_t> getAmplitude (index_t bits);
   const State& operator+= (const State &r);
   const State& operator*= (const std::complex<float_t>);
+	void normalize();
+	void kron (state&);
 
 	unsigned int dim;
   std::map<index_t, std::complex<float_t> > data;

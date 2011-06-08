@@ -2,6 +2,7 @@
 #include "utility.h" // ipow
 #include <complex>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -39,7 +40,22 @@ const State& State::operator+= (const State& r) {
   for (it = r.data.begin(); it != r.data.end(); it++) {
 		if (it->second != complex<float_t>(0)){
     	data[it->first] += it->second;
-			if (data[it->first] == complex<float_t>(0)){
+			float e = numeric_limits<float_t>::epsilon();
+			if (data[it->first].real() < e && data[it->first].imag() < e){//TODO: Probably want some multiple of e
+				data.erase(it->first);
+			}
+		}
+  }
+  return *this;
+}
+
+const State& State::operator-= (const State& r) {
+  map<index_t, complex<float_t> >::const_iterator it;
+  for (it = r.data.begin(); it != r.data.end(); it++) {
+		if (it->second != complex<float_t>(0)){
+    	data[it->first] -= it->second;
+			float e = numeric_limits<float_t>::epsilon();
+			if (data[it->first].real() < e && data[it->first].imag() < e){//TODO: Probably want some multiple of e
 				data.erase(it->first);
 			}
 		}
@@ -53,6 +69,25 @@ const State& State::operator*= (const complex<float_t> x) {
     data[it->first] *= x;
   }
   return *this;
+}
+
+void kron (state& r){
+  for (it = data.begin(); it != r.data.end(); it++) {
+  for (it = r.data.begin(); it != r.data.end(); it++) {
+		}
+	}
+}
+
+void State::normalize(){
+	map<index_t, complex<float_t> >::const_iterator it;
+	float_t normFact = 0;
+  for (it = data.begin(); it != data.end(); it++) {
+		normFact+= it->second.real()*it->second.real()+it->second.imag()*it->second.imag();
+  }
+	normFact = sqrt(normFact);
+  for (it = data.begin(); it != data.end(); it++) {
+		it->second = it->second/normFact;
+	}
 }
 
 void State::print(){

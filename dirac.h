@@ -2,12 +2,7 @@
 #define  DIRAC_INCLUDE
 
 #include <string>
-#include <complex>
+#include "state.h"
 
-struct stateVec {
-	unsigned int dim;
-  std::complex<float> *data;
-};
-
-stateVec *getStateVec (std::string,bool=false);
+State *getStateVec (std::string,bool=false);
 #endif

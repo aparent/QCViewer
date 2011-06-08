@@ -1,17 +1,17 @@
 #include "dirac.h"
+#include "state.h"
+#include "utility.h"
 #include <cmath>
 #include <string.h>
-#include "armadillo/include/armadillo"
 #include "diracParser.h"
 #include "parseNode.h"
 #include <iostream>//for error messages
 
 using namespace std;
-using namespace arma;
 
 struct diracTerm{
 	int type;
-	cx_mat vecValue;
+	State vecValue;
 	cx_double numValue;
 };
 
@@ -20,21 +20,17 @@ string printTree(parseNode *node);
 diracTerm evalTree(parseNode *node);
 
 
-stateVec *getStateVec (std::string input, bool normalize){
+State *getStateVec (std::string input, bool normalize){
 	parseNode *node = parseDirac(input); 
 	if(node!=NULL){
 		diracTerm term = evalTree(node);
+		if (node.type != KET ){
+			return NULL;
+		}
 		if (normalize){
-			term.vecValue = term.vecValue/sqrt(cdot(term.vecValue,term.vecValue));
+			term.vecValue.normalize();
 		}
-		stateVec *result= new stateVec;
-		cx_mat ket = term.vecValue;
-		result->dim = ket.n_rows;
-		result->data = new complex<float>[ket.n_rows];
-		for(unsigned int i=0;i<ket.n_rows;i++){
-			result->data[i] = ket(i,0);
-		}
-		return result;
+		return vecValue;
 	}
 	else{
 		cout << "PARSE ERROR" << endl;
@@ -52,17 +48,18 @@ string printTree(parseNode *node){
 
 diracTerm stringToKet(string value){
 	diracTerm ret;
+	index_t basis = 0; 
 	ret.type = KET;
-  cx_mat zero(2,1); zero(0,0)=1; zero(1,0)=0;//|0>
-  cx_mat one(2,1) ; one(0,0) =0; one(1,0) =1;//|1>
-	if      (value[0] == '0') ret.vecValue = zero;
-	else if (value[0] == '1') ret.vecValue = one;
-	else    cout << "ERROR BAD CHAR IN KET: " << value[0] << endl;
-	for(unsigned int i = 1;i<value.size();i++){
-		if      (value[i] == '0') ret.vecValue = kron(ret.vecValue,zero);
-		else if (value[i] == '1') ret.vecValue = kron(ret.vecValue,one);
-		else    cout << "ERROR BAD CHAR IN KET: " << value[i] << endl;
+	for (unsigned int i = value.size-1; i<=0; i--){
+		if      (value[i] == '1') {
+			basis = SetRegister(basis,i);
+		} else if (value[i] == '0') {
+		} else    {
+			cout << "ERROR BAD CHAR IN KET: " << value[i] << endl;
+		}
 	}
+	ret.vecValue = State(1,basis);
+	ret.vecValue.dim = value.size;
 	return ret;
 }
 
@@ -81,24 +78,18 @@ diracTerm constSub(diracTerm a, diracTerm b){
 }
 
 diracTerm constMult(diracTerm a, diracTerm b){
-	diracTerm ret;
-	ret.numValue = a.numValue * b.numValue;
-	ret.type = NUM;
-	return ret;
+	a.numValue *= b.numValue;
+	return a;
 }
 
 diracTerm ketAdd(diracTerm a, diracTerm b){
-	diracTerm ret;
-	ret.vecValue = a.vecValue + b.vecValue;
-	ret.type = KET;
-	return ret;
+	a.vecValue += b.vecValue;
+	return a;
 }
 
 diracTerm ketSub(diracTerm a, diracTerm b){
-	diracTerm ret;
-	ret.vecValue = a.vecValue - b.vecValue;
-	ret.type = KET;
-	return ret;
+	a.vecValue -= b.vecValue;
+	return a;
 }
 
 diracTerm ketKron(diracTerm a, diracTerm b){
