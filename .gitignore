@@ -1,5 +1,6 @@
 diracParser.output
 *.o
+simTest
 CMakeCache.txt
 CMakeFiles/*
 a.out

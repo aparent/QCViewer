@@ -7,57 +7,75 @@
 
 using namespace std;
 
-enum gateType {NOT, H, FRED, U};
+enum gateType {RGATE, UGATE};
+enum dType {NOT, FRED, DEFAULT};
 
+//used to specify a control number and polarity
 class Control{
   public:
     Control (int,bool);
-    int wire;
+    unsigned int wire;
     bool polarity;
 };
 
+/*
+GATE
+---------------
+This is the general gate class from which all gates are derived.
+Name is kept private since in the case of gates like the arbitray
+rotation gate we may want the name to be dependent on the rot amount
+*/
+
 class Gate {
-  public:
-    string name;
-    int gateType;
-		float setting; //used for R gate theta 
+	public:
+		virtual ~Gate();
 
-    vector <Control> controls;
-    vector <int> targets;
+		virtual string getName()=0;
+		virtual State *applyToBasis(index_t)=0;
 
-    virtual int QCost(int numLines) = 0;
-    int numCont();//total number of negative and positive controls
-    int numNegCont();
-
-    complex<float_t> *matrix;
+		gateType type; //used with enum gateType
+		dType drawType;
+		vector <Control> controls;
+		vector <unsigned int> targets;
 };
 
-class NOTGate : public Gate {
-  public:
-    int QCost(int numLines);
-    NOTGate();
+//A gate matrix struct for UGate
+struct gateMatrix{
+	unsigned int dim;
+	complex<float_t> * data;
 };
 
-class HGate : public Gate {//hadamard gate
+//A general unitary gate
+class UGate : public Gate {
   public:
-    int QCost(int numLines);
-    HGate();
+		UGate(string);
+
+		string getName();
+		State *applyToBasis(index_t);
+
+		void setName(string);
+	private:
+		unsigned int ExtractInput (index_t);
+		index_t BuildBitString (index_t, unsigned int);
+		State* ApplyU(index_t);
+    gateMatrix *matrix;
+		string name;
 };
 
-class FredGate : public Gate {//hadamard gate
+//An arbitrary rotation gate
+class RGate : public Gate {
   public:
-    int QCost(int numLines);
-    FredGate();
+		RGate(float_t);
+
+		string getName();
+		State *applyToBasis(index_t);
+
+	private:
+		index_t BuildBitString (index_t, unsigned int);
+		State* ApplyU(index_t);
+    float_t rot;
+		string name;
 };
 
-class UGate : public Gate {//hadamard gate
-  public:
-    int QCost(int numLines);
-    void setQCost(int QCost);
-    UGate(int QCost = 0);
-  private:
-    int cost; //stores quantum cosst
-};
-
-void minmaxWire (vector<Control>* ctrl, vector<int>* targ, int *dstmin, int *dstmax);
+void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned int *dstmin, unsigned int *dstmax);
 #endif

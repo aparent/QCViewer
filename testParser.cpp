@@ -7,7 +7,7 @@
 
 using namespace std;
 int main(){
-	string file = "testCircuits/mod5d4.tfc";
+	string file = "testCircuits/simtest2.tfc";
 	vector<TFCToken> *tokens = lexCircuit(file);
   vector<TFCToken>::iterator it;
   for (it = tokens->begin(); it != tokens->end(); it++) {

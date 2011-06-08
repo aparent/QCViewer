@@ -42,11 +42,7 @@ unsigned int Circuit::numGates(){
 }
 
 int Circuit::QCost(){
-  int totalCost =0;
-  for(unsigned int i = 0; i < numGates(); i++){
-    totalCost = totalCost + getGate(i)->QCost(numLines());
-  }
-  return totalCost;
+  return 0;
 }
 
 string Line::getInputLabel(){
@@ -118,13 +114,13 @@ vector<int> Circuit::getGreedyParallel(){
   sort (parallel.begin (), parallel.end ());
   vector<int>  returnValue;
   map<int,int> linesUsed;
-  int maxw, minw;
+  unsigned int maxw, minw;
   int k = 0;
   for(unsigned int i = 0; i < numGates(); i++){
     start:
     Gate *g = getGate(i);
     minmaxWire (&g->controls, &g->targets, &minw, &maxw);
-    for (int j = minw; j <= maxw; j++) {
+    for (unsigned int j = minw; j <= maxw; j++) {
       if (linesUsed.find(j) != linesUsed.end()) {
         returnValue.push_back(i - 1);
         linesUsed.clear ();
@@ -148,7 +144,7 @@ vector<int> Circuit::getGreedyParallel(){
 
 vector<int> Circuit::getArchWarnings () {
   vector<int> warnings;
-  vector<int> wires;
+  vector<unsigned int> wires;
   if (arch == 0) return warnings; // Assume "no" architecture by default.
   for (unsigned int g = 0; g < gates.size(); g++) {
     wires = getGate(g)->targets;

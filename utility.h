@@ -21,11 +21,18 @@ void printIntBin(unsigned int);
 using namespace std;
 
 int ipow(int base, int exp);
-
 void tokenize(const string&,
               vector<string>&,
               const string&);
-
 string intToString(int i);
+string sToUpper(string);
+
+/* Bit set/get functions */
+//Sets the bit at position reg to 1
+unsigned int SetRegister (unsigned int bits, unsigned int reg);
+//Sets the bit at position reg to 0
+unsigned int UnsetRegister (unsigned int bits, unsigned int reg);
+//Returns the value of the bit at position reg
+unsigned int GetRegister (unsigned int bits, unsigned int reg);
 
 #endif
