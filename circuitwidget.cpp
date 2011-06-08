@@ -13,6 +13,7 @@ using namespace std;
 CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel (false), circuit (NULL), selection (-1)  {
   NextGateToSimulate = 0;
 	scale = 1.0;
+	state = NULL;
   add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);
   signal_button_press_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_press_event));
   signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
@@ -54,7 +55,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
   const int height = allocation.get_height();
   // translate mouse click coords into circuit diagram coords
   double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
-  double y = (event->y - height/2.0 + ext.height)/2.0/scale + cy;// - cy*scale;
+  double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
   if(event->button == 1 && panning) {
     panning = false;
   } else if (event->button == 1 && insert) {
@@ -108,7 +109,6 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->set_source_rgb (1,1,1);
 		cr->fill ();
     cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
-		cout << "ext.height = " << ext.height << endl;
     //cr->clip();
     if (circuit != NULL) {
       rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
@@ -186,8 +186,7 @@ void CircuitWidget::set_scale (double x) {
 }
 
 bool CircuitWidget::step () {
-  if (!circuit) return false;
-  if (!state) return false;
+  if (!circuit || !state) return false;
   if (NextGateToSimulate < circuit->numGates ()) {
     *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
     NextGateToSimulate++;

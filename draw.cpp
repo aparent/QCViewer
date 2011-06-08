@@ -86,10 +86,10 @@ void drawDot (cairo_t *cr, float xc, float yc, float radius, float thickness, bo
 gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<int> *targ) {
   int minw, maxw;
   minmaxWire (ctrl, targ, &minw, &maxw);
+  if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw), thickness);
   for (unsigned int i = 0; i < ctrl->size(); i++) {
     drawDot (cr, xc, wireToY((*ctrl)[i].wire), dotradius, thickness, (*ctrl)[i].polarity);
   }
-  if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw), thickness);
   gateRect rect;
   rect.x0 = xc-dotradius;
   rect.y0 = wireToY(minw)-dotradius;
@@ -353,7 +353,7 @@ cout << "hello\n" << flush;
   cairo_t *cr = cairo_create(unbounded_rec_surface);
   cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
   cairo_scale (cr, scale, scale);
-  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
   draw (cr, c, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
   cairo_rectangle_t ext;
@@ -374,7 +374,7 @@ void write_to_png (cairo_surface_t* surf, string filename) {
 
 vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
   cairo_scale (cr, scale, scale);
-  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;

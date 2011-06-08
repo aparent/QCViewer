@@ -1,1 +1,0 @@
-clang++ draw.cpp main.cpp window.cpp circuitwidget.cpp -o viewer -lQC -L../QCLib -I../QCLib `pkg-config gtkmm-2.4 cairo --cflags --libs`
