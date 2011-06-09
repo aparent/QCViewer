@@ -99,7 +99,6 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 	(*it)++;
   while((**it).type != SEC_END){
   	Gate *newGate;
-		cout << ((**it).value) <<endl;
 		if(((**it).value).compare("R") == 0){
 			(*it)++;
 			if ((**it).type != GATE_SET){

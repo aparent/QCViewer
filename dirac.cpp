@@ -1,18 +1,18 @@
 #include "dirac.h"
 #include "state.h"
 #include "utility.h"
-#include <cmath>
-#include <string.h>
 #include "diracParser.h"
 #include "parseNode.h"
+#include <cmath>
 #include <iostream>//for error messages
+#include <stdlib.h> //atof
 
 using namespace std;
 
 struct diracTerm{
 	int type;
 	State vecValue;
-	cx_double numValue;
+	complex<float_t> numValue;
 };
 
 parseNode *parseDirac(std::string input); //Defined in diracParser.y
@@ -21,16 +21,17 @@ diracTerm evalTree(parseNode *node);
 
 
 State *getStateVec (std::string input, bool normalize){
-	parseNode *node = parseDirac(input); 
+	parseNode *node = parseDirac(input);
 	if(node!=NULL){
 		diracTerm term = evalTree(node);
-		if (node.type != KET ){
+		if (term.type != KET ){
 			return NULL;
 		}
 		if (normalize){
 			term.vecValue.normalize();
 		}
-		return vecValue;
+		State *ret = new State(term.vecValue);
+		return ret;
 	}
 	else{
 		cout << "PARSE ERROR" << endl;
@@ -48,33 +49,29 @@ string printTree(parseNode *node){
 
 diracTerm stringToKet(string value){
 	diracTerm ret;
-	index_t basis = 0; 
+	index_t basis = 0;
 	ret.type = KET;
-	for (unsigned int i = value.size-1; i<=0; i--){
+	for (int i = value.size()-1, j = 0; i>=0; i--,j++){
 		if      (value[i] == '1') {
-			basis = SetRegister(basis,i);
+			basis = SetRegister(basis,j);
 		} else if (value[i] == '0') {
 		} else    {
 			cout << "ERROR BAD CHAR IN KET: " << value[i] << endl;
 		}
 	}
 	ret.vecValue = State(1,basis);
-	ret.vecValue.dim = value.size;
+	ret.vecValue.dim = ipow(2,value.size());
 	return ret;
 }
 
 diracTerm constAdd(diracTerm a, diracTerm b){
-	diracTerm ret;
-	ret.numValue = a.numValue + b.numValue;
-	ret.type = NUM;
-	return ret;
+	a.numValue += b.numValue;
+	return a;
 }
 
 diracTerm constSub(diracTerm a, diracTerm b){
-	diracTerm ret;
-	ret.numValue = a.numValue - b.numValue;
-	ret.type = NUM;
-	return ret;
+	a.numValue += b.numValue;
+	return a;
 }
 
 diracTerm constMult(diracTerm a, diracTerm b){
@@ -100,22 +97,20 @@ diracTerm ketKron(diracTerm a, diracTerm b){
 }
 
 diracTerm constKetMult(diracTerm a, diracTerm b){
-	diracTerm ret;
-	ret.vecValue = a.numValue*b.vecValue;
-	ret.type = KET;
-	return ret;
+	b.vecValue*=a.numValue;
+	return b;
 }
 
 diracTerm evalTree(parseNode *node){
 	diracTerm ret;
 	if(node->type == CNUM){
 		ret.type = NUM;
-		ret.numValue = cx_double(0,atof((node->value).c_str()));
+		ret.numValue = complex<float_t>(0,atof((node->value).c_str()));
 		return ret;
 	}
 	if(node->type == NUM){
 		ret.type = NUM;
-		ret.numValue = cx_double(atof((node->value).c_str()),0);
+		ret.numValue = complex<float_t>(atof((node->value).c_str()),0);
 		return ret;
 	}
 	if(node->type == KET){

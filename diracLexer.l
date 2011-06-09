@@ -6,14 +6,19 @@
 %{
 	#include "parseNode.h"
 	#include <string>
+	#include <sstream>
+	#include "utility.h"
   #include <iostream>
+  #include <cstdlib>
 	#define YYSTYPE parseNode*
 	#include "diracParser.h"
 	using namespace std;
+	stringstream temp;
 	parseNode *setupNode(int type, string value);
 %}
 
 %x ket
+%x ketmult
 
 %%
 sqrt                {
@@ -54,7 +59,24 @@ i										{
 											yylval = setupNode(KET,string(yytext));
 											return KET;
 										}
+<ket>[0-1]+/\^      {
+											cout << yytext << endl;
+											temp.str("");
+											temp << yytext;
+											BEGIN(ketmult);
+										}
 <ket>\>							{BEGIN(INITIAL);}
+
+<ketmult>\^
+<ketmult>[0-9]+			{
+											cout << "temp" <<  temp.str() << endl;
+											int reps = atoi(yytext);
+											string pat = temp.str();
+											for(int i = 0; i<reps-1; i++) temp << pat;
+											yylval = setupNode(KET,temp.str());
+											return KET;
+										}
+<ketmult>\>					{BEGIN(INITIAL);}
 <*>[ \t\n]+					/* eat whitespace */
 . 		 			    	  {return(yytext[0]);}
 

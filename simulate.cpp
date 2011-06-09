@@ -1,5 +1,6 @@
 #include "simulate.h"
 #include <cmath>
+#include <iostream>
 #include <string>
 #include "utility.h"
 #include "gates/UGateLookup.h"
@@ -22,7 +23,8 @@ State ApplyGate (State* in, Gate* g) {
   for (it = in->data.begin(); it != in->data.end(); it++) {
     State* tmp = g->applyToBasis(it->first);
     if (tmp == NULL){
-			 return NULL;
+			 cout << "Simulation Error" << endl;
+			 return answer;
 		}
     complex<float_t> foo = (*it).second;
     *tmp *= foo;

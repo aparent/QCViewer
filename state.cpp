@@ -1,5 +1,5 @@
 #include "state.h"
-#include "utility.h" // ipow
+#include "utility.h" // ipow floorLog2
 #include <complex>
 #include <iostream>
 #include <limits>
@@ -10,21 +10,13 @@ State::State () {
 	dim = 0;
 }
 
+State::State (index_t n_dim) {
+	dim = n_dim;
+}
+
 State::State (complex<float_t> amp, index_t bits) {
 	if(amp!=complex<float_t>(0)){
   	data[bits] = amp;
-	}
-}
-
-State::State (stateVec *v) {
-  //assert (v.dim <= sizeof(index_t)*8)i;
-	if ( v != NULL ){
-		dim = v->dim;
-  	for (index_t i = 0; i < (index_t)v->dim; i++) {
-    	if (v->data[i] != complex<float_t>(0)) {
-    	  data[i] = v->data[i];
-    	}
-  	}
 	}
 }
 
@@ -41,7 +33,7 @@ const State& State::operator+= (const State& r) {
 		if (it->second != complex<float_t>(0)){
     	data[it->first] += it->second;
 			float e = numeric_limits<float_t>::epsilon();
-			if (data[it->first].real() < e && data[it->first].imag() < e){//TODO: Probably want some multiple of e
+			if (abs(data[it->first]) < e ){//TODO: Probably want some multiple of e
 				data.erase(it->first);
 			}
 		}
@@ -54,8 +46,8 @@ const State& State::operator-= (const State& r) {
   for (it = r.data.begin(); it != r.data.end(); it++) {
 		if (it->second != complex<float_t>(0)){
     	data[it->first] -= it->second;
-			float e = numeric_limits<float_t>::epsilon();
-			if (data[it->first].real() < e && data[it->first].imag() < e){//TODO: Probably want some multiple of e
+			float e = 10*numeric_limits<float_t>::epsilon();
+			if (abs(data[it->first].real()) < e){//TODO: Probably want some multiple of e
 				data.erase(it->first);
 			}
 		}
@@ -71,11 +63,17 @@ const State& State::operator*= (const complex<float_t> x) {
   return *this;
 }
 
-void kron (state& r){
-  for (it = data.begin(); it != r.data.end(); it++) {
-  for (it = r.data.begin(); it != r.data.end(); it++) {
+State kron (State& l, State& r){
+  StateMap::iterator it_r;
+  StateMap::iterator it_l;
+	State ret;
+  for (it_l = l.data.begin(); it_l != l.data.end(); it_l++) {
+  	for (it_r = r.data.begin(); it_r != r.data.end(); it_r++) {
+			ret.data[(it_l->first << floorLog2(r.dim))|(it_r->first)] = it_l->second*it_r->second;
 		}
 	}
+	ret.dim = l.dim*r.dim;
+	return ret;
 }
 
 void State::normalize(){
@@ -86,13 +84,14 @@ void State::normalize(){
   }
 	normFact = sqrt(normFact);
   for (it = data.begin(); it != data.end(); it++) {
-		it->second = it->second/normFact;
+		data[it->first] = it->second/normFact;
 	}
 }
 
 void State::print(){
 	map<index_t, complex<float_t> >::const_iterator it;
 	cout << "Printing state:" << endl;
+	cout << "Size: "<< dim << endl;
   for (it = data.begin(); it != data.end(); it++) {
 		printIntBin(it->first);
     cout << ":" << it->second << endl;
