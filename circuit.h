@@ -41,7 +41,8 @@ class Circuit {
     int    numLines();
 
     void addGate(Gate *newGate); //appends to end
-    void addGate(Gate *newGate,int pos); //inserts at pos
+    void addGate(Gate *newGate, unsigned int pos); //inserts at pos
+		void removeGate (unsigned int);
     Gate* getGate(int pos);
     unsigned int numGates(); //Returns the number of gates
 

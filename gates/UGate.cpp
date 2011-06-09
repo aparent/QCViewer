@@ -18,9 +18,9 @@ string UGate::getName(){
 void UGate::setName(string n_name){
 	name = n_name;
 }
-		
+
 /*
-	Applies the gate to a single basis state sim does this classically 
+  Applies the gate to a single basis state sim does this classically
 	for all basis states in the superposition.  Note this can return a
 	superpostion.
 */
