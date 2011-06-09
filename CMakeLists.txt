@@ -11,6 +11,7 @@ SET(QCVIEWER_SRC_FILES
 	stateView.cpp
 	drawState.cpp
 	stateWidget.cpp
+	GateIcon.cpp
 )
 
 SET(QCVIEWER_HEADER_FILES
@@ -21,6 +22,7 @@ SET(QCVIEWER_HEADER_FILES
 	stateView.h
 	drawState.h
 	stateWidget.h
+	GateIcon.h
 )
 
 

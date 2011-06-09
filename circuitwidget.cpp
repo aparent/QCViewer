@@ -1,4 +1,5 @@
 #include "circuitwidget.h"
+#include "GateIcon.h"
 #include <cairomm/context.h>
 #include <circuit.h>
 #include <circuitParser.h>
@@ -26,9 +27,56 @@ void CircuitWidget::set_offset (int y) { yoffset = y; }
 
 CircuitWidget::~CircuitWidget () {}
 
+void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time) {
+	if (!circuit) { context->drag_finish(false, false, time); return; }
+	Gtk::Widget* widget = drag_get_source_widget(context);
+  Gtk::ToolPalette* drag_palette = dynamic_cast<Gtk::ToolPalette*>(widget);
+	while(widget && !drag_palette) { // TODO: uh i should figure out what this actually does (magic)
+	  widget = widget->get_parent();
+		drag_palette = dynamic_cast<Gtk::ToolPalette*>(widget);
+	}
+  Gtk::ToolItem* drag_item = NULL;
+	if (drag_palette)
+    drag_item = drag_palette->get_drag_item(selection_data);
+  Gtk::ToolButton* button = dynamic_cast<Gtk::ToolButton*>(drag_item);
+  if(!button)
+	  return;
+
+  Gate *newgate;
+	unsigned int target = 0;
+	switch (((GateIcon*)button->get_icon_widget ())->type) {
+		case GateIcon::NOT:
+		   newgate = new UGate ("X");
+			 newgate->drawType = NOT;
+		   break;
+		case GateIcon::H: newgate = new UGate ("H"); break;
+		case GateIcon::X: newgate = new UGate ("X"); break;
+		case GateIcon::Y: newgate = new UGate ("Y"); break;
+		case GateIcon::Z: newgate = new UGate ("Z"); break;
+		case GateIcon::R: newgate = new RGate (1.0); break;
+		case GateIcon::SWAP:
+		  newgate = new UGate ("F");
+			newgate->drawType = FRED;
+			newgate->targets.push_back (target++);
+	    break;
+		default: cout << "unhandled gate drag and drop"; break;
+	}
+	newgate->targets.push_back(target);
+  Gtk::Allocation allocation = get_allocation();
+  const int width = allocation.get_width();
+  const int height = allocation.get_height();
+  // translate mouse click coords into circuit diagram coords
+  double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
+  double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
+	int i = pickRect (rects, xx, yy);
+	cout << "i  is " << i << endl;
+	insert_gate (newgate, 0);
+  context->drag_finish(true, false, time);
+}
+
 bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
 	if (!circuit) return true;
-  if (event->button == 1 && !insert) {
+  if (event->button == 3) {
     panning = true;
     oldmousex = event->x;
     oldmousey = event->y;
@@ -56,12 +104,9 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
   // translate mouse click coords into circuit diagram coords
   double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
   double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
-  if(event->button == 1 && panning) {
+  if(event->button == 3 && panning) {
     panning = false;
-  } else if (event->button == 1 && insert) {
-    int i = pickRect (rects, x, y);
-		insert_gate (i);
-  } else if (event->button == 3) {
+  } else if (event->button == 1) {
     int i = pickRect (rects, x, y);
     cout << "click! at (" << event->x << ", " << event->y << ") ";
     cout << "which translates to (" << x << ", "<< y << ")" << endl << flush;
@@ -191,7 +236,7 @@ bool CircuitWidget::step () {
     *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
 		if (!state) return false;
     NextGateToSimulate++;
-		state->print();
+//		state->print();
     force_redraw ();
     return true;
   } else {
@@ -215,19 +260,12 @@ int CircuitWidget::get_QCost () { return circuit->QCost(); }
 int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
 int CircuitWidget::get_NumGates () { return circuit->numGates(); }
 
-void CircuitWidget::insert_gate (unsigned int x) {
+void CircuitWidget::insert_gate (Gate *g, unsigned int x) {
   cout << "\n\n\nInserting gate after pos " << x << "...\n";
   cout << "layout";
   for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;
   cout << ".\n";
   if (!circuit) return;
-  Gate* g = new UGate;
-  static int id = 0;
-std::stringstream out;
-out << id++;
-  g->name = out.str();
-  g->controls.push_back(Control(0,false));
-  g->targets.push_back(1);
   unsigned int i;
   for (i = 0; i < layout.size() && layout[i].lastGateID < x; i++);
   unsigned int pos = layout[i].lastGateID + 1;
@@ -235,7 +273,7 @@ out << id++;
   cout << "Will insert gate as gate # "<< pos << ".\n";
   for (unsigned int j = i + 1; j < layout.size (); j++) { cout << "gate " << layout[j].lastGateID << "++\n"; layout[j].lastGateID += 1; }
   circuit->addGate (g, pos);
-  cout << "gate[pos].name = " << circuit->getGate(pos)->name << "\n";
+//  cout << "gate[pos].name = " << circuit->getGate(pos)->name << "\n";
   layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0)); 
   cout << "layout";
   for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;

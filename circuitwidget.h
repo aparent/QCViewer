@@ -31,7 +31,7 @@ public:
   void set_state (State*);
   bool step ();
   void reset ();
-  void insert_gate (unsigned int);
+  void insert_gate (Gate *, unsigned int);
 	void delete_gate ();
 	void set_insert (bool);
 protected:
@@ -41,6 +41,8 @@ protected:
   virtual bool onScrollEvent (GdkEventScroll* event);
   virtual bool onMotionEvent (GdkEventMotion* event);
   virtual bool on_button_press_event(GdkEventButton* event);
+	virtual void on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context,
+	    int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
 
 private:
   vector<LayoutColumn> layout;

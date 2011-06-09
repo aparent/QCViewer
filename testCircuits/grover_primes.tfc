@@ -1,24 +1,62 @@
-.v a b c d oracle
-.i a b c d oracle
-.o a b c d garbage
+.v 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 oracle
+.i 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 oracle
+.o 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 BEGIN
+H 1
+H 2
+H 3
+H 4
+H 5
+H 6
+H 7
+H 8
+H 9
+H 10
+H 11
+H 12
+H 13
+H 14
+H 15
+H 16
+H 17
+X 17
+t10 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 oracle
 H oracle
-t4 a' b c' d' oracle
-t4 a b c' d' oracle
-t4 a b' c d' oracle
-t4 a b c d' oracle
-t4 a b c' d oracle
-t4 a b' c d oracle
-H oracle
-H a
-H b
-H c
-H d
-X d
-Z a' b' c' d
-X d
-H a
-H b
-H c
-H d
+H 1
+H 2
+H 3
+H 4
+H 5
+H 6
+H 7
+H 8
+H 9
+H 10
+H 11
+H 12
+H 13
+H 14
+H 15
+H 16
+H 17
+X 17
+Z 1' 2' 3' 4' 5' 6' 7' 8' 9' 10' 11' 12' 13' 14' 15' 16' 17
+X 17
+H 1
+H 2
+H 3
+H 4
+H 5
+H 6
+H 7
+H 8
+H 9
+H 10
+H 11
+H 12
+H 13
+H 14
+H 15
+H 16
+H 17
 END

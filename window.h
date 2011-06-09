@@ -4,6 +4,7 @@
 #include <gtkmm.h>
 #include "circuitwidget.h"
 #include "stateView.h"
+#include "GateIcon.h"
 
 class QCViewer : public Gtk::Window
 {
@@ -14,7 +15,6 @@ public:
 protected:
 
   // Signal handlers:
-  void on_button_clicked(Glib::ustring data);
   void on_menu_file_open_circuit ();
   void on_menu_file_open_arch ();
 	void on_menu_mode_edit ();
@@ -48,18 +48,21 @@ protected:
 
   // Child widgets:
   Gtk::VBox m_vbox;
+	Gtk::HBox m_hbox;
   Gtk::TextView m_cmdOut;
   Gtk::Entry m_cmdIn;
   Glib::RefPtr<Gtk::UIManager> m_refUIManager;
   Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
 
-  Gtk::Button m_button1, m_button2;
   CircuitWidget c;
 	stateView sView;
 	Gtk::Statusbar m_statusbar;
 
 	Gtk::Widget* m_EditToolbar;
 	Gtk::Widget* m_SimulateToolbar;
+	Gtk::ToolPalette m_Palette;
+
+	GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
 private:
   enum Mode { EDIT_MODE, SIMULATE_MODE } mode;
 	State *state;

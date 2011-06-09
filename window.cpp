@@ -5,11 +5,18 @@
 #include <state.h>
 #include <dirac.h>
 
-QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparallel(false), drawarch (false) {
+QCViewer::QCViewer() : drawparallel(false), drawarch (false) {
 	mode = EDIT_MODE;
   set_title("QCViewer");
   set_border_width(0);
 	state = NULL;
+	NOTicon.type = GateIcon::NOT;
+	Hicon.type = GateIcon::H;
+	Xicon.type = GateIcon::X;
+	Yicon.type = GateIcon::Y;
+	Zicon.type = GateIcon::Z;
+	Ricon.type = GateIcon::R;
+	SWAPicon.type = GateIcon::SWAP;
 
   add(m_vbox);
  	m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
@@ -120,11 +127,6 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
         "      <menuitem action='DiagramArch'/>"
         "    </menu>"
         "    <menu action='SimulateMenu'>"
-        "      <menuitem action='SimulateLoad'/>"
-        "      <menuitem action='SimulateRun'/>"
-        "      <menuitem action='SimulateStep'/>"
-        "      <menuitem action='SimulateReset'/>"
-        "      <separator/>"
         "      <menuitem action='SimulateDisplay'/>"
         "    </menu>"
         "  </menubar>"
@@ -162,13 +164,59 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
   m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
 	m_EditToolbar = m_refUIManager->get_widget ("/EditToolbar");
+
+  Gtk::ToolItemGroup* group_gates = Gtk::manage(new Gtk::ToolItemGroup("Gates"));
+  Gtk::ToolItemGroup* group_gateprops = Gtk::manage(new Gtk::ToolItemGroup("Properties"));
+  Gtk::ToolItemGroup* group_warnings = Gtk::manage(new Gtk::ToolItemGroup("Warnings"));
+  m_Palette.add(*group_gates);
+	m_Palette.add(*group_gateprops);
+	m_Palette.add(*group_warnings);
+
+	m_Palette.set_orientation (Gtk::ORIENTATION_VERTICAL);
+
+	Gtk::ToolButton* NOTbrush = Gtk::manage(new Gtk::ToolButton(NOTicon));
+  NOTbrush->set_tooltip_text ("NOT");
+	group_gates->insert(*NOTbrush);
+
+	Gtk::ToolButton* Hbrush = Gtk::manage(new Gtk::ToolButton(Hicon));
+	Hbrush->set_tooltip_text ("Hadamard");
+	group_gates->insert(*Hbrush);
+
+	Gtk::ToolButton* Xbrush = Gtk::manage(new Gtk::ToolButton(Xicon));
+	Xbrush->set_tooltip_text ("Pauli-X");
+	group_gates->insert(*Xbrush);
+
+	Gtk::ToolButton* Ybrush = Gtk::manage(new Gtk::ToolButton(Yicon));
+  Ybrush->set_tooltip_text ("Pauli-Y");
+	group_gates->insert(*Ybrush);
+
+	Gtk::ToolButton* Zbrush = Gtk::manage(new Gtk::ToolButton(Zicon));
+	Zbrush->set_tooltip_text ("Pauli-Z");
+	group_gates->insert(*Zbrush);
+
+	Gtk::ToolButton* Rbrush = Gtk::manage(new Gtk::ToolButton(Ricon));
+	Rbrush->set_tooltip_text ("Phase Shift");
+	group_gates->insert(*Rbrush);
+
+	Gtk::ToolButton* SWAPbrush = Gtk::manage(new Gtk::ToolButton(SWAPicon));
+	SWAPbrush->set_tooltip_text ("SWAP");
+	group_gates->insert(*SWAPbrush);
+
+
+	Gtk::ToolButton* brush1 = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::CANCEL));
+	Gtk::ToolButton* brush2 = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::CANCEL));
+	group_gateprops->insert(*brush1);
+	group_warnings->insert(*brush2);
+	m_Palette.add_drag_dest (c);
+
 	if (!m_SimulateToolbar || !m_EditToolbar) { cout << "warning failed to create toolbars" << endl; return; }
   m_vbox.pack_start(*m_SimulateToolbar, Gtk::PACK_SHRINK);
 	m_vbox.pack_start(*m_EditToolbar, Gtk::PACK_SHRINK);
-
   c.set_window (this);
   c.show();
-  m_vbox.pack_start(c);
+	m_hbox.pack_end(c);
+	m_hbox.pack_start (m_Palette, Gtk::PACK_SHRINK);
+  m_vbox.pack_start(m_hbox);
 
 //  m_vbox.pack_start (m_cmdOut);
 //  m_vbox.pack_start (m_cmdIn, Gtk::PACK_SHRINK);
@@ -177,7 +225,7 @@ QCViewer::QCViewer() : m_button1("Button 1"), m_button2("Button 2"), drawparalle
 //  m_cmdIn.show ();
 
   m_vbox.show();
-
+  m_hbox.show();
   show_all_children ();
 	m_SimulateToolbar->hide ();
 }
@@ -186,9 +234,6 @@ QCViewer::~QCViewer() {}
 
 // Our new improved signal handler.  The data passed to this method is
 // printed to stdout.
-void QCViewer::on_button_clicked(Glib::ustring data) {
-  std::cout << "Hello World - " << data << " was pressed" << std::endl;
-}
 
 void QCViewer::unimplemented () {
   Gtk::MessageDialog dialog(*this, "Feature Unimplemented");
@@ -215,6 +260,7 @@ void QCViewer::on_menu_file_open_circuit () {
 		ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
     m_statusbar.push(ss.str());
   }
+	c.reset ();
 }
 
 void QCViewer::on_menu_file_open_arch () {
@@ -287,14 +333,14 @@ void QCViewer::on_menu_load_state () {
 	enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   enterState.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 	Gtk::Entry stateEntry;
-	stateEntry.set_max_length(50);
+	stateEntry.set_max_length(5000);
 	stateEntry.show();
 	enterState.get_vbox()->pack_start(stateEntry,Gtk::PACK_SHRINK);
 	int result = enterState.run();
 	if (result == Gtk::RESPONSE_OK){
 		if (state!=NULL) delete state;
 		state = new State(getStateVec (stateEntry.get_text(), true));
-		state->print();
+	//	state->print();
 		sView.set_state(state);
 		c.set_state(state);
 	}
@@ -313,19 +359,23 @@ void QCViewer::on_menu_reset () {
 void QCViewer::on_menu_run () {
   while (c.step()){
 		sView.redraw();
+    while (gtk_events_pending()) gtk_main_iteration(); // yield the cpu to pending ui tasks (e.g. drawing progress)
 	}
 }
 
 void QCViewer::on_menu_mode_edit () {
 	mode = EDIT_MODE;
+	c.reset ();
 	m_SimulateToolbar->hide();
 	m_EditToolbar->show ();
+	m_Palette.show ();
 }
 
 void QCViewer::on_menu_mode_simulate () {
 	mode = SIMULATE_MODE;
 	m_EditToolbar->hide ();
 	m_SimulateToolbar->show();
+	m_Palette.hide ();
 }
 
 void QCViewer::on_menu_delete () {

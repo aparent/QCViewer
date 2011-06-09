@@ -7,15 +7,15 @@
 
 class gateRect {
 public:
-  float x0, y0;
-  float width, height;
+  double x0, y0;
+  double width, height;
 };
 
 class Colour {
   public:
     Colour () {}
-    Colour (float rr, float gg, float bb, float aa) : r(rr), g(gg), b(bb), a(aa) {}
-    float r, g, b, a;
+    Colour (double rr, double gg, double bb, double aa) : r(rr), g(gg), b(bb), a(aa) {}
+    double r, g, b, a;
 };
 
 class LayoutColumn {
