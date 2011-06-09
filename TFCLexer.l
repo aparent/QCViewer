@@ -27,6 +27,7 @@
 \.c          					  {tokens->push_back(TFCToken(SEC_START,"C"));     BEGIN(lineNames);}
 \.(ol)									{tokens->push_back(TFCToken(SEC_START,"OL"));    BEGIN(lineNames);}
 (?i:begin)							{tokens->push_back(TFCToken(SEC_START,"GATES")); BEGIN(gates);    }
+\n
 
 <lineNames>[[:alnum:]]+            {tokens->push_back(TFCToken(VAR_NAME,yytext));}
 <lineNames>\"							         {BEGIN(lineQoute);}
@@ -38,11 +39,13 @@
 <gates>(?i:end)         					{tokens->push_back(TFCToken(SEC_END,"GATES")); BEGIN(INITIAL); }
 <gates>[[:alnum:]]+								{tokens->push_back(TFCToken(VAR_NAME,sToUpper(yytext)));}
 <gates>\(													{BEGIN(gateSet);}
-<gates>[[:blank:]]								{BEGIN(gateVars);}
+<gates>[ ]           							{BEGIN(gateVars);}
+<gates>\n
 
 <gateSet>[0-9]\.[0-9]							  {tokens->push_back(TFCToken(GATE_SET,yytext));}
 <gateSet>[0-9]		  							  {tokens->push_back(TFCToken(GATE_SET,yytext));}
 <gateSet>\)													{BEGIN(gateVars);}
+<gateSet>\n
 
 <gateVars>[[:alnum:]]+/'						{tokens->push_back(TFCToken(GATE_INPUT_N,string(yytext)));}
 <gateVars>[[:alnum:]]+  						{tokens->push_back(TFCToken(GATE_INPUT,string(yytext)));}
@@ -54,8 +57,8 @@
 <gateQoute>[[:alnum:][:space:]]*   	{tokens->push_back(TFCToken(GATE_INPUT,string(yytext)));}
 <gateQoute>\"											 	{BEGIN(gateVars);}
 
-<*>[ \t\n]+							/* eat whitespace */
-<*>#.*									/* eat comments */
+<*>[[:blank:]\t]+								/* eat whitespace */
+<*>#.*						  						/* eat comments */
 
 %%
 
