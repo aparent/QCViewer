@@ -18,7 +18,7 @@ stateView::stateView() {
 void stateView::set_state(State *n_state){
 	draw.set_state(n_state);
 }
-	
+
 void stateView::redraw(){
 	draw.force_redraw();
 }

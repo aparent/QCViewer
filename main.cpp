@@ -9,7 +9,7 @@ int main (int argc, char *argv[]) {
 
 	UGateSetup();//XXX
   QCViewer window;
-  window.set_default_size (400,300);
+  window.set_default_size (800,600);
 	Gtk::Main::run(window);
 
 

@@ -9,7 +9,7 @@ QCViewer::QCViewer() : drawparallel(false), drawarch (false) {
 	mode = EDIT_MODE;
   set_title("QCViewer-v0.1");
   set_border_width(0);
-	set_default_size(1000,1000);
+	sView.set_default_size(400,400);	
 	state = NULL;
 	NOTicon.type = GateIcon::NOT;
 	Hicon.type = GateIcon::H;
