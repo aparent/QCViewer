@@ -27,7 +27,7 @@ public:
 	int get_QCost ();
   int get_Depth ();
   int get_NumGates ();
-  
+
   void set_state (State*);
   bool step ();
   void reset ();
