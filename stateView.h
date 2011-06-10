@@ -15,6 +15,7 @@ public:
 protected:
   Gtk::VBox m_vbox;
 	StateWidget draw;
+	Gtk::Statusbar m_statusbar;
 private: 
 };
 #endif

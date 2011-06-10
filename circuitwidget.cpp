@@ -7,7 +7,7 @@
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
-#include <sstream> // XXX: itoa, remove later
+#include "window.h" // slows down compiles, would be nice to not need this (see: clicking, effects toolpalette)
 
 using namespace std;
 
@@ -61,15 +61,19 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 	    break;
 		default: cout << "unhandled gate drag and drop"; break;
 	}
-	newgate->targets.push_back(target);
+	newgate->targets.push_back(target++);
   Gtk::Allocation allocation = get_allocation();
   const int width = allocation.get_width();
   const int height = allocation.get_height();
   // translate mouse click coords into circuit diagram coords
   double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
   double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
+
 	int i = pickRect (rects, xx, yy);
 	cout << "i  is " << i << endl;
+
+//	findInsertionPoint (layout, xx, yy, &column, &
+
 	insert_gate (newgate, 0);
   context->drag_finish(true, false, time);
 }
@@ -108,17 +112,13 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
     panning = false;
   } else if (event->button == 1) {
     int i = pickRect (rects, x, y);
-    cout << "click! at (" << event->x << ", " << event->y << ") ";
-    cout << "which translates to (" << x << ", "<< y << ")" << endl << flush;
-    if (i == -1) cout << "no gate clicked..." << endl << flush;
-    else { cout << "clicked gate " << i << endl << flush; }
-
     selection = i;
+    ((QCViewer*)win)->set_selection (i);
     force_redraw ();
   }
   return true;
 }
-/* used to be able to select multiple gates. deemed silly.
+/* used to be able to select multiple gates. deemed silly. XXX: not so!
 void CircuitWidget::toggle_selection (int id) {
   set <int>::iterator it;
   it = selections.find(id);
@@ -148,23 +148,23 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     double yc = height/2.0;
 
     Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
-//    cr->rectangle(event->area.x, event->area.y,
-//                  event->area.width, event->area.height);
+    cr->rectangle(event->area.x, event->area.y,
+                  event->area.width, event->area.height);
+    cr->clip();
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1,1,1);
 		cr->fill ();
     cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
-    //cr->clip();
     if (circuit != NULL) {
       rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
+			generate_layout_rects ();
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
       }
+			for (unsigned int i = 0; i < layout.size (); i++) {
+      //  drawRect (cr->cobj(), layout[i].bounds, Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
+			}
     }
-		/*cr->set_matrix (Cairo::identity_matrix());
-		cr->rectangle (xc-5,yc-5,10,10);
-		cr->set_source_rgb (0,0,1);
-    cr->fill ();*/
   }
   return true;
 }
@@ -174,8 +174,10 @@ void CircuitWidget::load (string file) {
   circuit = parseCircuit(file);
   layout.clear ();
   vector<int> parallels = circuit->getGreedyParallel ();
-  for (unsigned int i = 0; i < parallels.size(); i++)
-    layout.push_back (LayoutColumn(parallels[i], 20.0));
+	for (unsigned int i = 0; i < parallels.size(); i++) {
+    layout.push_back (LayoutColumn(parallels[i], 0.0));
+  }
+	layout[parallels.size () - 1].pad = 10.0;
   if (circuit == NULL) {
     cout << "Error loading circuit" << endl;
     return;
@@ -274,7 +276,7 @@ void CircuitWidget::insert_gate (Gate *g, unsigned int x) {
   for (unsigned int j = i + 1; j < layout.size (); j++) { cout << "gate " << layout[j].lastGateID << "++\n"; layout[j].lastGateID += 1; }
   circuit->addGate (g, pos);
 //  cout << "gate[pos].name = " << circuit->getGate(pos)->name << "\n";
-  layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0)); 
+  layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0));
   cout << "layout";
   for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;
   cout << ".\n";
@@ -282,24 +284,46 @@ void CircuitWidget::insert_gate (Gate *g, unsigned int x) {
   force_redraw ();
 }
 
-void CircuitWidget::delete_gate () {
-	if (selection == -1 || !circuit) return;
-  unsigned int i = 0;
+void CircuitWidget::set_selection (int i) {
+  selection = i;
+}
+
+void CircuitWidget::delete_gate (unsigned int id) {
+	if (!circuit) return;
+	unsigned int i = 0;
+	selection = -1;
+  ((QCViewer*)win)->set_selection (i);
 	for (i = 0; i < layout.size(); i++) {
-    if (layout[i].lastGateID > (unsigned int)selection) break;
-    if (layout[i].lastGateID < (unsigned int)selection) continue;
+    if (layout[i].lastGateID > id) break;
+    if (layout[i].lastGateID < id) continue;
     // layout[i].lastGateID == id
-    if (i == 0 || layout[i - 1].lastGateID == (unsigned int)selection - 1) {
+		if (i == 0 && id != 0) break;
+    if (i == 0 || layout[i - 1].lastGateID == id - 1) {
       layout.erase (layout.begin() + i);
+			break;
     } else break;
   }
   for (; i < layout.size (); i++) layout[i].lastGateID -= 1;
-	circuit->removeGate (selection);
+	circuit->removeGate (id);
 	ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
 	force_redraw ();
 }
 
 void CircuitWidget::set_insert (bool x) {
   insert = x;
-	selection = 01;
+	selection = 0;
+}
+
+void CircuitWidget::generate_layout_rects () {
+	if (!circuit || circuit->numGates () == 0) return;
+  unsigned int start_gate = 0;
+  for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
+		gateRect bounds = rects[start_gate];
+    for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID; gate++) {
+      bounds = combine_gateRect(bounds, rects[gate]);
+		}
+		bounds.y0 = 0;
+    layout[column].bounds = bounds;
+		start_gate = layout[column].lastGateID + 1;
+	}
 }

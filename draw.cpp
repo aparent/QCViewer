@@ -303,14 +303,15 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
   // gates
   double xcurr = xinit+2.0*gatePad;
   unsigned int mingw, maxgw;
-// TODO ?? int minw = -1;
 // TODO: remove  vector <int> parallels = c->getGreedyParallel ();
 
   // Draw them in parallel using the greedy strategy.
   unsigned int i = 0;
   if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
+  double maxwidth = 0.0;
   for (unsigned int j = 0; j < columns.size(); j++) {
-    double maxwidth = 0;
+		xcurr += maxwidth;
+		maxwidth = 0.0;
     for (; i <= columns[j].lastGateID; i++) {
       Gate* g = c->getGate (i);
       gateRect r;
@@ -344,9 +345,9 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
        maxwidth = max (maxwidth, r.width);
     //  drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
     }
-    xcurr += maxwidth + gatePad + columns[j].pad;
+    xcurr += gatePad + columns[j].pad;
   }
-  *wireend = xcurr - gatePad;
+  *wireend = xcurr;
 
   // output labels
   cairo_set_source_rgb (cr, 0, 0, 0);

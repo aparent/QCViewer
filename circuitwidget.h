@@ -32,8 +32,10 @@ public:
   bool step ();
   void reset ();
   void insert_gate (Gate *, unsigned int);
-	void delete_gate ();
+	void delete_gate (unsigned int);
 	void set_insert (bool);
+	void set_selection (int);
+	void generate_layout_rects ();
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);

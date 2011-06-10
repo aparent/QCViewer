@@ -165,12 +165,12 @@ QCViewer::QCViewer() : drawparallel(false), drawarch (false) {
   m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
 	m_EditToolbar = m_refUIManager->get_widget ("/EditToolbar");
 
-  Gtk::ToolItemGroup* group_gates = Gtk::manage(new Gtk::ToolItemGroup("Gates"));
-  Gtk::ToolItemGroup* group_gateprops = Gtk::manage(new Gtk::ToolItemGroup("Properties"));
-  Gtk::ToolItemGroup* group_warnings = Gtk::manage(new Gtk::ToolItemGroup("Warnings"));
+  group_gates = Gtk::manage(new Gtk::ToolItemGroup("Gates         "));
+  group_gateprops = Gtk::manage(new Gtk::ToolItemGroup("Properties"));
+  group_warnings = Gtk::manage(new Gtk::ToolItemGroup("Warnings"));
   m_Palette.add(*group_gates);
 	m_Palette.add(*group_gateprops);
-	m_Palette.add(*group_warnings);
+//	m_Palette.add(*group_warnings);
 
 	m_Palette.set_orientation (Gtk::ORIENTATION_VERTICAL);
 
@@ -253,14 +253,15 @@ void QCViewer::on_menu_file_open_circuit () {
   int result = dialog.run();
   if (result == Gtk::RESPONSE_OK) {
     c.load (dialog.get_filename ());
+		selection = -1;
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
     c.set_scale (1);
 		std::stringstream ss;
 		ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
     m_statusbar.push(ss.str());
+	  c.reset ();
   }
-	c.reset ();
 }
 
 void QCViewer::on_menu_file_open_arch () {
@@ -349,7 +350,7 @@ void QCViewer::on_menu_load_state () {
 
 void QCViewer::on_menu_step () {
   c.step();
-	sView.redraw();	
+	sView.redraw();
 }
 
 void QCViewer::on_menu_reset () {
@@ -379,7 +380,8 @@ void QCViewer::on_menu_mode_simulate () {
 }
 
 void QCViewer::on_menu_delete () {
-  c.delete_gate ();
+	if (selection == -1) return;
+  c.delete_gate ((unsigned int)selection);
 }
 
 void QCViewer::on_menu_inserttest () {
@@ -388,4 +390,13 @@ void QCViewer::on_menu_inserttest () {
 
 void QCViewer::on_menu_pan () {
   c.set_insert (false);
+}
+
+void QCViewer::set_selection (int i) {
+  selection = i;
+	if (i == -1) {
+//	  m_Palette.remove(*group_gateprops);
+  } else {
+	//  m_Palette.add(*group_gateprops);
+	}
 }

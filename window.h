@@ -12,6 +12,7 @@ public:
   QCViewer ();
   virtual ~QCViewer();
 
+  void set_selection (int);
 protected:
 
   // Signal handlers:
@@ -37,6 +38,7 @@ protected:
 	void on_menu_pan ();
 	void on_menu_inserttest ();
 	void on_menu_load_state ();
+
 //  void on_architecture_load ();
 
 //  void on_menu_simulation_reset ();
@@ -63,11 +65,18 @@ protected:
 	Gtk::ToolPalette m_Palette;
 
 	GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
+	void set_selected (int i);
+
+	Gtk::ToolItemGroup* group_gates;
+  Gtk::ToolItemGroup* group_gateprops;
+  Gtk::ToolItemGroup* group_warnings;
+
 private:
   enum Mode { EDIT_MODE, SIMULATE_MODE } mode;
 	State *state;
   bool drawparallel;
   bool drawarch;
+	int selection;
 };
 
 #endif

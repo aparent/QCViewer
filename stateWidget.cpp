@@ -1,6 +1,12 @@
 #include "stateWidget.h"
+#include <string>
+using namespace std;
 
-StateWidget::StateWidget() : state (NULL) {}
+StateWidget::StateWidget() : state (NULL) {
+  add_events (Gdk::POINTER_MOTION_MASK);
+  signal_motion_notify_event().connect (sigc::mem_fun(*this, &StateWidget::onMotionEvent));
+	mousex = mousey = 0;
+}
 
 bool StateWidget::on_expose_event(GdkEventExpose* event) {
   (void)event; // placate compiler..
@@ -14,11 +20,22 @@ bool StateWidget::on_expose_event(GdkEventExpose* event) {
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1,1,1);
     cr->fill();
-    if (state != NULL)draw_state (cr, state,(float)width,(float)height);
+    if (state != NULL) {
+			string status = draw_state (cr, state,(float)width,(float)height, mousex, mousey);
+			m_statusbar->pop ();
+      m_statusbar->push(status);
+		}
   }
   return true;
 }
-	
+
+bool StateWidget::onMotionEvent (GdkEventMotion* event) {
+  mousex = event->x;
+	mousey = event->y;
+	force_redraw ();
+	return true;
+}
+
 void StateWidget::set_state(State* n_state){
 	state = n_state;
 	force_redraw();

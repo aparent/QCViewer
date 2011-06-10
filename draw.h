@@ -23,6 +23,7 @@ public:
   LayoutColumn (unsigned int, double);
   unsigned int lastGateID;
   double pad;
+	gateRect bounds;
 };
 
 cairo_rectangle_t get_circuit_size (Circuit *c, vector<LayoutColumn>&, double* wirestart, double* wireend, double scale);
@@ -32,5 +33,6 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>&, b
 void write_to_png (cairo_surface_t* surf, string filename);
 int pickRect (vector<gateRect> rects, double x, double y);
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
+gateRect combine_gateRect (gateRect a, gateRect b);
 
 #endif // DRAW__INCLUDED
