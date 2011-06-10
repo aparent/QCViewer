@@ -7,8 +7,9 @@
 
 QCViewer::QCViewer() : drawparallel(false), drawarch (false) {
 	mode = EDIT_MODE;
-  set_title("QCViewer");
+  set_title("QCViewer-v0.1");
   set_border_width(0);
+	set_default_size(1000,1000);
 	state = NULL;
 	NOTicon.type = GateIcon::NOT;
 	Hicon.type = GateIcon::H;
@@ -340,8 +341,8 @@ void QCViewer::on_menu_load_state () {
 	int result = enterState.run();
 	if (result == Gtk::RESPONSE_OK){
 		if (state!=NULL) delete state;
-		state = new State(getStateVec (stateEntry.get_text(), true));
-	//	state->print();
+		state = getStateVec (stateEntry.get_text(), true);
+		state->print();
 		sView.set_state(state);
 		c.set_state(state);
 	}
