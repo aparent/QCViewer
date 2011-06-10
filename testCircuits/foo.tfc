@@ -1,13 +1,15 @@
-# (c) Copyright 2011 Mfoobarrek Szyprowski foobarnd Pfoobarwel Kerntopf
-# Distributing this file without foobarn express written permission or erfoobarsing this note is prohibited.
-.v first,second,third,fourth
-.i first,second,third,fourth
-.o first,second,third,fourth
+.v first,second,third,fourth,fifth
+.i first,second,third,fourth,fifth
+.o first,second,third,fourth,fifth
 BEGIN
 H first
 H second
 H third
 H fourth
+H fifth
+t0 first third
+t1 second fifth
+h fourth
 t0 first
 t0 second
 t0 third
@@ -22,7 +24,6 @@ t1 test,third
 t1 third,fourth
 t1 first,fourth
 f first,second,fourth
-
 H second
 H third
 t0 first
@@ -33,5 +34,4 @@ H first
 X first
 Y second
 Z third
-QFT first second third fourth
 END
