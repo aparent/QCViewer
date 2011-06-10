@@ -215,9 +215,9 @@ QCViewer::QCViewer() : drawparallel(false), drawarch (false) {
 	m_vbox.pack_start(*m_EditToolbar, Gtk::PACK_SHRINK);
   c.set_window (this);
   c.show();
-	m_hbox.pack_end(c);
+	m_hbox.pack_end (c);
 	m_hbox.pack_start (m_Palette, Gtk::PACK_SHRINK);
-  m_vbox.pack_start(m_hbox);
+  m_vbox.pack_start (m_hbox);
 
 //  m_vbox.pack_start (m_cmdOut);
 //  m_vbox.pack_start (m_cmdIn, Gtk::PACK_SHRINK);

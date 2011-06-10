@@ -26,6 +26,20 @@ void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
 void CircuitWidget::set_offset (int y) { yoffset = y; }
 
 CircuitWidget::~CircuitWidget () {}
+double wireToY (int x); // XXX: !!!!
+unsigned int CircuitWidget::getFirstWire (double my) {
+  unsigned int ans;
+  double mindist;
+	for (unsigned int i = 0; i < circuit->numLines (); i++) {
+		double y = wireToY (i);
+		if (i == 0 || mindist > abs(my-y)) {
+			mindist = abs(my-y);
+			ans = i;
+		}
+	}
+	return ans;
+
+}
 
 void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time) {
 	if (!circuit) { context->drag_finish(false, false, time); return; }
@@ -59,7 +73,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 			newgate->drawType = FRED;
 			newgate->targets.push_back (target++);
 	    break;
-		default: cout << "unhandled gate drag and drop"; break;
+		default: cout << "unhandled gate drag and drop" << endl; break;
 	}
 	newgate->targets.push_back(target++);
   Gtk::Allocation allocation = get_allocation();
@@ -69,14 +83,65 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
   double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
   double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
 
-	int i = pickRect (rects, xx, yy);
-	cout << "i  is " << i << endl;
+	int column_id = pickRect (columns, xx, yy);
+	unsigned int wire = getFirstWire (yy);
+	for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
+	if (columns.size () == 0) {
+		insert_gate_at_front (newgate);
+	} else if (column_id == -1) {
+		if (yy < columns[0].y0 || yy - columns[0].y0 > columns[0].height) {
+      // bad drag and drop
+		} else if (xx < columns[0].x0) {
+			insert_gate_at_front (newgate);
+		} else {
+			unsigned int i;
+			for (i = 1; i < columns.size (); i++) {
+        if (xx < columns[i].x0) {
+					insert_gate_in_new_column (newgate, layout[i-1].lastGateID);
+          break;
+				}
+			}
+			if (i == columns.size ()) { // goes after all columns
+			  insert_gate_in_new_column (newgate, layout[i-1].lastGateID);
+			}
+		}
+	} else {
+		unsigned int start = (column_id == 0) ? 0 : layout[column_id - 1].lastGateID + 1;
+		unsigned int end   = layout[column_id].lastGateID;
+		bool ok = true;
+	  unsigned int mymaxwire, myminwire;
+		mymaxwire = myminwire = newgate->targets[0];
+		for (unsigned int j = 0; j < newgate->targets.size (); j++) {
+      mymaxwire = max (mymaxwire, newgate->targets[j]);
+			myminwire = min (myminwire, newgate->targets[j]);
+		}
+		for (unsigned int i = start; i <= end && ok; i++) {
+			Gate* g = circuit->getGate (i);
+			unsigned int maxwire, minwire;
+			maxwire = minwire = g->targets[0];
+      for (unsigned int j = 0; j < g->targets.size (); j++) {
+				minwire = min (minwire, g->targets[j]);
+				maxwire = max (maxwire, g->targets[j]);
+			}
+      for (unsigned int j = 0; j < g->controls.size (); j++) {
+				minwire = min (minwire, g->controls[j].wire);
+				maxwire = max (maxwire, g->controls[j].wire);
+			}
+			if (!(mymaxwire < minwire || myminwire > maxwire)) ok = false;
+		}
+		if (ok) {
+      insert_gate_in_column (newgate, column_id);
+		} else {
+      insert_gate_in_new_column (newgate, end);
+		}
+	}
 
 //	findInsertionPoint (layout, xx, yy, &column, &
 
-	insert_gate (newgate, 0);
   context->drag_finish(true, false, time);
 }
+
+
 
 bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
 	if (!circuit) return true;
@@ -161,9 +226,9 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
       }
-			for (unsigned int i = 0; i < layout.size (); i++) {
-      //  drawRect (cr->cobj(), layout[i].bounds, Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
-			}
+			//for (unsigned int i = 0; i < layout.size (); i++) {
+      //  drawRect (cr->cobj(), columns[i], Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
+			//}
     }
   }
   return true;
@@ -177,7 +242,7 @@ void CircuitWidget::load (string file) {
 	for (unsigned int i = 0; i < parallels.size(); i++) {
     layout.push_back (LayoutColumn(parallels[i], 0.0));
   }
-	layout[parallels.size () - 1].pad = 10.0;
+	layout[parallels.size () - 1].pad = 0.0;
   if (circuit == NULL) {
     cout << "Error loading circuit" << endl;
     return;
@@ -262,24 +327,30 @@ int CircuitWidget::get_QCost () { return circuit->QCost(); }
 int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
 int CircuitWidget::get_NumGates () { return circuit->numGates(); }
 
-void CircuitWidget::insert_gate (Gate *g, unsigned int x) {
-  cout << "\n\n\nInserting gate after pos " << x << "...\n";
-  cout << "layout";
-  for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;
-  cout << ".\n";
+void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id) {
+  for (unsigned int j = column_id; j < layout.size (); j++) layout[j].lastGateID += 1;
+  circuit->addGate(g, layout[column_id].lastGateID - 1);
+  ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+  force_redraw ();
+}
+
+void CircuitWidget::insert_gate_at_front (Gate *g) {
+  for (unsigned int j = 0; j < layout.size (); j++) layout[j].lastGateID += 1;
+  circuit->addGate(g, 0);
+	layout.insert(layout.begin(), LayoutColumn (0,0));
+  ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+  force_redraw ();
+}
+
+// XXX: this may actually be more complicated than necessary now.
+void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x) {
   if (!circuit) return;
   unsigned int i;
   for (i = 0; i < layout.size() && layout[i].lastGateID < x; i++);
   unsigned int pos = layout[i].lastGateID + 1;
-  cout << "Column " << i << " has lastGateID = " << layout[i].lastGateID << ".\n" << flush;
-  cout << "Will insert gate as gate # "<< pos << ".\n";
-  for (unsigned int j = i + 1; j < layout.size (); j++) { cout << "gate " << layout[j].lastGateID << "++\n"; layout[j].lastGateID += 1; }
+  for (unsigned int j = i + 1; j < layout.size (); j++) layout[j].lastGateID += 1;
   circuit->addGate (g, pos);
-//  cout << "gate[pos].name = " << circuit->getGate(pos)->name << "\n";
   layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0));
-  cout << "layout";
-  for (unsigned int k = 0; k < layout.size (); k++) cout << " " << layout[k].lastGateID;
-  cout << ".\n";
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
 }
@@ -315,6 +386,7 @@ void CircuitWidget::set_insert (bool x) {
 }
 
 void CircuitWidget::generate_layout_rects () {
+	columns.clear ();
 	if (!circuit || circuit->numGates () == 0) return;
   unsigned int start_gate = 0;
   for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
@@ -322,8 +394,9 @@ void CircuitWidget::generate_layout_rects () {
     for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID; gate++) {
       bounds = combine_gateRect(bounds, rects[gate]);
 		}
-		bounds.y0 = 0;
-    layout[column].bounds = bounds;
+		bounds.y0 = ext.y;
+		bounds.height = max (bounds.height, ext.height);
+		columns.push_back(bounds);
 		start_gate = layout[column].lastGateID + 1;
 	}
 }
