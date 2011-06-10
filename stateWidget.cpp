@@ -1,4 +1,9 @@
 #include "stateWidget.h"
+#include <iostream>
+#include <map>
+#include <complex>
+
+using namespace std;
 
 StateWidget::StateWidget() : state (NULL) {}
 
@@ -18,7 +23,7 @@ bool StateWidget::on_expose_event(GdkEventExpose* event) {
   }
   return true;
 }
-	
+
 void StateWidget::set_state(State* n_state){
 	state = n_state;
 	force_redraw();
@@ -31,4 +36,42 @@ void StateWidget::force_redraw () {
                      get_allocation().get_height());
     win->invalidate_rect(r, false);
   }
+}
+
+void StateWidget::draw_state (Cairo::RefPtr<Cairo::Context> cr, State* state, float width ,float height){
+	StateMap::const_iterator it;
+	float xborder = width/12;
+	float yborder = height/12;
+	float eValue, scale = 0;
+  for (it = state->data.begin(); it != state->data.end(); it++) {//find max value for scaling
+		eValue = pow(it->second.real(),2)+pow(it->second.imag(),2);
+    if (eValue > scale){
+			scale = eValue;
+		}
+  }
+	float rValue,iValue;//expectation value, real value, imaginary value
+	//scaled values
+	float barWidth = (width-2*xborder)/((float)state->dim);
+	float sHeight = height -2*yborder;
+
+  for (unsigned int i =0; i < state->dim; i++) {
+		if(state->data.find(i)!= state->data.end()){
+			rValue = state->data.find(i)->second.real();
+			iValue = state->data.find(i)->second.imag();
+			eValue = pow(iValue,2) + pow(rValue,2);
+			cr->set_source_rgb (1,0,0);
+			cr->rectangle (barWidth*i + xborder, sHeight*(1-eValue/scale)+yborder, barWidth, sHeight*eValue/scale);
+		}
+  }
+	cr->fill();
+	for (unsigned int i =0; i < state->dim; i++) {
+		if(state->data.find(i)!= state->data.end()){
+			rValue = state->data.find(i)->second.real();
+			iValue = state->data.find(i)->second.imag();
+			eValue = pow(iValue,2) + pow(rValue,2);
+			cr->set_source_rgb (0,0,0);
+			cr->rectangle (barWidth*i + xborder, sHeight*(1-eValue/scale)+yborder, barWidth, sHeight*eValue/scale);
+		}
+  }
+	cr->stroke();
 }

@@ -1,6 +1,5 @@
 #include "stateView.h"
 #include <cairomm/context.h>
-#include "drawState.h"
 
 
 stateView::stateView() {
