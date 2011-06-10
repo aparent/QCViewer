@@ -31,7 +31,9 @@ public:
   void set_state (State*);
   bool step ();
   void reset ();
-  void insert_gate (Gate *, unsigned int);
+  void insert_gate_in_new_column (Gate *, unsigned int);
+  void insert_gate_in_column (Gate *, unsigned int);
+  void insert_gate_at_front (Gate*);
 	void delete_gate (unsigned int);
 	void set_insert (bool);
 	void set_selection (int);
@@ -69,8 +71,12 @@ private:
   double scale;
   double cx, cy;
 
-  vector<gateRect> rects;
+  vector<gateRect> columns;
+	vector<gateRect> rects;
   int selection;
+
+
+	unsigned int getFirstWire (double);
 };
 
 #endif
