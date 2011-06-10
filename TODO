@@ -1,3 +1,4 @@
 APARENT:
 -Use vector bool instead of int to remove 32 QBit cap on sim. Started on branch "vec-Bool".
--Fix dirac state input to directly use State class rather then a full array. Started on branch "dirac-state".
+	-vector bool may not be ideal due to strick size requirements due to memory use
+	-it may be better to just use uint64?

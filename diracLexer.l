@@ -69,7 +69,6 @@ i										{
 
 <ketmult>\^
 <ketmult>[0-9]+			{
-											cout << "temp" <<  temp.str() << endl;
 											int reps = atoi(yytext);
 											string pat = temp.str();
 											for(int i = 0; i<reps-1; i++) temp << pat;

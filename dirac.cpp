@@ -3,7 +3,6 @@
 #include "utility.h"
 #include "diracParser.h"
 #include "parseNode.h"
-#include <cmath>
 #include <iostream>//for error messages
 #include <stdlib.h> //atof
 
