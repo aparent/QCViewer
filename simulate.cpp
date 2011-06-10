@@ -17,7 +17,7 @@ gateMatrix getGateMatrix(Gate*);//defined below
 	optimization if nessicary. (For a good example of how this works see gates/UGate.cpp
 */
 State ApplyGate (State* in, Gate* g) {
-  map<index_t, complex<float_t> >::iterator it;
+  map<index_t, complex<float_type> >::iterator it;
   State answer;
 	answer.dim = in->dim;
   for (it = in->data.begin(); it != in->data.end(); it++) {
@@ -26,7 +26,7 @@ State ApplyGate (State* in, Gate* g) {
 			 cout << "Simulation Error" << endl;
 			 return answer;
 		}
-    complex<float_t> foo = (*it).second;
+    complex<float_type> foo = (*it).second;
     *tmp *= foo;
     answer += *tmp;
     delete tmp;

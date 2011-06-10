@@ -11,7 +11,7 @@ using namespace std;
 struct diracTerm{
 	int type;
 	State vecValue;
-	complex<float_t> numValue;
+	complex<float_type> numValue;
 };
 
 parseNode *parseDirac(std::string input); //Defined in diracParser.y
@@ -104,12 +104,12 @@ diracTerm evalTree(parseNode *node){
 	diracTerm ret;
 	if(node->type == CNUM){
 		ret.type = NUM;
-		ret.numValue = complex<float_t>(0,atof((node->value).c_str()));
+		ret.numValue = complex<float_type>(0,atof((node->value).c_str()));
 		return ret;
 	}
 	if(node->type == NUM){
 		ret.type = NUM;
-		ret.numValue = complex<float_t>(atof((node->value).c_str()),0);
+		ret.numValue = complex<float_type>(atof((node->value).c_str()),0);
 		return ret;
 	}
 	if(node->type == KET){

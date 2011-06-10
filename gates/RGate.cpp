@@ -5,7 +5,7 @@
 #include <complex>
 #define PI 3.14159265
 
-RGate::RGate(float_t n_rot) : rot(n_rot) {
+RGate::RGate(float_type n_rot) : rot(n_rot) {
 	drawType = DEFAULT;
 	type = RGATE;
 }
@@ -39,7 +39,7 @@ State *RGate::applyToBasis(index_t bitString){
 State *RGate::ApplyU (index_t bits){
   State *answer = new State;
 	if (GetRegister (bits, targets.at(0))){
-		*answer = State(exp(complex<float_t>(0,PI*rot)), BuildBitString (bits, 1));
+		*answer = State(exp(complex<float_type>(0,PI*rot)), BuildBitString (bits, 1));
 	}
 	else{
 		*answer = State(1, bits);

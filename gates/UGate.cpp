@@ -53,7 +53,7 @@ State *UGate::ApplyU (index_t bits){
 		if (matrix == NULL) return NULL;
 	}
   for (unsigned int i = 0; i < matrix->dim; i++) {
-    if (matrix->data[input*matrix->dim+i] != complex<float_t>(0)){
+    if (matrix->data[input*matrix->dim+i] != complex<float_type>(0)){
 			*answer += State(matrix->data[input*matrix->dim+i], BuildBitString (bits, i));
 		}
   }

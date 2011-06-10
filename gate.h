@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "state.h" // float_t
+#include "state.h" // float_type
 
 using namespace std;
 
@@ -40,7 +40,7 @@ class Gate {
 //A gate matrix struct for UGate
 struct gateMatrix{
 	unsigned int dim;
-	complex<float_t> * data;
+	complex<float_type> * data;
 };
 
 //A general unitary gate
@@ -61,13 +61,13 @@ class UGate : public Gate {
 //An arbitrary rotation gate
 class RGate : public Gate {
   public:
-		RGate(float_t);
+		RGate(float_type);
 		string getName();
 		State *applyToBasis(index_t);
 	private:
 		index_t BuildBitString (index_t, unsigned int);
 		State* ApplyU(index_t);
-    float_t rot;
+    float_type rot;
 		string name;
 };
 

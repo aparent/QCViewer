@@ -7,22 +7,22 @@
 // If it is desired to up the accuracy later, or change the maximum
 // qubit size, change this.
 // Templates were removed because they made the code ugly.
-typedef float float_t;
+typedef float float_type;
 typedef uint32_t index_t;
-typedef std::map<index_t, std::complex<float_t> >  StateMap;
+typedef std::map<index_t, std::complex<float_type> >  StateMap;
 
 class State {
 public:
   State ();
   State (index_t);
-  State (std::complex<float_t> amp, index_t bits);
+  State (std::complex<float_type> amp, index_t bits);
 
 	void print();
 
-  std::complex<float_t> getAmplitude (index_t bits);
+  std::complex<float_type> getAmplitude (index_t bits);
   const State& operator+= (const State &r);
   const State& operator-= (const State &r);
-  const State& operator*= (const std::complex<float_t>);
+  const State& operator*= (const std::complex<float_type>);
 	void normalize();
 
 	index_t dim;
