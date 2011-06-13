@@ -17,7 +17,7 @@ void parseLineNames(Circuit * circ, vector<TFCToken>::iterator * it){
 
 void parseInputs(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
-		for(int j = 0; j < circ->numLines(); j++){
+		for(unsigned int j = 0; j < circ->numLines(); j++){
       if ((**it).value.compare(circ->getLine(j)->lineName)==0){
         circ->getLine(j)->constant=false;
         break;
@@ -29,7 +29,7 @@ void parseInputs(Circuit * circ, vector<TFCToken>::iterator * it){
 
 void parseOutputs(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
-		for(int j = 0; j < circ->numLines(); j++){
+		for(unsigned int j = 0; j < circ->numLines(); j++){
       if ((**it).value.compare(circ->getLine(j)->lineName)==0){
         circ->getLine(j)->garbage=false;
         break;
@@ -41,7 +41,7 @@ void parseOutputs(Circuit * circ, vector<TFCToken>::iterator * it){
 
 void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
-		for(int j = 0; j < circ->numLines(); j++){
+		for(unsigned int j = 0; j < circ->numLines(); j++){
       if (!circ->getLine(j)->garbage){
       	circ->getLine(j)->outLabel = (**it).value;
         break;
@@ -55,7 +55,7 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
 	bool found,error=false; 
   while((*(++(*it))).type == GATE_INPUT || (**it).type == GATE_INPUT_N){
 		found = false; 
-    for(int j = 0; j < circ->numLines(); j++){
+    for(unsigned int j = 0; j < circ->numLines(); j++){
       if (((**it).value).compare(circ->getLine(j)->lineName)==0){
 				if ((**it).type == GATE_INPUT_N){
         	gate->controls.push_back(Control(j,true));
@@ -127,7 +127,7 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
 
 void parseConstants(Circuit * circ, vector<TFCToken>::iterator * it){
 	while((*(++(*it))).type == VAR_NAME){
-		for(int j = 0; j < circ->numLines(); j++){
+		for(unsigned int j = 0; j < circ->numLines(); j++){
       if (circ->getLine(j)->constant){
       	circ->getLine(j)->initValue = atoi(((**it).value).c_str());
         break;
