@@ -1,16 +1,26 @@
 #include "circuit.h"
 #include <cairo.h>
 #include <cairo-svg.h>
+#include <cairo-ft.h>
 #include <cmath>
 #include <iostream>
 #include <vector>
 #include "draw.h"
+
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #ifndef M_PI
 #define M_PI 3.141592
 #endif
 
 using namespace std;
+
+//Font stuff
+FT_Library library;
+FT_Face ft_face;
+cairo_font_face_t * ft_default;
 
 // XXX organize this!!
 double radius = 15.0;
@@ -23,6 +33,12 @@ double gatePad = 18.0;
 double textPad = 5.0;
 double Upad = 0.9;
 
+
+void init_fonts(){
+	FT_Init_FreeType( &library );
+	FT_New_Face( library, "fonts/cmbx12.ttf", 0, &ft_face );
+	ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+}
 
 double wireToY (int x) {
   return yoffset+(x+1)*wireDist;
@@ -100,17 +116,17 @@ gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vect
 }
 
 void drawShowU (cairo_t *cr, double xc, double yc, double width, string name) {
-  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_face (cr,ft_default);
   cairo_set_font_size(cr, 18);
   cairo_text_extents_t extents;
 	cairo_text_extents (cr, name.c_str (), &extents);
-	double textwidth = extents.width+2.0*textPad;
-	double textheight = extents.height+2.0*textPad;
-  cairo_rectangle (cr, xc - textwidth/2.0, yc- textheight/2.0, textwidth, textheight);
+  cairo_rectangle (cr, xc - width/2.0, yc- width/2.0, width, width);
 	cairo_set_source_rgb (cr, 0, 0, 0);
 	cairo_stroke (cr);
-	double x = xc - (extents.width/2.0 + extents.x_bearing);
-	double y = yc - (extents.height/2.0 + extents.y_bearing);
+	double scale = width/(max(extents.width,extents.height)+textPad*2);
+	cairo_scale(cr,scale,scale);
+	double x = (1.0/scale)*(xc) - (1.0/2.0)*extents.width;
+	double y = (1.0/scale)*(yc) - (1.0/2.0)*extents.y_bearing;
 	cairo_move_to (cr, x, y);
 	cairo_show_text (cr, name.c_str());
 }
@@ -184,7 +200,8 @@ gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=
 }
 
 void drawShowRotation (cairo_t *cr, double xc, double yc, double radius) {
-  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  //cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_face (cr,ft_default);
   cairo_set_font_size(cr, 18);
   cairo_set_line_width (cr, thickness);
 
@@ -263,7 +280,7 @@ void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, do
   cairo_rectangle (cr, 0, 0, w/scale, h/scale); // TODO: document why the scale factors are here
   cairo_fill (cr);
 
-  for (int i = 0; i < c->numLines(); i++) {
+  for (unsigned int i = 0; i < c->numLines(); i++) {
     double y = wireToY (i);
     drawWire (cr, wirestart, y, wireend, y);
   }
@@ -282,7 +299,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   // input labels
   double xinit = 0.0;
-  for (int i = 0; i < c->numLines(); i++) {
+  for (unsigned int i = 0; i < c->numLines(); i++) {
     Line *line = c->getLine (i);
     string label = line->getInputLabel ();
     cairo_text_extents_t extents;
@@ -351,7 +368,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   // output labels
   cairo_set_source_rgb (cr, 0, 0, 0);
-  for (int i = 0; i < c->numLines (); i++) {
+  for (unsigned int i = 0; i < c->numLines (); i++) {
     Line *line = c->getLine (i);
     string label = line->getOutputLabel();
     cairo_text_extents_t extents;
@@ -401,7 +418,8 @@ cairo_rectangle_t get_circuit_size (Circuit *c, vector<LayoutColumn>& columns, d
   cairo_t *cr = cairo_create(unbounded_rec_surface);
   cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
   cairo_scale (cr, scale, scale);
-  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  //cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_face (cr,ft_default);
   cairo_set_font_size(cr, 18);
   draw (cr, c, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
   cairo_rectangle_t ext;
@@ -422,7 +440,8 @@ void write_to_png (cairo_surface_t* surf, string filename) {
 
 vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
   cairo_scale (cr, scale, scale);
-  cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_face (cr,ft_default);
+  //cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;
