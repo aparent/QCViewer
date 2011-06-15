@@ -5,16 +5,17 @@
   #include <string.h>
   #include <iostream>
   #include <string>
-  #include "parseNode.h"
-  #define YYSTYPE QCLParseNode*
-  string printTree(parseNode *node);
+	#include "QCLParserUtils.h"
+	
   void yyerror(const char *s);
-  int QCLlex();
-  int yy_scan_string(const char*);
-  parseNode *final;
-
   using namespace std;
+	QCLParseNode *final;
 %}
+
+%union{
+	char* str;
+	QCLParseNode * node;
+}
 %name-prefix "QCL"
 %error-verbose
 %verbose 
@@ -23,44 +24,50 @@
 %define api.pure
 %locations
 
-%start block
-%token NUM KET PLUS MINUS TIMES DIV EQUALS FUNC
-%token IF FOR ID OP KVAR
+%start input
+%token IF FOR PLUS MINUS TIMES DIV EQUALS INPUTS 
+%token LINE OPERATION OPEXPONENT FUNC
+%token <str> ID KVAR NUM KET OP
+%type <node> block exp line conditional var operations finputs 
 %left MINUS PLUS
 %left TIMES DIV
 %right EXPONENT
 
 %%
+input: 				/* empty */
+							| block { final = $1; }
 
-block:				/* empty */
-							| FOR exp'..'exp '        {' '\n' block '}' '\n' block
-							| IF '(' conditional ')' '{' '\n' block '}' '\n' block
-              | statement '\n' block     
-              | '\n' block     
+block:					line 
+							| FOR exp'..'exp         '{' '\n' block '}' '\n' block 	{ $$ = setupFOR($2,$4,$7,$10); }
+							| IF '(' conditional ')' '{' '\n' block '}' '\n' block 	{ $$ = NULL; }
+              | line '\n' block	 { $$ = setupLINE($1,$3); } 
+              | '\n' block  { $$ = $2; } 
 		;
-statement:		  var EQUALS exp
-							| operations KVAR
+line:					  var EQUALS exp	{ $$ = setupBINOP(EQUALS,$1,$3); }
+							| operations KVAR { $$ = setupOPERATION($1, $2);}
 							| ID '(' finputs ')'
 		;
-var: 					  KVAR
-							| ID
+var: 					  KVAR {$$=setupVAR(KVAR,$1);}
+							| ID   {$$=setupVAR(ID,$1);}
 		;
-operations:			OP
-							|	OP EXPONENT exp 
-							|	OP EXPONENT exp operations
-							| OP operations
+operations:			OP {$$=setupOP($1,NULL);}
+							|	OP EXPONENT exp {$$=setupOPEXPONENT($1,$3,NULL);} 
+							|	OP EXPONENT exp operations {$$=setupOPEXPONENT($1,$3,$4);}
+							| OP operations {$$=setupOP($1,$2);}
 		;
-finputs:			/*empty*/
-							| KVAR ',' finputs
-							| exp  ',' finputs
+finputs:			/*empty*/						{$$ = NULL;}
+							| KVAR ',' finputs	{$$ = setupINPUTS(setupVar($1),$3);}
+							| exp  ',' finputs	{$$ = setupINPUTS($1,$3);}
+							| KVAR							{$$ = setupINPUTS(setupVar($1),NULL);}
+							| exp								{$$ = setupINPUTS($1,NULL);}
 		;
-exp:					  value
-							| exp MINUS 		exp 
-							|	exp PLUS  		exp
-							|	exp TIMES			exp
-							| exp DIV 			exp
-							| exp EXPONENT 	exp
-							| '(' exp ')'
+exp:					  value							
+							| exp MINUS 		exp { $$ = setupBINOP(MINUS,$1,$3);   } 
+							|	exp PLUS  		exp { $$ = setupBINOP(PLUS,$1,$3);    }
+							|	exp TIMES			exp { $$ = setupBINOP(TIMES,$1,$3);   }
+							| exp DIV 			exp { $$ = setupBINOP(DIV,$1,$3);     }
+							| exp EXPONENT 	exp { $$ = setupBINOP(EXPONENT,$1,$3);}
+							| '(' exp ')'				{ $$ = $2;                        }
 							| ID '(' finputs ')'
 		;
 value:					ID
@@ -71,15 +78,6 @@ conditional:
 ;
 %%
 
-
-parseNode *parseDirac(string input){
-  char *in = (char*)malloc(input.length() + 1);
-  strcpy(in,input.c_str());
-  yy_scan_string(in);
-  yyparse ();
-  return final;
-}
-
-void yyerror (const char *s){ /* Called by yyparse on error */
+void QCLerror (const char *s){ /* Called by yyparse on error */
   printf ("%s\n", s);
 }
