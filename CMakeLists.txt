@@ -18,6 +18,9 @@ SET(QCLIB_SRC_FILES
 	gates/UGate.cpp
 	gates/RGate.cpp
 	gates/UGateLookup.cpp
+	QCLang/QCLParser.cpp
+	QCLang/QCLLexer.cpp
+	QCLang/QCLParserUtils.cpp
 )
 
 SET(QCLIB_HEADER_FILES
@@ -49,6 +52,16 @@ IF(UNIX)
 		COMMAND bison -d -v -o diracParser.cpp ${CMAKE_SOURCE_DIR}/diracParser.y
 		DEPENDS ${CMAKE_SOURCE_DIR}/diracParser.y
 	)
+	add_custom_command (
+		OUTPUT ${CMAKE_SOURCE_DIR}/QCLang/QCLLexer.cpp
+		COMMAND flex ${CMAKE_SOURCE_DIR}/QCLang/QCLLexer.l
+		DEPENDS ${CMAKE_SOURCE_DIR}/QCLang/QCLLexer.l
+	)
+	add_custom_command (
+		OUTPUT ${CMAKE_SOURCE_DIR}/QCLang/QCLParser.cpp
+		COMMAND bison ${CMAKE_SOURCE_DIR}/QCLang/QCLParser.y
+		DEPENDS ${CMAKE_SOURCE_DIR}/QCLang/QCLParser.y
+	)
 ENDIF(UNIX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -71,5 +84,9 @@ target_link_libraries(simTest QC )
 
 add_executable (testParser  testParser.cpp )
 target_link_libraries(testParser QC )
+
+add_executable (QCLang/QCLTest  QCLang/QCLTest.cpp )
+target_link_libraries(QCLang/QCLTest QC )
+
 #add_executable (testParser testParser.cpp)
 #target_link_libraries(testParser QCLib)

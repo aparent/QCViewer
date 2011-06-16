@@ -2,34 +2,34 @@
 %option nounput
 %option never-interactive
 %option unistd
-%option outfile="diracLexer.cpp"
-%option prefix="QCL"
-%option bison-bridge bison-locations
+%option outfile="QCLang/QCLLexer.cpp"
+%option prefix="QCL_"
 %{
 	#include <string>
 	#include <sstream>
   #include <iostream>
   #include <cstdlib>
+	#define YYSTYPE QCLParseNode*
 	#include "QCLParserUtils.h"
 	using namespace std;
-	stringstream temp;
+	stringstream QCL_temp;
 %}
 
 %x ket
 %x ketmult
 
 DIGIT [0-9]
-ID [a-z][a-z0-9]*
+ID [a-z][a-zA-z0-9]*
 OP [A-Z][a-z]*
 %%
 FOR                 { return FOR;   }
 IF                 	{ return IF;    }
 {OP}								{
-											yylval->str = strdup(yytext);
+											QCL_lval = setupVAR(OP,strdup(yytext));
 											return OP;
 										}
 {ID}								{
-											yylval->str = strdup(yytext);
+											QCL_lval = setupVAR(ID,strdup(yytext));
 											return ID;
 										}
 \+                  { return PLUS;  }
@@ -37,30 +37,30 @@ IF                 	{ return IF;    }
 \*                  { return TIMES; }
 \/                  { return DIV;   }
 =										{ return EQUALS;}
-{DIGIT}+i							{
-											yylval->str = strdup(yytext);
+{DIGIT}+i						{
+											QCL_lval = setupVAR(NUM,strdup(yytext));
 											return NUM;
 										}
-{DIGIT}+	      	    {
-											yylval->str = strdup(yytext);
+{DIGIT}+	      	  {
+											QCL_lval = setupVAR(NUM,strdup(yytext));
 											return NUM;
 										}
-{DIGIT}+\.{DIGIT}+	      {
-											yylval->str = strdup(yytext);
+{DIGIT}+\.{DIGIT}+	{
+											QCL_lval = setupVAR(NUM,strdup(yytext));
 											return NUM;
 										}
 \|									{BEGIN(ket);}
-<ket>[a-zA-Z]+      {
-											yylval->str = strdup(yytext);
+<ket>{ID}			      {
+											QCL_lval = setupVAR(KVAR,strdup(yytext));
 											return KVAR;
 										}
 <ket>[0-1]+    	    {
-											yylval->str = strdup(yytext);
+											QCL_lval = setupVAR(KET,strdup(yytext));
 											return KET;
 										}
 <ket>[0-1]+/\^      { cout << yytext << endl;
-											temp.str("");
-											temp << yytext;
+											QCL_temp.str("");
+											QCL_temp << yytext;
 											BEGIN(ketmult);
 										}
 <ket>\>							{BEGIN(INITIAL);}
@@ -68,15 +68,16 @@ IF                 	{ return IF;    }
 <ketmult>\^
 <ketmult>{DIGIT}+			{
 											int reps = atoi(yytext);
-											string pat = temp.str();
-											for(int i = 0; i<reps-1; i++) temp << pat;
-											yylval->str=strdup(temp.str().c_str());
+											string pat = QCL_temp.str();
+											for(int i = 0; i<reps-1; i++) QCL_temp << pat;
+											QCL_lval = setupVAR(KET,strdup(QCL_temp.str().c_str()));
 											return KET;
 										}
 <ketmult>\>					{BEGIN(INITIAL);}
 
 <*>[ \t]+						/* eat whitespace */
-. 		 			    	  {return(yytext[0]);}
-
-
+\.\.            {return(yytext[0]);}
+. 		 			    {return(yytext[0]);}
+\n 		 			    {return(yytext[0]);}
+<*>#.*          /* eat comments */
 %%
