@@ -5,7 +5,6 @@
 QCLParseNode * setupFOR(QCLParseNode * exp1, QCLParseNode * exp2, QCLParseNode * repBlock, QCLParseNode * nextBlock){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = FOR;
-	ret->value = NULL;
 	ret->leaves = new QCLParseNode*[4];
 	ret->leaves[0]=exp1;
 	ret->leaves[1]=exp2;
@@ -27,7 +26,6 @@ QCLParseNode * setupLINE(QCLParseNode * currentLine, QCLParseNode * nextLine){
 QCLParseNode * setupBINOP(int type, QCLParseNode * arg1, QCLParseNode * arg2){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = type;
-	ret->value = NULL;
 	ret->leaves = new QCLParseNode*[2];
 	ret->leaves[0]=arg1;
 	ret->leaves[1]=arg2;
@@ -45,7 +43,6 @@ QCLParseNode * setupVAR(int type, char* name){
 QCLParseNode * setupOPERATION(QCLParseNode * ops, QCLParseNode * targetVar){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = OPERATION;
-	ret->value = NULL;
 	ret->leaves = new QCLParseNode*[2];
 	ret->leaves[0]=ops;
 	ret->leaves[1]=targetVar;
@@ -65,11 +62,11 @@ QCLParseNode * setupOP(QCLParseNode * op, QCLParseNode * next){
 QCLParseNode * setupOPEXPONENT(QCLParseNode * op, QCLParseNode * exp, QCLParseNode * next){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = OPEXPONENT;
-	ret->value = NULL;
+	ret->value = strdup(op->value);
+	delete op;
 	ret->leaves = new QCLParseNode*[3];
-	ret->leaves[0]=op;
-	ret->leaves[1]=exp;
-	ret->leaves[2]=next;
+	ret->leaves[0]=exp;
+	ret->leaves[1]=next;
 	return ret;
 }
 
@@ -86,7 +83,6 @@ QCLParseNode * setupFUNC(QCLParseNode * id, QCLParseNode * inputs){
 QCLParseNode * setupINPUTS(QCLParseNode * input, QCLParseNode * next){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = INPUTS;
-	ret->value = NULL;
 	ret->leaves = new QCLParseNode*[2];
 	ret->leaves[0]=input;
 	ret->leaves[1]=next;
@@ -162,9 +158,9 @@ int QCLNodeNumLeaves(int type){
 		case LINE:
 			return 2;		
 		case OPERATION:
-			return 2;		
+			return 1;		
 		case OPEXPONENT:
-			return 3;		
+			return 2;		
 		case FUNC:
 			return 1;		
 		case INPUTS:
