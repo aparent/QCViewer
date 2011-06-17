@@ -154,6 +154,7 @@ evalTerm REPL_Interperater::applyEquals(QCLParseNode * in,	evalTerm right){
 
 evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 	order(left,right);
+	promote(left,right);
 	if (left.error || right.error) return left;
 	switch (left.type){
 		case KET:
@@ -217,38 +218,6 @@ evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 							return left;
 					}
 					break;
-				case FLOAT:
-					switch (OP){
-						case PLUS:
-							*left.value.COMPLEX+=right.value.FLOAT;
-							return left;
-						case MINUS:
-							*left.value.COMPLEX-=right.value.FLOAT;
-							return left;
-						case TIMES:
-							*left.value.COMPLEX*=right.value.FLOAT;
-							return left;
-						case DIV:
-							*left.value.COMPLEX/=right.value.FLOAT;
-							return left;
-					}
-					break;
-				case INT:
-					switch (OP){
-						case PLUS:
-							*left.value.COMPLEX+=right.value.INT;
-							return left;
-						case MINUS:
-							*left.value.COMPLEX-=right.value.INT;
-							return left;
-						case TIMES:
-							*left.value.COMPLEX*=right.value.INT;
-							return left;
-						case DIV:
-							*left.value.COMPLEX/=right.value.INT;
-							return left;
-					}
-					break;
 			}
 			break;
 		case FLOAT:
@@ -268,22 +237,6 @@ evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 							left.value.FLOAT/=right.value.FLOAT;
 							return left;
 					}
-				case INT:
-					switch (OP){
-						case PLUS:
-							left.value.FLOAT+=right.value.INT;
-							return left;
-						case MINUS:
-							left.value.FLOAT-=right.value.INT;
-							return left;
-						case TIMES:
-							left.value.FLOAT*=right.value.INT;
-							return left;
-						case DIV:
-							left.value.FLOAT/=right.value.INT;
-							return left;
-					}
-					break;
 			}
 		case INT:
 			switch (right.type){
@@ -339,6 +292,20 @@ void REPL_Interperater::order(evalTerm &a,evalTerm &b){
 		t = a;
 		a = b;
 		b = t;
+	}
+}
+
+void REPL_Interperater::promote(evalTerm &a,evalTerm &b){//Use after ordering
+	evalTerm t;
+	if (a.type == FLOAT && b.type == INT){
+		b.type = FLOAT;
+		b.value.FLOAT = b.value.INT;
+	} else if (a.type == COMPLEX && b.type == INT){
+		b.type = COMPLEX;
+		b.value.COMPLEX = new complex<float_type>(b.value.INT,0);
+	}	else if (a.type == COMPLEX && b.type == FLOAT){
+		b.type = COMPLEX;
+		b.value.COMPLEX = new complex<float_type>(b.value.FLOAT,0);
 	}
 }
 //evalTerm REPL_Interperater::applyMinus(evalTerm left,evalTerm right);

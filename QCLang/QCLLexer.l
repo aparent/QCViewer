@@ -20,6 +20,8 @@
 %x wireList
 
 DIGIT [0-9]
+INT {DIGIT}+
+FLOAT {INT}\.{INT}
 ID [a-z][a-zA-z0-9]*
 OP [A-Z][a-z]*
 %%
@@ -37,15 +39,16 @@ OP [A-Z][a-z]*
 \*                  { return TIMES; }
 \/                  { return DIV;   }
 =										{ return EQUALS;}
-{DIGIT}+/i					{
+{FLOAT}/i						|
+{INT}/i							{
 											QCL_lval = setupVAR(COMPLEX,strdup(yytext));
 											return COMPLEX;
 										}
-{DIGIT}+	      	  {
+{INT}			      	  {
 											QCL_lval = setupVAR(INT,strdup(yytext));
 											return INT;
 										}
-{DIGIT}+\.{DIGIT}+	{
+{FLOAT}							{
 											QCL_lval = setupVAR(FLOAT,strdup(yytext));
 											return FLOAT;
 										}

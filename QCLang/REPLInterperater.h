@@ -46,6 +46,7 @@ struct REPL_Interperater{
 		evalTerm applyExponent(evalTerm left,evalTerm right);
 
 		void order(evalTerm &a,evalTerm &b);
+		void promote(evalTerm &a,evalTerm &b);
 };
 
 #endif

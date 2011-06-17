@@ -17,3 +17,8 @@ TFCLexer.cpp
 diracLexer.cpp
 diracParser.cpp
 diracParser.h
+QCLang/QCLLexer.cpp
+QCLang/QCLParser.cpp
+QCLang/QCLParser.h
+QCLang/QCLParser.output
+QCLang/QCLTest
