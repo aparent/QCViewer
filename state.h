@@ -29,5 +29,24 @@ public:
   StateMap data;
 };
 
+/* TODO: soon!!!!
+class BitString {
+public:
+  BitString (uint32_t len);
+
+  void get (uint32_t pos);
+	void set (uint32_t pos, uint8_t val);
+	void and (BitString &);
+  void or (BitString &);
+	void flip ();
+	void clear ();
+  void map (...);
+
+	bool operator== (const BitString&) const;
+private:
+
+};
+*/
+
 State kron (State&,State&);
 #endif // STATE__INCLUDED
