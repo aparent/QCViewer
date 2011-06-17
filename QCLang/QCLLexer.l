@@ -17,13 +17,12 @@
 
 %x ket
 %x ketmult
+%x wireList
 
 DIGIT [0-9]
 ID [a-z][a-zA-z0-9]*
 OP [A-Z][a-z]*
 %%
-FOR                 { return FOR;   }
-IF                 	{ return IF;    }
 \^                 	{ return EXPONENT;  }
 {OP}								{
 											QCL_lval = setupVAR(OP,strdup(yytext));
@@ -38,17 +37,17 @@ IF                 	{ return IF;    }
 \*                  { return TIMES; }
 \/                  { return DIV;   }
 =										{ return EQUALS;}
-{DIGIT}+i						{
-											QCL_lval = setupVAR(NUM,strdup(yytext));
-											return NUM;
+{DIGIT}+/i					{
+											QCL_lval = setupVAR(COMPLEX,strdup(yytext));
+											return COMPLEX;
 										}
 {DIGIT}+	      	  {
-											QCL_lval = setupVAR(NUM,strdup(yytext));
-											return NUM;
+											QCL_lval = setupVAR(INT,strdup(yytext));
+											return INT;
 										}
 {DIGIT}+\.{DIGIT}+	{
-											QCL_lval = setupVAR(NUM,strdup(yytext));
-											return NUM;
+											QCL_lval = setupVAR(FLOAT,strdup(yytext));
+											return FLOAT;
 										}
 \|									{BEGIN(ket);}
 <ket>{ID}			      {
@@ -76,9 +75,9 @@ IF                 	{ return IF;    }
 										}
 <ketmult>\>					{BEGIN(INITIAL);}
 
-<*>[ \t]+						/* eat whitespace */
+<*>, 						/* eat commas (these are just treated as spaces by the compliler for now)*/
+<*>[ i\t\n]+		/* eat whitespace */
 \.\.            {return(yytext[0]);}
 . 		 			    {return(yytext[0]);}
-\n 		 			    {return(yytext[0]);}
 <*>#.*          /* eat comments */
 %%

@@ -1,4 +1,4 @@
-#include "QCLParserUtils.h"
+#include "REPLInterperater.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,7 +6,7 @@ using namespace std;
 
 void printTree(QCLParseNode * node);
 QCLParseNode * parseQCL(string input);
-
+/*
 int main(int argc, char* argv[]){
 	if (argc != 2) return 0;
 	string in = argv[1];
@@ -24,5 +24,15 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 	printTree(node);	
+	return 0;
+}
+*/
+int main(){
+	REPL_Interperater interp;
+	char  a[256];
+	while(true){
+		cin.getline (a,256);
+		interp.runLine(a);
+	}
 	return 0;
 }

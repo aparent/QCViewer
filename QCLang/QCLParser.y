@@ -21,28 +21,25 @@
 
 %start input
 %token IF FOR EQUALS  
-%token LINE OPERATION OPEXPONENT FUNC INPUTS
-%token  ID KVAR NUM KET OP
+%token LINE OPERATION OPEXPONENT FUNC INPUTS WIREMAP
+%token  ID KVAR KET OP INT FLOAT COMPLEX
 %left MINUS PLUS
 %left TIMES DIV
 %right EXPONENT
 
 %%
-input: 				block { QCL_Final = $1; }
+input: 				line { QCL_Final = $1; }
 
-block:					/*empty*/ {$$ = NULL;} 
-							| '\n' block {$$ = $2;}
-              | line '\n' block	 { $$ = setupLINE($1,$3);} 
-							| FOR exp'..'exp '{' '\n' block '}' block { $$ = setupFOR($2,$4,$7,$9);}
-							| IF '(' conditional ')' '{' '\n' block '}'  block 	{ $$ = NULL; }
-							| line {$$ = $1;}
-		;
-line:					  var EQUALS exp	{ $$ = setupBINOP(EQUALS,$1,$3); }
+line:					  ID EQUALS exp	{ $$ = setupBINOP(EQUALS,$1,$3); }
+							|	KVAR EQUALS '[' wireMap ']' {$$ = setupBINOP(EQUALS,$1,$4);}
 							| operations KVAR { $$ = setupOPERATION($1, $2);}
-							| ID '(' finputs ')' { $$ = setupFUNC($1,$3);}
+							| exp
+							| KVAR
 		;
-var: 					  KVAR 
-							| ID   
+wireMap: 			  INT										{$$ = setupWIREMAP($1,NULL,NULL);}
+							| INT '..' INT 					{$$ = setupWIREMAP($1,$3,NULL);}
+							| INT wireMap						{$$ = setupWIREMAP($1,NULL,$2);}
+							| INT '..' INT wireMap 	{$$ = setupWIREMAP($1,$3,$4);}
 		;
 operations:			OP {$$=setupOP($1,NULL);}
 							|	OP EXPONENT exp {$$=setupOPEXPONENT($1,$3,NULL);} 
@@ -65,10 +62,10 @@ exp:					  value
 							| ID '(' finputs ')'{ $$ = setupFUNC($1,$3);}
 		;
 value:					ID 
-							|	NUM 
+							|	INT
+							| FLOAT
+							| COMPLEX 
 							| KET 
-;
-conditional:  
 ;
 %%
 

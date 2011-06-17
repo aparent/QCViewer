@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 QCLParseNode * setupFOR(QCLParseNode * exp1, QCLParseNode * exp2, QCLParseNode * repBlock, QCLParseNode * nextBlock){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = FOR;
@@ -89,14 +90,24 @@ QCLParseNode * setupINPUTS(QCLParseNode * input, QCLParseNode * next){
 	return ret;
 }
 
+QCLParseNode * setupWIREMAP(QCLParseNode * input1, QCLParseNode * input2, QCLParseNode * next){
+	QCLParseNode * ret = new QCLParseNode;
+	ret->type = WIREMAP;
+	ret->leaves = new QCLParseNode*[3];
+	ret->leaves[0]=input1;
+	ret->leaves[1]=input2;
+	ret->leaves[2]=next;
+	return ret;
+}
+
 std::string QCLNodeName(int type){
 	switch(type){
 		case KET:
 			return "KET";
 		case ID:
 			return "ID";
-		case NUM:
-			return "NUM";
+		case INT:
+			return "INT";
 		case KVAR:
 			return "KVAR";
 		case OP:
@@ -135,7 +146,7 @@ int QCLNodeNumLeaves(int type){
 			return 0;
 		case ID:
 			return 0;
-		case NUM:
+		case INT:
 			return 0;
 		case KVAR:
 			return 0;

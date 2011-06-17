@@ -12,6 +12,7 @@ struct QCLParseNode{
 
 #include "QCLParser.h"
 
+QCLParseNode * setupWIREMAP(QCLParseNode*, QCLParseNode*, QCLParseNode*);
 QCLParseNode * setupFOR(QCLParseNode*, QCLParseNode*, QCLParseNode*, QCLParseNode*);
 QCLParseNode * setupLINE(QCLParseNode * currentLine, QCLParseNode * nextLine);
 QCLParseNode * setupBINOP(int type, QCLParseNode * arg1, QCLParseNode * arg2);
