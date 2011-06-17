@@ -8,7 +8,6 @@ SET(QCVIEWER_SRC_FILES
 	main.cpp
 	window.cpp
 	circuitwidget.cpp
-	stateView.cpp
 	stateWidget.cpp
 	GateIcon.cpp
 )
@@ -18,7 +17,6 @@ SET(QCVIEWER_HEADER_FILES
 	main.h
 	window.h
 	circuitwidget.h
-	stateView.h
 	stateWidget.h
 	GateIcon.h
 )

@@ -1,6 +1,9 @@
 #include "GateIcon.h"
 #include "draw_internal.h"
 
+GateIcon::GateIcon () {
+	set_size_request (20,20);
+}
 
 bool GateIcon::on_expose_event(GdkEventExpose* event) {
   double scale = 0.85; // drawing to the borders tends to look bad in buttons

@@ -20,6 +20,7 @@ CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel
   signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
   signal_scroll_event().connect( sigc::mem_fun( *this, &CircuitWidget::onScrollEvent ) );
   signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
+	signal_drag_data_received().connect(sigc::mem_fun(*this, &CircuitWidget::on_drag_data_received));
 }
 
 void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
@@ -42,23 +43,15 @@ unsigned int CircuitWidget::getFirstWire (double my) {
 }
 
 void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time) {
+	cout << "got drag" << endl;
 	if (!circuit) { context->drag_finish(false, false, time); return; }
 	Gtk::Widget* widget = drag_get_source_widget(context);
-  Gtk::ToolPalette* drag_palette = dynamic_cast<Gtk::ToolPalette*>(widget);
-	while(widget && !drag_palette) { // TODO: uh i should figure out what this actually does (magic)
-	  widget = widget->get_parent();
-		drag_palette = dynamic_cast<Gtk::ToolPalette*>(widget);
-	}
-  Gtk::ToolItem* drag_item = NULL;
-	if (drag_palette)
-    drag_item = drag_palette->get_drag_item(selection_data);
-  Gtk::ToolButton* button = dynamic_cast<Gtk::ToolButton*>(drag_item);
-  if(!button)
-	  return;
+  Gtk::Button* button = dynamic_cast<Gtk::Button*>(widget);
+	if (button == NULL) return;
 
   Gate *newgate;
 	unsigned int target = 0;
-	switch (((GateIcon*)button->get_icon_widget ())->type) {
+	switch (((GateIcon*)button->get_image ())->type) {
 		case GateIcon::NOT:
 		   newgate = new UGate ("X");
 			 newgate->drawType = NOT;
