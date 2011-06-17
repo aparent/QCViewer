@@ -7,45 +7,45 @@
 
 void QCViewer::setup_gate_button (Gtk::Button& btn, GateIcon& g, vector<Gtk::TargetEntry> &listTargets) {
   btn.set_image (g);
-	btn.drag_source_set (listTargets);
-	btn.signal_drag_data_get().connect(sigc::mem_fun(*this, &QCViewer::dummy));
+  btn.drag_source_set (listTargets);
+  btn.signal_drag_data_get().connect(sigc::mem_fun(*this, &QCViewer::dummy));
 }
 
 void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& selection_data, guint, guint){
-	selection_data.set(selection_data.get_target(), 8 /* 8 bits format */,
-	                   (const guchar*)"I'm Data!",
-						         9 /* the length of I'm Data! in bytes */);
+  selection_data.set(selection_data.get_target(), 8 /* 8 bits format */,
+                     (const guchar*)"I'm Data!",
+                     9 /* the length of I'm Data! in bytes */);
 }
 
 QCViewer::QCViewer() {
-	drawparallel = drawarch = false;
-	mode = EDIT_MODE;
+  drawparallel = drawarch = false;
+  mode = EDIT_MODE;
   set_title("QCViewer-v0.1");
   set_border_width(0);
-	set_default_size(1000,1000);
-	state = NULL;
-	NOTicon.type = GateIcon::NOT;
-	Hicon.type = GateIcon::H;
-	Xicon.type = GateIcon::X;
-	Yicon.type = GateIcon::Y;
-	Zicon.type = GateIcon::Z;
-	Ricon.type = GateIcon::R;
-	SWAPicon.type = GateIcon::SWAP;
+  set_default_size(1000,1000);
+  state = NULL;
+  NOTicon.type = GateIcon::NOT;
+  Hicon.type = GateIcon::H;
+  Xicon.type = GateIcon::X;
+  Yicon.type = GateIcon::Y;
+  Zicon.type = GateIcon::Z;
+  Ricon.type = GateIcon::R;
+  SWAPicon.type = GateIcon::SWAP;
 
   add(m_vbox);
- 	m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
+   m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
 
   m_refActionGroup = Gtk::ActionGroup::create();
   m_refActionGroup->add(Gtk::Action::create("File", "File"));
-	m_refActionGroup->add(Gtk::Action::create("Mode", "Mode"));
+  m_refActionGroup->add(Gtk::Action::create("Mode", "Mode"));
   m_refActionGroup->add(Gtk::Action::create("Circuit", "Circuit"));
   m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
   m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
 
   m_refActionGroup->add(Gtk::Action::create("ModeEdit", "Edit"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_edit));
-	m_refActionGroup->add(Gtk::Action::create("ModeDelete", Gtk::Stock::DELETE, "Delete Gate"), sigc::mem_fun (*this, &QCViewer::on_menu_delete));
+  m_refActionGroup->add(Gtk::Action::create("ModeDelete", Gtk::Stock::DELETE, "Delete Gate"), sigc::mem_fun (*this, &QCViewer::on_menu_delete));
 
-	m_refActionGroup->add(Gtk::Action::create("ModeSimulate", "Simulate"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_simulate));
+  m_refActionGroup->add(Gtk::Action::create("ModeSimulate", "Simulate"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_simulate));
 
   m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
@@ -81,7 +81,7 @@ QCViewer::QCViewer() {
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
   m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
-	m_refActionGroup->add(Gtk::ToggleAction::create ("Pan", "Pan"), sigc::mem_fun (*this, &QCViewer::on_menu_pan));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("Pan", "Pan"), sigc::mem_fun (*this, &QCViewer::on_menu_pan));
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -94,8 +94,8 @@ QCViewer::QCViewer() {
                         sigc::mem_fun(*this, &QCViewer::on_menu_reset));
   m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
-	m_refActionGroup->add(Gtk::ToggleAction::create ("EditBreakpoints", "Edit Breakpoints"),
-	                      sigc::mem_fun(*this, &QCViewer::on_menu_edit_breakpoints));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("EditBreakpoints", "Edit Breakpoints"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_edit_breakpoints));
 
   m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramParallel", "Show parallel guides"),
@@ -118,10 +118,10 @@ QCViewer::QCViewer() {
         "    <menu action='File'>"
         "      <menuitem action='FileQuit'/>"
         "    </menu>"
-				"    <menu action='Mode'>"
-				"      <menuitem action='ModeEdit'/>"
-				"      <menuitem action='ModeSimulate'/>"
-				"    </menu>"
+        "    <menu action='Mode'>"
+        "      <menuitem action='ModeEdit'/>"
+        "      <menuitem action='ModeSimulate'/>"
+        "    </menu>"
         "    <menu action='Circuit'>"
         "      <menuitem action='CircuitNew'/>"
         "      <menuitem action='CircuitOpen'/>"
@@ -155,18 +155,18 @@ QCViewer::QCViewer() {
         "    <toolitem action='SimulateRun'/>"
         "    <toolitem action='SimulateStep'/>"
         "    <toolitem action='SimulateReset'/>"
-				"    <separator/>"
-				"    <toolitem action='EditBreakpoints'/>"
+        "    <separator/>"
+        "    <toolitem action='EditBreakpoints'/>"
         "  </toolbar>"
-				"  <toolbar name='EditToolbar'>"
-				"    <toolitem action='CircuitOpen'/>"
-				"    <separator/>"
+        "  <toolbar name='EditToolbar'>"
+        "    <toolitem action='CircuitOpen'/>"
+        "    <separator/>"
         "    <toolitem action='Zoom100'/>"
         "    <separator/>"
-				"    <toolitem action='ModeDelete'/>"
+        "    <toolitem action='ModeDelete'/>"
         "    <separator/>"
         "    <toolitem action='DiagramArch'/>"
-				"  </toolbar>"
+        "  </toolbar>"
         "</ui>";
 
   try
@@ -181,45 +181,46 @@ QCViewer::QCViewer() {
   if(pMenubar)
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
   m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
-	m_EditToolbar = m_refUIManager->get_widget ("/EditToolbar");
+  m_EditToolbar = m_refUIManager->get_widget ("/EditToolbar");
 
   m_GatesFrame.set_label ("Gates");
-	m_GatesFrame.add (m_GatesTable);
-	m_GatesTable.resize (2, 4);
+  m_GatesFrame.add (m_GatesTable);
+  m_GatesTable.resize (2, 4);
   m_EditSidebar.pack_start (m_GatesFrame, Gtk::PACK_SHRINK);
-	m_EditSidebar.set_homogeneous (false);
+  m_EditSidebar.set_homogeneous (false);
 
   vector<Gtk::TargetEntry> listTargets;
-	listTargets.push_back(Gtk::TargetEntry ("STRING"));
-	listTargets.push_back(Gtk::TargetEntry ("text/plain"));
-	c.drag_dest_set (listTargets);
+  listTargets.push_back(Gtk::TargetEntry ("STRING"));
+  listTargets.push_back(Gtk::TargetEntry ("text/plain"));
+  c.drag_dest_set (listTargets);
 
-	setup_gate_button (btn_NOT, NOTicon, listTargets);
-	setup_gate_button (btn_H, Hicon, listTargets);
-	setup_gate_button (btn_X, Xicon, listTargets);
-	setup_gate_button (btn_Y, Yicon, listTargets);
-	setup_gate_button (btn_Z, Zicon, listTargets);
-	setup_gate_button (btn_R, Ricon, listTargets);
-	setup_gate_button (btn_SWAP, SWAPicon, listTargets);
-	m_GatesTable.attach (btn_H,0,1,0,1);
-	m_GatesTable.attach (btn_X,1,2,0,1);
-	m_GatesTable.attach (btn_Y,2,3,0,1);
-	m_GatesTable.attach (btn_Z,3,4,0,1);
-	m_GatesTable.attach (btn_R,0,1,1,2);
-	m_GatesTable.attach (btn_SWAP,1,2,1,2);
-	m_GatesTable.set_homogeneous ();
+  setup_gate_button (btn_NOT, NOTicon, listTargets);
+  setup_gate_button (btn_H, Hicon, listTargets);
+  setup_gate_button (btn_X, Xicon, listTargets);
+  setup_gate_button (btn_Y, Yicon, listTargets);
+  setup_gate_button (btn_Z, Zicon, listTargets);
+  setup_gate_button (btn_R, Ricon, listTargets);
+  setup_gate_button (btn_SWAP, SWAPicon, listTargets);
+  m_GatesTable.attach (btn_NOT,0,1,0,1);
+  m_GatesTable.attach (btn_H,1,2,0,1);
+  m_GatesTable.attach (btn_SWAP, 2,3,0,1);
+  m_GatesTable.attach (btn_R, 3,4,0,1);
+  m_GatesTable.attach (btn_X,0,1,1,2);
+  m_GatesTable.attach (btn_Y,1,2,1,2);
+  m_GatesTable.attach (btn_Z,2,3,1,2);
+  m_GatesTable.set_homogeneous ();
 
-	if (!m_SimulateToolbar || !m_EditToolbar) { cout << "warning failed to create toolbars" << endl; return; }
+  if (!m_SimulateToolbar || !m_EditToolbar) { cout << "warning failed to create toolbars" << endl; return; }
   m_vbox.pack_start(*m_SimulateToolbar, Gtk::PACK_SHRINK);
-	m_vbox.pack_start(*m_EditToolbar, Gtk::PACK_SHRINK);
+  m_vbox.pack_start(*m_EditToolbar, Gtk::PACK_SHRINK);
   c.set_window (this);
   c.show();
-	m_VisBox.set_homogeneous ();
-	m_hbox.pack_end (c);
-	m_hbox.pack_start (m_EditSidebar, Gtk::PACK_SHRINK);
-	m_EditVisPane.pack1 (m_hbox, true, true);
-	m_EditVisPane.pack2 (m_VisBox, true, true);
-	m_vbox.pack_start (m_EditVisPane);
+  m_VisBox.set_homogeneous ();
+  m_hbox.pack_end (c);
+  m_hbox.pack_start (m_EditSidebar, Gtk::PACK_SHRINK);
+  m_EditVisPane.pack1 (m_hbox, true, true);
+  m_EditVisPane.pack2 (m_VisBox, true, true);
+  m_vbox.pack_start (m_EditVisPane);
 
 //  m_vbox.pack_start (m_cmdOut);
 //  m_vbox.pack_start (m_cmdIn, Gtk::PACK_SHRINK);
@@ -229,9 +230,9 @@ QCViewer::QCViewer() {
 
   m_vbox.show();
   m_hbox.show();
-	m_VisBox.show ();
+  m_VisBox.show ();
   show_all_children ();
-	m_SimulateToolbar->hide ();
+  m_SimulateToolbar->hide ();
 }
 
 QCViewer::~QCViewer() {}
@@ -257,14 +258,14 @@ void QCViewer::on_menu_file_open_circuit () {
   int result = dialog.run();
   if (result == Gtk::RESPONSE_OK) {
     c.load (dialog.get_filename ());
-		selection = -1;
+    selection = -1;
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
     c.set_scale (1);
-		std::stringstream ss;
-		ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
+    std::stringstream ss;
+    ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
     m_statusbar.push(ss.str());
-	  c.reset ();
+    c.reset ();
   }
 }
 
@@ -280,17 +281,17 @@ void QCViewer::on_menu_file_open_arch () {
   }
 }
 void QCViewer::on_menu_simulate_show_stateView(){
-	int pos = m_EditVisPane.get_position ();
+  int pos = m_EditVisPane.get_position ();
   StateViewWidget* sw = new StateViewWidget (&m_statusbar);
-	sw->set_state (state);
-	m_VisBox.add (*sw);
-	viz.push_back (sw);
-	sw->show ();
-	static bool first = true;
-	if (first) {
-		first = false;
-		m_EditVisPane.set_position (pos - 100);
-	}
+  sw->set_state (state);
+  m_VisBox.add (*sw);
+  viz.push_back (sw);
+  sw->show ();
+  static bool first = true;
+  if (first) {
+    first = false;
+    m_EditVisPane.set_position (pos - 100);
+  }
 }
 
 void QCViewer::on_menu_file_quit () {
@@ -345,21 +346,21 @@ void QCViewer::on_menu_zoom_100 () {
 }
 
 void QCViewer::on_menu_load_state () {
-	Gtk::Dialog enterState("Enter State");
-	enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  Gtk::Dialog enterState("Enter State");
+  enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   enterState.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	Gtk::Entry stateEntry;
-	stateEntry.set_max_length(5000);
-	stateEntry.show();
-	enterState.get_vbox()->pack_start(stateEntry,Gtk::PACK_SHRINK);
-	int result = enterState.run();
-	if (result == Gtk::RESPONSE_OK){
-		if (state!=NULL) delete state;
-		state = getStateVec (stateEntry.get_text(), true);
-		state->print();
-		for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
-		c.set_state(state);
-	}
+  Gtk::Entry stateEntry;
+  stateEntry.set_max_length(5000);
+  stateEntry.show();
+  enterState.get_vbox()->pack_start(stateEntry,Gtk::PACK_SHRINK);
+  int result = enterState.run();
+  if (result == Gtk::RESPONSE_OK){
+    if (state!=NULL) delete state;
+    state = getStateVec (stateEntry.get_text(), true);
+    state->print();
+    for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
+    c.set_state(state);
+  }
   c.reset ();
 }
 
@@ -374,28 +375,28 @@ void QCViewer::on_menu_reset () {
 
 void QCViewer::on_menu_run () {
   while (c.step()){
-    for (unsigned int i = 0; i < viz.size(); i++)	viz[i]->reset ();
+    for (unsigned int i = 0; i < viz.size(); i++)  viz[i]->reset ();
     while (gtk_events_pending()) gtk_main_iteration(); // yield the cpu to pending ui tasks (e.g. drawing progress)
-	}
+  }
 }
 
 void QCViewer::on_menu_mode_edit () {
-	mode = EDIT_MODE;
-	c.reset ();
-	m_SimulateToolbar->hide();
-	m_EditToolbar->show ();
-	m_EditSidebar.show ();
+  mode = EDIT_MODE;
+  c.reset ();
+  m_SimulateToolbar->hide();
+  m_EditToolbar->show ();
+  m_EditSidebar.show ();
 }
 
 void QCViewer::on_menu_mode_simulate () {
-	mode = SIMULATE_MODE;
-	m_EditToolbar->hide ();
-	m_SimulateToolbar->show();
-	m_EditSidebar.hide ();
+  mode = SIMULATE_MODE;
+  m_EditToolbar->hide ();
+  m_SimulateToolbar->show();
+  m_EditSidebar.hide ();
 }
 
 void QCViewer::on_menu_delete () {
-	if (selection == -1) return;
+  if (selection == -1) return;
   c.delete_gate ((unsigned int)selection);
 }
 
@@ -413,9 +414,9 @@ void QCViewer::on_menu_edit_breakpoints () {
 
 void QCViewer::set_selection (int i) {
   selection = i;
-	if (i == -1) {
-//	  m_Palette.remove(*group_gateprops);
+  if (i == -1) {
+//    m_Palette.remove(*group_gateprops);
   } else {
-	//  m_Palette.add(*group_gateprops);
-	}
+  //  m_Palette.add(*group_gateprops);
+  }
 }
