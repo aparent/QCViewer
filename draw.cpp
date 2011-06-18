@@ -364,7 +364,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     }
     xcurr += gatePad + columns[j].pad;
   }
-  *wireend = xcurr;
+  *wireend = xcurr+gatePad;
 
   // output labels
   cairo_set_source_rgb (cr, 0, 0, 0);

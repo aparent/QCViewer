@@ -18,6 +18,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 }
 
 QCViewer::QCViewer() {
+  breakpointmode = false;
   drawparallel = drawarch = false;
   mode = EDIT_MODE;
   set_title("QCViewer-v0.1");
@@ -262,6 +263,7 @@ void QCViewer::on_menu_file_open_circuit () {
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
     c.set_scale (1);
+    if (breakpointmode) { c.toggle_breakpoint_edit (); }
     std::stringstream ss;
     ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
     m_statusbar.push(ss.str());
@@ -374,10 +376,11 @@ void QCViewer::on_menu_reset () {
 }
 
 void QCViewer::on_menu_run () {
-  while (c.step()){
+//  while (c.step()){
+    c.run (true);
     for (unsigned int i = 0; i < viz.size(); i++)  viz[i]->reset ();
-    while (gtk_events_pending()) gtk_main_iteration(); // yield the cpu to pending ui tasks (e.g. drawing progress)
-  }
+//    while (gtk_events_pending()) gtk_main_iteration(); // yield the cpu to pending ui tasks (e.g. drawing progress)
+//  }
 }
 
 void QCViewer::on_menu_mode_edit () {
@@ -409,7 +412,8 @@ void QCViewer::on_menu_pan () {
 }
 
 void QCViewer::on_menu_edit_breakpoints () {
-
+  breakpointmode = !breakpointmode;
+  c.toggle_breakpoint_edit ();
 }
 
 void QCViewer::set_selection (int i) {

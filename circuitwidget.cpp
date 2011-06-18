@@ -11,7 +11,8 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() : panning (false), drawarch (false), drawparallel (false), circuit (NULL), selection (-1)  {
+CircuitWidget::CircuitWidget() : circuit (NULL), selection (-1)  {
+  breakpointmode = panning = drawarch = drawparallel = false;
   NextGateToSimulate = 0;
   scale = 1.0;
   state = NULL;
@@ -151,7 +152,6 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
     cy -= (event->y - oldmousey)/scale;
     oldmousex = event->x;
     oldmousey = event->y;
-    force_redraw ();
   }
   return true;
 }
@@ -166,6 +166,22 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
   double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
   if(event->button == 3 && panning) {
     panning = false;
+  } else if (event->button == 1 && breakpointmode) {
+    int column_id = -1.0; // before column 0
+    double mindist = -1.0;
+    // note: the -1 on the range is so a breakpoint can't go after the last column. also can't go before first.
+    for (unsigned int i = 0; i < columns.size () - 1 && x >= columns[i].x0+columns[i].width; i++) {
+      double dist = abs(x - (columns[i].x0 + columns[i].width));
+      if (dist < mindist || mindist == -1.0) { mindist = dist; column_id = i; }
+    }
+    if (column_id == -1) return true;
+    vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), (unsigned int) column_id);
+    if (it == breakpoints.end ()) {
+      breakpoints.push_back ((unsigned int)column_id);
+    } else {
+      breakpoints.erase (it);
+    }
+    force_redraw ();
   } else if (event->button == 1) {
     int i = pickRect (rects, x, y);
     selection = i;
@@ -217,9 +233,20 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
       }
-      //for (unsigned int i = 0; i < layout.size (); i++) {
-      //  drawRect (cr->cobj(), columns[i], Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
-      //}
+      if (breakpointmode && false) {
+        for (unsigned int i = 0; i < layout.size (); i++) {
+          drawRect (cr->cobj(), columns[i], Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
+        }
+      }
+      for (unsigned int i = 0; i < breakpoints.size (); i++) {
+        unsigned int j = breakpoints[i];
+        double x = (columns[j].x0+columns[j].width+columns[j+1].x0)/2.0;
+        double y = (0 - height/2.0 + ext.height/2.0)/scale + cy;
+        cr->set_source_rgba (0.8,0,0,0.8);
+        cr->move_to (x, y);
+        cr->line_to (x, y+height/scale);
+        cr->stroke ();
+      }
     }
   }
   return true;
@@ -229,6 +256,7 @@ void CircuitWidget::load (string file) {
   if (circuit != NULL) delete circuit;
   circuit = parseCircuit(file);
   layout.clear ();
+  breakpoints.clear ();
   vector<int> parallels = circuit->getGreedyParallel ();
   for (unsigned int i = 0; i < parallels.size(); i++) {
     layout.push_back (LayoutColumn(parallels[i], 0.0));
@@ -286,6 +314,33 @@ void CircuitWidget::set_scale (double x) {
   scale = x;
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
+}
+
+// XXX: urg, may be duplicated elsewhere. check.
+unsigned int findcolumn (vector<LayoutColumn>& layout, unsigned int gate) {
+  unsigned int i;
+  for (i = 0; i < layout.size () && gate > layout[i].lastGateID; i++);
+  return i - 1;
+}
+
+bool CircuitWidget::run (bool breaks) {
+  if (!circuit || !state) return false;
+  if (NextGateToSimulate == circuit->numGates ()) NextGateToSimulate = 0;
+  // always step over first breakpoint if it is around
+  while (NextGateToSimulate < circuit->numGates ()) {
+    *state = ApplyGate (state, circuit->getGate (NextGateToSimulate));
+    if (!state) { force_redraw (); return false; }
+    NextGateToSimulate++;
+    if (!breaks) continue;
+    // check if we have reached a breakpoint
+    // find column that gate is in. if 0, ignore. else, check if gateid is one more than previous layout column last id. if so, return true.
+    unsigned int column_id = findcolumn (layout, NextGateToSimulate);
+    vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), column_id );
+    if (it == breakpoints.end ()) continue;
+    if (layout[column_id].lastGateID + 1 == NextGateToSimulate) { force_redraw (); return true; }
+  }
+  force_redraw ();
+  return false;
 }
 
 bool CircuitWidget::step () {
@@ -361,6 +416,8 @@ void CircuitWidget::delete_gate (unsigned int id) {
     // layout[i].lastGateID == id
     if (i == 0 && id != 0) break;
     if (i == 0 || layout[i - 1].lastGateID == id - 1) {
+      vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), i);
+      if (it != breakpoints.end ()) breakpoints.erase (it);
       layout.erase (layout.begin() + i);
       break;
     } else break;
@@ -385,9 +442,14 @@ void CircuitWidget::generate_layout_rects () {
     for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID; gate++) {
       bounds = combine_gateRect(bounds, rects[gate]);
     }
-    bounds.y0 = ext.y;
-    bounds.height = max (bounds.height, ext.height);
+    //bounds.y0 = ext.y;
+    //bounds.height = max (bounds.height, ext.height);
     columns.push_back(bounds);
     start_gate = layout[column].lastGateID + 1;
   }
+}
+
+void CircuitWidget::toggle_breakpoint_edit () {
+  breakpointmode = !breakpointmode;
+  force_redraw ();
 }
