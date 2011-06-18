@@ -77,8 +77,8 @@ State kron (State& l, State& r){
 }
 
 void State::normalize(){
-	map<index_t, complex<float_t> >::const_iterator it;
-  float_t norm;
+	StateMap::const_iterator it;
+  float_t norm = 0;
 	float_t real;
 	float_t imag;
 	for (it = data.begin(); it != data.end(); it++) {
@@ -88,7 +88,7 @@ void State::normalize(){
   }
 	norm = sqrt(norm);
   for (it = data.begin(); it != data.end(); it++) {
-		data[it->first] = it->second/norm;
+		data[it->first] = (it->second) / complex<float_type>(norm,0);
 	}
 }
 
