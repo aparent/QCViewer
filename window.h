@@ -2,8 +2,9 @@
 #define WINDOW__INCLUDED
 
 #include <gtkmm.h>
+#include <vector>
 #include "circuitwidget.h"
-#include "stateView.h"
+#include "stateWidget.h"
 #include "GateIcon.h"
 
 class QCViewer : public Gtk::Window
@@ -14,12 +15,15 @@ public:
 
   void set_selection (int);
 protected:
+  void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
+  void setup_gate_button (Gtk::Button&, GateIcon&, vector<Gtk::TargetEntry> &);
 
   // Signal handlers:
   void on_menu_file_open_circuit ();
   void on_menu_file_open_arch ();
 	void on_menu_mode_edit ();
 	void on_menu_mode_simulate ();
+	void on_menu_edit_breakpoints ();
 //  void on_menu_file_save ();
   void on_menu_file_quit ();
   void on_menu_save_png ();
@@ -49,27 +53,38 @@ protected:
 //  void on_options_parallel_guides ();
 
   // Child widgets:
-  Gtk::VBox m_vbox;
+	Gtk::HBox m_VisBox;
+  std::vector <StateViewWidget*> viz;
+  Gtk::VPaned m_EditVisPane;
 	Gtk::HBox m_hbox;
+	Gtk::VBox m_vbox;
   Gtk::TextView m_cmdOut;
   Gtk::Entry m_cmdIn;
   Glib::RefPtr<Gtk::UIManager> m_refUIManager;
   Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
 
   CircuitWidget c;
-	stateView sView;
+	//stateView sView;
 	Gtk::Statusbar m_statusbar;
 
 	Gtk::Widget* m_EditToolbar;
 	Gtk::Widget* m_SimulateToolbar;
-	Gtk::ToolPalette m_Palette;
 
+
+	// Editing sidebar
+	Gtk::VBox        m_EditSidebar;
+	Gtk::Frame       m_GatesFrame;
+	Gtk::Table       m_GatesTable;
+	Gtk::Button      btn_H, btn_X, btn_Y, btn_Z, btn_NOT, btn_R, btn_SWAP;
 	GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
+	Gtk::Frame       m_PropFrame;
 	void set_selected (int i);
 
 	Gtk::ToolItemGroup* group_gates;
-  Gtk::ToolItemGroup* group_gateprops;
-  Gtk::ToolItemGroup* group_warnings;
+  Gtk::ToolItemGroup* group_prop;
+  Gtk::ToolItemGroup* group_misc;
+
+
 
 private:
   enum Mode { EDIT_MODE, SIMULATE_MODE } mode;

@@ -1,14 +1,13 @@
 cmake_minimum_required (VERSION 2.6)
 project (viewer)
 
-ADD_DEFINITIONS( "-g -Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-O2 -Wall -ansi -pedantic" )
 
 SET(QCVIEWER_SRC_FILES
 	draw.cpp
 	main.cpp
 	window.cpp
 	circuitwidget.cpp
-	stateView.cpp
 	stateWidget.cpp
 	GateIcon.cpp
 )
@@ -18,7 +17,6 @@ SET(QCVIEWER_HEADER_FILES
 	main.h
 	window.h
 	circuitwidget.h
-	stateView.h
 	stateWidget.h
 	GateIcon.h
 )
@@ -28,7 +26,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 
 find_package(PkgConfig)
-pkg_check_modules(GTKMM gtkmm-2.4)
+pkg_check_modules(GTKMM gtkmm-2.4 freetype2)
 
 include_directories(${GTKMM_INCLUDE_DIRS}  ${CMAKE_SOURCE_DIR}/../QCLib)
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS} ${CMAKE_SOURCE_DIR}/../QCLib)
