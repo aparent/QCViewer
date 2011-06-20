@@ -152,6 +152,7 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
     cy -= (event->y - oldmousey)/scale;
     oldmousex = event->x;
     oldmousey = event->y;
+    force_redraw ();
   }
   return true;
 }

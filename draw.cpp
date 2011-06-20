@@ -263,7 +263,7 @@ void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, do
   cairo_rectangle (cr, 0, 0, w/scale, h/scale); // TODO: document why the scale factors are here
   cairo_fill (cr);
 
-  for (int i = 0; i < c->numLines(); i++) {
+  for (unsigned int i = 0; i < c->numLines(); i++) {
     double y = wireToY (i);
     drawWire (cr, wirestart, y, wireend, y);
   }
@@ -282,7 +282,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   // input labels
   double xinit = 0.0;
-  for (int i = 0; i < c->numLines(); i++) {
+  for (unsigned int i = 0; i < c->numLines(); i++) {
     Line *line = c->getLine (i);
     string label = line->getInputLabel ();
     cairo_text_extents_t extents;
@@ -351,7 +351,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   // output labels
   cairo_set_source_rgb (cr, 0, 0, 0);
-  for (int i = 0; i < c->numLines (); i++) {
+  for (unsigned int i = 0; i < c->numLines (); i++) {
     Line *line = c->getLine (i);
     string label = line->getOutputLabel();
     cairo_text_extents_t extents;

@@ -20,7 +20,6 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 QCViewer::QCViewer() {
   breakpointmode = false;
   drawparallel = drawarch = false;
-  mode = EDIT_MODE;
   set_title("QCViewer-v0.1");
   set_border_width(0);
   set_default_size(1000,1000);
@@ -43,10 +42,10 @@ QCViewer::QCViewer() {
   m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
   m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
 
-  m_refActionGroup->add(Gtk::Action::create("ModeEdit", "Edit"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_edit));
-  m_refActionGroup->add(Gtk::Action::create("ModeDelete", Gtk::Stock::DELETE, "Delete Gate"), sigc::mem_fun (*this, &QCViewer::on_menu_delete));
+//  m_refActionGroup->add(Gtk::Action::create("ModeEdit", "Edit"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_edit));
+//  m_refActionGroup->add(Gtk::Action::create("ModeDelete", Gtk::Stock::DELETE, "Delete Gate"), sigc::mem_fun (*this, &QCViewer::on_menu_delete));
 
-  m_refActionGroup->add(Gtk::Action::create("ModeSimulate", "Simulate"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_simulate));
+//  m_refActionGroup->add(Gtk::Action::create("ModeSimulate", "Simulate"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_simulate));
 
   m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
@@ -119,10 +118,6 @@ QCViewer::QCViewer() {
         "    <menu action='File'>"
         "      <menuitem action='FileQuit'/>"
         "    </menu>"
-        "    <menu action='Mode'>"
-        "      <menuitem action='ModeEdit'/>"
-        "      <menuitem action='ModeSimulate'/>"
-        "    </menu>"
         "    <menu action='Circuit'>"
         "      <menuitem action='CircuitNew'/>"
         "      <menuitem action='CircuitOpen'/>"
@@ -159,15 +154,6 @@ QCViewer::QCViewer() {
         "    <separator/>"
         "    <toolitem action='EditBreakpoints'/>"
         "  </toolbar>"
-        "  <toolbar name='EditToolbar'>"
-        "    <toolitem action='CircuitOpen'/>"
-        "    <separator/>"
-        "    <toolitem action='Zoom100'/>"
-        "    <separator/>"
-        "    <toolitem action='ModeDelete'/>"
-        "    <separator/>"
-        "    <toolitem action='DiagramArch'/>"
-        "  </toolbar>"
         "</ui>";
 
   try
@@ -182,7 +168,6 @@ QCViewer::QCViewer() {
   if(pMenubar)
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
   m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
-  m_EditToolbar = m_refUIManager->get_widget ("/EditToolbar");
 
   m_GatesFrame.set_label ("Gates");
   m_GatesFrame.add (m_GatesTable);
@@ -211,9 +196,9 @@ QCViewer::QCViewer() {
   m_GatesTable.attach (btn_Z,2,3,1,2);
   m_GatesTable.set_homogeneous ();
 
-  if (!m_SimulateToolbar || !m_EditToolbar) { cout << "warning failed to create toolbars" << endl; return; }
+  if (!m_SimulateToolbar) { cout << "warning failed to create toolbar" << endl; return; }
   m_vbox.pack_start(*m_SimulateToolbar, Gtk::PACK_SHRINK);
-  m_vbox.pack_start(*m_EditToolbar, Gtk::PACK_SHRINK);
+  m_SimulateToolbar->show ();
   c.set_window (this);
   c.show();
   m_VisBox.set_homogeneous ();
@@ -233,7 +218,7 @@ QCViewer::QCViewer() {
   m_hbox.show();
   m_VisBox.show ();
   show_all_children ();
-  m_SimulateToolbar->hide ();
+  show ();
 }
 
 QCViewer::~QCViewer() {}
@@ -283,16 +268,15 @@ void QCViewer::on_menu_file_open_arch () {
   }
 }
 void QCViewer::on_menu_simulate_show_stateView(){
-  int pos = m_EditVisPane.get_position ();
-  StateViewWidget* sw = new StateViewWidget (&m_statusbar);
+  StateViewWidget* sw = new StateViewWidget (&m_statusbar, &m_VisBox, &viz, &m_EditVisPane);
   sw->set_state (state);
   m_VisBox.add (*sw);
   viz.push_back (sw);
   sw->show ();
-  static bool first = true;
-  if (first) {
-    first = false;
-    m_EditVisPane.set_position (pos - 100);
+  if (viz.size() == 1) {
+    int w, h;
+    get_size (w, h);
+    m_EditVisPane.set_position (h - 200);
   }
 }
 
@@ -381,21 +365,6 @@ void QCViewer::on_menu_run () {
     for (unsigned int i = 0; i < viz.size(); i++)  viz[i]->reset ();
 //    while (gtk_events_pending()) gtk_main_iteration(); // yield the cpu to pending ui tasks (e.g. drawing progress)
 //  }
-}
-
-void QCViewer::on_menu_mode_edit () {
-  mode = EDIT_MODE;
-  c.reset ();
-  m_SimulateToolbar->hide();
-  m_EditToolbar->show ();
-  m_EditSidebar.show ();
-}
-
-void QCViewer::on_menu_mode_simulate () {
-  mode = SIMULATE_MODE;
-  m_EditToolbar->hide ();
-  m_SimulateToolbar->show();
-  m_EditSidebar.hide ();
 }
 
 void QCViewer::on_menu_delete () {

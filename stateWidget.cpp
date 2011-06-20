@@ -2,24 +2,41 @@
 #include <map>
 #include <complex>
 #include "stateWidget.h"
+#include <vector>
 
 using namespace std;
 
-StateViewWidget::StateViewWidget (Gtk::Statusbar* ns) : sw(ns), btn_expected ("Expected"),  btn_real ("Real"), btn_imag ("Imag") {
+StateViewWidget::StateViewWidget (Gtk::Statusbar* ns, Gtk::HBox* h, vector<StateViewWidget*>* svw, Gtk::VPaned* pane) : 
+    sw(ns), btn_expected ("Expected"),  btn_real ("Real"), btn_imag ("Imag"), btn_close ("Close") {
+  visbox = h;
+  svwList = svw;
+  vispane = pane;
   Gtk::RadioButton::Group group = btn_expected.get_group ();
   btn_real.set_group (group);
   btn_imag.set_group (group);
   buttonbox.pack_start (btn_expected, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_real, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_imag, Gtk::PACK_SHRINK);
+  buttonbox.pack_start (btn_close, Gtk::PACK_SHRINK);
   pack_start (sw);
   pack_start (buttonbox, Gtk::PACK_SHRINK);
   btn_expected.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
   btn_real.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
   btn_imag.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
+  btn_close.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::close));
   btn_expected.set_active ();
   set_style ();
   show_all_children ();
+}
+
+void StateViewWidget::close () {
+  visbox->remove (*this);
+  vector<StateViewWidget*>::iterator it = find (svwList->begin (), svwList->end (), this);
+  if (it == svwList->end ()) cout << "VERY BAD WARNING\n";
+  svwList->erase (it);
+  if (svwList->size () == 0) {
+    vispane->set_position (3000); // TODO: do this better
+  }
 }
 
 void StateViewWidget::set_style () {
