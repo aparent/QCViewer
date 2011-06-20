@@ -62,7 +62,7 @@ string Line::getOutputLabel(){
   return outLabel;
 }
 
-int Circuit::numLines(){
+unsigned int Circuit::numLines(){
   return lines.size();
 }
 
