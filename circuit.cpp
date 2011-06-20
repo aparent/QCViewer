@@ -21,6 +21,12 @@ void Circuit::removeArch () {
   }
 }
 
+void Circuit::swapGate (unsigned int i, unsigned int j) {
+  Gate *tmp = gates[i];
+  gates[i] = gates[j];
+  gates[j] = tmp;
+}
+
 void Circuit::addGate(Gate *newGate){
   gates.push_back(newGate);
 }

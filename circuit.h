@@ -45,6 +45,7 @@ class Circuit {
 		void removeGate (unsigned int);
     Gate* getGate(int pos);
     unsigned int numGates(); //Returns the number of gates
+    void swapGate (unsigned int, unsigned int);
 
     void newArch ();
     void removeArch ();
