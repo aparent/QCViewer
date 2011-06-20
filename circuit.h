@@ -38,7 +38,7 @@ class Circuit {
 
     void   addLine(string line);
     Line*  getLine(int pos);
-    unsigned int    numLines();
+    unsigned int numLines();
 
     void addGate(Gate *newGate); //appends to end
     void addGate(Gate *newGate, unsigned int pos); //inserts at pos

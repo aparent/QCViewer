@@ -8,7 +8,7 @@
 // qubit size, change this.
 // Templates were removed because they made the code ugly.
 typedef float float_type;
-typedef uint32_t index_t;
+typedef uint64_t index_t;
 typedef std::map<index_t, std::complex<float_type> >  StateMap;
 
 class State {

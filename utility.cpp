@@ -1,11 +1,13 @@
 #include "utility.h"
 #include <stdio.h>
 #include <algorithm>
+#include <iostream> //XXX
 
 using namespace std;
 
-void printIntBin(unsigned int M){
-	printf(BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN,
+void printIntBin(index_t M){
+	printf(BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN" "BYTETOBINARYPATTERN,
+	BYTETOBINARY(M>>56),BYTETOBINARY(M>>48),BYTETOBINARY(M>>40), BYTETOBINARY(M>>32), 
 	BYTETOBINARY(M>>24),BYTETOBINARY(M>>16),BYTETOBINARY(M>>8), BYTETOBINARY(M));
 }
 
@@ -42,7 +44,7 @@ unsigned int UnsetRegister (unsigned int bits, unsigned int reg) {
 }
 
 //Returns the value of the bit at position reg
-unsigned int GetRegister (unsigned int bits, unsigned int reg) {
+index_t GetRegister (index_t bits, index_t reg) {
   return (bits & (1 << reg)) >> reg;
 }
 /**
@@ -60,3 +62,27 @@ unsigned int floorLog2(unsigned int n) {
 	if (n >= 1<< 1) {           pos +=  1; }
 	return pos;
 }
+
+unsigned int bitcount(unsigned int n) {
+	unsigned int tot = 0;
+	for (unsigned int i = 1; i <= n; i = i<<1){
+		if (n & i)
+		++tot;
+	}
+		return tot;
+}
+
+index_t ExtractBits (index_t target, index_t bitstring) {
+	index_t output = 0;
+	unsigned int pos = 0;
+	for (unsigned int i = 0; i < 64; i++) { //XXX ug 64bit specific replace with sizeof magics?
+		if (GetRegister(bitstring,i)) {
+			if (GetRegister(target,i)){
+				output = SetRegister (output, pos);
+			}
+			pos++;
+		}
+	}
+	return output;
+}
+
