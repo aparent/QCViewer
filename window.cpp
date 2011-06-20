@@ -18,7 +18,6 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 }
 
 QCViewer::QCViewer() {
-  breakpointmode = false;
   drawparallel = drawarch = false;
   set_title("QCViewer-v0.1");
   set_border_width(0);
@@ -37,15 +36,9 @@ QCViewer::QCViewer() {
 
   m_refActionGroup = Gtk::ActionGroup::create();
   m_refActionGroup->add(Gtk::Action::create("File", "File"));
-  m_refActionGroup->add(Gtk::Action::create("Mode", "Mode"));
   m_refActionGroup->add(Gtk::Action::create("Circuit", "Circuit"));
   m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
   m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
-
-//  m_refActionGroup->add(Gtk::Action::create("ModeEdit", "Edit"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_edit));
-//  m_refActionGroup->add(Gtk::Action::create("ModeDelete", Gtk::Stock::DELETE, "Delete Gate"), sigc::mem_fun (*this, &QCViewer::on_menu_delete));
-
-//  m_refActionGroup->add(Gtk::Action::create("ModeSimulate", "Simulate"), sigc::mem_fun (*this, &QCViewer::on_menu_mode_simulate));
 
   m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
@@ -81,7 +74,6 @@ QCViewer::QCViewer() {
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
   m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("Pan", "Pan"), sigc::mem_fun (*this, &QCViewer::on_menu_pan));
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -94,17 +86,12 @@ QCViewer::QCViewer() {
                         sigc::mem_fun(*this, &QCViewer::on_menu_reset));
   m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("EditBreakpoints", "Edit Breakpoints"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_edit_breakpoints));
 
   m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramParallel", "Show parallel guides"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
-
-  m_refActionGroup->add(Gtk::ToggleAction::create ("InsertTest", "Insert Hadamard"), sigc::mem_fun(*this, &QCViewer::on_menu_inserttest));
-
 
   m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
@@ -151,8 +138,6 @@ QCViewer::QCViewer() {
         "    <toolitem action='SimulateRun'/>"
         "    <toolitem action='SimulateStep'/>"
         "    <toolitem action='SimulateReset'/>"
-        "    <separator/>"
-        "    <toolitem action='EditBreakpoints'/>"
         "  </toolbar>"
         "</ui>";
 
@@ -174,6 +159,26 @@ QCViewer::QCViewer() {
   m_GatesTable.resize (2, 4);
   m_EditSidebar.pack_start (m_GatesFrame, Gtk::PACK_SHRINK);
   m_EditSidebar.set_homogeneous (false);
+
+  m_SimulationFrame.set_label ("Simulation");
+  m_SimulationFrame.add (m_SimulationTable);
+  m_SimulationTable.resize (1, 1);
+  m_EditSidebar.pack_start (m_SimulationFrame, Gtk::PACK_SHRINK);
+  btn_editbreakpoints.set_label ("Edit Breakpoints");
+  btn_editbreakpoints.signal_clicked ().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
+  m_SimulationTable.attach (btn_editbreakpoints, 0,1,0,1);
+
+  m_PropFrame.set_label ("Properties");
+  m_PropFrame.add (m_PropTable);
+  m_PropTable.resize (2,1);
+  m_EditSidebar.pack_start (m_PropFrame, Gtk::PACK_SHRINK);
+  btn_delete.set_label ("Delete");
+  btn_editcontrols.set_label ("Edit Controls");
+  btn_delete.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::on_menu_delete));
+  btn_editcontrols.signal_clicked().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
+  m_PropTable.attach (btn_delete,0,1,0,1);
+  m_PropTable.attach (btn_editcontrols,0,1,1,2);
+
 
   vector<Gtk::TargetEntry> listTargets;
   listTargets.push_back(Gtk::TargetEntry ("STRING"));
@@ -218,7 +223,7 @@ QCViewer::QCViewer() {
   m_hbox.show();
   m_VisBox.show ();
   show_all_children ();
-  show ();
+  m_PropFrame.hide ();
 }
 
 QCViewer::~QCViewer() {}
@@ -248,7 +253,8 @@ void QCViewer::on_menu_file_open_circuit () {
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
     c.set_scale (1);
-    if (breakpointmode) { c.toggle_breakpoint_edit (); }
+    btn_editcontrols.set_active (false);
+    btn_editcontrols.set_active (false);
     std::stringstream ss;
     ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
     m_statusbar.push(ss.str());
@@ -370,26 +376,34 @@ void QCViewer::on_menu_run () {
 void QCViewer::on_menu_delete () {
   if (selection == -1) return;
   c.delete_gate ((unsigned int)selection);
-}
-
-void QCViewer::on_menu_inserttest () {
-  c.set_insert (true);
-}
-
-void QCViewer::on_menu_pan () {
-  c.set_insert (false);
-}
-
-void QCViewer::on_menu_edit_breakpoints () {
-  breakpointmode = !breakpointmode;
-  c.toggle_breakpoint_edit ();
+  set_selection (-1);
 }
 
 void QCViewer::set_selection (int i) {
   selection = i;
   if (i == -1) {
-//    m_Palette.remove(*group_gateprops);
+    btn_editcontrols.set_active (false);
+    m_PropFrame.hide ();
   } else {
-  //  m_Palette.add(*group_gateprops);
+    m_PropFrame.show ();
+  }
+  btn_editbreakpoints.set_active (false);
+}
+
+void QCViewer::update_mode () {
+  if (btn_editcontrols.get_active ()) {
+    btn_editbreakpoints.set_active (false); // enforce di/trichotomy
+    if (selection == -1) { 
+      cout << "warning: this shouldn't have happened " << __FILE__ << " " << __LINE__ << endl; 
+      btn_editcontrols.set_active (false);
+      c.set_mode (CircuitWidget::NORMAL);
+      return;
+    } else {
+      c.set_mode (CircuitWidget::EDIT_CONTROLS);
+    }
+  } else if (btn_editbreakpoints.get_active ()) {
+    c.set_mode (CircuitWidget::EDIT_BREAKPOINTS); 
+  } else {
+    c.set_mode (CircuitWidget::NORMAL);
   }
 }

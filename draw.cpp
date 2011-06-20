@@ -33,15 +33,22 @@ double gatePad = 18.0;
 double textPad = 5.0;
 double Upad = 0.9;
 
-
 void init_fonts(){
 	FT_Init_FreeType( &library );
 	FT_New_Face( library, "fonts/cmbx12.ttf", 0, &ft_face );
 	ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 
-double wireToY (int x) {
+double wireToY (unsigned int x) {
   return yoffset+(x+1)*wireDist;
+}
+
+int pickWire (double y) {
+  if (y < yoffset+wireDist/2) return -1;
+  if (y < yoffset+wireDist) return 0;
+  int wire = floor((y-yoffset)/wireDist - 1);
+  if ((double)(y - wireToY (wire)) > wireDist/2) return wire + 1;
+  return wire;
 }
 
 LayoutColumn::LayoutColumn (unsigned int g, double p) : lastGateID(g), pad(p) {}

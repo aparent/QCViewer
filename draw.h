@@ -23,7 +23,7 @@ public:
   LayoutColumn (unsigned int, double);
   unsigned int lastGateID;
   double pad;
-	gateRect bounds;
+  gateRect bounds;
 };
 
 void init_fonts();
@@ -35,5 +35,7 @@ void write_to_png (cairo_surface_t* surf, string filename);
 int pickRect (vector<gateRect> rects, double x, double y);
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
 gateRect combine_gateRect (gateRect a, gateRect b);
+int pickWire (double);
+double wireToY (unsigned int);
 
 #endif // DRAW__INCLUDED

@@ -23,7 +23,6 @@ protected:
   void on_menu_file_open_arch ();
   void on_menu_mode_edit ();
   void on_menu_mode_simulate ();
-  void on_menu_edit_breakpoints ();
 //  void on_menu_file_save ();
   void on_menu_file_quit ();
   void on_menu_save_png ();
@@ -39,8 +38,6 @@ protected:
   void on_menu_delete();
   void unimplemented ();
   void on_menu_simulate_show_stateView ();
-  void on_menu_pan ();
-  void on_menu_inserttest ();
   void on_menu_load_state ();
 
 //  void on_architecture_load ();
@@ -78,7 +75,15 @@ protected:
   Gtk::Button      btn_H, btn_X, btn_Y, btn_Z, btn_NOT, btn_R, btn_SWAP;
   GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
   Gtk::Frame       m_PropFrame;
+  Gtk::Table       m_PropTable;
+  Gtk::Button      btn_delete;
+
+  Gtk::Frame       m_SimulationFrame;
+  Gtk::Table       m_SimulationTable;
+
   void set_selected (int i);
+
+  Gtk::ToggleButton btn_editbreakpoints, btn_editcontrols;
 
   Gtk::ToolItemGroup* group_gates;
   Gtk::ToolItemGroup* group_prop;
@@ -87,12 +92,12 @@ protected:
 
 
 private:
-  enum Mode { EDIT_MODE, SIMULATE_MODE } mode;
+  void update_mode ();
+
   State *state;
   bool drawparallel;
   bool drawarch;
   int selection;
-  bool breakpointmode;
 };
 
 #endif
