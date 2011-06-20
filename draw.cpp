@@ -23,9 +23,16 @@ double gatePad = 18.0;
 double textPad = 5.0;
 double Upad = 0.9;
 
-
-double wireToY (int x) {
+double wireToY (unsigned int x) {
   return yoffset+(x+1)*wireDist;
+}
+
+int pickWire (double y) {
+  if (y < yoffset+wireDist/2) return -1;
+  if (y < yoffset+wireDist) return 0;
+  int wire = floor((y-yoffset)/wireDist - 1);
+  if ((double)(y - wireToY (wire)) > wireDist/2) return wire + 1;
+  return wire;
 }
 
 LayoutColumn::LayoutColumn (unsigned int g, double p) : lastGateID(g), pad(p) {}

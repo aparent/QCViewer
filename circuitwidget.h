@@ -36,10 +36,12 @@ public:
   void insert_gate_in_column (Gate *, unsigned int);
   void insert_gate_at_front (Gate*);
   void delete_gate (unsigned int);
-  void set_insert (bool);
   void set_selection (int);
   void generate_layout_rects ();
-  void toggle_breakpoint_edit ();
+
+  enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
+  void set_mode (Mode);
+  
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -51,13 +53,12 @@ protected:
       int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
 
 private:
+  Mode mode;
   vector<LayoutColumn> layout;
   vector<unsigned int> breakpoints;
 
-  bool breakpointmode;
   bool simulation_enabled;
   unsigned int NextGateToSimulate;
-  bool insert;
   bool panning;
   double oldmousex, oldmousey;
 

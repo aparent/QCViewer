@@ -7,12 +7,15 @@
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
+#include <gate.h>
+#include "draw.h"
 #include "window.h" // slows down compiles, would be nice to not need this (see: clicking, effects toolpalette)
 
 using namespace std;
 
 CircuitWidget::CircuitWidget() : circuit (NULL), selection (-1)  {
-  breakpointmode = panning = drawarch = drawparallel = false;
+  panning = drawarch = drawparallel = false;
+  mode = NORMAL;
   NextGateToSimulate = 0;
   scale = 1.0;
   state = NULL;
@@ -27,7 +30,6 @@ void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
 void CircuitWidget::set_offset (int y) { yoffset = y; }
 
 CircuitWidget::~CircuitWidget () {}
-double wireToY (int x); // XXX: !!!!
 unsigned int CircuitWidget::getFirstWire (double my) {
   unsigned int ans;
   double mindist;
@@ -44,6 +46,8 @@ unsigned int CircuitWidget::getFirstWire (double my) {
 
 void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time) {
   if (!circuit) { context->drag_finish(false, false, time); return; }
+  selection = -1;
+  ((QCViewer*)win)->set_selection (-1);
   Gtk::Widget* widget = drag_get_source_widget(context);
   Gtk::Button* button = dynamic_cast<Gtk::Button*>(widget);
   if (button == NULL) { context->drag_finish(false, false, time); return; }
@@ -67,6 +71,11 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
       break;
     default: cout << "unhandled gate drag and drop" << endl; break;
   }
+  if (newgate->targets.size () > circuit->numLines ()) {
+    delete newgate;
+    context->drag_finish (false, false, time);
+    return;
+  }
   newgate->targets.push_back(target++);
   Gtk::Allocation allocation = get_allocation();
   const int width = allocation.get_width();
@@ -77,6 +86,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 
   int column_id = pickRect (columns, xx, yy);
   unsigned int wire = getFirstWire (yy);
+  if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
   for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
   if (columns.size () == 0) {
     insert_gate_at_front (newgate);
@@ -103,6 +113,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     bool ok = true;
     unsigned int mymaxwire, myminwire;
     mymaxwire = myminwire = newgate->targets[0];
+    // TODO: holy crap this is too complicated! use minmaxWire!!!!!!!!!
     for (unsigned int j = 0; j < newgate->targets.size (); j++) {
       mymaxwire = max (mymaxwire, newgate->targets[j]);
       myminwire = min (myminwire, newgate->targets[j]);
@@ -165,29 +176,98 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
   // translate mouse click coords into circuit diagram coords
   double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
   double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
+  Gate* g;
   if(event->button == 3 && panning) {
     panning = false;
-  } else if (event->button == 1 && breakpointmode) {
+  } else if (event->button == 1) {
     int column_id = -1.0; // before column 0
     double mindist = -1.0;
-    // note: the -1 on the range is so a breakpoint can't go after the last column. also can't go before first.
-    for (unsigned int i = 0; i < columns.size () - 1 && x >= columns[i].x0+columns[i].width; i++) {
-      double dist = abs(x - (columns[i].x0 + columns[i].width));
-      if (dist < mindist || mindist == -1.0) { mindist = dist; column_id = i; }
+    int wireid;
+    int gateid;
+    double dist;
+    unsigned int i;
+    vector<Control>::iterator it;
+    vector<unsigned int>::iterator it2;
+    switch (mode) {
+      case NORMAL:
+        gateid = pickRect (rects, x, y);
+        if (selection != gateid) {
+          selection = gateid;
+          ((QCViewer*)win)->set_selection (gateid);
+          force_redraw ();
+        }
+        break;
+      case EDIT_CONTROLS:
+        if (selection == -1) { 
+          cout << "very bad thing happened: " << __LINE__ << __FILE__ << endl; 
+          set_selection (-1);        
+          ((QCViewer*)win)->set_selection (-1);
+        }
+        // find out which wire was clicked
+        // get the control associated with this gate, wire
+        // if null, add it as a positive control
+        // if ctrl is positive, add as negative
+        // if ctrl is negative. remove.
+        if (rects[selection].x0 > x || rects[selection].x0+rects[selection].width < x) return true;
+        wireid = pickWire (y);
+        if ((unsigned int)wireid >= circuit->numLines()) wireid = -1;
+        if (wireid == -1) return true;
+        g = circuit->getGate (selection);
+        for (it = g->controls.begin (); it != g->controls.end (); it++) {
+          if (it->wire == (unsigned int)wireid) {
+            it->polarity = !it->polarity;
+            if (!it->polarity) { // instead of cycling pos/neg, delete if it /was/ neg.
+              g->controls.erase (it);
+              force_redraw ();
+              return true;
+            }
+            force_redraw ();
+            return true;
+          }
+        }
+        { // XXX: sick of using switch due to the declaration stuff. switch it to if-else later.
+          vector<unsigned int>::iterator it = find (g->targets.begin (), g->targets.end (), wireid);
+          if (it != g->targets.end ()) return true; // if a target, can't be a control.
+          g->controls.push_back (Control(wireid, false));
+          // now, calculate whether adding this control will make this gate overlap with another.
+          unsigned int col_id;
+          for (col_id = 0; col_id < layout.size () && (unsigned int)selection > layout[col_id].lastGateID; col_id++);
+          unsigned int minW, maxW;
+          minmaxWire (&g->controls, &g->targets, &minW, &maxW);
+          unsigned int firstGateID = col_id == 0 ? 0 : layout[col_id - 1].lastGateID + 1;
+          for (unsigned int i = firstGateID; i <= layout[col_id].lastGateID; i++) {
+            Gate* gg = circuit->getGate (i);
+            unsigned int minW2, maxW2;
+            minmaxWire (&gg->controls, &gg->targets, &minW2, &maxW2);
+            if (i != (unsigned int)selection && !(minW2 > maxW || maxW2 < minW2)) {
+              circuit->swapGate (firstGateID, selection); // pop it out to the left
+              selection = firstGateID;
+              ((QCViewer*)win)->set_selection (selection);
+              layout.insert (layout.begin()+col_id, LayoutColumn (firstGateID,0));
+	      force_redraw ();
+	      return true;
+            }
+          }
+        }
+        force_redraw ();
+        return true;
+        break;
+      case EDIT_BREAKPOINTS:
+        // note: the -1 on the range is so a breakpoint can't go after the last column. also can't go before first.
+        for (i = 0; i < columns.size () - 1 && x >= columns[i].x0+columns[i].width; i++) {
+          dist = abs(x - (columns[i].x0 + columns[i].width));
+          if (dist < mindist || mindist == -1.0) { mindist = dist; column_id = i; }
+        }
+        if (column_id == -1) return true;
+        it2 = find (breakpoints.begin (), breakpoints.end (), (unsigned int) column_id);
+        if (it2 == breakpoints.end ()) {
+          breakpoints.push_back ((unsigned int)column_id);
+        } else {
+          breakpoints.erase (it2);
+        }
+        force_redraw ();
+        break;
     }
-    if (column_id == -1) return true;
-    vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), (unsigned int) column_id);
-    if (it == breakpoints.end ()) {
-      breakpoints.push_back ((unsigned int)column_id);
-    } else {
-      breakpoints.erase (it);
-    }
-    force_redraw ();
-  } else if (event->button == 1) {
-    int i = pickRect (rects, x, y);
-    selection = i;
-    ((QCViewer*)win)->set_selection (i);
-    force_redraw ();
   }
   return true;
 }
@@ -234,7 +314,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
       }
-      if (breakpointmode && false) {
+      if (false) {
         for (unsigned int i = 0; i < layout.size (); i++) {
           drawRect (cr->cobj(), columns[i], Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
         }
@@ -379,6 +459,8 @@ void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id) {
   circuit->addGate(g, layout[column_id].lastGateID - 1);
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
+  selection = layout[column_id].lastGateID - 1;
+  ((QCViewer*)win)->set_selection (selection);
 }
 
 void CircuitWidget::insert_gate_at_front (Gate *g) {
@@ -387,6 +469,8 @@ void CircuitWidget::insert_gate_at_front (Gate *g) {
   layout.insert(layout.begin(), LayoutColumn (0,0));
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
+  selection = 0;
+  ((QCViewer*)win)->set_selection (0);
 }
 
 // XXX: this may actually be more complicated than necessary now.
@@ -400,6 +484,8 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x) {
   layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0));
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
+  selection = pos;
+  ((QCViewer*)win)->set_selection (pos);
 }
 
 void CircuitWidget::set_selection (int i) {
@@ -429,11 +515,6 @@ void CircuitWidget::delete_gate (unsigned int id) {
   force_redraw ();
 }
 
-void CircuitWidget::set_insert (bool x) {
-  insert = x;
-  selection = 0;
-}
-
 void CircuitWidget::generate_layout_rects () {
   columns.clear ();
   if (!circuit || circuit->numGates () == 0) return;
@@ -443,14 +524,11 @@ void CircuitWidget::generate_layout_rects () {
     for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID; gate++) {
       bounds = combine_gateRect(bounds, rects[gate]);
     }
-    //bounds.y0 = ext.y;
-    //bounds.height = max (bounds.height, ext.height);
+    bounds.y0 = ext.y;
+    bounds.height = max (bounds.height, ext.height);
     columns.push_back(bounds);
     start_gate = layout[column].lastGateID + 1;
   }
 }
 
-void CircuitWidget::toggle_breakpoint_edit () {
-  breakpointmode = !breakpointmode;
-  force_redraw ();
-}
+void CircuitWidget::set_mode (Mode m) { mode = m; }
