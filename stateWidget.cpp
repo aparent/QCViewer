@@ -1,22 +1,25 @@
 #include <iostream>
 #include <map>
 #include <complex>
+#include <utility.h>
 #include "stateWidget.h"
 
 using namespace std;
 
-StateViewWidget::StateViewWidget (Gtk::Statusbar* ns) : sw(ns), btn_expected ("Expected"),  btn_real ("Real"), btn_imag ("Imag") {
+StateViewWidget::StateViewWidget (Gtk::Statusbar* ns) : sw(ns), btn_expected ("Expected"),  btn_real ("Real"), btn_imag ("Imag"),btn_trace ("Trace") {
   Gtk::RadioButton::Group group = btn_expected.get_group ();
   btn_real.set_group (group);
   btn_imag.set_group (group);
   buttonbox.pack_start (btn_expected, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_real, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_imag, Gtk::PACK_SHRINK);
+  buttonbox.pack_start (btn_trace, Gtk::PACK_SHRINK);
   pack_start (sw);
   pack_start (buttonbox, Gtk::PACK_SHRINK);
   btn_expected.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
   btn_real.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
   btn_imag.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
+  btn_trace.signal_clicked().connect(sigc::mem_fun(*this, &StateViewWidget::set_style));
   btn_expected.set_active ();
   set_style ();
   show_all_children ();
@@ -26,6 +29,7 @@ void StateViewWidget::set_style () {
 	StateWidget::DrawMode d;
 	if (btn_real.get_active ())     		d = StateWidget::STATEDRAW_REAL;
 	else if (btn_imag.get_active ())    d = StateWidget::STATEDRAW_IMAG;
+	else if (btn_trace.get_active ())   d = StateWidget::STATEDRAW_EXPECTED_TRACED;
 	else 																d = StateWidget::STATEDRAW_EXPECTED;
 	if (d != sw.drawmode) {
 		sw.drawmode = d;
@@ -49,6 +53,7 @@ StateWidget::StateWidget(Gtk::Statusbar* ns) {
   mousex = mousey = 0;
   drawmode = STATEDRAW_EXPECTED;
   num_draw = 0;
+	trace = 63;
   set_size_request (100,100);
 }
 
@@ -66,25 +71,37 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
     yborder = 0.02*height;
     tickwidth = 0.5*xborder;
     barWidth = (width - 2.0*xborder)/((double)num_draw);
+    t_barWidth = (width - 2.0*xborder)/((double)num_draw_traced);
     barHeight = height - 2.0*yborder;
 
     Cairo::RefPtr <Cairo::Context> cr = window->create_cairo_context ();
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1, 1, 1);
     cr->fill ();
-    if (drawmode == STATEDRAW_EXPECTED) {
+    if (drawmode == STATEDRAW_EXPECTED || drawmode == STATEDRAW_EXPECTED_TRACED) {
       if (state != NULL) {
-        for (unsigned int i = 0; i < num_draw; i++) {
-          double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
-          if (eValue > EPS) {
-            cr->rectangle (xborder + ((double)i)*barWidth, height - yborder, barWidth, -eValue*barHeight);
-            cr->set_source_rgb (0, 0, 0);
-             cr->stroke_preserve ();
-             cr->set_source_rgb (0, 1, 0);
-             cr->fill ();
-          }
-        }
-      }
+				if (drawmode == STATEDRAW_EXPECTED){
+        	for (unsigned int i = 0; i < num_draw; i++) {
+          	double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
+          	if (eValue > EPS) {
+          		cr->rectangle (xborder + ((double)i)*barWidth, height - yborder, barWidth, -eValue*barHeight);
+          	  cr->set_source_rgb (0, 0, 0);
+          	  cr->stroke_preserve ();
+          	  cr->set_source_rgb (0, 1, 0);
+          	  cr->fill ();
+          	}
+        	}
+				} else {
+					for (unsigned int i = 0; i < num_draw_traced; i++) {
+          	if (traced_bucket[i] > EPS) {
+          		cr->rectangle (xborder + ((double)i)*t_barWidth, height - yborder, t_barWidth, -traced_bucket[i]*barHeight);
+          	  cr->set_source_rgb (0, 0, 0);
+          	  cr->stroke_preserve ();
+          	  cr->set_source_rgb (0, 1, 0);
+          	  cr->fill ();
+					}
+      	}
+			}
       cr->set_source_rgb (0.5, 0.5, 0.5);
       cr->move_to (xborder, height - yborder);
       cr->line_to (xborder, yborder);
@@ -95,6 +112,7 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
       cr->move_to (xborder-tickwidth/2.0, yborder);
       cr->line_to (xborder+tickwidth/2.0, yborder);
       cr->stroke ();
+			}
     } else if (drawmode == STATEDRAW_REAL || drawmode == STATEDRAW_IMAG) { // XXX: proper scaling?
       double avg = 0.0;
       if (state != NULL) {
@@ -156,17 +174,23 @@ bool StateWidget::onMotionEvent (GdkEventMotion* event) {
   if (status == NULL) return true;
   mousex = event->x;
   mousey = event->y;
-  unsigned int i = floor ((mousex - xborder)/barWidth);
+	unsigned int i=0;
+	if (drawmode!=STATEDRAW_EXPECTED_TRACED) i = floor ((mousex - xborder)/barWidth);
+	else i = floor ((mousex - xborder)/t_barWidth);
   if (i >= 0 && i < num_draw) {
-
     stringstream oss;
     string mystr;
-    double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
-
     int dim = 0;
-    int twotothedim = state->dim;
-    while (twotothedim >>= 1) dim++; // TODO: we should have size/dim encoded in the state vector.
-    oss << "State " << base2enc ((unsigned long)bucketID[i], dim) << " (" << bucketID[i] << ") amplitude " << bucket[i].real() << " + " << bucket[i].imag () << "i (" << 100.0*eValue << "%)";
+		if (drawmode!=STATEDRAW_EXPECTED_TRACED){
+    	double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
+    	int twotothedim = state->dim;
+    	while (twotothedim >>= 1) dim++; // TODO: we should have size/dim encoded in the state vector.
+			oss << "State " << base2enc ((unsigned long)bucketID[i], dim) << " (" << bucketID[i] << ") amplitude " << bucket[i].real() << " + " << bucket[i].imag () << "i (" << 100.0*eValue << "%)";
+		} else{
+    	unsigned int twotothedim = num_draw_traced;
+    	while (twotothedim >>= 1) dim++; // TODO: we should have size/dim encoded in the state vector.
+			oss << "State " << base2enc ((unsigned long)i, dim) << " (" << i << ")(" << 100.0*traced_bucket[i] << "%)";
+		}
     status->pop ();
     status->push (oss.str());
   } else {
@@ -178,12 +202,18 @@ bool StateWidget::onMotionEvent (GdkEventMotion* event) {
 void StateWidget::reset () {
   if (state != NULL) {
     parse_state ();
+		parse_state_trace ();
   }
   force_redraw ();
 }
 
 void StateWidget::set_state(State* n_state){
   state = n_state;
+  reset ();
+}
+
+void StateWidget::set_trace(index_t n_trace){
+  trace = n_trace;
   reset ();
 }
 
@@ -215,6 +245,23 @@ void StateWidget::parse_state () {
       maxID = mag > maxMag ? n : maxID;
     }
     bucketID[i] = maxID;
-    bucket[i] /= skip;
+    //bucket[i] /= skip;  Would average might want to just add probs?
   }
+}
+
+void StateWidget::parse_state_trace () {
+	//Traced Part.
+  index_t basis_size = bitcount(trace);
+  index_t state_size = ipow(2,basis_size);
+	num_draw_traced = state_size;
+  if (state_size >= numBuckets) {
+		cout << "Error Too large for trace" << endl;
+		return;
+	}
+	for (unsigned int i = 0; i < numBuckets; i++){
+		traced_bucket[i] = 0.0;
+	}
+	for (StateMap::iterator it = state->data.begin(); it != state->data.end(); it++){
+    traced_bucket[ExtractBits(it->first,trace)] += it->second.real()*it->second.real() + it->second.imag()*it->second.imag();
+	}
 }

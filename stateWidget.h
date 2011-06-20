@@ -12,10 +12,11 @@ class StateWidget : public Gtk::DrawingArea {
 public:
   StateWidget (Gtk::Statusbar*);
 	void set_state(State *state);
+	void set_trace(index_t);
 	void parse_state ();
+	void parse_state_trace ();
 	void reset ();
-	enum DrawMode {STATEDRAW_EXPECTED, STATEDRAW_REAL, STATEDRAW_IMAG } drawmode;
-
+	enum DrawMode {STATEDRAW_EXPECTED, STATEDRAW_EXPECTED_TRACED, STATEDRAW_REAL, STATEDRAW_IMAG } drawmode;
 protected:
   virtual bool on_expose_event(GdkEventExpose* event);
   virtual bool onMotionEvent (GdkEventMotion* event);
@@ -24,6 +25,7 @@ private:
 	double xborder, yborder;
 	double tickwidth;
 	double barWidth, barHeight;
+	double t_barWidth;
 
 	void force_redraw ();
 	State *state;
@@ -31,8 +33,12 @@ private:
 	int mousex, mousey;
 	bool draw_compressed;
 	unsigned int num_draw; // number of buckets to draw
-  unsigned int bucketID[numBuckets]; // XXX: need to be bitstrings
+  index_t bucketID[numBuckets]; // XXX: need to be bitstrings
 	std::complex<float_t> bucket[numBuckets];
+
+	index_t trace;  // This is a bit string where 1s indicate parts to be included in the expectation
+	float_type traced_bucket[numBuckets];// These hold the expectation value of a traced out state
+	unsigned int num_draw_traced;
 };
 
 class StateViewWidget : public Gtk::VBox {
@@ -49,6 +55,7 @@ private:
 	Gtk::HBox buttonbox;
 	Gtk::VBox layoutbox;
 	Gtk::RadioButton btn_expected, btn_real, btn_imag;
+	Gtk::CheckButton btn_trace;
 	Gtk::Statusbar* status;
 };
 
