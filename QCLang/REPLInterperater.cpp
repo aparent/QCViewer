@@ -38,6 +38,16 @@ void REPL_Interperater::runLine(string in){
 	}
 }
 
+State *REPL_Interperater::computeKet(string in){
+	QCLParseNode * input =  parseQCL(in);
+	evalTerm a = eval(input);
+	if (a.error || a.type != KET){
+		cout << "A parse error occured or input was not a Ket" <<endl;
+		return NULL;
+	}
+	return a.value.STATE;
+}
+
 evalTerm REPL_Interperater::eval(QCLParseNode * in){
 	evalTerm ret;
 	switch (in->type){

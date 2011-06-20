@@ -34,14 +34,15 @@ struct REPL_Interperater{
 		std::map<std::string,REPL_VAR> varMap;
 		void runLine(std::string);
 		evalTerm eval(QCLParseNode *);
-		
+		State *computeKet(std::string);
+
 		void setVar(evalTerm,	std::string);
 		evalTerm getVar(std::string);
 		evalTerm getKet(std::string);
 
 		evalTerm applyEquals(QCLParseNode*,evalTerm);
 		evalTerm evalWireMap(QCLParseNode*);
-		
+
 		evalTerm applyBinOP(int,evalTerm,evalTerm);
 		evalTerm applyExponent(evalTerm left,evalTerm right);
 
