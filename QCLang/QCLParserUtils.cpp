@@ -1,7 +1,8 @@
 #include "QCLParserUtils.h"
 #include <stdio.h>
 #include <string.h>
-
+#include <iostream> //XXX
+using namespace std;
 
 QCLParseNode * setupFOR(QCLParseNode * exp1, QCLParseNode * exp2, QCLParseNode * repBlock, QCLParseNode * nextBlock){
 	QCLParseNode * ret = new QCLParseNode;

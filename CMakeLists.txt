@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (QCLib)
 
-ADD_DEFINITIONS( "-O2 -Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-g -Wall -ansi -pedantic" )
 
 SET(QCLIB_SRC_FILES
 	circuit.cpp

@@ -4,6 +4,7 @@
 #include <string>
 #include "utility.h"
 #include "gates/UGateLookup.h"
+#include "circuit.h"
 
 gateMatrix getGateMatrix(Gate*);//defined below
 
@@ -32,4 +33,12 @@ State ApplyGate (State* in, Gate* g) {
     delete tmp;
   }
   return answer;
+}
+
+State ApplyCircuit (State* in, Circuit* circ) {
+	State s = *in;
+ 	for (unsigned int i = 0; i < circ->numGates(); i++){
+		s = ApplyGate(&s,circ->getGate(i));
+	}
+	return s;
 }

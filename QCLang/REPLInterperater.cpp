@@ -6,6 +6,17 @@
 
 using namespace std;
 
+REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
+	type = b;
+	if (type == COMPLEX){
+		value.COMPLEX = new complex<float_type>(*a.COMPLEX);
+	} else if (type == KET){
+		value.STATE = new State(*a.STATE);
+	} else{
+		value = a;
+	}
+}
+
 void printTree(QCLParseNode * node);
 QCLParseNode *parseQCL(string input);
 
@@ -50,6 +61,9 @@ State *REPL_Interperater::computeKet(string in){
 
 evalTerm REPL_Interperater::eval(QCLParseNode * in){
 	evalTerm ret;
+	if (in == NULL){
+		return NULL;
+	}
 	switch (in->type){
 		case KET:
 			return getKet(string(in->value));
@@ -87,6 +101,7 @@ evalTerm REPL_Interperater::eval(QCLParseNode * in){
 		case OPERATION:
 		case OPEXPONENT:
 		case FUNC:
+			return Run_FUNC(in->value,in->leaves[0]);
 		case INPUTS:
 		default:
 			ret.error = true;
@@ -106,7 +121,13 @@ void REPL_Interperater::setVar(evalTerm right,	string var){
 evalTerm REPL_Interperater::getVar(string var){
 	evalTerm ret;
 	if (varMap.find(var) != varMap.end()){
-		ret.value = varMap[var].value;
+		if (varMap[var].type == KET) {
+			ret.value.STATE = new State(*varMap[var].value.STATE);
+		} else if(varMap[var].type == COMPLEX){
+			*ret.value.COMPLEX = *varMap[var].value.COMPLEX;
+		} else {
+			ret.value = varMap[var].value;
+		}
 		ret.type = varMap[var].type;
 	} else {
 		cout << "ERROR: varible not declared." << endl;
@@ -173,12 +194,15 @@ evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 					switch (OP){
 						case PLUS:
 							*left.value.STATE += *right.value.STATE;
+							delete right.value.STATE;
 							return left;
 						case MINUS:
 							*left.value.STATE -= *right.value.STATE;
+							delete right.value.STATE;
 							return left;
 						case TIMES:
 							*left.value.STATE = kron(*left.value.STATE,*right.value.STATE);
+							delete right.value.STATE;
 							return left;
 					}
 					break;
@@ -186,6 +210,7 @@ evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 					switch (OP){
 						case TIMES:
 							*left.value.STATE *= *right.value.COMPLEX;
+							delete right.value.COMPLEX;
 							return left;
 					}
 					break;
@@ -216,15 +241,19 @@ evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 					switch (OP){
 						case PLUS:
 							*left.value.COMPLEX+=*right.value.COMPLEX;
+							delete right.value.COMPLEX;
 							return left;
 						case MINUS:
 							*left.value.COMPLEX-=*right.value.COMPLEX;
+							delete right.value.COMPLEX;
 							return left;
 						case TIMES:
 							*left.value.COMPLEX*=*right.value.COMPLEX;
+							delete right.value.COMPLEX;
 							return left;
 						case DIV:
 							*left.value.COMPLEX/=*right.value.COMPLEX;
+							delete right.value.COMPLEX;
 							return left;
 					}
 					break;
@@ -318,4 +347,31 @@ void REPL_Interperater::promote(evalTerm &a,evalTerm &b){//Use after ordering
 		b.value.COMPLEX = new complex<float_type>(b.value.FLOAT,0);
 	}
 }
-//evalTerm REPL_Interperater::applyMinus(evalTerm left,evalTerm right);
+		
+evalTerm REPL_Interperater::Run_FUNC(std::string name , QCLParseNode * input){
+	evalTerm ret;
+	if (name.compare("setState")==0){
+		evalTerm in =eval(input->leaves[0]);
+		if (in.type == KET){
+			if (Sim_State != NULL) delete Sim_State;
+			Sim_State = in.value.STATE;
+			ret.type = KET;
+			ret.value.STATE = Sim_State; 
+			return ret;
+		} 	
+	}
+	if (name.compare("printState")==0){
+		if (Sim_State != NULL){
+			cout << "Printing from the print function!" << endl;
+			Sim_State->print();				
+		}	else {
+			cout << "ERROR: State not set" << endl;
+		}
+		ret.type = KET;
+		ret.value.STATE = Sim_State; 
+		return ret;
+	}
+	//No Function accepted ERROR
+	cout << "ERROR: Function does not exist" << endl;
+	return evalTerm(false);
+}

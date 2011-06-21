@@ -15,12 +15,12 @@
 
 %name-prefix "QCL_"
 %error-verbose
-%verbose 
+%verbose
 %defines "QCLang/QCLParser.h"
 %output "QCLang/QCLParser.cpp"
 
 %start input
-%token IF FOR EQUALS  
+%token IF FOR EQUALS
 %token LINE OPERATION OPEXPONENT FUNC INPUTS WIREMAP
 %token  ID KVAR KET OP INT FLOAT COMPLEX
 %left MINUS PLUS
@@ -42,7 +42,7 @@ wireMap: 			  INT										{$$ = setupWIREMAP($1,NULL,NULL);}
 							| INT '..' INT wireMap 	{$$ = setupWIREMAP($1,$3,$4);}
 		;
 operations:			OP {$$=setupOP($1,NULL);}
-							|	OP EXPONENT exp {$$=setupOPEXPONENT($1,$3,NULL);} 
+							|	OP EXPONENT exp {$$=setupOPEXPONENT($1,$3,NULL);}
 							|	OP EXPONENT exp operations {$$=setupOPEXPONENT($1,$3,$4);}
 							| OP operations {$$=setupOP($1,$2);}
 		;
@@ -52,8 +52,8 @@ finputs:			/*empty*/						{$$ = NULL;}
 							| KVAR							{$$ = setupINPUTS($1,NULL);}
 							| exp								{$$ = setupINPUTS($1,NULL);}
 		;
-exp:					  value							
-							| exp MINUS 		exp { $$ = setupBINOP(MINUS,$1,$3);   } 
+exp:					  value
+							| exp MINUS 		exp { $$ = setupBINOP(MINUS,$1,$3);   }
 							|	exp PLUS  		exp { $$ = setupBINOP(PLUS,$1,$3);    }
 							|	exp TIMES			exp { $$ = setupBINOP(TIMES,$1,$3);   }
 							| exp DIV 			exp { $$ = setupBINOP(DIV,$1,$3);     }
@@ -61,11 +61,11 @@ exp:					  value
 							| '(' exp ')'				{ $$ = $2;                        }
 							| ID '(' finputs ')'{ $$ = setupFUNC($1,$3);}
 		;
-value:					ID 
+value:					ID
 							|	INT
 							| FLOAT
-							| COMPLEX 
-							| KET 
+							| COMPLEX
+							| KET
 ;
 %%
 
