@@ -8,4 +8,6 @@ t2 "this is a really long label",test123
 t3 c,test123,e
 t2 c,test123
 t2 test123,e
+ABCDEF test123
+H test123
 END

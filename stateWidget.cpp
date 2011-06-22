@@ -75,7 +75,7 @@ StateWidget::StateWidget(Gtk::Statusbar* ns) {
 }
 
 // TODO: this is ugly
-#define EPS 0.000001
+#define EPS 0.0001
 
 bool StateWidget::on_expose_event (GdkEventExpose* event) {
   (void)event; // placate compiler...
@@ -135,13 +135,14 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
       if (state != NULL) {
         double maxX = 0.0;
         for (unsigned int i = 0; i < num_draw; i++) {
-          double val = drawmode == STATEDRAW_REAL ? bucket[i].real() : bucket[i].imag ();
-          avg += val;
+          double val = max(bucket[i].real(), bucket[i].imag ());
+          avg += drawmode == STATEDRAW_REAL ? bucket[i].real () : bucket[i].imag ();
           maxX = max (abs(val), maxX);
         }
         for (unsigned int i = 0; i < num_draw; i++) {
-          float_t eValue = (drawmode == STATEDRAW_REAL ? bucket[i].real() : bucket[i].imag ())/maxX;
-          if (abs(eValue) > EPS) {
+          float_t val = drawmode == STATEDRAW_REAL ? bucket[i].real() : bucket[i].imag ();
+          float_t eValue = val/maxX;
+          if (abs(val) > EPS) {
             cr->rectangle (xborder + (double)i*barWidth, height/2.0, barWidth, -eValue*barHeight/2.0);
             cr->set_source_rgb (0, 0, 0);
              cr->stroke_preserve ();
@@ -199,10 +200,15 @@ bool StateWidget::onMotionEvent (GdkEventMotion* event) {
     string mystr;
     int dim = 0;
 		if (drawmode!=STATEDRAW_EXPECTED_TRACED){
-    	double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
+      double rValue = bucket[i].real ();
+      double iValue = bucket[i].imag ();
+      rValue = abs(rValue) > EPS ? rValue : 0;
+      iValue = abs(iValue) > EPS ? iValue : 0;
+    	double eValue = rValue*rValue + iValue*iValue;
+      eValue = abs(eValue) > EPS ? eValue : 0;
     	int twotothedim = state->dim;
     	while (twotothedim >>= 1) dim++; // TODO: we should have size/dim encoded in the state vector.
-			oss << "State " << base2enc ((unsigned long)bucketID[i], dim) << " (" << bucketID[i] << ") amplitude " << bucket[i].real() << " + " << bucket[i].imag () << "i (" << 100.0*eValue << "%)";
+			oss << "State " << base2enc ((unsigned long)bucketID[i], dim) << " (" << bucketID[i] << ") amplitude " << rValue << " + " << iValue << "i (" << 100.0*eValue << "%)";
 		} else{
     	unsigned int twotothedim = num_draw_traced;
     	while (twotothedim >>= 1) dim++; // TODO: we should have size/dim encoded in the state vector.
