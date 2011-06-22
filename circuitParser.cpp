@@ -107,13 +107,13 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
       istringstream ss((**it).value);
       float_t rot;
       ss >>  rot;
-      newGate = new RGate(rot); //sets rotation amount
+      newGate = new RGate(rot, RGate::Z); //sets rotation amount
     } else if (((**it).value[0]) == 'T'){
       newGate = new UGate("X");
-      newGate->drawType = NOT;
+      newGate->drawType = Gate::NOT;
     } else if (((**it).value[0]) == 'F'){
       newGate = new UGate("F");
-      newGate->drawType = FRED;
+      newGate->drawType = Gate::FRED;
     } else {
       newGate = new UGate((**it).value);
     }
