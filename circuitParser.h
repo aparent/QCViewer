@@ -11,5 +11,6 @@
 using namespace std;
 
 Circuit *parseCircuit (string file);
+void saveCircuit(Circuit *circ, string filename);
 
 #endif

@@ -94,11 +94,8 @@ void State::normalize(){
 
 void State::print(){
 	map<index_t, complex<float_type> >::const_iterator it;
-	cout << "Printing state:" << endl;
-	cout << "Size: "<< dim << endl;
   for (it = data.begin(); it != data.end(); it++) {
 		printIntBin(it->first);
     cout << ":" << it->second << endl;
   }
-	cout << "-----------------------------------------------" << endl;
 }

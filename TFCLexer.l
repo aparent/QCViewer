@@ -42,9 +42,9 @@
 <gates>[ ]           							{BEGIN(gateVars);}
 <gates>\n
 
-<gateSet>[0-9]\.[0-9]							  {tokens->push_back(TFCToken(GATE_SET,yytext));}
-<gateSet>[0-9]		  							  {tokens->push_back(TFCToken(GATE_SET,yytext));}
-<gateSet>\)													{BEGIN(gateVars);}
+<gateSet>[x|y|z]?[0-9]+\.[0-9]+		{tokens->push_back(TFCToken(GATE_SET,yytext));}
+<gateSet>[x|y|z]?[0-9]+		  			{tokens->push_back(TFCToken(GATE_SET,yytext));}
+<gateSet>\)												{BEGIN(gateVars);}
 <gateSet>\n
 
 <gateVars>[[:alnum:]]+/'						{tokens->push_back(TFCToken(GATE_INPUT_N,string(yytext)));}

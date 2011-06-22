@@ -5,14 +5,21 @@
 #include <complex>
 #define PI 3.14159265
 
-RGate::RGate(float_type n_rot) : rot(n_rot) {
+RGate::RGate(float_type n_rot,rot_t n_type) : rot(n_rot), rot_type(n_type){
 	drawType = DEFAULT;
 	type = RGATE;
+}
+		
+void RGate::set_rotation(float_type n_rot){
+	rot=n_rot;
+}
+void RGate::set_rot_type(rot_t n_type){
+	rot_type=n_type;
 }
 
 string RGate::getName(){
 	stringstream ss;
-	ss << "R(" << rot << ")";
+	ss << "R(" << rot_type << rot  << ")";
 	return ss.str();
 }
 

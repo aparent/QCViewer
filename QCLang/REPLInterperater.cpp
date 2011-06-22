@@ -1,4 +1,5 @@
 #include "REPLInterperater.h"
+#include "../simulate.h"
 #include "../utility.h"
 #include <iostream>
 #include <cmath>
@@ -23,8 +24,9 @@ QCLParseNode *parseQCL(string input);
 void REPL_Interperater::runLine(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
+	delete input;
 	if (a.error){
-		cout << "An error occured" <<endl;
+		cout << "An error occurred" <<endl;
 		return;
 	}
 	switch (a.type){
@@ -44,6 +46,11 @@ void REPL_Interperater::runLine(string in){
 			printIntBin(a.value.INT);
 			cout << endl;
 			break;
+		case MESSAGE:
+			if (a.value.MESSAGE == SHOW_STATE){
+				cout << "I would update the state drawing now!" << endl;
+			}
+			break;
 		default:
 			cout << "Unrecognized Type" << endl;
 	}
@@ -53,7 +60,7 @@ State *REPL_Interperater::computeKet(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
 	if (a.error || a.type != KET){
-		cout << "A parse error occured or input was not a Ket" <<endl;
+		cout << "A parse error occurred or input was not a Ket" <<endl;
 		return NULL;
 	}
 	return a.value.STATE;
@@ -85,7 +92,6 @@ evalTerm REPL_Interperater::eval(QCLParseNode * in){
 			ret.value.FLOAT = atof(in->value);
 			ret.type = FLOAT;
 			return ret;
-		case OP:
 		case MINUS:
 			return applyBinOP(MINUS,eval(in->leaves[0]),eval(in->leaves[1]));
 		case PLUS:
@@ -99,7 +105,7 @@ evalTerm REPL_Interperater::eval(QCLParseNode * in){
 		case EXPONENT:
 			return applyBinOP(EXPONENT,eval(in->leaves[0]),eval(in->leaves[1]));
 		case OPERATION:
-		case OPEXPONENT:
+			return applyOPERATION(in->leaves[0]);  //XXX Must be fixed when applyOPERATION is fixed (need to pass line map as well)
 		case FUNC:
 			return Run_FUNC(in->value,in->leaves[0]);
 		case INPUTS:
@@ -130,7 +136,7 @@ evalTerm REPL_Interperater::getVar(string var){
 		}
 		ret.type = varMap[var].type;
 	} else {
-		cout << "ERROR: varible not declared." << endl;
+		cout << "ERROR: variable not declared." << endl;
 		ret.error = true;
 	}
 	return ret;
@@ -348,7 +354,7 @@ void REPL_Interperater::promote(evalTerm &a,evalTerm &b){//Use after ordering
 	}
 }
 		
-evalTerm REPL_Interperater::Run_FUNC(std::string name , QCLParseNode * input){
+evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNode * input){
 	evalTerm ret;
 	if (name.compare("setState")==0){
 		evalTerm in =eval(input->leaves[0]);
@@ -359,8 +365,7 @@ evalTerm REPL_Interperater::Run_FUNC(std::string name , QCLParseNode * input){
 			ret.value.STATE = Sim_State; 
 			return ret;
 		} 	
-	}
-	if (name.compare("printState")==0){
+	} else if (name.compare("printState")==0){
 		if (Sim_State != NULL){
 			cout << "Printing from the print function!" << endl;
 			Sim_State->print();				
@@ -370,8 +375,48 @@ evalTerm REPL_Interperater::Run_FUNC(std::string name , QCLParseNode * input){
 		ret.type = KET;
 		ret.value.STATE = Sim_State; 
 		return ret;
+	} else if (name.compare("showState")==0){
+		if (Sim_State != NULL){
+			ret.type = MESSAGE;
+			ret.value.MESSAGE=SHOW_STATE; 
+			return ret;
+		}	else {
+			cout << "ERROR: State not set" << endl;
+			return evalTerm(false);
+		}
 	}
 	//No Function accepted ERROR
 	cout << "ERROR: Function does not exist" << endl;
 	return evalTerm(false);
+}
+//TODO: Make this only apply to the mapped lines as originally intended 
+//currently it just applies the op to the 
+evalTerm REPL_Interperater::applyOPERATION(QCLParseNode * input){   
+	QCLParseNode * ops = input;					 
+	while (ops->leaves[0]!= NULL){
+		ops = ops->leaves[0];
+		string name = ops->value;
+		if (circMap.find(name) != circMap.end()){
+			Circuit * c = circMap[name];
+			if (ops->type == OPEXPONENT){
+				evalTerm exp = eval(ops->leaves[1]);
+				if (exp.type != INT){
+					cout << "ERROR: Invalid Exponent type" << endl;
+					return evalTerm(false);
+				}
+				for(unsigned int i = 0; i < exp.value.INT; i++){
+					*Sim_State = ApplyCircuit (Sim_State,c);
+				}
+			} else {
+				*Sim_State = ApplyCircuit (Sim_State,c);
+			}
+		}else{
+			cout << "ERROR: Circuit does not exist" << endl;
+			return evalTerm(false);
+		}
+	}
+	evalTerm ret;
+	ret.type = KET;
+	ret.value.STATE = Sim_State; 
+	return ret;
 }

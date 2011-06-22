@@ -4,6 +4,7 @@
 #include <string>
 
 struct QCLParseNode{
+	~QCLParseNode();
 	QCLParseNode() : type(0),value(NULL),leaves(NULL) { }
 	int type;
 	char * value;

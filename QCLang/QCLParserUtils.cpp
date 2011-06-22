@@ -4,6 +4,11 @@
 #include <iostream> //XXX
 using namespace std;
 
+QCLParseNode::~QCLParseNode(){
+	delete value;
+	delete leaves;
+}
+
 QCLParseNode * setupFOR(QCLParseNode * exp1, QCLParseNode * exp2, QCLParseNode * repBlock, QCLParseNode * nextBlock){
 	QCLParseNode * ret = new QCLParseNode;
 	ret->type = FOR;
@@ -66,9 +71,9 @@ QCLParseNode * setupOPEXPONENT(QCLParseNode * op, QCLParseNode * exp, QCLParseNo
 	ret->type = OPEXPONENT;
 	ret->value = strdup(op->value);
 	delete op;
-	ret->leaves = new QCLParseNode*[3];
-	ret->leaves[0]=exp;
-	ret->leaves[1]=next;
+	ret->leaves = new QCLParseNode*[2];
+	ret->leaves[0]=next;
+	ret->leaves[1]=exp;
 	return ret;
 }
 

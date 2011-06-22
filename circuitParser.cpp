@@ -1,5 +1,6 @@
 #include "circuitParser.h"
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -104,10 +105,24 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
       if ((**it).type != GATE_SET){
         cout << "ERROR: No setting for R gate."<< endl;
       }
-      istringstream ss((**it).value);
+			char t = (**it).value[0];//for rot type
+			rot_t rot_type;
+      stringstream ss((**it).value);
+			if (t=='x'||t=='X'){
+				rot_type = X;
+				ss.ignore(1);
+			} else if (t=='y'||t=='Y'){
+				rot_type = Y;
+				ss.ignore(1);
+			} else if (t=='Z'||t=='z'){
+				rot_type = Z;
+				ss.ignore(1);
+			} else {
+				rot_type = X;
+			}
       float_t rot;
       ss >>  rot;
-      newGate = new RGate(rot); //sets rotation amount
+      newGate = new RGate(rot,rot_type); //sets rotation amount
     } else if (((**it).value[0]) == 'T'){
       newGate = new UGate("X");
       newGate->drawType = NOT;
@@ -138,11 +153,29 @@ void parseConstants(Circuit * circ, vector<TFCToken>::iterator * it){
 }
 
 Circuit *parseCircuit (string file){
+  Circuit *circ = new Circuit;
+
+	//removes the file type from the circuit name
+	bool name_set = false;
+	unsigned int slash=0;
+	for (unsigned int i = 0;i<file.size();i++){
+		if (file[i]=='/' || file[i]=='\\'){
+			slash = i;
+		}
+		if (file[i]=='.'){
+			circ->name = file.substr(slash,i-slash);
+			name_set = true;
+			break;
+		}
+	}
+	if (!name_set){
+		circ->name = file;
+	}
+
   vector<TFCToken> *tokens = lexCircuit(file);
   if (tokens == NULL) return NULL;
   vector<TFCToken>::iterator tempIt = tokens->begin();
   vector<TFCToken>::iterator * it = &tempIt;
-  Circuit *circ = new Circuit;
   for(; ;){
     if ((**it).type == SEC_START){
       if (((**it).value).compare("V")     == 0){
@@ -172,4 +205,58 @@ Circuit *parseCircuit (string file){
     }
   }
   return circ;
+}
+
+
+
+string getGateInfo(Circuit *circ){
+	Gate *gate; //for current gate
+	stringstream ret;
+	ret << "BEGIN\n";
+	for (unsigned int i = 0; i< circ->numGates(); i++){
+		gate = circ->getGate(i);
+		ret << gate->getName();
+		for (unsigned int j = 0; j < gate->controls.size() ; j++){
+			ret << " \"" << circ->getLine(gate->controls[j].wire)->lineName << "\"";
+		}
+		for (unsigned int j = 0; j < gate->targets.size() ; j++){
+			ret << " \"" << circ->getLine(gate->targets[j])->lineName << "\"";
+		}
+		ret << "\n";
+	}
+	ret << "END";
+	return ret.str();
+}
+
+string getCircuitInfo(Circuit *circ){
+	stringstream v,in,o,ol,c,ret;  //correspond to simlarly named sections in the file
+	v << ".v" ; in << ".i"; o << ".o"; ol << ".ol"; c << ".c";
+	Line *line;  //for current line
+	for (unsigned int i = 0; i< circ->numLines(); i++){
+		line = circ->getLine(i);
+		v << " \"" << line->lineName << "\"";
+		if (line->constant){
+			c << " " << line->initValue;
+		} else {
+		 in << " \"" << line->lineName << "\"";
+		}
+		if (!line->garbage){
+			o << " \""<< line->lineName << "\"";
+		}
+		if (line->outLabel.compare("")!=0){
+			ol << " \""<< line->lineName << "\"";
+		}
+	}
+	v << "\n"; in << "\n"; o << "\n"; ol << "\n"; c << "\n";
+	ret << v.str() << in.str() << o.str() << ol.str() << c.str();
+	return ret.str();
+}
+
+void saveCircuit(Circuit *circ, string filename){
+	ofstream f;
+  f.open (filename.c_str());
+	string circInfo = getCircuitInfo(circ);
+	string gateInfo = getGateInfo(circ);
+	f << circInfo << gateInfo;
+	f.close();
 }

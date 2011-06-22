@@ -59,15 +59,19 @@ class UGate : public Gate {
 };
 
 //An arbitrary rotation gate
+enum rot_t {X,Y,Z};
 class RGate : public Gate {
   public:
-		RGate(float_type);
+		RGate(float_type, rot_t=X);
 		string getName();
 		State *applyToBasis(index_t);
+		void set_rotation(float_type);
+		void set_rot_type(rot_t);
 	private:
+    float_type rot;
+		rot_t rot_type;
 		index_t BuildBitString (index_t, unsigned int);
 		State* ApplyU(index_t);
-    float_type rot;
 		string name;
 };
 

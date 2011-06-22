@@ -50,7 +50,8 @@ class Circuit {
     void newArch ();
     void removeArch ();
     void parseArch (string);
-
+		
+		string name;
     vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
     vector<int> getGreedyParallel (); // used for drawing gates in the same column
     vector<int> getArchWarnings ();
