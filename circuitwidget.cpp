@@ -24,6 +24,7 @@ CircuitWidget::CircuitWidget() : circuit (NULL), selection (-1)  {
   signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
   signal_scroll_event().connect( sigc::mem_fun( *this, &CircuitWidget::onScrollEvent ) );
   signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
+	cx = cy = 0;
 }
 
 void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
@@ -57,16 +58,16 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
   switch (((GateIcon*)button->get_image ())->type) {
     case GateIcon::NOT:
        newgate = new UGate ("X");
-       newgate->drawType = NOT;
+       newgate->drawType = Gate::NOT;
        break;
     case GateIcon::H: newgate = new UGate ("H"); break;
     case GateIcon::X: newgate = new UGate ("X"); break;
     case GateIcon::Y: newgate = new UGate ("Y"); break;
     case GateIcon::Z: newgate = new UGate ("Z"); break;
-    case GateIcon::R: newgate = new RGate (1.0); break;
+    case GateIcon::R: newgate = new RGate (1.0, RGate::Z); break;
     case GateIcon::SWAP:
       newgate = new UGate ("F");
-      newgate->drawType = FRED;
+      newgate->drawType = Gate::FRED;
       newgate->targets.push_back (target++);
       break;
     default: cout << "unhandled gate drag and drop" << endl; break;
@@ -496,7 +497,6 @@ void CircuitWidget::delete_gate (unsigned int id) {
   if (!circuit) return;
   unsigned int i = 0;
   selection = -1;
-  ((QCViewer*)win)->set_selection (i);
   for (i = 0; i < layout.size(); i++) {
     if (layout[i].lastGateID > id) break;
     if (layout[i].lastGateID < id) continue;
@@ -532,3 +532,5 @@ void CircuitWidget::generate_layout_rects () {
 }
 
 void CircuitWidget::set_mode (Mode m) { mode = m; }
+
+Gate *CircuitWidget::getSelectedGate () { if (!circuit || selection == -1) return NULL; return circuit->getGate(selection); }

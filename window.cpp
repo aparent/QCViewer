@@ -4,6 +4,7 @@
 #include <string>
 #include <state.h>
 #include <dirac.h>
+#include <sstream>
 
 void QCViewer::setup_gate_button (Gtk::Button& btn, GateIcon& g, vector<Gtk::TargetEntry> &listTargets) {
   btn.set_image (g);
@@ -170,7 +171,7 @@ QCViewer::QCViewer() {
 
   m_PropFrame.set_label ("Properties");
   m_PropFrame.add (m_PropTable);
-  m_PropTable.resize (2,1);
+  m_PropTable.resize (3,1);
   m_EditSidebar.pack_start (m_PropFrame, Gtk::PACK_SHRINK);
   btn_delete.set_label ("Delete");
   btn_editcontrols.set_label ("Edit Controls");
@@ -178,7 +179,24 @@ QCViewer::QCViewer() {
   btn_editcontrols.signal_clicked().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
   m_PropTable.attach (btn_delete,0,1,0,1);
   m_PropTable.attach (btn_editcontrols,0,1,1,2);
+  m_PropTable.attach (m_RGateEditFrame,0,1,2,3);
 
+	m_RGateEditFrame.set_label ("Rotation");
+	m_RGateEditFrame.add (m_RGateEditTable);
+	m_RGateEditTable.resize (3,2);
+	btn_RX.set_group (m_RAxisGroup); btn_RX.set_label ("X");
+	btn_RY.set_group (m_RAxisGroup); btn_RY.set_label ("Y");
+	btn_RZ.set_group (m_RAxisGroup); btn_RZ.set_label ("Z");
+	btn_RX.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
+	btn_RY.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
+	btn_RZ.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
+	m_RValLabel.set_text ("Value: ");
+	m_RValEntry.signal_activate().connect (sigc::mem_fun(*this, &QCViewer::set_rval));
+  m_RGateEditTable.attach (btn_RX, 0,1,0,1);
+  m_RGateEditTable.attach (btn_RY, 1,2,0,1);
+	m_RGateEditTable.attach (btn_RZ, 2,3,0,1);
+	m_RGateEditTable.attach (m_RValLabel, 0,2,1,2);
+	m_RGateEditTable.attach (m_RValEntry, 2,3,1,2);
 
   vector<Gtk::TargetEntry> listTargets;
   listTargets.push_back(Gtk::TargetEntry ("STRING"));
@@ -224,6 +242,7 @@ QCViewer::QCViewer() {
   m_VisBox.show ();
   show_all_children ();
   m_PropFrame.hide ();
+	m_RGateEditFrame.hide ();
 }
 
 QCViewer::~QCViewer() {}
@@ -236,6 +255,44 @@ void QCViewer::unimplemented () {
   dialog.set_secondary_text(
           "This feature doesn't exist yet/is currently disabled.");
   dialog.run();
+}
+
+void QCViewer::set_raxis () {
+  Gate* g = c.getSelectedGate ();
+	if (g->type != Gate::RGATE) {
+		cout << "UNEXPECTED THING HAPPENED!!!! " << __FILE__ << __LINE__ << endl;
+		return;
+	}
+	RGate::Axis na;
+	     if (btn_RX.get_active ()) na = RGate::X;
+  else if (btn_RY.get_active ()) na = RGate::Y;
+	else                           na = RGate::Z;
+	if (na != ((RGate*)g)->get_axis ()) {
+    ((RGate*)g)->set_axis (na);
+    c.force_redraw ();
+	}
+}
+
+void QCViewer::set_rval () {
+  Gate* g = c.getSelectedGate ();
+	if (g->type != Gate::RGATE) {
+		cout << "UNEXPECTED THING HAPPENED!!!! " << __FILE__ << __LINE__ << endl;
+		return;
+	}
+  istringstream ss (m_RValEntry.get_text ());
+	float nr;
+	if (ss.fail ()) {
+    stringstream ss;
+		ss << ((RGate*)g)->get_rotVal ();
+    m_RValEntry.set_text (ss.str ());
+    Gtk::MessageDialog dialog(*this, "Error");
+    dialog.set_secondary_text("Rotation factor must be a floating point number.");
+    dialog.run();
+		return;
+	}
+	ss >> nr;
+	((RGate*)g)->set_rotVal (nr);
+	c.force_redraw ();
 }
 
 void QCViewer::on_menu_file_open_circuit () {
@@ -375,16 +432,32 @@ void QCViewer::on_menu_run () {
 
 void QCViewer::on_menu_delete () {
   if (selection == -1) return;
-  c.delete_gate ((unsigned int)selection);
+	unsigned int s = (unsigned int)selection;
   set_selection (-1);
+  c.delete_gate (s);
 }
 
 void QCViewer::set_selection (int i) {
+	cout << "selection was " << selection << " now is " << i << endl;
   selection = i;
   if (i == -1) {
     btn_editcontrols.set_active (false);
     m_PropFrame.hide ();
   } else {
+		if (c.getSelectedGate()->type == Gate::RGATE) {
+			m_RGateEditFrame.show ();
+			RGate* g = (RGate*)c.getSelectedGate ();
+			switch (g->get_axis ()) {
+				case RGate::X: btn_RX.set_active (); break;
+				case RGate::Y: btn_RY.set_active (); break;
+				case RGate::Z: btn_RZ.set_active (); break;
+			}
+			stringstream ss;
+			ss << g->get_rotVal ();
+			m_RValEntry.set_text (ss.str ());
+	  } else {
+			m_RGateEditFrame.hide ();
+		}
     m_PropFrame.show ();
   }
   btn_editbreakpoints.set_active (false);
@@ -393,8 +466,8 @@ void QCViewer::set_selection (int i) {
 void QCViewer::update_mode () {
   if (btn_editcontrols.get_active ()) {
     btn_editbreakpoints.set_active (false); // enforce di/trichotomy
-    if (selection == -1) { 
-      cout << "warning: this shouldn't have happened " << __FILE__ << " " << __LINE__ << endl; 
+    if (selection == -1) {
+      cout << "warning: this shouldn't have happened " << __FILE__ << " " << __LINE__ << endl;
       btn_editcontrols.set_active (false);
       c.set_mode (CircuitWidget::NORMAL);
       return;
@@ -402,7 +475,7 @@ void QCViewer::update_mode () {
       c.set_mode (CircuitWidget::EDIT_CONTROLS);
     }
   } else if (btn_editbreakpoints.get_active ()) {
-    c.set_mode (CircuitWidget::EDIT_BREAKPOINTS); 
+    c.set_mode (CircuitWidget::EDIT_BREAKPOINTS);
   } else {
     c.set_mode (CircuitWidget::NORMAL);
   }

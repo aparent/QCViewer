@@ -31,11 +31,13 @@ protected:
   void on_menu_options_arch ();
   void on_menu_zoom_in ();
   void on_menu_zoom_out ();
+	void set_rval();
   void on_menu_zoom_100 ();
   void on_menu_run ();
   void on_menu_step();
   void on_menu_reset();
   void on_menu_delete();
+	void set_raxis ();
   void unimplemented ();
   void on_menu_simulate_show_stateView ();
   void on_menu_load_state ();
@@ -76,7 +78,14 @@ protected:
   GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
   Gtk::Frame       m_PropFrame;
   Gtk::Table       m_PropTable;
-  Gtk::Button      btn_delete;
+
+	Gtk::Button      btn_delete;
+	Gtk::Frame       m_RGateEditFrame;
+  Gtk::Table       m_RGateEditTable;
+	Gtk::RadioButton::Group m_RAxisGroup;
+  Gtk::RadioButton btn_RX, btn_RY, btn_RZ;
+	Gtk::Label       m_RValLabel;
+	Gtk::Entry       m_RValEntry;
 
   Gtk::Frame       m_SimulationFrame;
   Gtk::Table       m_SimulationTable;
