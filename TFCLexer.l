@@ -42,8 +42,8 @@
 <gates>[ ]           							{BEGIN(gateVars);}
 <gates>\n
 
-<gateSet>[x|y|z]?[0-9]+\.[0-9]+		{tokens->push_back(TFCToken(GATE_SET,yytext));}
-<gateSet>[x|y|z]?[0-9]+		  			{tokens->push_back(TFCToken(GATE_SET,yytext));}
+<gateSet>[x-zX-Z]?[0-9]+\.[0-9]+		{tokens->push_back(TFCToken(GATE_SET,yytext));}
+<gateSet>[x-zX-Z]?[0-9]+		  			{tokens->push_back(TFCToken(GATE_SET,yytext));}
 <gateSet>\)												{BEGIN(gateVars);}
 <gateSet>\n
 

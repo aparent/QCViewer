@@ -106,29 +106,30 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
         cout << "ERROR: No setting for R gate."<< endl;
       }
 			char t = (**it).value[0];//for rot type
-			rot_t rot_type;
+			cout << "RotT|" << (**it).value[0] << "|"<< endl;
+			RGate::Axis rot_type;
       stringstream ss((**it).value);
 			if (t=='x'||t=='X'){
-				rot_type = X;
+				rot_type = RGate::X;
 				ss.ignore(1);
 			} else if (t=='y'||t=='Y'){
-				rot_type = Y;
+				rot_type = RGate::Y;
 				ss.ignore(1);
 			} else if (t=='Z'||t=='z'){
-				rot_type = Z;
+				rot_type = RGate::Z;
 				ss.ignore(1);
 			} else {
-				rot_type = X;
+				rot_type = RGate::Z;
 			}
       float_t rot;
       ss >>  rot;
-      newGate = new RGate(rot,rot_type); //sets rotation amount
+      newGate = new RGate(rot, rot_type); //sets rotation amount
     } else if (((**it).value[0]) == 'T'){
       newGate = new UGate("X");
-      newGate->drawType = NOT;
+      newGate->drawType = Gate::NOT;
     } else if (((**it).value[0]) == 'F'){
       newGate = new UGate("F");
-      newGate->drawType = FRED;
+      newGate->drawType = Gate::FRED;
     } else {
       newGate = new UGate((**it).value);
     }
@@ -215,7 +216,19 @@ string getGateInfo(Circuit *circ){
 	ret << "BEGIN\n";
 	for (unsigned int i = 0; i< circ->numGates(); i++){
 		gate = circ->getGate(i);
-		ret << gate->getName();
+		if(gate->type == Gate::RGATE){
+			string symbol;
+			if (((RGate*)gate)->get_axis()==RGate::X){
+				symbol = "X";
+			}else if (((RGate*)gate)->get_axis()==RGate::Y){	 
+				symbol = "Y";
+			}if (((RGate*)gate)->get_axis()==RGate::Z){
+				symbol = "Z";
+			}
+			ret << "R(" << symbol << ((RGate*)gate)->get_rotVal() << ")";
+		} else {
+			ret << gate->getName();
+		}
 		for (unsigned int j = 0; j < gate->controls.size() ; j++){
 			ret << " \"" << circ->getLine(gate->controls[j].wire)->lineName << "\"";
 		}

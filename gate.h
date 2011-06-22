@@ -7,8 +7,6 @@
 
 using namespace std;
 
-enum gateType {RGATE, UGATE};
-enum dType {NOT, FRED, DEFAULT};
 
 //used to specify a control number and polarity
 class Control{
@@ -28,6 +26,8 @@ rotation gate we may want the name to be dependent on the rot amount
 
 class Gate {
 	public:
+    enum gateType {RGATE, UGATE};
+    enum dType {NOT, FRED, DEFAULT};
 		virtual ~Gate();
 		virtual string getName()=0;
 		virtual State *applyToBasis(index_t)=0;
@@ -59,20 +59,22 @@ class UGate : public Gate {
 };
 
 //An arbitrary rotation gate
-enum rot_t {X,Y,Z};
 class RGate : public Gate {
   public:
-		RGate(float_type, rot_t=X);
+		enum Axis { X, Y, Z };
+		RGate(float_type, Axis);
 		string getName();
 		State *applyToBasis(index_t);
-		void set_rotation(float_type);
-		void set_rot_type(rot_t);
+		float_type get_rotVal (); // XXX: remove float_type, consildate this stuff!!
+		void set_rotVal (float_type);
+		Axis get_axis ();
+		void set_axis (Axis);
 	private:
     float_type rot;
-		rot_t rot_type;
 		index_t BuildBitString (index_t, unsigned int);
 		State* ApplyU(index_t);
 		string name;
+		Axis axis;
 };
 
 void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned int *dstmin, unsigned int *dstmax);
