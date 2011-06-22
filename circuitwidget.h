@@ -21,6 +21,7 @@ public:
 
   void savepng (std::string);
   void savesvg (std::string);
+  void save_circuit (std::string);
 
   void set_scale (double);
   double get_scale ();
@@ -73,13 +74,12 @@ private:
   double wirestart, wireend;
   void force_redraw ();
 
-  double scale;
-  double cx, cy;
-
   vector<gateRect> columns;
   vector<gateRect> rects;
   int selection;
 
+  double scale;
+  double cx, cy;
 
   unsigned int getFirstWire (double);
 };

@@ -53,7 +53,7 @@ QCViewer::QCViewer() {
   m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save",
                                             "Save the circuit diagram to an image file"));
   m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_save_circuit));
   m_refActionGroup->add(Gtk::Action::create("ArchSave", Gtk::Stock::SAVE, "Save", "Save architecture"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
   m_refActionGroup->add(Gtk::Action::create("DiagramSavePng", "P_NG",
@@ -299,6 +299,17 @@ void QCViewer::on_menu_save_png () {
   int result = dialog.run ();
   if (result == Gtk::RESPONSE_OK) {
     c.savepng (dialog.get_filename ());
+  }
+}
+void QCViewer::on_menu_save_circuit () {
+	Gtk::FileChooserDialog dialog ("Please choose a qc file to save to",
+                                 Gtk::FILE_CHOOSER_ACTION_SAVE);
+  dialog.set_transient_for (*this);
+  dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+  int result = dialog.run ();
+  if (result == Gtk::RESPONSE_OK) {
+    c.save_circuit (dialog.get_filename ());
   }
 }
 void QCViewer::on_menu_save_svg () {
