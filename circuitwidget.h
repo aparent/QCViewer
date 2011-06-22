@@ -6,6 +6,7 @@
 #include <string>
 #include "draw.h"
 #include <state.h>
+#include <gate.h>
 
 class CircuitWidget : public Gtk::DrawingArea {
 public:
@@ -40,9 +41,11 @@ public:
   void set_selection (int);
   void generate_layout_rects ();
 
+	Gate* getSelectedGate ();
   enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
   void set_mode (Mode);
-  
+  void force_redraw ();
+
 protected:
   //Override default signal handler:
   virtual bool on_expose_event(GdkEventExpose* event);
@@ -72,7 +75,6 @@ private:
   Circuit *circuit;
   cairo_rectangle_t ext;
   double wirestart, wireend;
-  void force_redraw ();
 
   vector<gateRect> columns;
   vector<gateRect> rects;

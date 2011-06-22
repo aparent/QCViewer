@@ -342,8 +342,8 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
       minmaxWire (&g->controls, &g->targets, &mingw, &maxgw);
       int count = 1; // XXX: hack for clumping hadamards, remove soon
       switch (g->drawType) {
-        case NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
-        case FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
+        case Gate::NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
+        case Gate::FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
         default:
           // XXX: maybe expose as a setting? 
           /*if (g->name.compare ("H") == 0) { // if hadamard
@@ -360,10 +360,19 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
             count--;
             // draw hadamards together. this isn't really cool. proof of concept.
             r = drawCU (cr, xcurr, g->name, &ctrl, &targ);
-          } else {*/
+          } else { ... } */
+				  if (g->type == Gate::RGATE) {
+				    string lbl = g->getName ();
+						switch (((RGate*)g)->get_axis ()) {
+							case RGate::X: lbl += "X"; break;
+							case RGate::Y: lbl += "Y"; break;
+							case RGate::Z: lbl += "Z"; break;
+						}
+						r = drawCU (cr, xcurr, lbl, &g->controls, &g->targets);
+					} else {
             r = drawCU (cr, xcurr, g->getName(), &g->controls, &g->targets);
-          //}
-          break;
+          }
+					break;
        }
        for (int i = 0; i < count; i++) rects.push_back(r);
        maxwidth = max (maxwidth, r.width);
