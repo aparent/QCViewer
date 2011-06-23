@@ -330,8 +330,10 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 // TODO: remove  vector <int> parallels = c->getGreedyParallel ();
 
   unsigned int i = 0;
+  double maxX;
   if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
   for (unsigned int j = 0; j < columns.size(); j++) {
+    maxX = 0.0;
     for (; i <= columns[j].lastGateID; i++) {
       Gate* g = c->getGate (i);
       gateRect r;
@@ -370,9 +372,10 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 					break;
        }
        rects.push_back(r);
-       xcurr += r.width;
+       maxX = max (maxX, r.width);
     //  drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
     }
+    xcurr += maxX;
     xcurr += gatePad + columns[j].pad;
   }
   xcurr -= gatePad;
