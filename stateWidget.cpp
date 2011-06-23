@@ -169,8 +169,9 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
               cr->fill ();
             } else {
               if ( (lastVal < 0 && eValue > 0) || (lastVal > 0 && eValue < 0)) {
-                cout << "poop" << endl;
-                cr->rel_line_to (barWidth, 0);
+                double NextEValue = eValue;
+                if (i != numdraw) NextEValue = drawmode == REAL ? bucket[i+1].real () : bucket[i+1].imag ();
+                cr->rel_line_to (barWidth, (eValue+NextEValue)/2.0);
                 cr->line_to (xborder + ((double)i)*barWidth, height/2.0);
                 cr->close_path ();
                 cr->set_source_rgb (drawmode == REAL ? 1: 0, 0, drawmode == IMAG ? 1 :0);
