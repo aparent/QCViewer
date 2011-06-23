@@ -25,6 +25,7 @@ CircuitWidget::CircuitWidget() :  circuit (NULL), selection (-1), cx(0), cy(0) {
   signal_scroll_event().connect( sigc::mem_fun( *this, &CircuitWidget::onScrollEvent ) );
   signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
 	cx = cy = 0;
+  wirestart = wireend = 0;
 }
 
 void CircuitWidget::set_window (Gtk::Window *w) { win = w; }

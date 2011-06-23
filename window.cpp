@@ -404,12 +404,12 @@ void QCViewer::on_menu_set_arch_LNN(){
 
 void QCViewer::on_menu_zoom_in () {
   double scale = c.get_scale ();
-  c.set_scale (scale*1.25);
+  c.set_scale (scale*1.125);
 }
 
 void QCViewer::on_menu_zoom_out () {
   double scale = c.get_scale ();
-  c.set_scale (scale/1.25);
+  c.set_scale (scale/1.125);
 }
 
 void QCViewer::on_menu_zoom_100 () {

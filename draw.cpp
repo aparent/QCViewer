@@ -289,7 +289,7 @@ void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, do
 
   for (unsigned int i = 0; i < c->numLines(); i++) {
     double y = wireToY (i);
-    drawWire (cr, wirestart, y, wireend, y);
+    drawWire (cr, wirestart+xoffset, y, wireend, y);
   }
 }
 
@@ -301,6 +301,7 @@ int pickRect (vector<gateRect> rects, double x, double y) {
 }
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) {
+  cout << "wirestart: " << *wirestart << "  wireend: " << *wireend <<endl;
   vector <gateRect> rects;
   cairo_set_source_rgb (cr, 0, 0, 0);
 
@@ -395,7 +396,6 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     cairo_move_to (cr, x, y);
     cairo_show_text (cr, label.c_str());
   }
-
   return rects;
 }
 
@@ -460,7 +460,7 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& co
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;
-  drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart, wireend+xoffset, scale);
+  drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart, wireend, scale);
   rects = draw (cr, c, columns, &wirestart, &wireend, true);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
