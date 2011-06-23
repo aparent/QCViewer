@@ -44,10 +44,10 @@ void StateViewWidget::close () {
 
 void StateViewWidget::set_style () {
 	StateWidget::DrawMode d;
-	if (btn_real.get_active ())     		d = StateWidget::STATEDRAW_REAL;
-	else if (btn_imag.get_active ())    d = StateWidget::STATEDRAW_IMAG;
-	else if (btn_trace.get_active ())   d = StateWidget::STATEDRAW_EXPECTED_TRACED;
-	else 																d = StateWidget::STATEDRAW_EXPECTED;
+	if (btn_real.get_active ())     		d = StateWidget::REAL;
+	else if (btn_imag.get_active ())    d = StateWidget::IMAG;
+	else if (btn_trace.get_active ())   { d = StateWidget::EXPECTED_TRACED; sw.parse_state (); }
+	else 																d = StateWidget::EXPECTED;
 	if (d != sw.drawmode) {
 		sw.drawmode = d;
 	  sw.reset ();
@@ -68,7 +68,7 @@ StateWidget::StateWidget(Gtk::Statusbar* ns) {
   add_events (Gdk::POINTER_MOTION_MASK);
   signal_motion_notify_event().connect (sigc::mem_fun(*this, &StateWidget::onMotionEvent));
   mousex = mousey = 0;
-  drawmode = STATEDRAW_EXPECTED;
+  drawmode = EXPECTED;
   num_draw = 0;
 	trace = 63;
   set_size_request (100,100);
@@ -95,19 +95,35 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
     cr->rectangle (0, 0, width, height);
     cr->set_source_rgb (1, 1, 1);
     cr->fill ();
-    if (drawmode == STATEDRAW_EXPECTED || drawmode == STATEDRAW_EXPECTED_TRACED) {
+    if (drawmode == EXPECTED || drawmode == EXPECTED_TRACED) {
       if (state != NULL) {
-				if (drawmode == STATEDRAW_EXPECTED){
+				if (drawmode == EXPECTED){
+          if (draw_compressed) cr->move_to (xborder, height-yborder);
         	for (unsigned int i = 0; i < num_draw; i++) {
           	double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
           	if (eValue > EPS) {
-          		cr->rectangle (xborder + ((double)i)*barWidth, height - yborder, barWidth, -eValue*barHeight);
-          	  cr->set_source_rgb (0, 0, 0);
-          	  cr->stroke_preserve ();
-          	  cr->set_source_rgb (0, 1, 0);
-          	  cr->fill ();
-          	}
+              if (draw_compressed == false) {
+          		  cr->rectangle (xborder + ((double)i)*barWidth, height - yborder, barWidth, -eValue*barHeight);
+          	    cr->set_source_rgb (0, 0, 0);
+          	    cr->stroke_preserve ();
+          	    cr->set_source_rgb (0, 1, 0);
+          	    cr->fill ();
+              } else {
+                cr->line_to (xborder + ((double)i)*barWidth,height-yborder-eValue*barHeight);
+              }
+          	} else if (draw_compressed) {
+              cr->line_to (xborder + ((double)i)*barWidth, height-yborder);
+            }
         	}
+          if (draw_compressed) {
+            cr->rel_line_to (barWidth, 0);
+            cr->line_to (width - xborder, height-yborder);
+            cr->close_path ();
+            cr->set_source_rgb (0, 1, 0);
+            cr->fill_preserve ();
+            cr->set_source_rgb (0, 0, 0);
+            cr->stroke ();
+          }
 				} else {
 					for (unsigned int i = 0; i < num_draw_traced; i++) {
           	if (traced_bucket[i] > EPS) {
@@ -130,25 +146,56 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
       cr->line_to (xborder+tickwidth/2.0, yborder);
       cr->stroke ();
 			}
-    } else if (drawmode == STATEDRAW_REAL || drawmode == STATEDRAW_IMAG) { // XXX: proper scaling?
+    } else if (drawmode == REAL || drawmode == IMAG) { // XXX: proper scaling?
       double avg = 0.0;
       if (state != NULL) {
         double maxX = 0.0;
         for (unsigned int i = 0; i < num_draw; i++) {
           double val = max(bucket[i].real(), bucket[i].imag ());
-          avg += drawmode == STATEDRAW_REAL ? bucket[i].real () : bucket[i].imag ();
+          avg += drawmode == REAL ? bucket[i].real () : bucket[i].imag ();
           maxX = max (abs(val), maxX);
         }
+        double lastVal = drawmode == REAL? bucket[0].real () : bucket[0].imag ();
+        if (draw_compressed) cr->move_to (xborder, height/2.0);
         for (unsigned int i = 0; i < num_draw; i++) {
-          float_t val = drawmode == STATEDRAW_REAL ? bucket[i].real() : bucket[i].imag ();
+          float_t val = drawmode == REAL ? bucket[i].real() : bucket[i].imag ();
           float_t eValue = val/maxX;
           if (abs(val) > EPS) {
-            cr->rectangle (xborder + (double)i*barWidth, height/2.0, barWidth, -eValue*barHeight/2.0);
-            cr->set_source_rgb (0, 0, 0);
-             cr->stroke_preserve ();
-             cr->set_source_rgb (drawmode == STATEDRAW_REAL ? 1 : 0, 0, drawmode == STATEDRAW_IMAG ? 1 : 0);
-             cr->fill ();
+            if (!draw_compressed) {
+              cr->rectangle (xborder + (double)i*barWidth, height/2.0, barWidth, -eValue*barHeight/2.0);
+              cr->set_source_rgb (0, 0, 0);
+              cr->stroke_preserve ();
+              cr->set_source_rgb (drawmode == REAL ? 1 : 0, 0, drawmode == IMAG ? 1 : 0);
+              cr->fill ();
+            } else {
+              if ( (lastVal < 0 && eValue > 0) || (lastVal > 0 && eValue < 0)) {
+                cout << "poop" << endl;
+                cr->rel_line_to (barWidth, 0);
+                cr->line_to (xborder + ((double)i)*barWidth, height/2.0);
+                cr->close_path ();
+                cr->set_source_rgb (drawmode == REAL ? 1: 0, 0, drawmode == IMAG ? 1 :0);
+                cr->fill_preserve ();
+                cr->set_source_rgb (0, 0, 0);
+                cr->stroke ();
+                cr->move_to (xborder + ((double)i)*barWidth, height/2.0);
+                cr->line_to (xborder + ((double)i)*barWidth, height/2.0-eValue*barHeight/2.0);
+                lastVal = eValue;
+              } else {
+                cr->line_to (xborder + ((double)i)*barWidth,height/2.0-eValue*barHeight/2.0);
+              }
+            }
+          } else if (draw_compressed) {
+            cr->line_to (xborder + ((double)i)*barWidth, height/2.0);
           }
+        }
+        if (draw_compressed) {
+          cr->rel_line_to (barWidth, 0);
+          cr->line_to (width - xborder, height/2.0);
+          cr->close_path ();
+          cr->set_source_rgb (drawmode == REAL ? 1: 0, 0, drawmode == IMAG ? 1 :0);
+          cr->fill_preserve ();
+          cr->set_source_rgb (0, 0, 0);
+          cr->stroke ();
         }
         avg /= num_draw;
         cr->set_source_rgba (0.5, 0.5, 0.5, 0.5);
@@ -193,13 +240,13 @@ bool StateWidget::onMotionEvent (GdkEventMotion* event) {
   mousex = event->x;
   mousey = event->y;
 	unsigned int i=0;
-	if (drawmode!=STATEDRAW_EXPECTED_TRACED) i = floor ((mousex - xborder)/barWidth);
+	if (drawmode!=EXPECTED_TRACED) i = floor ((mousex - xborder)/barWidth);
 	else i = floor ((mousex - xborder)/t_barWidth);
   if (i >= 0 && i < num_draw) {
     stringstream oss;
     string mystr;
     int dim = 0;
-		if (drawmode!=STATEDRAW_EXPECTED_TRACED){
+		if (drawmode!=EXPECTED_TRACED){
       double rValue = bucket[i].real ();
       double iValue = bucket[i].imag ();
       rValue = abs(rValue) > EPS ? rValue : 0;
@@ -225,7 +272,6 @@ bool StateWidget::onMotionEvent (GdkEventMotion* event) {
 void StateWidget::reset () {
   if (state != NULL) {
     parse_state ();
-		parse_state_trace ();
   }
   force_redraw ();
 }
@@ -252,7 +298,8 @@ void StateWidget::force_redraw () {
 
 // XXX: this needs to be changed a lot to support more than 32 qubits
 void StateWidget::parse_state () {
-  if (state->dim >= numBuckets) { draw_compressed = true; }
+  if (drawmode == EXPECTED_TRACED) { parse_state_trace (); return; }
+  if (state->dim >= numBuckets) { draw_compressed = true; num_draw = numBuckets; }
   else { draw_compressed = false; num_draw = state->dim; }
   unsigned int skip = ceil ((double)state->dim/(double)numBuckets);
   unsigned int n = 0;
