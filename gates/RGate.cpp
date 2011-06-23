@@ -3,6 +3,7 @@
 #include "utility.h"
 #include <cmath>
 #include <complex>
+#include <iostream>//XXX
 
 RGate::RGate(float_type n_rot, Axis a) : rot(n_rot) {
   drawType = DEFAULT;
@@ -39,32 +40,36 @@ State *RGate::ApplyU (index_t bits){
   switch (axis) {
     case X:
       {
-        float_type cosr = cos (rot);
-        float_type sinr = sin (rot);
+        float_type cosr = cos (M_PI*rot/2.0);
+        float_type sinr = sin (M_PI*rot/2.0);
+				cout <<  cosr*cosr+sinr*sinr << endl;
         if (GetRegister (bits, targets.at (0))) {
-          // *answer += State ();
-          // *answer += State ();
+          *answer = State (complex<float_type>(sinr,0),BuildBitString(bits,0));
+          *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
         } else {
-          // *answer += State ();
-          // *answer += State ();
+          *answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
+          *answer += State (complex<float_type>(sinr,0),BuildBitString(bits,1));
         }
       }
       break;
     case Y:
       {
+        float_type cosr = cos (M_PI*rot/2.0);
+        float_type sinr = sin (M_PI*rot/2.0);
+				cout <<  cosr*cosr+sinr*sinr << endl;
         if (GetRegister (bits, targets.at (0))) {
-          // *answer += State ();
-          // *answer += State ();
+          *answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
+          *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
         } else {
-          // *answer += State ();
-          // *answer += State ();
+          *answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
+          *answer += State (complex<float_type>(0,sinr),BuildBitString(bits,1));
         }
       }
       break;
     case Z:
       {
         if (GetRegister (bits, targets.at(0))){
-          *answer = State(exp(complex<float_type>(0,M_PI*rot)), bits);// XXX: verify do not need buildbitstring
+          *answer = State(exp(complex<float_type>(0,M_PI*rot/2.0)), bits);// XXX: verify do not need buildbitstring
         }
         else{
           *answer = State(1, bits);
@@ -80,6 +85,8 @@ index_t RGate::BuildBitString (index_t orig, unsigned int ans) {
   unsigned int output = orig;
   if (ans) {
     output = SetRegister (output, targets.at(0));
+  }  else {
+    output = UnsetRegister (output, targets.at(0));
   }
   return output;
 }
