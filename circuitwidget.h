@@ -30,6 +30,8 @@ public:
   int get_Depth ();
   int get_NumGates ();
 
+  void newcircuit (unsigned int);
+
   void set_state (State*);
   bool step ();
   bool run (bool);

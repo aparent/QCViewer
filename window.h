@@ -22,6 +22,7 @@ protected:
   void on_menu_file_open_circuit ();
   void on_menu_file_open_arch ();
   void on_menu_mode_edit ();
+  void on_menu_new ();
   void on_menu_mode_simulate ();
 //  void on_menu_file_save ();
   void on_menu_file_quit ();

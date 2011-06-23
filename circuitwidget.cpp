@@ -309,6 +309,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->fill ();
     cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
     if (circuit != NULL) {
+      cout << "drawing with " << layout.size () << " columns." << endl;
       rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
       generate_layout_rects ();
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
@@ -333,12 +334,29 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
   return true;
 }
 
+void CircuitWidget::newcircuit (unsigned int numqubits) {
+  if (circuit != NULL) delete circuit;
+  circuit = new Circuit ();
+  layout.clear ();
+  breakpoints.clear ();
+  for (unsigned int i = 0; i < numqubits; i++) {
+    stringstream ss;
+    ss << i + 1;
+    circuit->addLine (ss.str ());
+    Line* l = circuit->getLine (i);
+    l->outLabel = ss.str ();
+    l->constant = false;
+    l->garbage = false;
+  }
+}
+
 void CircuitWidget::load (string file) {
   if (circuit != NULL) delete circuit;
   circuit = parseCircuit(file);
   layout.clear ();
   breakpoints.clear ();
   vector<int> parallels = circuit->getGreedyParallel ();
+
   for (unsigned int i = 0; i < parallels.size(); i++) {
     layout.push_back (LayoutColumn(parallels[i], 0.0));
   }

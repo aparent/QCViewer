@@ -329,7 +329,6 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
   unsigned int mingw, maxgw;
 // TODO: remove  vector <int> parallels = c->getGreedyParallel ();
 
-  // Draw them in parallel using the greedy strategy.
   unsigned int i = 0;
   if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
   for (unsigned int j = 0; j < columns.size(); j++) {

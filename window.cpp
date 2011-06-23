@@ -42,7 +42,7 @@ QCViewer::QCViewer() {
   m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
 
   m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+                        sigc::mem_fun(*this, &QCViewer::on_menu_new));
   m_refActionGroup->add(Gtk::Action::create("ArchNew", Gtk::Stock::NEW, "New", "Create new architecture"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
 
@@ -281,6 +281,7 @@ void QCViewer::set_rval () {
 	}
   istringstream ss (m_RValEntry.get_text ());
 	float nr;
+	ss >> nr;
 	if (ss.fail ()) {
     stringstream ss;
 		ss << ((RGate*)g)->get_rotVal ();
@@ -290,7 +291,6 @@ void QCViewer::set_rval () {
     dialog.run();
 		return;
 	}
-	ss >> nr;
 	((RGate*)g)->set_rotVal (nr);
 	c.force_redraw ();
 }
@@ -405,6 +405,32 @@ void QCViewer::on_menu_zoom_100 () {
   c.set_scale (1);
 }
 
+void QCViewer::on_menu_new () {
+  Gtk::Dialog newdlg ("Number of qubits");
+  newdlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  newdlg.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+  Gtk::Entry num_qubits;
+  num_qubits.set_max_length (4);
+  num_qubits.show();
+  newdlg.get_vbox()->pack_start(num_qubits,Gtk::PACK_SHRINK);
+  int result = newdlg.run();
+  if (result == Gtk::RESPONSE_OK) {
+    istringstream ss(num_qubits.get_text());
+    unsigned int n = 0;
+    ss >> n;
+    if (ss.fail ()) {
+      return;
+    }
+    c.newcircuit (n);
+    selection = -1;
+    c.set_drawparallel (drawparallel);
+    c.set_drawarch (drawarch);
+    c.set_scale (1);
+    btn_editcontrols.set_active (false);
+    btn_editcontrols.set_active (false);
+    c.reset ();
+  }
+}
 void QCViewer::on_menu_load_state () {
   Gtk::Dialog enterState("Enter State");
   enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
