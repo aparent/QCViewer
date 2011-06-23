@@ -13,7 +13,7 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() : circuit (NULL), selection (-1)  {
+CircuitWidget::CircuitWidget() :  circuit (NULL), selection (-1), cx(0), cy(0) {
   panning = drawarch = drawparallel = false;
   mode = NORMAL;
   NextGateToSimulate = 0;
@@ -297,7 +297,6 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     Gtk::Allocation allocation = get_allocation();
     const int width = allocation.get_width();
     const int height = allocation.get_height();
-
     double xc = width/2.0;
     double yc = height/2.0;
 
@@ -366,6 +365,9 @@ void CircuitWidget::force_redraw () {
 void CircuitWidget::set_drawarch (bool foo) { drawarch = foo; force_redraw (); }
 void CircuitWidget::set_drawparallel (bool foo) { drawparallel = foo; force_redraw (); }
 
+void CircuitWidget::save_circuit (string filename) {
+	saveCircuit(circuit,filename);
+}
 void CircuitWidget::savepng (string filename) {
   if (!circuit) return;
   double wirestart, wireend;
