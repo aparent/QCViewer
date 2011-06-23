@@ -309,7 +309,6 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->fill ();
     cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
     if (circuit != NULL) {
-      cout << "drawing with " << layout.size () << " columns." << endl;
       rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
       generate_layout_rects ();
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
