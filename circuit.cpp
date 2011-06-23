@@ -4,7 +4,7 @@
 #include <algorithm> // for sort, which we should probably cut out
 #include <fstream>
 
-Circuit::Circuit() : arch(0) {}
+Circuit::Circuit() : arch(NULL) {}
 
 Circuit::~Circuit () {
   removeArch ();
@@ -187,4 +187,12 @@ void Circuit::parseArch (const string filename) {
     }
   }
   file.close ();
+}
+
+void Circuit::arch_set_LNN(){
+	if (arch!= NULL) delete arch;
+  arch = new QArch(numLines());
+	for(unsigned int i=0; i < numLines()-1; i++){
+		arch->set(i,i+1);
+	}
 }

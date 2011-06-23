@@ -50,6 +50,7 @@ class Circuit {
     void newArch ();
     void removeArch ();
     void parseArch (string);
+		void arch_set_LNN();
 		
 		string name;
     vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
