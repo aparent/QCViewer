@@ -43,7 +43,7 @@ protected:
   void unimplemented ();
   void on_menu_simulate_show_stateView ();
   void on_menu_load_state ();
-
+	void on_menu_set_arch_LNN();
 //  void on_architecture_load ();
 
 //  void on_menu_simulation_reset ();
