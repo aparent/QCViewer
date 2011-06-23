@@ -536,3 +536,8 @@ void CircuitWidget::generate_layout_rects () {
 void CircuitWidget::set_mode (Mode m) { mode = m; }
 
 Gate *CircuitWidget::getSelectedGate () { if (!circuit || selection == -1) return NULL; return circuit->getGate(selection); }
+
+void  CircuitWidget::arch_set_LNN(){
+	circuit->arch_set_LNN();
+}
+

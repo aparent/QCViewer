@@ -14,6 +14,7 @@ public:
   virtual ~CircuitWidget ();
   void load (string);
   void loadArch (string);
+	void arch_set_LNN();
 
   void set_window (Gtk::Window *);
   void set_offset (int);

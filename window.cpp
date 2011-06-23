@@ -66,6 +66,9 @@ QCViewer::QCViewer() {
   m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
                         sigc::mem_fun(*this, &QCViewer::unimplemented));
 
+	m_refActionGroup->add(Gtk::Action::create("SetArch", "Preset Arch"));
+	m_refActionGroup->add(Gtk::Action::create("LNN", "LNN"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_set_arch_LNN));
 
   m_refActionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT, "Quit"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_quit));
@@ -115,6 +118,10 @@ QCViewer::QCViewer() {
         "      <menuitem action='ArchNew'/>"
         "      <menuitem action='ArchOpen'/>"
         "      <menuitem action='ArchSave'/>"
+        "      <menu action='SetArch'>"
+        "        <menuitem action='LNN'/>"
+        "        <separator/>"
+        "      </menu>"
         "    </menu>"
         "    <menu action='Diagram'>"
         "      <menu action='DiagramSave'>"
@@ -389,6 +396,10 @@ void QCViewer::on_menu_options_parallel () {
 void QCViewer::on_menu_options_arch () {
   drawarch = !drawarch;
   c.set_drawarch (drawarch);
+}
+
+void QCViewer::on_menu_set_arch_LNN(){
+	c.arch_set_LNN();
 }
 
 void QCViewer::on_menu_zoom_in () {
