@@ -18,7 +18,7 @@ StateViewWidget::StateViewWidget (Gtk::Statusbar* ns, Gtk::HBox* h, vector<State
   buttonbox.pack_start (btn_expected, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_real, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_imag, Gtk::PACK_SHRINK);
-  buttonbox.pack_start (btn_trace, Gtk::PACK_SHRINK);
+  // buttonbox.pack_start (btn_trace, Gtk::PACK_SHRINK);
   buttonbox.pack_start (btn_close, Gtk::PACK_SHRINK);
   pack_start (sw);
   pack_start (buttonbox, Gtk::PACK_SHRINK);
@@ -151,7 +151,7 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
       if (state != NULL) {
         double maxX = 0.0;
         for (unsigned int i = 0; i < num_draw; i++) {
-          double val = max(bucket[i].real(), bucket[i].imag ());
+          double val = max(abs(bucket[i].real()), abs(bucket[i].imag ()));
           avg += drawmode == REAL ? bucket[i].real () : bucket[i].imag ();
           maxX = max (abs(val), maxX);
         }

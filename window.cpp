@@ -432,8 +432,9 @@ void QCViewer::on_menu_new () {
     if (ss.fail ()) {
       return;
     }
-    c.newcircuit (n);
     selection = -1;
+    c.set_selection (-1);
+    c.newcircuit (n);
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
     c.set_scale (1);

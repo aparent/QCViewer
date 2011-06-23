@@ -140,7 +140,6 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name) {
 
 gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctrl, vector<unsigned int> *targ) {
   unsigned int minw, maxw;
-  gateRect rect = drawControls (cr, xc, ctrl, targ);
   vector<Control> dummy;
   minmaxWire (&dummy, targ, &minw, &maxw); // only the targets
   // (XXX) need to do a  check in here re: target wires intermixed with not targets.
@@ -157,6 +156,7 @@ gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctr
   if (width < dw*Upad) {
     width = dw*Upad;
   }
+  gateRect rect = drawControls (cr, xc-radius+width/2.0, ctrl, targ);
   cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
   cairo_set_source_rgb (cr, 1, 1, 1);
   cairo_fill(cr);
