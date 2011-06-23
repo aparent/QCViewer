@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-const unsigned int numBuckets = 256;
+const unsigned int numBuckets = 512;
 
 class StateWidget : public Gtk::DrawingArea {
 public:
@@ -16,7 +16,7 @@ public:
 	void parse_state ();
 	void parse_state_trace ();
 	void reset ();
-	enum DrawMode {STATEDRAW_EXPECTED, STATEDRAW_EXPECTED_TRACED, STATEDRAW_REAL, STATEDRAW_IMAG } drawmode;
+	enum DrawMode {EXPECTED,EXPECTED_TRACED, REAL, IMAG } drawmode;
 
 protected:
   virtual bool on_expose_event(GdkEventExpose* event);

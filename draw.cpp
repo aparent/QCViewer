@@ -157,21 +157,21 @@ gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctr
   if (width < dw*Upad) {
     width = dw*Upad;
   }
-  cairo_rectangle (cr, xc-width/2, yc-height/2, width, height);
+  cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
   cairo_set_source_rgb (cr, 1, 1, 1);
   cairo_fill(cr);
-  cairo_rectangle (cr, xc-width/2, yc-height/2, width, height);
+  cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_set_line_width (cr, thickness);
   cairo_stroke(cr);
 
-  double x = xc - (extents.width/2 + extents.x_bearing);
-  double y = yc - (extents.height/2 + extents.y_bearing);
+  double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
+  double y = yc - extents.height/2 - extents.y_bearing;
   cairo_move_to(cr, x, y);
   cairo_show_text (cr, name.c_str());
   gateRect r;
-  r.x0 = xc - width/2 - thickness;
-  r.y0 = yc - height/2 - thickness;
+  r.x0 = xc - thickness-radius;
+  r.y0 = yc -height/2 - thickness;
   r.width = width + 2*thickness;
   r.height = height + 2*thickness;
   return combine_gateRect(rect, r);
@@ -332,15 +332,11 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
   // Draw them in parallel using the greedy strategy.
   unsigned int i = 0;
   if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
-  double maxwidth = 0.0;
   for (unsigned int j = 0; j < columns.size(); j++) {
-		xcurr += maxwidth;
-		maxwidth = 0.0;
     for (; i <= columns[j].lastGateID; i++) {
       Gate* g = c->getGate (i);
       gateRect r;
       minmaxWire (&g->controls, &g->targets, &mingw, &maxgw);
-      int count = 1; // XXX: hack for clumping hadamards, remove soon
       switch (g->drawType) {
         case Gate::NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
         case Gate::FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
@@ -374,13 +370,14 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
           }
 					break;
        }
-       for (int i = 0; i < count; i++) rects.push_back(r);
-       maxwidth = max (maxwidth, r.width);
+       rects.push_back(r);
+       xcurr += r.width;
     //  drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
     }
     xcurr += gatePad + columns[j].pad;
   }
-  *wireend = xcurr+gatePad;
+  xcurr -= gatePad;
+  *wireend = xcurr;
 
   // output labels
   cairo_set_source_rgb (cr, 0, 0, 0);
@@ -461,7 +458,7 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& co
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;
-  drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart+xoffset, wireend, scale);
+  drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart, wireend+xoffset, scale);
   rects = draw (cr, c, columns, &wirestart, &wireend, true);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());

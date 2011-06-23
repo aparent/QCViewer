@@ -449,7 +449,6 @@ void QCViewer::on_menu_delete () {
 }
 
 void QCViewer::set_selection (int i) {
-	cout << "selection was " << selection << " now is " << i << endl;
   selection = i;
   if (i == -1) {
     btn_editcontrols.set_active (false);
