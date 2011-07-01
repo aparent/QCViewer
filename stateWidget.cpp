@@ -243,7 +243,7 @@ bool StateWidget::onMotionEvent (GdkEventMotion* event) {
 	unsigned int i=0;
 	if (drawmode!=EXPECTED_TRACED) i = floor ((mousex - xborder)/barWidth);
 	else i = floor ((mousex - xborder)/t_barWidth);
-  if (i >= 0 && i < num_draw) {
+  if (i < num_draw) {
     stringstream oss;
     string mystr;
     int dim = 0;
@@ -332,7 +332,7 @@ void StateWidget::parse_state_trace () {
 	for (unsigned int i = 0; i < numBuckets; i++){
 		traced_bucket[i] = 0.0;
 	}
-	for (StateMap::iterator it = state->data.begin(); it != state->data.end(); it++){
+	for (StateMap::iterator it = state->data.begin(); it != state->data.end(); ++it){
     traced_bucket[ExtractBits(it->first,trace)] += it->second.real()*it->second.real() + it->second.imag()*it->second.imag();
 	}
 }

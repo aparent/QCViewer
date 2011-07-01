@@ -215,7 +215,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
         if ((unsigned int)wireid >= circuit->numLines()) wireid = -1;
         if (wireid == -1) return true;
         g = circuit->getGate (selection);
-        for (it = g->controls.begin (); it != g->controls.end (); it++) {
+        for (it = g->controls.begin (); it != g->controls.end (); ++it) {
           if (it->wire == (unsigned int)wireid) {
             it->polarity = !it->polarity;
             if (!it->polarity) { // instead of cycling pos/neg, delete if it /was/ neg.

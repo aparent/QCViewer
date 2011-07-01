@@ -51,7 +51,6 @@ int pickWire (double y) {
   return wire;
 }
 
-LayoutColumn::LayoutColumn (unsigned int g, double p) : lastGateID(g), pad(p) {}
 
 void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2) {
   cairo_set_line_width (cr, thickness);
@@ -118,7 +117,6 @@ gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vect
   rect.y0 = wireToY(minw)-dotradius;
   rect.width = 2*dotradius;
   rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
-  // drawRect (cr, rect, Colour (0.1,0.2,0.6,0.8), Colour (0.1,0.2,0.6,0.3)); // DEBUG
   return rect;
 }
 
@@ -207,7 +205,6 @@ gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=
 }
 
 void drawShowRotation (cairo_t *cr, double xc, double yc, double radius) {
-  //cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_face (cr,ft_default);
   cairo_set_font_size(cr, 18);
   cairo_set_line_width (cr, thickness);
@@ -215,8 +212,6 @@ void drawShowRotation (cairo_t *cr, double xc, double yc, double radius) {
   string text = "R";
   cairo_text_extents_t extents;
 	cairo_text_extents (cr, text.c_str (), &extents);
-//	double textwidth = extents.width+2.0*textPad;
-//	double textheight = extents.height+2.0*textPad;
 	double tw = extents.width + 2.0*textPad;
 	double th = extents.height + 2.0*textPad;
 
@@ -301,7 +296,6 @@ int pickRect (vector<gateRect> rects, double x, double y) {
 }
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) {
-  cout << "wirestart: " << *wirestart << "  wireend: " << *wireend <<endl;
   vector <gateRect> rects;
   cairo_set_source_rgb (cr, 0, 0, 0);
 
@@ -313,7 +307,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label.c_str(), &extents);
 
-    double x = 0, y = 0; // XXX: these were not initialized - why didn't this cause a bug?
+    double x = 0, y = 0;
     if (forreal) {
       x = *wirestart - extents.width;
       y = wireToY(i) - (extents.height/2 + extents.y_bearing);
@@ -374,7 +368,6 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
        }
        rects.push_back(r);
        maxX = max (maxX, r.width);
-    //  drawRect (cr, r, Colour (0.1,0.5,0.2,0.8), Colour (0.1, 0.5, 0.2, 0.3)); // DEBUG
     }
     xcurr += maxX;
     xcurr += gatePad + columns[j].pad;
@@ -433,7 +426,6 @@ cairo_rectangle_t get_circuit_size (Circuit *c, vector<LayoutColumn>& columns, d
   cairo_t *cr = cairo_create(unbounded_rec_surface);
   cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
   cairo_scale (cr, scale, scale);
-  //cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_face (cr,ft_default);
   cairo_set_font_size(cr, 18);
   draw (cr, c, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
@@ -456,7 +448,6 @@ void write_to_png (cairo_surface_t* surf, string filename) {
 vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
   cairo_scale (cr, scale, scale);
 	cairo_set_font_face (cr,ft_default);
-  //cairo_select_font_face(cr, "Courier", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;
