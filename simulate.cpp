@@ -21,7 +21,7 @@ State ApplyGate (State* in, Gate* g) {
   map<index_t, complex<float_type> >::iterator it;
   State answer;
 	answer.dim = in->dim;
-  for (it = in->data.begin(); it != in->data.end(); it++) {
+  for (it = in->data.begin(); it != in->data.end(); ++it) {
     State* tmp = g->applyToBasis(it->first);
     if (tmp == NULL){
 			 cout << "Simulation Error" << endl;

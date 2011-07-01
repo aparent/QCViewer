@@ -20,6 +20,7 @@ class Line {
 
 class QArch { // Less space efficient than it could trivially be.
 public:
+	~QArch(){delete graph;}
   QArch (int nn) : n(nn) { graph = new char[n*n]; for (int i = 0; i < n*n; i++) graph[i] = 0; }
 
   bool query (int i, int j) { return (0 != graph[i+n*j]); }

@@ -106,7 +106,6 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
         cout << "ERROR: No setting for R gate."<< endl;
       }
 			char t = (**it).value[0];//for rot type
-			cout << "RotT|" << (**it).value[0] << "|"<< endl;
 			RGate::Axis rot_type;
       stringstream ss((**it).value);
 			if (t=='x'||t=='X'){
@@ -161,7 +160,7 @@ Circuit *parseCircuit (string file){
 	unsigned int slash=0;
 	for (unsigned int i = 0;i<file.size();i++){
 		if (file[i]=='/' || file[i]=='\\'){
-			slash = i;
+			slash = i+1;
 		}
 		if (file[i]=='.'){
 			circ->name = file.substr(slash,i-slash);

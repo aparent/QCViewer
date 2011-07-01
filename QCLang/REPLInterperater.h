@@ -19,15 +19,15 @@ union REPL_VALUE{
 
 struct REPL_VAR{
 	REPL_VAR(REPL_VALUE a,int b);
-	REPL_VAR(){}
+	REPL_VAR():type(-1){}
 	REPL_VALUE value;
 	int type;
 };
 
 struct evalTerm{
-	evalTerm() : error(false){}
-	evalTerm(REPL_VALUE a,int b) : value(a),type(b){}
-	evalTerm(bool a) : error(a){}
+	evalTerm() :error(false),type(-1){}
+	evalTerm(REPL_VALUE a,int b) :error(false), value(a),type(b){}
+	evalTerm(bool a) : error(a),type(-1){}
 	bool error;
 	REPL_VALUE value;
 	int type;
