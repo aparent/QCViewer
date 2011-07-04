@@ -6,7 +6,6 @@
 
 // If it is desired to up the accuracy later, or change the maximum
 // qubit size, change this.
-// Templates were removed because they made the code ugly.
 typedef float float_type;
 typedef uint64_t index_t;
 typedef std::map<index_t, std::complex<float_type> >  StateMap;

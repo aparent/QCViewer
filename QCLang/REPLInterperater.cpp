@@ -7,7 +7,7 @@
 
 using namespace std;
 
-REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
+REPL_Interperater::REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
 	type = b;
 	if (type == COMPLEX){
 		value.COMPLEX = new complex<float_type>(*a.COMPLEX);
@@ -18,16 +18,18 @@ REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
 	}
 }
 
-void printTree(QCLParseNode * node);
-QCLParseNode *parseQCL(string input);
+void printTree(QCLParseNode * node);  //XXX
+QCLParseNode *parseQCL(string input); //XXX
 
-void REPL_Interperater::runLine(string in){
+REPL_Interperater::evalTerm REPL_Interperater::runLine(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
 	delete input;
+	return a;
+	/*  XXX
 	if (a.error){
 		cout << "An error occurred" <<endl;
-		return;
+		return ERROR;
 	}
 	switch (a.type){
 		case INT:
@@ -54,6 +56,8 @@ void REPL_Interperater::runLine(string in){
 		default:
 			cout << "Unrecognized Type" << endl;
 	}
+	return DEFAULT;
+	*/
 }
 
 State *REPL_Interperater::computeKet(string in){
@@ -66,7 +70,7 @@ State *REPL_Interperater::computeKet(string in){
 	return a.value.STATE;
 }
 
-evalTerm REPL_Interperater::eval(QCLParseNode * in){
+REPL_Interperater::evalTerm REPL_Interperater::eval(QCLParseNode * in){
 	evalTerm ret;
 	if (in == NULL){
 		return NULL;
@@ -124,7 +128,7 @@ void REPL_Interperater::setVar(evalTerm right,	string var){
 	}
 }
 
-evalTerm REPL_Interperater::getVar(string var){
+REPL_Interperater::evalTerm REPL_Interperater::getVar(string var){
 	evalTerm ret;
 	if (varMap.find(var) != varMap.end()){
 		if (varMap[var].type == KET) {
@@ -142,7 +146,7 @@ evalTerm REPL_Interperater::getVar(string var){
 	return ret;
 }
 
-evalTerm REPL_Interperater::evalWireMap(QCLParseNode * in){
+REPL_Interperater::evalTerm REPL_Interperater::evalWireMap(QCLParseNode * in){
 	index_t wire = 0;
 	if (in->leaves[2] != NULL){
 		wire = (evalWireMap(in->leaves[2])).value.INT;
@@ -162,7 +166,7 @@ evalTerm REPL_Interperater::evalWireMap(QCLParseNode * in){
 	return ret;
 }
 
-evalTerm REPL_Interperater::getKet(string value){
+REPL_Interperater::evalTerm REPL_Interperater::getKet(string value){
 	evalTerm ret;
 	index_t basis = 0;
 	ret.type = KET;
@@ -179,7 +183,7 @@ evalTerm REPL_Interperater::getKet(string value){
 	return ret;
 }
 
-evalTerm REPL_Interperater::applyEquals(QCLParseNode * in,	evalTerm right){
+REPL_Interperater::evalTerm REPL_Interperater::applyEquals(QCLParseNode * in,	evalTerm right){
 	if (right.error || (in->type != ID && in->type != KVAR)){
 		right.error = true;
 	}
@@ -189,7 +193,7 @@ evalTerm REPL_Interperater::applyEquals(QCLParseNode * in,	evalTerm right){
 	return right;
 }
 
-evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
+REPL_Interperater::evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 	order(left,right);
 	promote(left,right);
 	if (left.error || right.error) return left;
@@ -313,7 +317,7 @@ evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
 	return ret;
 }
 
-evalTerm REPL_Interperater::applyExponent(evalTerm left,evalTerm right){
+REPL_Interperater::evalTerm REPL_Interperater::applyExponent(evalTerm left,evalTerm right){
 	if (left.error || right.error ) return left;
 	if (left.type == INT && right.type == INT ){
 		left.value.INT=ipow(left.value.INT,right.value.INT);
@@ -353,8 +357,8 @@ void REPL_Interperater::promote(evalTerm &a,evalTerm &b){//Use after ordering
 		b.value.COMPLEX = new complex<float_type>(b.value.FLOAT,0);
 	}
 }
-		
-evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNode * input){
+
+REPL_Interperater::evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNode * input){
 	evalTerm ret;
 	if (name.compare("setState")==0){
 		evalTerm in =eval(input->leaves[0]);
@@ -362,23 +366,23 @@ evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNode * input){
 			if (Sim_State != NULL) delete Sim_State;
 			Sim_State = in.value.STATE;
 			ret.type = KET;
-			ret.value.STATE = Sim_State; 
+			ret.value.STATE = Sim_State;
 			return ret;
-		} 	
+		}
 	} else if (name.compare("printState")==0){
 		if (Sim_State != NULL){
 			cout << "Printing from the print function!" << endl;
-			Sim_State->print();				
+			Sim_State->print();
 		}	else {
 			cout << "ERROR: State not set" << endl;
 		}
 		ret.type = KET;
-		ret.value.STATE = Sim_State; 
+		ret.value.STATE = Sim_State;
 		return ret;
 	} else if (name.compare("showState")==0){
 		if (Sim_State != NULL){
 			ret.type = MESSAGE;
-			ret.value.MESSAGE=SHOW_STATE; 
+			ret.value.MESSAGE=SHOW_STATE;
 			return ret;
 		}	else {
 			cout << "ERROR: State not set" << endl;
@@ -389,10 +393,11 @@ evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNode * input){
 	cout << "ERROR: Function does not exist" << endl;
 	return evalTerm(false);
 }
-//TODO: Make this only apply to the mapped lines as originally intended 
-//currently it just applies the op to the 
-evalTerm REPL_Interperater::applyOPERATION(QCLParseNode * input){   
-	QCLParseNode * ops = input;					 
+
+//TODO: Make this only apply to the mapped lines as originally intended
+//currently it just applies the op to the
+REPL_Interperater::evalTerm REPL_Interperater::applyOPERATION(QCLParseNode * input){
+	QCLParseNode * ops = input;
 	while (ops->leaves[0]!= NULL){
 		ops = ops->leaves[0];
 		string name = ops->value;
@@ -417,6 +422,6 @@ evalTerm REPL_Interperater::applyOPERATION(QCLParseNode * input){
 	}
 	evalTerm ret;
 	ret.type = KET;
-	ret.value.STATE = Sim_State; 
+	ret.value.STATE = Sim_State;
 	return ret;
 }

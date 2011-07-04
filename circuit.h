@@ -52,7 +52,7 @@ class Circuit {
     void removeArch ();
     void parseArch (string);
 		void arch_set_LNN();
-		
+
 		string name;
     vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
     vector<int> getGreedyParallel (); // used for drawing gates in the same column

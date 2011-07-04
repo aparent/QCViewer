@@ -1,8 +1,9 @@
 cmake_minimum_required (VERSION 2.6)
 project (QCLib)
 
-#ADD_DEFINITIONS( "-ggdb3 -Wall -Wextra -pedantic -ansi" )
-ADD_DEFINITIONS( "-O2 -Wall -Wextra -pedantic -ansi" )
+ADD_DEFINITIONS( "-ggdb3 -Wall -Wextra -pedantic -ansi  -Wno-unused-function " )
+#ADD_DEFINITIONS( "-O2 -Wall -Wextra -pedantic -ansi" )
+#ADD_DEFINITIONS( "-O3 -Wall -pedantic -ansi" )
 
 SET(QCLIB_SRC_FILES
 	circuit.cpp
@@ -78,17 +79,14 @@ SOURCE_GROUP("Source Files" FILES ${QCLIB_SRC_FILES})
 ADD_LIBRARY(QC STATIC ${QCLIB_HEADER_FILES} ${QCLIB_SRC_FILES})
 install (TARGETS QC DESTINATION lib)
 
-add_executable (diracTest  diracTest.cpp )
-target_link_libraries(diracTest QC )
-
-add_executable (simTest  simTest.cpp )
-target_link_libraries(simTest QC )
-
-add_executable (testParser  testParser.cpp )
-target_link_libraries(testParser QC )
-
+#Some testing stuff, uncomment to use
+#add_executable (diracTest  diracTest.cpp )
+#target_link_libraries(diracTest QC )
+#add_executable (simTest  simTest.cpp )
+#target_link_libraries(simTest QC )
+#add_executable (testParser  testParser.cpp )
+#target_link_libraries(testParser QC )
 add_executable (QCLang/QCLTest  QCLang/QCLTest.cpp )
 target_link_libraries(QCLang/QCLTest QC )
-
 #add_executable (testParser testParser.cpp)
 #target_link_libraries(testParser QCLib)
