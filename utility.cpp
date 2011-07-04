@@ -1,5 +1,6 @@
 #include "utility.h"
 #include <stdio.h>
+#include <sstream>
 #include <algorithm>
 #include <iostream> //XXX
 

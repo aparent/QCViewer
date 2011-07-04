@@ -21,43 +21,11 @@ REPL_Interperater::REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
 void printTree(QCLParseNode * node);  //XXX
 QCLParseNode *parseQCL(string input); //XXX
 
-string REPL_Interperater::runLine(string in){
+REPL_Interperater::evalTerm REPL_Interperater::runLine(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
 	delete input;
-	return "Test";
-	/*  XXX
-	if (a.error){
-		cout << "An error occurred" <<endl;
-		return ERROR;
-	}
-	switch (a.type){
-		case INT:
-			cout << a.value.INT << endl;
-			break;
-		case FLOAT:
-			cout << a.value.FLOAT << endl;
-			break;
-		case COMPLEX:
-			cout << *a.value.COMPLEX << endl;
-			break;
-		case KET:
-			a.value.STATE->print();
-			break;
-		case WIREMAP:
-			printIntBin(a.value.INT);
-			cout << endl;
-			break;
-		case MESSAGE:
-			if (a.value.MESSAGE == SHOW_STATE){
-				cout << "I would update the state drawing now!" << endl;
-			}
-			break;
-		default:
-			cout << "Unrecognized Type" << endl;
-	}
-	return DEFAULT;
-	*/
+	return a;
 }
 
 State *REPL_Interperater::computeKet(string in){

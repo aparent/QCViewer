@@ -2,7 +2,6 @@
 #define UTILITY_FUNCS
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include "state.h"
 

@@ -13,7 +13,7 @@ class REPL_Interperater{
 	public:
 		REPL_Interperater(): Sim_State(NULL){}
 		enum message {DEFAULT,ERROR,SHOW_STATE};
-		//Union of possible values for a variable 
+		//Union of possible values for a variable
 		union REPL_VALUE{
 			index_t INT;
 			message MESSAGE;
@@ -21,7 +21,7 @@ class REPL_Interperater{
 			float_type FLOAT;
 			State * STATE;
 		};
-		//Evaluation term, includes information about the success of the operation. 
+		//Evaluation term, includes information about the success of the operation.
 		struct evalTerm{
 			evalTerm() :error(false),type(-1){}
 			evalTerm(REPL_VALUE a,int b) : error(false), value(a),type(b){}
@@ -30,12 +30,11 @@ class REPL_Interperater{
 			REPL_VALUE value;
 			int type;
 		};
-		string runLine(std::string);
+		evalTerm runLine(std::string);
 		State *computeKet(std::string);
 		State *Sim_State;
 		std::map<std::string,Circuit*> circMap;
 	private:
-		
 		//Interpreter variable
 		struct REPL_VAR{
 			REPL_VAR(REPL_VALUE a,int b);
