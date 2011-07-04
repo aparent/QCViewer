@@ -21,11 +21,11 @@ REPL_Interperater::REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
 void printTree(QCLParseNode * node);  //XXX
 QCLParseNode *parseQCL(string input); //XXX
 
-REPL_Interperater::evalTerm REPL_Interperater::runLine(string in){
+string REPL_Interperater::runLine(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
 	delete input;
-	return a;
+	return "Test";
 	/*  XXX
 	if (a.error){
 		cout << "An error occurred" <<endl;

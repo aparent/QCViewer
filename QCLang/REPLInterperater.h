@@ -11,12 +11,8 @@
 
 class REPL_Interperater{
 	public:
-		enum message {DEFAULT,ERROR,SHOW_STATE};
 		REPL_Interperater(): Sim_State(NULL){}
-		message runLine(std::string);
-		State *computeKet(std::string);
-		State *Sim_State;
-		std::map<std::string,Circuit*> circMap;
+		enum message {DEFAULT,ERROR,SHOW_STATE};
 		//Union of possible values for a variable 
 		union REPL_VALUE{
 			index_t INT;
@@ -34,6 +30,10 @@ class REPL_Interperater{
 			REPL_VALUE value;
 			int type;
 		};
+		string runLine(std::string);
+		State *computeKet(std::string);
+		State *Sim_State;
+		std::map<std::string,Circuit*> circMap;
 	private:
 		
 		//Interpreter variable
