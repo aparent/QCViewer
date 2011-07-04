@@ -1,3 +1,6 @@
+#ifndef __STATEWIDGET__INCLUDED
+#define __STATEWIDGET__INCLUDED
+
 #include <gtkmm/drawingarea.h>
 #include <cairo.h>
 #include <cairomm/context.h>
@@ -69,3 +72,5 @@ private:
 };
 
 std::string draw_state (Cairo::RefPtr<Cairo::Context> cr, State* state, float width ,float height, float mousex, float mousey);
+
+#endif
