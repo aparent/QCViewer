@@ -18,7 +18,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
                      9 /* the length of I'm Data! in bytes */);
 }
 
-QCViewer::QCViewer() {
+QCViewer::QCViewer(): console((void*)this) {
   drawparallel = drawarch = false;
   set_title("QCViewer-v0.1");
   set_border_width(0);
@@ -461,6 +461,14 @@ void QCViewer::on_menu_load_state () {
     c.set_state(state);
   }
   c.reset ();
+}
+
+void QCViewer::load_state (State* s) {
+    if (state!=NULL) delete state;
+		state = s;
+    for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
+    c.set_state(state);
+  	c.reset ();
 }
 
 void QCViewer::on_menu_step () {

@@ -7,16 +7,19 @@
 #include <state.h>
 #include <string>
 #include <vector>
+#include <QCLang/REPLInterperater.h>
 
 
 class ConsoleWidget : public Gtk::VBox {
 public:
-  ConsoleWidget ();
+  ConsoleWidget (void*);
 
 protected:
   void eval ();
 private:
+	REPL_Interperater interp;
   Gtk::Entry entry;
+	void* window;
   Gtk::TextView log;
 //  Gtk::TextBuffer logbuffer;
 };

@@ -15,6 +15,7 @@ public:
   virtual ~QCViewer();
 
   void set_selection (int);
+	void load_state (State* s);
 protected:
   void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
   void setup_gate_button (Gtk::Button&, GateIcon&, vector<Gtk::TargetEntry> &);
