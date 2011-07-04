@@ -237,6 +237,7 @@ QCViewer::QCViewer() {
   m_EditVisPane.pack1 (m_hbox, true, true);
   m_EditVisPane.pack2 (m_VisBox, true, true);
   m_vbox.pack_start (m_EditVisPane);
+  m_vbox.pack_start (console, Gtk::PACK_SHRINK);
 
 //  m_vbox.pack_start (m_cmdOut);
 //  m_vbox.pack_start (m_cmdIn, Gtk::PACK_SHRINK);
