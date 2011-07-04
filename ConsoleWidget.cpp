@@ -1,9 +1,10 @@
 #include "ConsoleWidget.h"
 #include "window.h"
 #include <iostream>
+#include <sstream>
 using namespace std;
 
-ConsoleWidget::ConsoleWidget (void* w) : window(w)  {
+ConsoleWidget::ConsoleWidget () {
   log.set_editable (false);
   log.set_cursor_visible (false);
   log.set_size_request (0, 100);
@@ -16,14 +17,40 @@ ConsoleWidget::ConsoleWidget (void* w) : window(w)  {
   show_all_children ();
 }
 
-
+void ConsoleWidget::set_window(void* w){
+	window = w;
+}
 
 void ConsoleWidget::eval () {
   Glib::ustring text = "> " + entry.get_text () + "\n";
   log.get_buffer()->insert (log.get_buffer()->end(), text);
-	
-	string result = interp.runLine(entry.get_text ());
-
-
+/*	
+	REPL_Interperater::evalTerm result = interp.runLine(entry.get_text ());
+	if (result.error){
+		cout << "An error occurred" <<endl;
+	}
+	stringstream ss;
+	switch (result.type){
+		case INT:
+			ss << result.value.INT << endl;
+  		log.get_buffer()->insert (log.get_buffer()->end(), ss.str());
+			break;
+		case FLOAT:
+			ss << result.value.FLOAT << endl;
+  		log.get_buffer()->insert (log.get_buffer()->end(), ss.str());
+			break;
+		case COMPLEX:
+			ss << *result.value.COMPLEX << endl;
+  		log.get_buffer()->insert (log.get_buffer()->end(), ss.str());
+			break;
+		case MESSAGE:
+			if (result.value.MESSAGE == REPL_Interperater::SHOW_STATE){
+				((QCViewer*)window)->load_state(interp.Sim_State);
+			}
+			break;
+		default:
+  		log.get_buffer()->insert (log.get_buffer()->end(), "Unrecognized Type\n");
+	}
+*/
   entry.set_text ("");
 }

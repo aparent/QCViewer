@@ -12,8 +12,8 @@
 
 class ConsoleWidget : public Gtk::VBox {
 public:
-  ConsoleWidget (void*);
-
+  ConsoleWidget ();
+	void set_window(void*);
 protected:
   void eval ();
 private:

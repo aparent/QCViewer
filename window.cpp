@@ -18,7 +18,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
                      9 /* the length of I'm Data! in bytes */);
 }
 
-QCViewer::QCViewer(): console((void*)this) {
+QCViewer::QCViewer() {
   drawparallel = drawarch = false;
   set_title("QCViewer-v0.1");
   set_border_width(0);
@@ -31,6 +31,8 @@ QCViewer::QCViewer(): console((void*)this) {
   Zicon.type = GateIcon::Z;
   Ricon.type = GateIcon::R;
   SWAPicon.type = GateIcon::SWAP;
+
+	console.set_window((void*)this);
 
   add(m_vbox);
    m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
