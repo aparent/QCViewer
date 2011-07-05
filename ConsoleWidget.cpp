@@ -56,4 +56,5 @@ void ConsoleWidget::eval () {
   		log.get_buffer()->insert (log.get_buffer()->end(), "Unrecognized Type\n");
 	}
   entry.set_text ("");
+  log.scroll_to (log.get_buffer()->create_mark(log.get_buffer()->end()));
 }
