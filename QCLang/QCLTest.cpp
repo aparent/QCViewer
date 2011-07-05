@@ -1,4 +1,4 @@
-#include "REPLInterperater.h"
+#include "REPLInterpreter.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
 }
 */
 int main(){
-	REPL_Interperater interp;
+	REPLInterpreter interp;
 	char  a[256];
 	while(true){
 		cin.getline (a,256);

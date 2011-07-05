@@ -23,7 +23,7 @@ SET(QCLIB_SRC_FILES
 	QCLang/QCLParser.cpp
 	QCLang/QCLLexer.cpp
 	QCLang/QCLParserUtils.cpp
-	QCLang/REPLInterperater.cpp
+	QCLang/REPLInterpreter.cpp
 )
 
 SET(QCLIB_HEADER_FILES

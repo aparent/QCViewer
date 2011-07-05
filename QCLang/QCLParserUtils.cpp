@@ -5,7 +5,8 @@
 using namespace std;
 
 QCLParseNode::~QCLParseNode(){
-	delete value;
+	if (value!=NULL)delete value;
+	for (int i = 0; i < QCLNodeNumLeaves(type);i++) delete leaves[i];
 	delete leaves;
 }
 
@@ -183,7 +184,7 @@ int QCLNodeNumLeaves(int type){
 		case INPUTS:
 			return 2;		
 		default:
-			return -1;
+			return 0;
 	}
 }
 

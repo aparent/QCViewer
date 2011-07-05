@@ -9,12 +9,12 @@
 #include "../state.h"
 
 
-class REPL_Interperater{
+class REPLInterpreter{
 	public:
-		REPL_Interperater(): Sim_State(NULL){}
+		REPLInterpreter(): Sim_State(NULL){}
 		enum message {DEFAULT,ERROR,SHOW_STATE};
 		//Union of possible values for a variable
-		union REPL_VALUE{
+		union Value{
 			index_t INT;
 			message MESSAGE;
 			std::complex<float_type>* COMPLEX;
@@ -24,10 +24,10 @@ class REPL_Interperater{
 		//Evaluation term, includes information about the success of the operation.
 		struct evalTerm{
 			evalTerm() :error(false),type(-1){}
-			evalTerm(REPL_VALUE a,int b) : error(false), value(a),type(b){}
+			evalTerm(Value a,int b) : error(false), value(a),type(b){}
 			evalTerm(bool a) : error(a),type(-1){}
 			bool error;
-			REPL_VALUE value;
+			Value value;
 			int type;
 		};
 		evalTerm runLine(std::string);
@@ -36,12 +36,12 @@ class REPL_Interperater{
 		std::map<std::string,Circuit*> circMap;
 	private:
 		//Interpreter variable
-		struct REPL_VAR{
-			REPL_VAR(REPL_VALUE a,int b);
-			REPL_VAR():type(-1){}
-			REPL_VALUE value;
+		struct Var{
+			Var(Value a,int b);
+			Var():type(-1){}
+			Value value;
 			int type;
-		};		
+		};
 		evalTerm eval(QCLParseNode *);
 		evalTerm Run_FUNC(std::string, QCLParseNode *);
 		evalTerm applyOPERATION(QCLParseNode * input);
@@ -50,7 +50,7 @@ class REPL_Interperater{
 		evalTerm getVar(std::string);
 		evalTerm getKet(std::string);
 
-		std::map<std::string,REPL_VAR> varMap;
+		std::map<std::string,Var> varMap;
 
 		evalTerm applyEquals(QCLParseNode*,evalTerm);
 		evalTerm evalWireMap(QCLParseNode*);

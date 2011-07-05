@@ -1,4 +1,4 @@
-#include "REPLInterperater.h"
+#include "REPLInterpreter.h"
 #include "../simulate.h"
 #include "../utility.h"
 #include <iostream>
@@ -7,7 +7,7 @@
 
 using namespace std;
 
-REPL_Interperater::REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
+REPLInterpreter::Var::Var(Value a,int b){
 	type = b;
 	if (type == COMPLEX){
 		value.COMPLEX = new complex<float_type>(*a.COMPLEX);
@@ -21,14 +21,14 @@ REPL_Interperater::REPL_VAR::REPL_VAR(REPL_VALUE a,int b){
 void printTree(QCLParseNode * node);  //XXX
 QCLParseNode *parseQCL(string input); //XXX
 
-REPL_Interperater::evalTerm REPL_Interperater::runLine(string in){
+REPLInterpreter::evalTerm REPLInterpreter::runLine(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
 	delete input;
 	return a;
 }
 
-State *REPL_Interperater::computeKet(string in){
+State *REPLInterpreter::computeKet(string in){
 	QCLParseNode * input =  parseQCL(in);
 	evalTerm a = eval(input);
 	if (a.error || a.type != KET){
@@ -38,7 +38,7 @@ State *REPL_Interperater::computeKet(string in){
 	return a.value.STATE;
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::eval(QCLParseNode * in){
+REPLInterpreter::evalTerm REPLInterpreter::eval(QCLParseNode * in){
 	evalTerm ret;
 	if (in == NULL){
 		return NULL;
@@ -88,15 +88,15 @@ REPL_Interperater::evalTerm REPL_Interperater::eval(QCLParseNode * in){
 }
 
 
-void REPL_Interperater::setVar(evalTerm right,	string var){
+void REPLInterpreter::setVar(evalTerm right,	string var){
 	if (!right.error){
-			varMap[var]=REPL_VAR(right.value,right.type);
+			varMap[var]=Var(right.value,right.type);
 	} else {
 		cout << "ERROR UNKNOWN TYPE" << endl;
 	}
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::getVar(string var){
+REPLInterpreter::evalTerm REPLInterpreter::getVar(string var){
 	evalTerm ret;
 	if (varMap.find(var) != varMap.end()){
 		if (varMap[var].type == KET) {
@@ -114,7 +114,7 @@ REPL_Interperater::evalTerm REPL_Interperater::getVar(string var){
 	return ret;
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::evalWireMap(QCLParseNode * in){
+REPLInterpreter::evalTerm REPLInterpreter::evalWireMap(QCLParseNode * in){
 	index_t wire = 0;
 	if (in->leaves[2] != NULL){
 		wire = (evalWireMap(in->leaves[2])).value.INT;
@@ -134,7 +134,7 @@ REPL_Interperater::evalTerm REPL_Interperater::evalWireMap(QCLParseNode * in){
 	return ret;
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::getKet(string value){
+REPLInterpreter::evalTerm REPLInterpreter::getKet(string value){
 	evalTerm ret;
 	index_t basis = 0;
 	ret.type = KET;
@@ -151,7 +151,7 @@ REPL_Interperater::evalTerm REPL_Interperater::getKet(string value){
 	return ret;
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::applyEquals(QCLParseNode * in,	evalTerm right){
+REPLInterpreter::evalTerm REPLInterpreter::applyEquals(QCLParseNode * in,	evalTerm right){
 	if (right.error || (in->type != ID && in->type != KVAR)){
 		right.error = true;
 	}
@@ -161,7 +161,7 @@ REPL_Interperater::evalTerm REPL_Interperater::applyEquals(QCLParseNode * in,	ev
 	return right;
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,evalTerm right){
+REPLInterpreter::evalTerm REPLInterpreter::applyBinOP(int OP,evalTerm left,evalTerm right){
 	order(left,right);
 	promote(left,right);
 	if (left.error || right.error) return left;
@@ -285,7 +285,7 @@ REPL_Interperater::evalTerm REPL_Interperater::applyBinOP(int OP,evalTerm left,e
 	return ret;
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::applyExponent(evalTerm left,evalTerm right){
+REPLInterpreter::evalTerm REPLInterpreter::applyExponent(evalTerm left,evalTerm right){
 	if (left.error || right.error ) return left;
 	if (left.type == INT && right.type == INT ){
 		left.value.INT=ipow(left.value.INT,right.value.INT);
@@ -295,7 +295,7 @@ REPL_Interperater::evalTerm REPL_Interperater::applyExponent(evalTerm left,evalT
 	return left;
 }
 
-void REPL_Interperater::order(evalTerm &a,evalTerm &b){
+void REPLInterpreter::order(evalTerm &a,evalTerm &b){
 	evalTerm t;
 	if ( a.type == INT && b.type != INT){
 		t = a;
@@ -312,7 +312,7 @@ void REPL_Interperater::order(evalTerm &a,evalTerm &b){
 	}
 }
 
-void REPL_Interperater::promote(evalTerm &a,evalTerm &b){//Use after ordering
+void REPLInterpreter::promote(evalTerm &a,evalTerm &b){//Use after ordering
 	evalTerm t;
 	if (a.type == FLOAT && b.type == INT){
 		b.type = FLOAT;
@@ -326,15 +326,15 @@ void REPL_Interperater::promote(evalTerm &a,evalTerm &b){//Use after ordering
 	}
 }
 
-REPL_Interperater::evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNode * input){
+REPLInterpreter::evalTerm REPLInterpreter::Run_FUNC(string name , QCLParseNode * input){
 	evalTerm ret;
 	if (name.compare("setState")==0){
 		evalTerm in =eval(input->leaves[0]);
 		if (in.type == KET){
 			if (Sim_State != NULL) delete Sim_State;
 			Sim_State = in.value.STATE;
-			ret.type = KET;
-			ret.value.STATE = Sim_State;
+			ret.type = MESSAGE;
+			ret.value.MESSAGE=SHOW_STATE;
 			return ret;
 		}
 	} else if (name.compare("printState")==0){
@@ -364,7 +364,7 @@ REPL_Interperater::evalTerm REPL_Interperater::Run_FUNC(string name , QCLParseNo
 
 //TODO: Make this only apply to the mapped lines as originally intended
 //currently it just applies the op to the
-REPL_Interperater::evalTerm REPL_Interperater::applyOPERATION(QCLParseNode * input){
+REPLInterpreter::evalTerm REPLInterpreter::applyOPERATION(QCLParseNode * input){
 	QCLParseNode * ops = input;
 	while (ops->leaves[0]!= NULL){
 		ops = ops->leaves[0];
