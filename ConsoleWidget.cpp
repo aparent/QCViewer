@@ -41,11 +41,16 @@ void ConsoleWidget::eval () {
 		case COMPLEX:
 			ss << *result.value.COMPLEX << endl;
   		log.get_buffer()->insert (log.get_buffer()->end(), ss.str());
+			delete result.value.COMPLEX;
 			break;
 		case MESSAGE:
 			if (result.value.MESSAGE == REPLInterpreter::SHOW_STATE){
 				((QCViewer*)window)->load_state(interp.Sim_State);
 			}
+			break;
+		case KET:
+			result.value.STATE->print();
+			delete result.value.STATE;
 			break;
 		default:
   		log.get_buffer()->insert (log.get_buffer()->end(), "Unrecognized Type\n");
