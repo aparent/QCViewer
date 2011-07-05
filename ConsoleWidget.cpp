@@ -24,8 +24,7 @@ void ConsoleWidget::set_window(void* w){
 void ConsoleWidget::eval () {
   Glib::ustring text = "> " + entry.get_text () + "\n";
   log.get_buffer()->insert (log.get_buffer()->end(), text);
-/*	
-	REPL_Interperater::evalTerm result = interp.runLine(entry.get_text ());
+	REPLInterpreter::evalTerm result = interp.runLine(entry.get_text ());
 	if (result.error){
 		cout << "An error occurred" <<endl;
 	}
@@ -44,13 +43,12 @@ void ConsoleWidget::eval () {
   		log.get_buffer()->insert (log.get_buffer()->end(), ss.str());
 			break;
 		case MESSAGE:
-			if (result.value.MESSAGE == REPL_Interperater::SHOW_STATE){
+			if (result.value.MESSAGE == REPLInterpreter::SHOW_STATE){
 				((QCViewer*)window)->load_state(interp.Sim_State);
 			}
 			break;
 		default:
   		log.get_buffer()->insert (log.get_buffer()->end(), "Unrecognized Type\n");
 	}
-*/
   entry.set_text ("");
 }

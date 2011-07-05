@@ -466,7 +466,6 @@ void QCViewer::on_menu_load_state () {
 }
 
 void QCViewer::load_state (State* s) {
-    if (state!=NULL) delete state;
 		state = s;
     for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
     c.set_state(state);

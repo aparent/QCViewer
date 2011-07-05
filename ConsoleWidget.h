@@ -7,8 +7,7 @@
 #include <state.h>
 #include <string>
 #include <vector>
-#include <QCLang/REPLInterperater.h>
-
+#include <QCLang/REPLInterpreter.h>
 
 class ConsoleWidget : public Gtk::VBox {
 public:
@@ -17,7 +16,7 @@ public:
 protected:
   void eval ();
 private:
-	REPL_Interperater interp;
+	REPLInterpreter interp;
   Gtk::Entry entry;
 	void* window;
   Gtk::TextView log;

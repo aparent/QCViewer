@@ -2,8 +2,8 @@ cmake_minimum_required (VERSION 2.6)
 project (viewer)
 
 #ADD_DEFINITIONS( "-O2 -Wall -Wextra -ansi -pedantic" )
-#ADD_DEFINITIONS( "-ggdb3 -ansi" )
-ADD_DEFINITIONS( "-O3 -ansi" )
+ADD_DEFINITIONS( "-ggdb3 -ansi" )
+#ADD_DEFINITIONS( "-O3 -ansi" )
 
 SET(QCVIEWER_SRC_FILES
 	draw.cpp
