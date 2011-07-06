@@ -41,7 +41,9 @@ State *REPLInterpreter::computeKet(string in){
 REPLInterpreter::evalTerm REPLInterpreter::eval(QCLParseNode * in){
 	evalTerm ret;
 	if (in == NULL){
-		return NULL;
+		cout << "NULL input" << endl;
+		ret.error=true;
+		return ret;
 	}
 	switch (in->type){
 		case KET:

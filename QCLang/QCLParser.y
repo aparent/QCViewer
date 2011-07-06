@@ -28,7 +28,8 @@
 %right EXPONENT
 
 %%
-input: 				line { QCL_Final = $1; }
+input: 			 	/*empty*/ {QCL_Final = NULL; }
+							| line { QCL_Final = $1; }
 
 line:					  ID EQUALS exp	{ $$ = setupBINOP(EQUALS,$1,$3); }
 							|	KVAR EQUALS '[' wireMap ']' {$$ = setupBINOP(EQUALS,$1,$4);}
