@@ -5,7 +5,7 @@
 class GateIcon : public Gtk::DrawingArea {
 	public:
     GateIcon ();
-	  enum GateType { NOT, H, X, Y, Z, R, SWAP };
+	  enum GateType { NOT, H, X, Y, Z, R, SWAP, DEFAULT };
 		GateType type;
     virtual bool on_expose_event(GdkEventExpose* event);
 };

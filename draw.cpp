@@ -23,15 +23,15 @@ FT_Face ft_face;
 cairo_font_face_t * ft_default;
 
 // XXX organize this!!
-double radius = 15.0;
-double dotradius = 10.0;
-double thickness = 2.0;
-double xoffset = 10.0;
-double yoffset = 10.0;
-double wireDist = 40.0;
-double gatePad = 18.0;
-double textPad = 5.0;
-double Upad = 0.9;
+const double radius = 15.0;
+const double dotradius = 10.0;
+const double thickness = 2.0;
+const double xoffset = 10.0;
+const double yoffset = 10.0;
+const double wireDist = 40.0;
+const double gatePad = 18.0;
+const double textPad = 5.0;
+const double Upad = 0.9;
 
 void init_fonts(){
 	FT_Init_FreeType( &library );
@@ -277,9 +277,9 @@ gateRect drawFred (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<u
   return rect;
 }
 
-void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, double wireend, double scale) {
+void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, double wireend) {
   cairo_set_source_rgb (cr, 1, 1, 1);
-  cairo_rectangle (cr, 0, 0, w/scale, h/scale); // TODO: document why the scale factors are here
+  cairo_rectangle (cr, 0, 0, w, h); // TODO: document why the scale factors are here
   cairo_fill (cr);
 
   for (unsigned int i = 0; i < c->numLines(); i++) {
@@ -337,7 +337,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
         case Gate::NOT: r = drawCNOT (cr, xcurr, &g->controls, &g->targets); break;
         case Gate::FRED: r = drawFred (cr, xcurr, &g->controls, &g->targets); break;
         default:
-          // XXX: maybe expose as a setting? 
+          // XXX: maybe expose as a setting?
           /*if (g->name.compare ("H") == 0) { // if hadamard
             vector<Control> ctrl;
             vector<int> targ;
@@ -451,8 +451,15 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& co
   cairo_set_font_size(cr, 18);
 
   vector<gateRect> rects;
-  drawbase (cr, c, ext.width+ext.x, ext.height+scale*ext.y+thickness, wirestart, wireend, scale);
-  rects = draw (cr, c, columns, &wirestart, &wireend, true);
+  //Push the gate drawing into a group so that wireend can be determined and wires can be drawn first
+	cairo_push_group (cr);
+	rects = draw (cr, c, columns, &wirestart, &wireend, true);
+	cairo_pattern_t *group = cairo_pop_group (cr);
+  drawbase (cr, c, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
+	cairo_set_source (cr, group);
+	//Draw the gates
+	cairo_paint(cr);
+	cairo_pattern_destroy (group);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
   if (selection != -1) drawSelections (cr, rects, selection);

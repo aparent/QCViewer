@@ -349,7 +349,7 @@ void QCViewer::on_menu_simulate_show_stateView(){
   if (viz.size() == 1) {
     int w, h;
     get_size (w, h);
-    m_EditVisPane.set_position (h - 200);
+    m_EditVisPane.set_position (h - 400);
   }
 }
 

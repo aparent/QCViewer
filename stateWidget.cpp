@@ -147,8 +147,8 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
       cr->stroke ();
 			}
     } else if (drawmode == REAL || drawmode == IMAG) { // XXX: proper scaling?
-      double avg = 0.0;
       if (state != NULL) {
+      	double avg = 0.0;
         double maxX = 0.0;
         for (unsigned int i = 0; i < num_draw; i++) {
           double val = max(abs(bucket[i].real()), abs(bucket[i].imag ()));

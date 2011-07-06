@@ -284,8 +284,8 @@ void CircuitWidget::toggle_selection (int id) {
 
 bool CircuitWidget::onScrollEvent (GdkEventScroll *event) {
   double s;
-  if (event->direction == 1) s = get_scale()/1.25;
-  else s = get_scale()*1.25;
+  if (event->direction == 1) s = get_scale()/1.15;
+  else s = get_scale()*1.15;
   set_scale(s);
   force_redraw ();
   return true;
