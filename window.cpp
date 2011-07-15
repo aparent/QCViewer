@@ -20,7 +20,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 
 QCViewer::QCViewer() {
   drawparallel = drawarch = false;
-  set_title("QCViewer-v0.1");
+  set_title("QCViewer-v0.2");
   set_border_width(0);
   set_default_size(1000,1000);
   state = NULL;
