@@ -1,0 +1,4 @@
+APARENT:
+-Use vector bool instead of int to remove 32 QBit cap on sim. Started on branch "vec-Bool".
+	-vector bool may not be ideal due to strick size requirements due to memory use
+	-it may be better to just use uint64?
