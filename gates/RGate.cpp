@@ -5,6 +5,10 @@
 #include <complex>
 #include <iostream>//XXX
 
+#ifndef M_PI
+#define M_PI 3.14159265
+#endif
+
 RGate::RGate(float_type n_rot, Axis a) : rot(n_rot) {
   drawType = DEFAULT;
   type = RGATE;
