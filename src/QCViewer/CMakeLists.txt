@@ -11,11 +11,14 @@ file(GLOB QCVIEWER_HEADER_FILES *.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 include_directories(${GTKMM_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
 
+include_directories(${QCViewer_SOURCE_DIR}/QCLib)
+LINK_DIRECTORIES(${QCViewer_BINARY_DIR}/QClib)
+
 add_executable (viewer  ${QCVIEWER_SRC_FILES})
-target_link_libraries(viewer ${GTKMM_LIBRARIES} ${CMAKE_SOURCE_DIR}/../QCLib/libQC.a )
-install(FILES ${QCLIB_HEADER_FILES} DESTINATION include)
+target_link_libraries(viewer ${GTKMM_LIBRARIES} ${QCViewer_SOURCE_DIR}/QCLib/libQC.a )
+install(TARGETS viewer DESTINATION ${QCViewer_BINARY_DIR}/../bin)
