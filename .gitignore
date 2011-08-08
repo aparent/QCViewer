@@ -3,6 +3,6 @@ viewer
 CMakeCache.txt
 CMakeList.txt
 CMakeFiles/*
-Makefile
+src/Makefile
 cmake_install.cmake
 .nfs*
