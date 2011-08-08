@@ -1,6 +1,6 @@
 #ADD_DEFINITIONS( "-ggdb3 -Wall -Wextra -pedantic -ansi  -Wno-unused-function " )
 #ADD_DEFINITIONS( "-O2 -Wall -Wextra -pedantic -ansi" )
-ADD_DEFINITIONS( "-O3 -Wall -pedantic -ansi" )
+ADD_DEFINITIONS( "-ggdb3 -Wall -pedantic -ansi" )
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 SET(QCLIB_SRC_FILES
@@ -11,6 +11,8 @@ SET(QCLIB_SRC_FILES
 	circuitParser.cpp
 	dirac.cpp
 	diracParser.cpp
+	QCLParser.cpp
+	QCLLexer.cpp
 	gate.cpp
   state.cpp
   state.cpp
@@ -18,8 +20,6 @@ SET(QCLIB_SRC_FILES
 	gates/UGate.cpp
 	gates/RGate.cpp
 	gates/UGateLookup.cpp
-	QCLang/QCLParser.cpp
-	QCLang/QCLLexer.cpp
 	QCLang/QCLParserUtils.cpp
 	QCLang/REPLInterpreter.cpp
 )
@@ -34,34 +34,36 @@ SET(QCLIB_HEADER_FILES
 	TFCLexer.h
 	utility.h
   state.h
+	QCLParser.h
+	QCLang/QCLParserUtils.h
 	gates/UGateLookup.h
 )
 
 IF(UNIX)
 	add_custom_command (
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TFCLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_BINARY_DIR}/TFCLexer.l
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/TFCLexer.l
+		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
 	)
 	add_custom_command (
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.l
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.l
+		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/diracLexer.l
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/diracLexer.l
 	)
 	add_custom_command (
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/diracParser.h
-		COMMAND bison -d -v -o diracParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/diracParser.y
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/diracParser.y
+		COMMAND bison -d -v -o diracParser.cpp ${CMAKE_CURRENT_SOURCE_DIR}/diracParser.y
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/diracParser.y
 	)
 	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLang/QCLLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_BINARY_DIR}/QCLang/QCLLexer.l
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/QCLang/QCLLexer.l
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLLexer.cpp
+		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLLexer.l
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLLexer.l
 	)
 	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLang/QCLParser.cpp
-		COMMAND bison ${CMAKE_CURRENT_BINARY_DIR}/QCLang/QCLParser.y
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/QCLang/QCLParser.y
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.h
+		COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
 	)
 ENDIF(UNIX)
 

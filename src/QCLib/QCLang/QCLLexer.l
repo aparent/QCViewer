@@ -2,7 +2,7 @@
 %option nounput
 %option never-interactive
 %option unistd
-%option outfile="QCLang/QCLLexer.cpp"
+%option outfile="QCLLexer.cpp"
 %option prefix="QCL_"
 %{
 	#include <string>
@@ -10,7 +10,7 @@
   #include <iostream>
   #include <cstdlib>
 	#define YYSTYPE QCLParseNode*
-	#include "QCLParserUtils.h"
+	#include "QCLang/QCLParserUtils.h"
 	using namespace std;
 	stringstream QCL_temp;
 %}

@@ -4,7 +4,7 @@
   #include <string.h>
   #include <iostream>
   #include <string>
-	#include "QCLParserUtils.h"
+	#include "QCLang/QCLParserUtils.h"
   void QCL_error(const char *s);
   using namespace std;
 	QCLParseNode *QCL_Final;
@@ -16,8 +16,8 @@
 %name-prefix "QCL_"
 %error-verbose
 %verbose
-%defines "QCLang/QCLParser.h"
-%output "QCLang/QCLParser.cpp"
+%defines "QCLParser.h"
+%output "QCLParser.cpp"
 
 %start input
 %token IF FOR EQUALS
