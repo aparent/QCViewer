@@ -15,9 +15,9 @@ void Circuit::newArch () {
 }
 
 void Circuit::removeArch () {
-  if (arch != 0) {
+  if (arch != NULL) {
     delete arch;
-    arch = 0;
+    arch = NULL;
   }
 }
 
@@ -190,7 +190,7 @@ void Circuit::parseArch (const string filename) {
 }
 
 void Circuit::arch_set_LNN(){
-	if (arch!= NULL) delete arch;
+	removeArch();
   arch = new QArch(numLines());
 	for(unsigned int i=0; i < numLines()-1; i++){
 		arch->set(i,i+1);

@@ -1,6 +1,6 @@
-#ADD_DEFINITIONS( "-ggdb3 -Wall -Wextra -pedantic -ansi  -Wno-unused-function " )
-#ADD_DEFINITIONS( "-O2 -Wall -Wextra -pedantic -ansi" )
-ADD_DEFINITIONS( "-ggdb3 -Wall -pedantic -ansi" )
+set(CMAKE_CXX_FLAGS "-Wall -pedantic -ansi")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -pedantic -ansi")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -ansi")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 SET(QCLIB_SRC_FILES

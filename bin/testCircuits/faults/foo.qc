@@ -1,4 +1,4 @@
-# asd
+# hangs due to a t gate having controls on the same wire twice
 .v first,second,third,fourth,fifth
 .i first,second,third,fourth,fifth
 .o first,second,third,fourth,fifth
@@ -18,10 +18,10 @@ t0 fourth
 t1 first,second
 t1 third,fourth
 t2 first,second,third
-t0 fourth # asd
+t0 fourth
 t3 first,second,third,fourth
 t1 first,second
-t1 first,third
+t1 third,third # due to this
 t1 third,fourth
 t1 first,fourth
 f first,second,fourth

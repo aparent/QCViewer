@@ -1,6 +1,6 @@
-#ADD_DEFINITIONS( "-O2 -Wall -Wextra -ansi -pedantic" )
-ADD_DEFINITIONS( "-ggdb3 -ansi" )
-#ADD_DEFINITIONS( "-g -ansi" )
+set(CMAKE_CXX_FLAGS "-ansi")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -ansi")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -ansi")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(PkgConfig)
