@@ -13,6 +13,8 @@ SET(QCLIB_SRC_FILES
 	diracParser.cpp
 	QCLParser.cpp
 	QCLLexer.cpp
+	GateParser.cpp
+	GateLexer.cpp
 	gate.cpp
   state.cpp
   state.cpp
@@ -64,6 +66,16 @@ IF(UNIX)
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.h
 		COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
+	)
+	add_custom_command (
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/GateLexer.cpp
+		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateLexer.l
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateLexer.l
+	)
+	add_custom_command (
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/GateParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/GateParser.h
+		COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
 	)
 ENDIF(UNIX)
 

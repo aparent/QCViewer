@@ -5,9 +5,13 @@
 %option outfile="GateLexer.cpp"
 %option prefix="Gate_"
 %{
+	#include "GateParser.h"
 	#include <string>
-	#define SAVE_TOKEN yylval.string = yytext
-	#define TOKEN(t) (yylval.token = t)
+	#include <cstdlib>
+	#include <iostream>
+	using namespace std;
+	#define SAVE_TOKEN Gate_lval.string = strdup(yytext);
+	#define TOKEN(t) (Gate_lval.token = t)
 %}
 
 word [[:alnum:]]+
@@ -25,10 +29,13 @@ comment #.*
 "*"                 return TOKEN(TIMES);
 "/"                 return TOKEN(DIV);
 "i"									return TOKEN(IMAG);
-","									return TOKEN(COMMA)
+"("									return TOKEN(LPAREN);
+")"									return TOKEN(RPAREN);
+","									return TOKEN(COMMA);
+"\n"								return TOKEN(NEWLINE);
 "NAME"							return TOKEN(NAME);
 "SYMBOL"						return TOKEN(SYMBOL);
-"SQRT"							return TOKEN(SQRT);
+"sqrt"							return TOKEN(SQRT);
 {num}								SAVE_TOKEN; return NUM;
 {word}							SAVE_TOKEN; return WORD;
 

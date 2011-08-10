@@ -1,6 +1,7 @@
 #include "UGateLookup.h"
-#include "../state.h" //for float_type 
+#include "../state.h" //for float_type
 #include <iostream>
+#include <fstream>
 #include <map>
 
 using namespace std;
@@ -8,10 +9,10 @@ using namespace std;
 map<string,gateMatrix*> gateLib;
 
 gateMatrix *UGateLookup(string name){
-	if ( gateLib.find(name) == gateLib.end() ){ 
+	if ( gateLib.find(name) == gateLib.end() ){
 		cout << "GATE: " << name << " does not exist" << endl;
 		return NULL;
-	} 
+	}
 	return gateLib[name];
 }
 
@@ -19,46 +20,61 @@ void UGateLoad(string name, gateMatrix *mat){
 	if ( gateLib.find(name) == gateLib.end() ) {
 		gateLib[name]=mat;
 	} else {
-		std::cout << "WARNING: This gate already exists overwritting..." << endl;
+		std::cout << "WARNING: The gate "<<name << " already exists overwritting..." << endl;
 		gateLib[name]=mat;
 	}
 }
 
+gateMatrix *get_matrix(matrix_row *n){
+	matrix_row* temp = n;
+	unsigned int numRow=0;
+	while (temp){
+		temp = temp->next;
+		numRow++;
+	}
+	temp = n;
+	while (temp){
+		unsigned int numCol = 0;
+		row_terms *terms = temp->terms;
+		while(terms){
+			terms = terms->next;
+			numCol++;
+		}
+		if (numCol != numRow){
+			cout << "Invalid Gate Matrix" << endl;
+			return NULL;
+		}
+		temp = temp->next;
+	}
+	gateMatrix *ret = new gateMatrix;
+	ret->data = new complex<float_type>[numRow*numRow];
+	for(int i = 0; i < numRow; i++){
+		row_terms *terms = n->terms;
+		for(int j = 0; j < numRow; j++){
+			ret->data[i*numRow + j] = *terms->val;
+			terms = terms->next;
+		}
+		n = n->next;
+	}
+	ret->dim = numRow;
+	return ret;
+}
+
+void add_gates(gate_node *n){
+	gateMatrix *g =get_matrix(n->row);
+	if (g != NULL) UGateLoad(n->symbol,g);
+	if (n->next != NULL) add_gates(n->next);
+}
+
 void UGateSetup(){
-	gateMatrix *H = new gateMatrix;
-	H->data = new complex<float_type>[4];
-	H->dim=2;
-	H->data[0] =  1/sqrt(2) ; H->data[2] =  1/sqrt(2);
-	H->data[1] =  1/sqrt(2) ; H->data[3] = -1/sqrt(2);
-	UGateLoad("H",H);	
-	
-	gateMatrix *X = new gateMatrix;
-	X->data = new complex<float_type>[4];
-	X->dim=2;
-	X->data[0] =  0 ; X->data[2] = 1;
-	X->data[1] =  1 ; X->data[3] = 0;
-	UGateLoad("X",X);
-	
-	gateMatrix *Y = new gateMatrix;
-	Y->data = new complex<float_type>[4];
-	Y->dim=2;
-	Y->data[0] = 0                   ; Y->data[2] = -complex<float>(0,1);
-	Y->data[1] = complex<float>(0,1) ; Y->data[3] = 0;
-	UGateLoad("Y",Y);
-	
-	gateMatrix *Z = new gateMatrix;
-	Z->data = new complex<float_type>[4];
-	Z->dim=2;
-	Z->data[0] =  1 ; Z->data[2] =  0;
-	Z->data[1] =  0 ; Z->data[3] = -1;
-	UGateLoad("Z",Z);
-			
-	gateMatrix *F = new gateMatrix;
-	F->data = new complex<float_type>[16];
-	F->dim = 4;
-	F->data[0 ]=  1 ; F->data[4 ]=  0; F->data[8 ]=  0 ; F->data[12]=  0;
-	F->data[1 ]=  0 ; F->data[5 ]=  0; F->data[9 ]=  1 ; F->data[13]=  0;
-	F->data[2 ]=  0 ; F->data[6 ]=  1; F->data[10]=  0 ; F->data[14]=  0;
-	F->data[3 ]=  0 ; F->data[7 ]=  0; F->data[11]=  0 ; F->data[15]=  1;
-	UGateLoad("F",F);
+	string line,input;
+	ifstream myfile ("gateLib");
+	if (myfile.is_open()){
+		while ( myfile.good() ){
+			getline (myfile,line);
+			input += line + "\n";
+		}
+	}
+	gate_node * node = parse_gates(input);
+	add_gates(node);
 }
