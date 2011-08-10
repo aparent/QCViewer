@@ -22,4 +22,4 @@ LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
 
 add_executable (viewer  ${QCVIEWER_SRC_FILES})
 target_link_libraries(viewer ${GTKMM_LIBRARIES} ${CMAKE_CURRENT_BINARY_DIR}/../QCLib/libQC.a )
-install(TARGETS viewer DESTINATION ${QCViewer_BINARY_DIR}/../bin)
+install(TARGETS viewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
