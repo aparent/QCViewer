@@ -8,8 +8,6 @@ using namespace std;
 // *(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
 // the vector location where it points now
 
-//TODO: parseCircuit should return null in the event of a parsing error 
-
 void parseLineNames(Circuit * circ, vector<TFCToken>::iterator * it){
   while((*(++(*it))).type == VAR_NAME){
     circ->addLine((**it).value);
@@ -219,7 +217,7 @@ string getGateInfo(Circuit *circ){
 			string symbol;
 			if (((RGate*)gate)->get_axis()==RGate::X){
 				symbol = "X";
-			}else if (((RGate*)gate)->get_axis()==RGate::Y){	 
+			}else if (((RGate*)gate)->get_axis()==RGate::Y){
 				symbol = "Y";
 			}if (((RGate*)gate)->get_axis()==RGate::Z){
 				symbol = "Z";

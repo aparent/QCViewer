@@ -32,8 +32,8 @@ const State& State::operator+= (const State& r) {
   for (it = r.data.begin(); it != r.data.end(); ++it) {
 		if (it->second != complex<float_type>(0)){
     	data[it->first] += it->second;
-			float e = numeric_limits<float_type>::epsilon();
-			if (abs(data[it->first]) < e ){//TODO: Probably want some multiple of e
+			float_type e = 10*numeric_limits<float_type>::epsilon();
+			if (abs(data[it->first]) < e ){
 				data.erase(it->first);
 			}
 		}
@@ -46,8 +46,8 @@ const State& State::operator-= (const State& r) {
   for (it = r.data.begin(); it != r.data.end(); ++it) {
 		if (it->second != complex<float_type>(0)){
     	data[it->first] -= it->second;
-			float e = 10*numeric_limits<float_type>::epsilon();
-			if (abs(data[it->first].real()) < e){//TODO: Probably want some multiple of e
+			float_type e = 10*numeric_limits<float_type>::epsilon();
+			if (abs(data[it->first].real()) < e){
 				data.erase(it->first);
 			}
 		}

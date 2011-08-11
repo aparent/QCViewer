@@ -4,7 +4,9 @@
 #include <complex>
 #include <string>
 #include "../gate.h" //for gateMatrix 
+#include "GateParserUtils.h"
 
+gate_node *parse_gates(string input);
 //Function for looking up the matrix of a given ugate Will return null if no matrix is found
 gateMatrix *UGateLookup(string name);
 

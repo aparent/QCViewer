@@ -1,3 +1,6 @@
 To build the project:
-cd src
-cmake . && make install
+cd build
+cmake ../src && make install
+Alternativly
+cmake -DCMAKE_BUILD_TYPE=Release ../src/
+to select release or debug builds

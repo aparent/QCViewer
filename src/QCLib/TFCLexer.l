@@ -20,6 +20,10 @@
 %x gateQoute
 %x gateSet
 
+WHITESPACE [[:blank:]\t]+
+COMMENT #.*
+NAME [[:alnum:]]+
+
 %%
 \.v           					{tokens->push_back(TFCToken(SEC_START,"V"));     BEGIN(lineNames);}
 \.i           					{tokens->push_back(TFCToken(SEC_START,"I"));     BEGIN(lineNames);}
@@ -29,15 +33,15 @@
 (?i:begin)							{tokens->push_back(TFCToken(SEC_START,"GATES")); BEGIN(gates);    }
 \n
 
-<lineNames>[[:alnum:]]+            {tokens->push_back(TFCToken(VAR_NAME,yytext));}
+<lineNames>{NAME}				           {tokens->push_back(TFCToken(VAR_NAME,yytext));}
 <lineNames>\"							         {BEGIN(lineQoute);}
 <lineNames>,
 <lineNames>\n											 {BEGIN(INITIAL);}
 <lineQoute>[[:alnum:][:space:]]*   {tokens->push_back(TFCToken(VAR_NAME,yytext));}
 <lineQoute>\"											 {BEGIN(lineNames);}
 
-<gates>(?i:end)         					{tokens->push_back(TFCToken(SEC_END,"GATES")); BEGIN(INITIAL); }
-<gates>[[:alnum:]]+								{tokens->push_back(TFCToken(VAR_NAME,sToUpper(yytext)));}
+<gates>(?i:end)         					{tokens->push_back(TFCToken(SEC_END,"GATES")); BEGIN(INITIAL);}
+<gates>{NAME}		       						{tokens->push_back(TFCToken(VAR_NAME,sToUpper(yytext)));}
 <gates>\(													{BEGIN(gateSet);}
 <gates>[ ]           							{BEGIN(gateVars);}
 <gates>\n
@@ -47,8 +51,8 @@
 <gateSet>\)												{BEGIN(gateVars);}
 <gateSet>\n
 
-<gateVars>[[:alnum:]]+/'						{tokens->push_back(TFCToken(GATE_INPUT_N,string(yytext)));}
-<gateVars>[[:alnum:]]+  						{tokens->push_back(TFCToken(GATE_INPUT,string(yytext)));}
+<gateVars>{NAME}/'						{tokens->push_back(TFCToken(GATE_INPUT_N,string(yytext)));}
+<gateVars>{NAME} 						{tokens->push_back(TFCToken(GATE_INPUT,string(yytext)));}
 <gateVars>\"												{BEGIN(gateQoute);}
 <gateVars>'
 <gateVars>,
@@ -57,8 +61,8 @@
 <gateQoute>[[:alnum:][:space:]]*   	{tokens->push_back(TFCToken(GATE_INPUT,string(yytext)));}
 <gateQoute>\"											 	{BEGIN(gateVars);}
 
-<*>[[:blank:]\t]+								/* eat whitespace */
-<*>#.*						  						/* eat comments */
+<*>{WHITESPACE}
+<*>{COMMENT}
 
 %%
 
