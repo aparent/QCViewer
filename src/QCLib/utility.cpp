@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <algorithm>
-#include <iostream> //XXX
+#include <iostream>
 
 using namespace std;
 

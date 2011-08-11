@@ -322,7 +322,7 @@ void QCViewer::on_menu_file_open_circuit () {
     btn_editcontrols.set_active (false);
     btn_editcontrols.set_active (false);
     std::stringstream ss;
-    ss << "QCost: " << c.get_QCost()<< " Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
+    ss << "Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
     m_statusbar.push(ss.str());
     c.reset ();
   }

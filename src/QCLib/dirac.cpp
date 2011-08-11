@@ -33,7 +33,7 @@ State *getStateVec (std::string input, bool normalize){
 		return ret;
 	}
 	else{
-		cout << "PARSE ERROR" << endl;
+		cerr << "PARSE ERROR" << endl;
 		return NULL;
 	}
 }
@@ -55,7 +55,7 @@ diracTerm stringToKet(string value){
 			basis = SetRegister(basis,j);
 		} else if (value[i] == '0') {
 		} else    {
-			cout << "ERROR BAD CHAR IN KET: " << value[i] << endl;
+			cerr << "ERROR BAD CHAR IN KET: " << value[i] << endl;
 		}
 	}
 	ret.vecValue = State(1,basis);
@@ -120,7 +120,7 @@ diracTerm evalTree(parseNode *node){
 	diracTerm right;
 
 	if(node->right == NULL){
-		cout << "ERROR right is NULL."<<endl;
+		cerr << "ERROR right is NULL."<<endl;
 		return ret;
 	}
 	else right = evalTree(node->right);
@@ -132,13 +132,13 @@ diracTerm evalTree(parseNode *node){
 			return ret;
 		}
  		else{
-			cout << "ERROR cannot subtract vector and a number"<<endl;
+			cerr << "ERROR cannot subtract vector and a number"<<endl;
 			return ret;
 		}
 	}
 
 	if(node->right == NULL){
-		cout << "ERROR left is NULL."<<endl;
+		cerr << "ERROR left is NULL."<<endl;
 		return ret;
 	}
 	else left = evalTree(node->left);
@@ -147,7 +147,7 @@ diracTerm evalTree(parseNode *node){
 		if      (left.type == NUM && right.type == NUM) return constAdd(left,right);
 		else if (left.type == KET && right.type == KET) return ketAdd(left,right);
 		else{
-			cout << "ERROR cannot add vector and a number"<<endl;
+			cerr << "ERROR cannot add vector and a number"<<endl;
 			return ret;
 		}
 	}
@@ -155,7 +155,7 @@ diracTerm evalTree(parseNode *node){
 		if      (left.type == NUM && right.type == NUM) return constSub(left,right);
 		else if (left.type == KET && right.type == KET) return ketSub(left,right);
 		else{
-			cout << "ERROR cannot subtract vector and a number"<<endl;
+			cerr << "ERROR cannot subtract vector and a number"<<endl;
 			return ret;
 		}
 	}
@@ -174,12 +174,12 @@ diracTerm evalTree(parseNode *node){
 			return ret;
 		}
 		else{
-			cout << "ERROR cannot divide a vector"<< endl;
+			cerr << "ERROR cannot divide a vector"<< endl;
 			return ret;
 		}
 	}
 	else{
-			cout << "ERROR unrecognized type: "<< node->type << endl;
+			cerr << "ERROR unrecognized type: "<< node->type << endl;
 			return ret;
 	}
 }

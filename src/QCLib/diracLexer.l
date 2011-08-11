@@ -19,50 +19,19 @@
 %x ketmult
 
 %%
-sqrt                {
-											yylval = setupNode(SQRT,"SQRT");
-											return SQRT;
-										}
-\+                  {
-											yylval = setupNode(PLUS,"+");
-											return PLUS;
-										}
-\-                  {
-											yylval = setupNode(MINUS,"-");
-											return MINUS;
-										}
-\*                  {
-											yylval = setupNode(TIMES,"*");
-											return TIMES;
-										}
-\/                  {
-											yylval = setupNode(DIV,"/");
-											return DIV;
-										}
-i										{
-											yylval = setupNode(CNUM,"1");
-											return CNUM;
-										}
-[0-9]+	      	    {
-											yylval = setupNode(NUM,string(yytext));
-											return NUM;
-										}
-[0-9]+\.[0-9]	      {
-											yylval = setupNode(NUM,string(yytext));
-											return NUM;
-										}
+"sqrt"          		yylval = setupNode(SQRT,"SQRT"); 				return SQRT;
+"+"             		yylval = setupNode(PLUS,"+"); 					return PLUS;
+"-"                	yylval = setupNode(MINUS,"-");					return MINUS;
+"*"                	yylval = setupNode(TIMES,"*");  				return TIMES;
+"/"                 yylval = setupNode(DIV,"/");					 	return DIV;
+"i"									yylval = setupNode(CNUM,"1"); 					return CNUM;
+[0-9]+	      	    yylval = setupNode(NUM,string(yytext)); return NUM;
+[0-9]+\.[0-9]				yylval = setupNode(NUM,string(yytext));	return NUM;
+"|"									BEGIN(ket);
 
-\|									{BEGIN(ket);}
-<ket>[0-1]+    	    {
-											yylval = setupNode(KET,string(yytext));
-											return KET;
-										}
-<ket>[0-1]+/\^      {
-											temp.str("");
-											temp << yytext;
-											BEGIN(ketmult);
-										}
-<ket>\>							{BEGIN(INITIAL);}
+<ket>[0-1]+    	    yylval = setupNode(KET,string(yytext));return KET;
+<ket>[0-1]+/\^      temp.str(""); temp << yytext; BEGIN(ketmult);
+<ket>\>							BEGIN(INITIAL);
 
 <ketmult>\^
 <ketmult>[0-9]+			{
@@ -72,9 +41,10 @@ i										{
 											yylval = setupNode(KET,temp.str());
 											return KET;
 										}
-<ketmult>\>					{BEGIN(INITIAL);}
+<ketmult>\>					BEGIN(INITIAL);
+
 <*>[ \t\n]+					/* eat whitespace */
-. 		 			    	  {return(yytext[0]);}
+. 		 			    	  return(yytext[0]);
 
 
 %%

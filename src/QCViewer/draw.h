@@ -5,7 +5,6 @@
 #include <qc.h>
 #include <string>
 #include <vector>
-#include <stdint.h>
 
 class gateRect {
 public:
@@ -36,7 +35,7 @@ cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
 vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, vector<uint32_t>);
 void write_to_png (cairo_surface_t* surf, string filename);
 int pickRect (vector<gateRect> rects, double x, double y);
-vector<uint32_t> pickRects (vector<gateRect>, gateRect); 
+vector<uint32_t> pickRects (vector<gateRect>, gateRect);
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
 gateRect combine_gateRect (gateRect a, gateRect b);
 int pickWire (double);

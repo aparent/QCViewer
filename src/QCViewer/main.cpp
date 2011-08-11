@@ -3,13 +3,13 @@
 #include "draw.h"
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
-#include <gates/UGateLookup.h>//XXX
+#include <gates/UGateLookup.h>
 #include <iostream>
 
 int main (int argc, char *argv[]) {
 	Gtk::Main kit(argc, argv);
 
-	UGateSetup();//XXX
+	UGateSetup();
 	init_fonts();
 
   QCViewer window;

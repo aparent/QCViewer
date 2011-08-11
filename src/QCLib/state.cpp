@@ -1,9 +1,7 @@
 #include "state.h"
 #include "utility.h" // ipow floorLog2
-#include <complex>
 #include <iostream>
 #include <limits>
-
 using namespace std;
 
 State::State () {

@@ -23,7 +23,6 @@
 	int token;
 }
 
-
 %name-prefix "Gate_"
 %error-verbose
 %verbose
@@ -38,7 +37,7 @@
 %right SQRT EXPONENT
 %left IMAG
 
-%type <val> exp 
+%type <val> exp
 %type <string> WORD NUM
 %type <gates> input gate
 %type <rows> matrix

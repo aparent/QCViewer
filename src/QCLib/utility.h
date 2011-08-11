@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "state.h"
+#include "types.h"
 
 #define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
 #define BYTETOBINARY(byte)  \

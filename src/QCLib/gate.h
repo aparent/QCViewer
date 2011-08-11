@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "state.h" // float_type
+#include "state.h" 
 
 using namespace std;
 

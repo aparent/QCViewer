@@ -4,12 +4,10 @@
 #include <cairo-ft.h>
 #include <cmath>
 #include <iostream>
-#include <vector>
 #include "draw.h"
 
 
 #include <ft2build.h>
-#include FT_FREETYPE_H
 
 #ifndef M_PI
 #define M_PI 3.141592

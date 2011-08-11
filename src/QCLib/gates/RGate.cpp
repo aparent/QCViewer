@@ -3,7 +3,6 @@
 #include "utility.h"
 #include <cmath>
 #include <complex>
-#include <iostream>//XXX
 
 #ifndef M_PI
 #define M_PI 3.14159265
@@ -46,7 +45,6 @@ State *RGate::ApplyU (index_t bits){
       {
         float_type cosr = cos (M_PI*rot/2.0);
         float_type sinr = sin (M_PI*rot/2.0);
-				cout <<  cosr*cosr+sinr*sinr << endl;
         if (GetRegister (bits, targets.at (0))) {
           *answer = State (complex<float_type>(sinr,0),BuildBitString(bits,0));
           *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
@@ -60,7 +58,6 @@ State *RGate::ApplyU (index_t bits){
       {
         float_type cosr = cos (M_PI*rot/2.0);
         float_type sinr = sin (M_PI*rot/2.0);
-				cout <<  cosr*cosr+sinr*sinr << endl;
         if (GetRegister (bits, targets.at (0))) {
           *answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
           *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));

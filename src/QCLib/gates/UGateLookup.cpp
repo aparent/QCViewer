@@ -10,7 +10,7 @@ map<string,gateMatrix*> gateLib;
 
 gateMatrix *UGateLookup(string name){
 	if ( gateLib.find(name) == gateLib.end() ){
-		cout << "GATE: " << name << " does not exist" << endl;
+		cerr << "GATE: " << name << " does not exist" << endl;
 		return NULL;
 	}
 	return gateLib[name];
@@ -20,7 +20,7 @@ void UGateLoad(string name, gateMatrix *mat){
 	if ( gateLib.find(name) == gateLib.end() ) {
 		gateLib[name]=mat;
 	} else {
-		std::cout << "WARNING: The gate "<<name << " already exists overwritting..." << endl;
+		cerr << "WARNING: The gate "<< name << " already exists overwritting..." << endl;
 		gateLib[name]=mat;
 	}
 }
@@ -41,7 +41,7 @@ gateMatrix *get_matrix(matrix_row *n){
 			numCol++;
 		}
 		if (numCol != numRow){
-			cout << "Invalid Gate Matrix" << endl;
+			cerr << "Invalid Gate Matrix" << endl;
 			return NULL;
 		}
 		temp = temp->next;
