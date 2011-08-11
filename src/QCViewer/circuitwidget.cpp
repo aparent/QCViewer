@@ -13,7 +13,6 @@
 using namespace std;
 
 CircuitWidget::CircuitWidget() :  circuit (NULL), cx(0), cy(0) {
-  pan_mode = false;
   panning = drawarch = drawparallel = false;
   mode = NORMAL;
   NextGateToSimulate = 0;
@@ -153,11 +152,11 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 
 bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
   if (!circuit) return true;
-  if (event->button == 1 && pan_mode) {
+  if (event->button == 1 && mode == PANNING) {
     panning = true;
     oldmousex = event->x;
     oldmousey = event->y;
-  } else if (event->button == 1 && !pan_mode) {
+  } else if (event->button == 1 && mode != PANNING) {
     selecting = true;
     select_rect.x0 = event->x;
     select_rect.y0 = event->y;
@@ -209,7 +208,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
         //gateid = pickRect (rects, x, y);
       {  gateRect r;
         r.x0 = (select_rect.x0-width/2.0+ext.width/2.0)/scale + cx;
-        r.y0 = (select_rect.y0-height/2.0+ext.height/2.0)/scale + cx;
+        r.y0 = (select_rect.y0-height/2.0+ext.height/2.0)/scale + cy;
         r.width  = select_rect.width/scale;
         r.height = select_rect.height/scale;
 
@@ -360,7 +359,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
       if (selecting) {
         gateRect r;
         r.x0 = (select_rect.x0-width/2.0+ext.width/2.0)/scale + cx;
-        r.y0 = (select_rect.y0-height/2.0+ext.height/2.0)/scale + cx;
+        r.y0 = (select_rect.y0-height/2.0+ext.height/2.0)/scale + cy;
         r.width  = select_rect.width/scale;
         r.height = select_rect.height/scale;
         drawRect (cr->cobj(), r, Colour (0.7,0.7,0.7,0.7), Colour (0.7,0.7,0.7,0.3));
@@ -391,6 +390,7 @@ void CircuitWidget::load (string file) {
   circuit = parseCircuit(file);
   layout.clear ();
   breakpoints.clear ();
+  cx = cy = 0;
   vector<int> parallels = circuit->getGreedyParallel ();
 
   for (unsigned int i = 0; i < parallels.size(); i++) {
@@ -599,8 +599,4 @@ Gate *CircuitWidget::getSelectedGate () {
 
 void  CircuitWidget::arch_set_LNN(){
 	circuit->arch_set_LNN();
-}
-
-void CircuitWidget::set_panning (bool p) {
-  pan_mode = p;
 }
