@@ -11,8 +11,6 @@ SET(QCLIB_SRC_FILES
 	circuitParser.cpp
 	dirac.cpp
 	diracParser.cpp
-	QCLParser.cpp
-	QCLLexer.cpp
 	GateParser.cpp
 	GateLexer.cpp
 	gate.cpp
@@ -22,8 +20,6 @@ SET(QCLIB_SRC_FILES
 	gates/UGate.cpp
 	gates/RGate.cpp
 	gates/UGateLookup.cpp
-	QCLang/QCLParserUtils.cpp
-	QCLang/REPLInterpreter.cpp
 )
 
 SET(QCLIB_HEADER_FILES
@@ -36,8 +32,6 @@ SET(QCLIB_HEADER_FILES
 	TFCLexer.h
 	utility.h
   state.h
-	QCLParser.h
-	QCLang/QCLParserUtils.h
 	gates/UGateLookup.h
 )
 

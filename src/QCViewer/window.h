@@ -7,7 +7,6 @@
 #include "circuitwidget.h"
 #include "stateWidget.h"
 #include "GateIcon.h"
-#include "ConsoleWidget.h"
 
 class QCViewer : public Gtk::Window
 {
@@ -103,7 +102,6 @@ protected:
   Gtk::ToolItemGroup* group_misc;
 
 
-  ConsoleWidget console;
   std::vector<Gtk::TargetEntry> listTargets;
 private:
   void update_mode ();

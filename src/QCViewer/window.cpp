@@ -34,7 +34,6 @@ QCViewer::QCViewer() {
   Ricon.type = GateIcon::R;
   SWAPicon.type = GateIcon::SWAP;
 
-	console.set_window((void*)this);
   add(m_vbox);
    m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
 
@@ -242,7 +241,6 @@ QCViewer::QCViewer() {
   m_EditVisPane.pack1 (m_hbox, true, true);
   m_EditVisPane.pack2 (m_VisBox, true, true);
   m_vbox.pack_start (m_EditVisPane);
-  m_vbox.pack_start (console, Gtk::PACK_SHRINK);
 
 //  m_vbox.pack_start (m_cmdOut);
 //  m_vbox.pack_start (m_cmdIn, Gtk::PACK_SHRINK);
@@ -464,7 +462,6 @@ void QCViewer::on_menu_load_state () {
   if (result == Gtk::RESPONSE_OK){
     if (state!=NULL) delete state;
     state = getStateVec (stateEntry.get_text(), true);
-    state->print();
     for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
     c.set_state(state);
   }
