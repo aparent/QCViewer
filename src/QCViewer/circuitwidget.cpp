@@ -13,7 +13,8 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() :  circuit (NULL), selection (-1), cx(0), cy(0) {
+CircuitWidget::CircuitWidget() :  circuit (NULL), cx(0), cy(0) {
+  pan_mode = false;
   panning = drawarch = drawparallel = false;
   mode = NORMAL;
   NextGateToSimulate = 0;
@@ -26,6 +27,7 @@ CircuitWidget::CircuitWidget() :  circuit (NULL), selection (-1), cx(0), cy(0) {
   signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
 	cx = cy = 0;
   wirestart = wireend = 0;
+  selecting = false;
 }
 
 void CircuitWidget::set_window (Gtk::Window *w) { win = w; }
@@ -46,10 +48,15 @@ unsigned int CircuitWidget::getFirstWire (double my) {
 
 }
 
+void CircuitWidget::clear_selection () {
+  selections.clear ();
+  force_redraw ();
+}
+
 void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time) {
   if (!circuit) { context->drag_finish(false, false, time); return; }
-  selection = -1;
-  ((QCViewer*)win)->set_selection (-1);
+  selections.clear();
+  ((QCViewer*)win)->set_selection (selections);
   Gtk::Widget* widget = drag_get_source_widget(context);
   Gtk::Button* button = dynamic_cast<Gtk::Button*>(widget);
   if (button == NULL) { context->drag_finish(false, false, time); return; }
@@ -150,10 +157,16 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 
 bool CircuitWidget::on_button_press_event (GdkEventButton* event) {
   if (!circuit) return true;
-  if (event->button == 3) {
+  if (event->button == 1 && pan_mode) {
     panning = true;
     oldmousex = event->x;
     oldmousey = event->y;
+  } else if (event->button == 1 && !pan_mode) {
+    selecting = true;
+    select_rect.x0 = event->x;
+    select_rect.y0 = event->y;
+    select_rect.width = 0;
+    select_rect.height = 0;
   }
   return true;
 }
@@ -165,6 +178,10 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event) {
     cy -= (event->y - oldmousey)/scale;
     oldmousex = event->x;
     oldmousey = event->y;
+    force_redraw ();
+  } else if (selecting) {
+    select_rect.width = -select_rect.x0+event->x;
+    select_rect.height = -select_rect.y0+event->y;
     force_redraw ();
   }
   return true;
@@ -179,9 +196,10 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
   double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
   double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
   Gate* g;
-  if(event->button == 3 && panning) {
+  if(event->button == 1 && panning) {
     panning = false;
   } else if (event->button == 1) {
+    selecting = false;
     int column_id = -1.0; // before column 0
     double mindist = -1.0;
     int wireid;
@@ -192,29 +210,43 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
     vector<unsigned int>::iterator it2;
     switch (mode) {
       case NORMAL:
-        gateid = pickRect (rects, x, y);
-        if (selection != gateid) {
-          selection = gateid;
-          ((QCViewer*)win)->set_selection (gateid);
-          force_redraw ();
-        }
-        break;
+        //gateid = pickRect (rects, x, y);
+      {  gateRect r;
+        r.x0 = (select_rect.x0-width/2.0+ext.width/2.0)/scale + cx;
+        r.y0 = (select_rect.y0-height/2.0+ext.height/2.0)/scale + cx;
+        r.width  = select_rect.width/scale;
+        r.height = select_rect.height/scale;
+
+        // make rect go in down/right direction
+        r.x0 = min (r.x0, r.x0+r.width);
+        r.y0 = min (r.y0, r.y0+r.height);
+        r.width = abs(r.width);
+        r.height = abs(r.height);
+
+        cout << "w: " << r.width << "\th: " << r.height << "\n";
+        selections.clear ();
+        selections = pickRects (rects, r);
+        //selections.clear ();
+        //if (gateid != -1) selections.push_back (gateid);
+        ((QCViewer*)win)->set_selection (selections);
+        force_redraw ();
+      }  break;
       case EDIT_CONTROLS:
-        if (selection == -1) {
+        if (selections.size () != 1) {
           cout << "very bad thing happened: " << __LINE__ << __FILE__ << endl;
-          set_selection (-1);
-          ((QCViewer*)win)->set_selection (-1);
+          selections.clear ();
+          ((QCViewer*)win)->set_selection (selections);
         }
         // find out which wire was clicked
         // get the control associated with this gate, wire
         // if null, add it as a positive control
         // if ctrl is positive, add as negative
         // if ctrl is negative. remove.
-        if (rects[selection].x0 > x || rects[selection].x0+rects[selection].width < x) return true;
+        if (rects[selections[0]].x0 > x || rects[selections[0]].x0+rects[selections[0]].width < x) return true;
         wireid = pickWire (y);
         if ((unsigned int)wireid >= circuit->numLines()) wireid = -1;
         if (wireid == -1) return true;
-        g = circuit->getGate (selection);
+        g = circuit->getGate (selections[0]);
         for (it = g->controls.begin (); it != g->controls.end (); ++it) {
           if (it->wire == (unsigned int)wireid) {
             it->polarity = !it->polarity;
@@ -233,7 +265,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
           g->controls.push_back (Control(wireid, false));
           // now, calculate whether adding this control will make this gate overlap with another.
           unsigned int col_id;
-          for (col_id = 0; col_id < layout.size () && (unsigned int)selection > layout[col_id].lastGateID; col_id++);
+          for (col_id = 0; col_id < layout.size () && selections[0] > layout[col_id].lastGateID; col_id++);
           unsigned int minW, maxW;
           minmaxWire (&g->controls, &g->targets, &minW, &maxW);
           unsigned int firstGateID = col_id == 0 ? 0 : layout[col_id - 1].lastGateID + 1;
@@ -241,10 +273,10 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
             Gate* gg = circuit->getGate (i);
             unsigned int minW2, maxW2;
             minmaxWire (&gg->controls, &gg->targets, &minW2, &maxW2);
-            if (i != (unsigned int)selection && !(minW2 > maxW || maxW2 < minW)) {
-              circuit->swapGate (firstGateID, selection); // pop it out to the left
-              selection = firstGateID;
-              ((QCViewer*)win)->set_selection (selection);
+            if (i != selections[0] && !(minW2 > maxW || maxW2 < minW)) {
+              circuit->swapGate (firstGateID, selections[0]); // pop it out to the left
+              selections[0] = firstGateID;
+              ((QCViewer*)win)->set_selection (selections);
               layout.insert (layout.begin()+col_id, LayoutColumn (firstGateID,0));
 	      force_redraw ();
 	      return true;
@@ -310,7 +342,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
     cr->fill ();
     cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
     if (circuit != NULL) {
-      rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selection);
+      rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selections);
       generate_layout_rects ();
       for (unsigned int i = 0; i < NextGateToSimulate; i++) {
         drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
@@ -328,6 +360,14 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event) {
         cr->move_to (x, y);
         cr->line_to (x, y+height/scale);
         cr->stroke ();
+      }
+      if (selecting) {
+        gateRect r;
+        r.x0 = (select_rect.x0-width/2.0+ext.width/2.0)/scale + cx;
+        r.y0 = (select_rect.y0-height/2.0+ext.height/2.0)/scale + cx;
+        r.width  = select_rect.width/scale;
+        r.height = select_rect.height/scale;
+        drawRect (cr->cobj(), r, Colour (0.7,0.7,0.7,0.7), Colour (0.7,0.7,0.7,0.3));
       }
     }
   }
@@ -394,7 +434,7 @@ void CircuitWidget::savepng (string filename) {
   cairo_surface_t* surface = make_png_surface (ext);
   cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-  draw_circuit (circuit, cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, -1);
+  draw_circuit (circuit, cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, vector<uint32_t>());
   write_to_png (surface, filename);
   cairo_destroy (cr);
   cairo_surface_destroy (surface);
@@ -407,7 +447,7 @@ void CircuitWidget::savesvg (string filename) {
   cairo_surface_t* surface = make_svg_surface (filename, ext);
   cairo_t* cr = cairo_create (surface);
   cairo_set_source_surface (cr, surface, 0, 0);
-  draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, -1);
+  draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<uint32_t>());
   cairo_destroy (cr);
   cairo_surface_destroy (surface);
 }
@@ -480,8 +520,9 @@ void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id) {
   circuit->addGate(g, layout[column_id].lastGateID - 1);
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
-  selection = layout[column_id].lastGateID - 1;
-  ((QCViewer*)win)->set_selection (selection);
+  selections.clear ();
+  selections.push_back(layout[column_id].lastGateID - 1);
+  ((QCViewer*)win)->set_selection (selections);
 }
 
 void CircuitWidget::insert_gate_at_front (Gate *g) {
@@ -490,8 +531,9 @@ void CircuitWidget::insert_gate_at_front (Gate *g) {
   layout.insert(layout.begin(), LayoutColumn (0,0));
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
-  selection = 0;
-  ((QCViewer*)win)->set_selection (0);
+  selections.clear ();
+  selections.push_back(0);
+  ((QCViewer*)win)->set_selection (selections);
 }
 
 // XXX: this may actually be more complicated than necessary now.
@@ -505,18 +547,16 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x) {
   layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0));
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
-  selection = pos;
-  ((QCViewer*)win)->set_selection (pos);
-}
-
-void CircuitWidget::set_selection (int i) {
-  selection = i;
+  selections.clear ();
+  selections.push_back (pos);
+  ((QCViewer*)win)->set_selection (selections);
 }
 
 void CircuitWidget::delete_gate (unsigned int id) {
   if (!circuit) return;
   unsigned int i = 0;
-  selection = -1;
+  selections.clear ();
+  NextGateToSimulate = 0;
   for (i = 0; i < layout.size(); i++) {
     if (layout[i].lastGateID > id) break;
     if (layout[i].lastGateID < id) continue;
@@ -553,9 +593,18 @@ void CircuitWidget::generate_layout_rects () {
 
 void CircuitWidget::set_mode (Mode m) { mode = m; }
 
-Gate *CircuitWidget::getSelectedGate () { if (!circuit || selection == -1) return NULL; return circuit->getGate(selection); }
+Gate *CircuitWidget::getSelectedGate () {
+  if (!circuit || selections.size () != 1) {
+    if (selections.size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
+    return NULL;
+  }
+  return circuit->getGate(selections[0]);
+}
 
 void  CircuitWidget::arch_set_LNN(){
 	circuit->arch_set_LNN();
 }
 
+void CircuitWidget::set_panning (bool p) {
+  pan_mode = p;
+}

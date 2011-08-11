@@ -7,6 +7,7 @@
 #include "draw.h"
 #include <state.h>
 #include <gate.h>
+#include <stdint.h>
 
 class CircuitWidget : public Gtk::DrawingArea {
 public:
@@ -16,6 +17,7 @@ public:
   void loadArch (string);
 	void arch_set_LNN();
 
+  void clear_selection ();
   void set_window (Gtk::Window *);
   void set_offset (int);
   void set_drawarch (bool);
@@ -31,22 +33,22 @@ public:
   int get_Depth ();
   int get_NumGates ();
 
-  void newcircuit (unsigned int);
+  void newcircuit (uint32_t);
 
   void set_state (State*);
   bool step ();
   bool run (bool);
   void reset ();
-  void insert_gate_in_new_column (Gate *, unsigned int);
-  void insert_gate_in_column (Gate *, unsigned int);
+  void insert_gate_in_new_column (Gate *, uint32_t);
+  void insert_gate_in_column (Gate *, uint32_t);
   void insert_gate_at_front (Gate*);
-  void delete_gate (unsigned int);
-  void set_selection (int);
+  void delete_gate (uint32_t);
   void generate_layout_rects ();
 
 	Gate* getSelectedGate ();
   enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
   void set_mode (Mode);
+  void set_panning (bool);
   void force_redraw ();
 
 protected:
@@ -62,12 +64,15 @@ protected:
 private:
   Mode mode;
   vector<LayoutColumn> layout;
-  vector<unsigned int> breakpoints;
+  vector<uint32_t> breakpoints;
 
   bool simulation_enabled;
-  unsigned int NextGateToSimulate;
-  bool panning;
+  uint32_t NextGateToSimulate;
+  bool pan_mode;
+  bool panning, selecting;
   double oldmousex, oldmousey;
+
+  gateRect select_rect;
 
   void toggle_selection (int);
 
@@ -81,12 +86,12 @@ private:
 
   vector<gateRect> columns;
   vector<gateRect> rects;
-  int selection;
+  vector<uint32_t> selections;
 
   double scale;
   double cx, cy;
 
-  unsigned int getFirstWire (double);
+  uint32_t getFirstWire (double);
 };
 
 #endif

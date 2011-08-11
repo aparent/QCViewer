@@ -4,6 +4,7 @@
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gates/UGateLookup.h>//XXX
+#include <iostream>
 
 int main (int argc, char *argv[]) {
 	Gtk::Main kit(argc, argv);
@@ -13,6 +14,7 @@ int main (int argc, char *argv[]) {
 
   QCViewer window;
   window.set_default_size (800,600);
+  std::cerr << "Running window\n";
 	Gtk::Main::run(window);
 
 

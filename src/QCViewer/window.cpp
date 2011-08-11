@@ -19,7 +19,9 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 }
 
 QCViewer::QCViewer() {
-  drawparallel = drawarch = false;
+  std::cerr << "In QCViewer::QCViewer.\n";
+  std::cerr << "...skipping\n";
+  drawparallel = panning = drawarch = false;
   set_title("QCViewer-v0.2");
   set_border_width(0);
   set_default_size(1000,1000);
@@ -33,7 +35,6 @@ QCViewer::QCViewer() {
   SWAPicon.type = GateIcon::SWAP;
 
 	console.set_window((void*)this);
-
   add(m_vbox);
    m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
 
@@ -80,6 +81,7 @@ QCViewer::QCViewer() {
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
   m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("Move", "Move"), sigc::mem_fun(*this, &QCViewer::on_menu_move));
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -143,6 +145,7 @@ QCViewer::QCViewer() {
         "    <toolitem action='CircuitOpen'/>"
         "    <separator/>"
         "    <toolitem action='Zoom100'/>"
+        "    <toolitem action='Move'/>"
         "    <separator/>"
         "    <toolitem action='SimulateLoad'/>"
         "    <toolitem action='SimulateRun'/>"
@@ -163,6 +166,7 @@ QCViewer::QCViewer() {
   if(pMenubar)
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
   m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
+ // goto skip;
 
   m_GatesFrame.set_label ("Gates");
   m_GatesFrame.add (m_GatesTable);
@@ -207,7 +211,6 @@ QCViewer::QCViewer() {
 	m_RGateEditTable.attach (m_RValLabel, 0,2,1,2);
 	m_RGateEditTable.attach (m_RValEntry, 2,3,1,2);
 
-  vector<Gtk::TargetEntry> listTargets;
   listTargets.push_back(Gtk::TargetEntry ("STRING"));
   listTargets.push_back(Gtk::TargetEntry ("text/plain"));
   c.drag_dest_set (listTargets);
@@ -246,13 +249,14 @@ QCViewer::QCViewer() {
 //  m_cmdOut.show();
 //  m_cmdOut.set_editable (false);
 //  m_cmdIn.show ();
-
+skip:
   m_vbox.show();
   m_hbox.show();
   m_VisBox.show ();
   show_all_children ();
   m_PropFrame.hide ();
 	m_RGateEditFrame.hide ();
+  std::cerr << "Done QCViewer::QCViewer\n";
 }
 
 QCViewer::~QCViewer() {}
@@ -316,9 +320,10 @@ void QCViewer::on_menu_file_open_circuit () {
   int result = dialog.run();
   if (result == Gtk::RESPONSE_OK) {
     c.load (dialog.get_filename ());
-    selection = -1;
+    selections.clear ();
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
+    c.set_panning (panning);
     c.set_scale (1);
     btn_editcontrols.set_active (false);
     btn_editcontrols.set_active (false);
@@ -435,11 +440,12 @@ void QCViewer::on_menu_new () {
     if (ss.fail ()) {
       return;
     }
-    selection = -1;
-    c.set_selection (-1);
+    selections.clear ();
+    c.clear_selection ();
     c.newcircuit (n);
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
+    c.set_panning (panning );
     c.set_scale (1);
     btn_editcontrols.set_active (false);
     btn_editcontrols.set_active (false);
@@ -490,18 +496,18 @@ void QCViewer::on_menu_run () {
 }
 
 void QCViewer::on_menu_delete () {
-  if (selection == -1) return;
-	unsigned int s = (unsigned int)selection;
-  set_selection (-1);
+  if (selections.size () != 1) return;
+	unsigned int s = (unsigned int)selections[0];
+  set_selection (vector<uint32_t>());
   c.delete_gate (s);
 }
 
-void QCViewer::set_selection (int i) {
-  selection = i;
-  if (i == -1) {
+void QCViewer::set_selection (vector<uint32_t> s) {
+  selections = s;
+  if (selections.size () == 0) {
     btn_editcontrols.set_active (false);
     m_PropFrame.hide ();
-  } else {
+  } else if (selections.size () == 1) {
 		if (c.getSelectedGate()->type == Gate::RGATE) {
 			m_RGateEditFrame.show ();
 			RGate* g = (RGate*)c.getSelectedGate ();
@@ -517,14 +523,21 @@ void QCViewer::set_selection (int i) {
 			m_RGateEditFrame.hide ();
 		}
     m_PropFrame.show ();
+  } else {
+    cout << "cool!";
   }
   btn_editbreakpoints.set_active (false);
+}
+
+void QCViewer::on_menu_move () {
+  panning = !panning;
+  c.set_panning (panning);
 }
 
 void QCViewer::update_mode () {
   if (btn_editcontrols.get_active ()) {
     btn_editbreakpoints.set_active (false); // enforce di/trichotomy
-    if (selection == -1) {
+    if (selections.size () != 1) {
       cout << "warning: this shouldn't have happened " << __FILE__ << " " << __LINE__ << endl;
       btn_editcontrols.set_active (false);
       c.set_mode (CircuitWidget::NORMAL);
