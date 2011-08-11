@@ -8,7 +8,6 @@
 #include "draw.h"
 #include <gtkmm.h>
 #include <gate.h>
-#include "draw.h"
 #include "window.h" // slows down compiles, would be nice to not need this (see: clicking, effects toolpalette)
 
 using namespace std;
@@ -147,9 +146,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
       insert_gate_in_new_column (newgate, end);
     }
   }
-
-//  findInsertionPoint (layout, xx, yy, &column, &
-
   context->drag_finish(true, false, time);
 }
 

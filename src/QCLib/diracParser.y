@@ -1,7 +1,6 @@
 %{
   #include <stdio.h>
   #include <string.h>
-  #include <iostream>
   #include <string>
   #include "parseNode.h"
   #define YYSTYPE parseNode*

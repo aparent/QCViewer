@@ -8,8 +8,6 @@
 	#include <string>
 	#include <sstream>
 	#include "utility.h"
-  #include <iostream>
-  #include <cstdlib>
 	#define YYSTYPE parseNode*
 	#include "diracParser.h"
 	using namespace std;
@@ -60,7 +58,6 @@ i										{
 											return KET;
 										}
 <ket>[0-1]+/\^      {
-											cout << yytext << endl;
 											temp.str("");
 											temp << yytext;
 											BEGIN(ketmult);

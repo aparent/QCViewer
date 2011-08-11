@@ -259,9 +259,6 @@ skip:
 
 QCViewer::~QCViewer() {}
 
-// Our new improved signal handler.  The data passed to this method is
-// printed to stdout.
-
 void QCViewer::unimplemented () {
   Gtk::MessageDialog dialog(*this, "Feature Unimplemented");
   dialog.set_secondary_text(

@@ -1,23 +1,23 @@
+//Might want to jsut replace this with a bison parser since it would be easier to maintain
 #include "circuitParser.h"
+#include <fstream>
+#include <vector>
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
-// NOTE: (*(++(*it))) means (*it): dereferance it, ++(*it): call the ++ operator on the iterator,
-// *(++(*it)): call the * operator on the iterator, note this is overloaded and actually means the value of
-// the vector location where it points now
-
-void parseLineNames(Circuit * circ, vector<TFCToken>::iterator * it){
-  while((*(++(*it))).type == VAR_NAME){
-    circ->addLine((**it).value);
+void parseLineNames(Circuit * circ, vector<TFCToken>::iterator &it){
+  while((*(++it)).type == VAR_NAME){
+    circ->addLine((*it).value);
   }
 }
 
-void parseInputs(Circuit * circ, vector<TFCToken>::iterator * it){
-  while((*(++(*it))).type == VAR_NAME){
+void parseInputs(Circuit * circ, vector<TFCToken>::iterator &it){
+  while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
-      if ((**it).value.compare(circ->getLine(j)->lineName)==0){
+      if ((*it).value.compare(circ->getLine(j)->lineName)==0){
         circ->getLine(j)->constant=false;
         break;
       }
@@ -26,10 +26,10 @@ void parseInputs(Circuit * circ, vector<TFCToken>::iterator * it){
   }
 }
 
-void parseOutputs(Circuit * circ, vector<TFCToken>::iterator * it){
-  while((*(++(*it))).type == VAR_NAME){
+void parseOutputs(Circuit * circ, vector<TFCToken>::iterator &it){
+  while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
-      if ((**it).value.compare(circ->getLine(j)->lineName)==0){
+      if ((*it).value.compare(circ->getLine(j)->lineName)==0){
         circ->getLine(j)->garbage=false;
         break;
       }
@@ -38,11 +38,11 @@ void parseOutputs(Circuit * circ, vector<TFCToken>::iterator * it){
   }
 }
 
-void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator * it){
-  while((*(++(*it))).type == VAR_NAME){
+void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator &it){
+  while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
       if (!circ->getLine(j)->garbage){
-        circ->getLine(j)->outLabel = (**it).value;
+        circ->getLine(j)->outLabel = (*it).value;
         break;
       }
     }
@@ -50,13 +50,24 @@ void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator * it){
   }
 }
 
-bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it){
-  bool found,error=false;
-  while((*(++(*it))).type == GATE_INPUT || (**it).type == GATE_INPUT_N){
+bool inControls(vector<Control> &ctr ,unsigned int n){
+	for (unsigned int i = 0; i < ctr.size(); i++){
+		if (ctr[i].wire == n) return true;
+	}
+	return false;
+}
+
+bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator &it){
+  bool found;
+  while((*(++it)).type == GATE_INPUT || (*it).type == GATE_INPUT_N){
     found = false;
-    for (unsigned int j = 0; j < circ->numLines(); j++){
-      if (((**it).value).compare(circ->getLine(j)->lineName)==0){
-        if ((**it).type == GATE_INPUT_N){
+    for (unsigned int j = 0; j < circ->numLines(); j++){	
+      if (((*it).value).compare(circ->getLine(j)->lineName)==0){
+				if (inControls(gate->controls,j)){ 
+					cerr << "ERROR: repeated control on " << gate->getName() << "." << endl;
+					return false;
+				}
+        if ((*it).type == GATE_INPUT_N){
           gate->controls.push_back(Control(j,true));
           found = true;
           break;
@@ -69,12 +80,9 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
       }
     }
     if (!found){
-      cout << "ERROR unknown wire: " << ((**it).value) << ". On:" << gate->getName() << "." << endl;
-      error = true;
+      cerr << "ERROR unknown wire: " << ((*it).value) << ". On:" << gate->getName() << "." << endl;
+    	return false;
     }
-  }
-  if (error){
-    return false;
   }
   unsigned int numTarg;
   if (gate->getName().compare("F")==0){
@@ -82,7 +90,7 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
   }
   else numTarg = 1;
   if (numTarg > gate->controls.size()){
-      cout << "ERROR Not enough targets." << endl;
+      cerr << "ERROR Not enough targets." << endl;
       delete gate;
       gate = NULL;
       return false;
@@ -94,18 +102,18 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator * it)
   return true;
 }
 
-void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
-  (*it)++;
-  while((**it).type != SEC_END){
+void parseGates(Circuit *circ, vector<TFCToken>::iterator &it){
+  it++;
+  while((*it).type != SEC_END){
     Gate *newGate;
-    if(((**it).value).compare("R") == 0){
-      (*it)++;
-      if ((**it).type != GATE_SET){
+    if(((*it).value).compare("R") == 0){
+      it++;
+      if ((*it).type != GATE_SET){
         cout << "ERROR: No setting for R gate."<< endl;
       }
-			char t = (**it).value[0];//for rot type
+			char t = (*it).value[0];//for rot type
 			RGate::Axis rot_type;
-      stringstream ss((**it).value);
+      stringstream ss((*it).value);
 			if (t=='x'||t=='X'){
 				rot_type = RGate::X;
 				ss.ignore(1);
@@ -121,14 +129,14 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
       float_t rot;
       ss >>  rot;
       newGate = new RGate(rot, rot_type); //sets rotation amount
-    } else if (((**it).value[0]) == 'T'){
+    } else if (((*it).value[0]) == 'T'){
       newGate = new UGate("X");
       newGate->drawType = Gate::NOT;
-    } else if (((**it).value[0]) == 'F'){
+    } else if (((*it).value[0]) == 'F'){
       newGate = new UGate("F");
       newGate->drawType = Gate::FRED;
     } else {
-      newGate = new UGate((**it).value);
+      newGate = new UGate((*it).value);
     }
     if(parseGateInputs(newGate,circ,it)){ //Will retun true if it succeeds
       circ->addGate(newGate);
@@ -138,11 +146,11 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator * it){
   }
 }
 
-void parseConstants(Circuit * circ, vector<TFCToken>::iterator * it){
-  while((*(++(*it))).type == VAR_NAME){
+void parseConstants(Circuit * circ, vector<TFCToken>::iterator &it){
+  while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
       if (circ->getLine(j)->constant){
-        circ->getLine(j)->initValue = atoi(((**it).value).c_str());
+        circ->getLine(j)->initValue = atoi(((*it).value).c_str());
         break;
       }
     }
@@ -172,30 +180,29 @@ Circuit *parseCircuit (string file){
 
   vector<TFCToken> *tokens = lexCircuit(file);
   if (tokens == NULL) return NULL;
-  vector<TFCToken>::iterator tempIt = tokens->begin();
-  vector<TFCToken>::iterator * it = &tempIt;
+  vector<TFCToken>::iterator it = tokens->begin();
   for(; ;){
-    if ((**it).type == SEC_START){
-      if (((**it).value).compare("V")     == 0){
+    if ((*it).type == SEC_START){
+      if (((*it).value).compare("V")     == 0){
         parseLineNames(circ,it);
       }
-      if (((**it).value).compare("I")     == 0){
+      if (((*it).value).compare("I")     == 0){
         parseInputs(circ,it);
       }
-      if (((**it).value).compare("O")     == 0){
+      if (((*it).value).compare("O")     == 0){
         parseOutputs(circ,it);
       }
-      if (((**it).value).compare("OL")    == 0){
+      if (((*it).value).compare("OL")    == 0){
         parseOutputLabels(circ,it);
       }
-      if (((**it).value).compare("C")     == 0){
+      if (((*it).value).compare("C")     == 0){
         parseConstants(circ,it);
       }
-      if (((**it).value).compare("GATES") == 0){
+      if (((*it).value).compare("GATES") == 0){
         parseGates(circ,it);
       }
     }
-    else if((**it).type == SEC_END){
+    else if((*it).type == SEC_END){
       break;
     } else {
       delete circ;

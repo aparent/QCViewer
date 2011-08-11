@@ -68,7 +68,6 @@ protected:
   Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
 
   CircuitWidget c;
-  //stateView sView;
   Gtk::Statusbar m_statusbar;
 
   Gtk::Widget* m_EditToolbar;

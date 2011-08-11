@@ -9,7 +9,6 @@
 %{
 	#include "TFCLexer.h"
 	#include "utility.h"
-	#include <stdlib.h>
 	vector<TFCToken> *tokens = new vector<TFCToken>;
 %}
 
