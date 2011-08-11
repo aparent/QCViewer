@@ -39,7 +39,7 @@ void init_fonts(){
 	ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 
-double wireToY (unsigned int x) {
+double wireToY (uint32_t x) {
   return yoffset+(x+1)*wireDist;
 }
 
@@ -105,11 +105,11 @@ void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative) {
   }
 }
 
-gateRect drawControls (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<unsigned int> *targ) {
-  unsigned int minw, maxw;
+gateRect drawControls (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ) {
+  uint32_t minw, maxw;
   minmaxWire (ctrl, targ, &minw, &maxw);
   if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
-  for (unsigned int i = 0; i < ctrl->size(); i++) {
+  for (uint32_t i = 0; i < ctrl->size(); i++) {
     drawDot (cr, xc, wireToY((*ctrl)[i].wire), dotradius, (*ctrl)[i].polarity);
   }
   gateRect rect;
@@ -136,8 +136,8 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name) {
 	cairo_show_text (cr, name.c_str());
 }
 
-gateRect drawCU (cairo_t *cr, unsigned int xc, string name, vector<Control> *ctrl, vector<unsigned int> *targ) {
-  unsigned int minw, maxw;
+gateRect drawCU (cairo_t *cr, uint32_t xc, string name, vector<Control> *ctrl, vector<uint32_t> *targ) {
+  uint32_t minw, maxw;
   vector<Control> dummy;
   minmaxWire (&dummy, targ, &minw, &maxw); // only the targets
   // (XXX) need to do a  check in here re: target wires intermixed with not targets.
@@ -247,9 +247,9 @@ gateRect drawX (cairo_t *cr, double xc, double yc, double radius) {
 }
 
 
-gateRect drawCNOT (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<unsigned int> *targ) {
+gateRect drawCNOT (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
-  for (unsigned int i = 0; i < targ->size(); i++) {
+  for (uint32_t i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawNOT (cr, xc, wireToY((*targ)[i]), radius);
     rect = combine_gateRect(rect, recttmp);
   }
@@ -263,11 +263,11 @@ void drawShowFred (cairo_t *cr, double width, double height) {
 	drawX (cr, width/2, height-Xrad, Xrad);
 }
 
-gateRect drawFred (cairo_t *cr, unsigned int xc, vector<Control> *ctrl, vector<unsigned int> *targ) {
+gateRect drawFred (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ) {
   gateRect rect = drawControls (cr, xc, ctrl, targ);
-  unsigned int minw = (*targ)[0];
-  unsigned int maxw = (*targ)[0];
-  for (unsigned int i = 0; i < targ->size(); i++) {
+  uint32_t minw = (*targ)[0];
+  uint32_t maxw = (*targ)[0];
+  for (uint32_t i = 0; i < targ->size(); i++) {
     gateRect recttmp = drawX (cr, xc, wireToY((*targ)[i]), radius);
     rect = combine_gateRect(rect, recttmp);
     minw = min (minw, (*targ)[i]);
@@ -282,7 +282,7 @@ void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, do
   cairo_rectangle (cr, 0, 0, w, h); // TODO: document why the scale factors are here
   cairo_fill (cr);
 
-  for (unsigned int i = 0; i < c->numLines(); i++) {
+  for (uint32_t i = 0; i < c->numLines(); i++) {
     double y = wireToY (i);
     drawWire (cr, wirestart+xoffset, y, wireend, y);
   }
@@ -295,13 +295,25 @@ int pickRect (vector<gateRect> rects, double x, double y) {
   return -1;
 }
 
+vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s) {
+  vector<uint32_t> ans;
+  for (uint32_t i = 0; i < (uint32_t)rects.size (); i++) {
+    if (rects[i].x0 <= s.x0 && rects[i].x0+rects[i].width <= s.x0) continue;
+    if (s.x0 <= rects[i].x0 && s.x0+s.width <= rects[i].x0) continue;
+    if (rects[i].y0 <= s.y0 && rects[i].y0+rects[i].height <= s.y0) continue;
+    if (s.y0 <= rects[i].y0 && s.y0+s.height <= rects[i].y0) continue;
+    ans.push_back (i);
+  }
+  return ans;
+}
+
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) {
   vector <gateRect> rects;
   cairo_set_source_rgb (cr, 0, 0, 0);
 
   // input labels
   double xinit = 0.0;
-  for (unsigned int i = 0; i < c->numLines(); i++) {
+  for (uint32_t i = 0; i < c->numLines(); i++) {
     Line *line = c->getLine (i);
     string label = line->getInputLabel ();
     cairo_text_extents_t extents;
@@ -321,13 +333,13 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   // gates
   double xcurr = xinit+2.0*gatePad;
-  unsigned int mingw, maxgw;
+  uint32_t mingw, maxgw;
 // TODO: remove  vector <int> parallels = c->getGreedyParallel ();
 
-  unsigned int i = 0;
+  uint32_t i = 0;
   double maxX;
   if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
-  for (unsigned int j = 0; j < columns.size(); j++) {
+  for (uint32_t j = 0; j < columns.size(); j++) {
     maxX = 0.0;
     for (; i <= columns[j].lastGateID; i++) {
       Gate* g = c->getGate (i);
@@ -377,7 +389,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   // output labels
   cairo_set_source_rgb (cr, 0, 0, 0);
-  for (unsigned int i = 0; i < c->numLines (); i++) {
+  for (uint32_t i = 0; i < c->numLines (); i++) {
     Line *line = c->getLine (i);
     string label = line->getOutputLabel();
     cairo_text_extents_t extents;
@@ -394,21 +406,26 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
 
 void drawArchitectureWarnings (cairo_t* cr, vector<gateRect> rects, vector<int> badGates) {
-  for (unsigned int i = 0; i < badGates.size(); i++) {
+  for (uint32_t i = 0; i < badGates.size(); i++) {
     drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
   }
 }
 
 void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLines, vector<int> pLines) {
-  for (unsigned int i = 0; i < pLines.size() - 1; i++) {
+  for (uint32_t i = 0; i < pLines.size() - 1; i++) {
     int gateNum = pLines[i];
     double x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
     drawPWire (cr, x, numLines);
   }
 }
 
-void drawSelections (cairo_t* cr, vector<gateRect> rects, int selection) {
-  drawRect (cr, rects[selection], Colour (0.1,0.2,0.7,0.7), Colour (0.1,0.2,0.7,0.3));
+void drawSelections (cairo_t* cr, vector<gateRect> rects, vector<uint32_t> selections) {
+  //gateRect r = rects[selections[0]];
+  for (uint32_t i = 0; i < (uint32_t)selections.size (); i++) {
+    //r = combine_gateRect (r,rects[selections[i]]);
+    drawRect(cr, rects[selections[i]], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
+  }
+  //drawRect (cr, r, Colour (0.1,0.2,0.7,0.7), Colour (0.1,0.2,0.7,0.3));
 }
 
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
@@ -445,7 +462,7 @@ void write_to_png (cairo_surface_t* surf, string filename) {
 }
 
 
-vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, int selection) {
+vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, vector<uint32_t> selections) {
   cairo_scale (cr, scale, scale);
 	cairo_set_font_face (cr,ft_default);
   cairo_set_font_size(cr, 18);
@@ -462,6 +479,6 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& co
 	cairo_pattern_destroy (group);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
-  if (selection != -1) drawSelections (cr, rects, selection);
+  if (selections.size () != 0) drawSelections (cr, rects, selections);
   return rects;
 }

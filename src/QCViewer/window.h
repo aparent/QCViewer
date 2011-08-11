@@ -3,6 +3,7 @@
 
 #include <gtkmm.h>
 #include <vector>
+#include <stdint.h>
 #include "circuitwidget.h"
 #include "stateWidget.h"
 #include "GateIcon.h"
@@ -14,7 +15,7 @@ public:
   QCViewer ();
   virtual ~QCViewer();
 
-  void set_selection (int);
+  void set_selection (vector<uint32_t>);
 	void load_state (State* s);
 protected:
   void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
@@ -25,6 +26,7 @@ protected:
   void on_menu_file_open_arch ();
   void on_menu_mode_edit ();
   void on_menu_new ();
+  void on_menu_move ();
   void on_menu_mode_simulate ();
 //  void on_menu_file_save ();
   void on_menu_file_quit ();
@@ -94,8 +96,6 @@ protected:
   Gtk::Frame       m_SimulationFrame;
   Gtk::Table       m_SimulationTable;
 
-  void set_selected (int i);
-
   Gtk::ToggleButton btn_editbreakpoints, btn_editcontrols;
 
   Gtk::ToolItemGroup* group_gates;
@@ -104,14 +104,15 @@ protected:
 
 
   ConsoleWidget console;
-
+  std::vector<Gtk::TargetEntry> listTargets;
 private:
   void update_mode ();
 
   State *state;
   bool drawparallel;
   bool drawarch;
-  int selection;
+  bool panning;
+  vector<uint32_t> selections;
 };
 
 #endif

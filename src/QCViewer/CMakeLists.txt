@@ -4,7 +4,7 @@ ADD_DEFINITIONS( "-O0 -ansi" )
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(PkgConfig)
-pkg_check_modules(GTKMM gtkmm-2.4 freetype2)
+pkg_check_modules(GTKMM glib-2.0 gtkmm-2.4 freetype2)
 
 file(GLOB QCVIEWER_SRC_FILES *.cpp)
 file(GLOB QCVIEWER_HEADER_FILES *.h)
