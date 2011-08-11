@@ -323,7 +323,6 @@ void QCViewer::on_menu_file_open_circuit () {
     selections.clear ();
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
-    c.set_panning (panning);
     c.set_scale (1);
     btn_editcontrols.set_active (false);
     btn_editcontrols.set_active (false);
@@ -445,7 +444,6 @@ void QCViewer::on_menu_new () {
     c.newcircuit (n);
     c.set_drawparallel (drawparallel);
     c.set_drawarch (drawarch);
-    c.set_panning (panning );
     c.set_scale (1);
     btn_editcontrols.set_active (false);
     btn_editcontrols.set_active (false);
@@ -524,30 +522,40 @@ void QCViewer::set_selection (vector<uint32_t> s) {
 		}
     m_PropFrame.show ();
   } else {
-    cout << "cool!";
+    m_PropFrame.hide ();
+    m_RGateEditFrame.show ();
   }
   btn_editbreakpoints.set_active (false);
 }
 
 void QCViewer::on_menu_move () {
   panning = !panning;
-  c.set_panning (panning);
+  update_mode ();
 }
 
 void QCViewer::update_mode () {
-  if (btn_editcontrols.get_active ()) {
+  if (panning) {
+    btn_editbreakpoints.set_active (false);
+    btn_editcontrols.set_active (false);
+    get_window()->set_cursor (Gdk::Cursor (Gdk::FLEUR));
+    c.set_mode (CircuitWidget::PANNING);
+  } else if (btn_editcontrols.get_active ()) {
     btn_editbreakpoints.set_active (false); // enforce di/trichotomy
     if (selections.size () != 1) {
       cout << "warning: this shouldn't have happened " << __FILE__ << " " << __LINE__ << endl;
       btn_editcontrols.set_active (false);
       c.set_mode (CircuitWidget::NORMAL);
+      get_window ()->set_cursor ();
       return;
     } else {
       c.set_mode (CircuitWidget::EDIT_CONTROLS);
+      get_window ()->set_cursor (Gdk::Cursor (Gdk::DOT));
     }
   } else if (btn_editbreakpoints.get_active ()) {
+    get_window ()->set_cursor (Gdk::Cursor (Gdk::RIGHT_TEE));
     c.set_mode (CircuitWidget::EDIT_BREAKPOINTS);
   } else {
+    get_window ()->set_cursor ();
     c.set_mode (CircuitWidget::NORMAL);
   }
 }
