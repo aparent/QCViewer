@@ -2,9 +2,9 @@
 .i a b c
 .o a b c
 BEGIN
-H a
+asdfasdf a
 H b
 t2 a b c
 H a
-H b
+asdfsadf b
 END

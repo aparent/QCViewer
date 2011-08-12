@@ -4,10 +4,9 @@
 #include <gtkmm/drawingarea.h>
 #include <circuit.h>
 #include <string>
-#include "draw.h"
 #include <state.h>
 #include <gate.h>
-#include <stdint.h>
+#include "draw.h"
 
 class CircuitWidget : public Gtk::DrawingArea {
 public:
@@ -32,6 +31,7 @@ public:
   int get_QCost ();
   int get_Depth ();
   int get_NumGates ();
+  unsigned int get_NumLines ();
 
   void newcircuit (uint32_t);
 

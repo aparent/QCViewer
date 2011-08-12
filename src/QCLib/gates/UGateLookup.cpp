@@ -48,9 +48,9 @@ gateMatrix *get_matrix(matrix_row *n){
 	}
 	gateMatrix *ret = new gateMatrix;
 	ret->data = new complex<float_type>[numRow*numRow];
-	for(int i = 0; i < numRow; i++){
+	for(unsigned int i = 0; i < numRow; i++){
 		row_terms *terms = n->terms;
-		for(int j = 0; j < numRow; j++){
+		for(unsigned int j = 0; j < numRow; j++){
 			ret->data[i*numRow + j] = *terms->val;
 			terms = terms->next;
 		}

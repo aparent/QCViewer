@@ -18,7 +18,6 @@ parseNode *parseDirac(std::string input); //Defined in diracParser.y
 string printTree(parseNode *node);
 diracTerm evalTree(parseNode *node);
 
-
 State *getStateVec (std::string input, bool normalize){
 	parseNode *node = parseDirac(input);
 	if(node!=NULL){

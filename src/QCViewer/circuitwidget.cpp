@@ -507,9 +507,13 @@ void CircuitWidget::set_state (State* n_state){
 }
 
 double CircuitWidget::get_scale () { return scale; }
-int CircuitWidget::get_QCost () { return circuit->QCost(); }
-int CircuitWidget::get_Depth () { return circuit->getParallel().size(); }
+int CircuitWidget::get_QCost () 	 { return circuit->QCost(); } 
+int CircuitWidget::get_Depth ()    { return circuit->getParallel().size(); }
 int CircuitWidget::get_NumGates () { return circuit->numGates(); }
+unsigned int CircuitWidget::get_NumLines() {
+	if (circuit!=NULL) return circuit->numLines(); 
+	else return 0;
+}
 
 void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id) {
   for (unsigned int j = column_id; j < layout.size (); j++) layout[j].lastGateID += 1;

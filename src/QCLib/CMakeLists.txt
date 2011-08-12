@@ -1,5 +1,5 @@
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -ansi")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -pedantic -ansi")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -ansi")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

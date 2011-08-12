@@ -35,7 +35,7 @@ StateViewWidget::StateViewWidget (Gtk::Statusbar* ns, Gtk::HBox* h, vector<State
 void StateViewWidget::close () {
   visbox->remove (*this);
   vector<StateViewWidget*>::iterator it = find (svwList->begin (), svwList->end (), this);
-  if (it == svwList->end ()) cout << "VERY BAD WARNING\n";
+  if (it == svwList->end ()) cerr << "VERY BAD WARNING\n";
   svwList->erase (it);
   if (svwList->size () == 0) {
     vispane->set_position (3000); // TODO: do this better
@@ -309,14 +309,13 @@ void StateWidget::parse_state () {
 		unsigned int maxID = 0; // XXX: should be bit string
 		double maxMag = -1;
 		for (unsigned int j = 0; j < skip; j++, n++) {
-      StateMap::iterator it = state->data.find (n); // XXX: why is std:: required here?
+      StateMap::iterator it = state->data.find (n);
 			if (it == state->data.end ()) continue;
       bucket[i] += it->second;
       double mag = it->second.real()*it->second.real() + it->second.imag()*it->second.imag();
       maxID = mag > maxMag ? n : maxID;
     }
     bucketID[i] = maxID;
-    //bucket[i] /= skip;  Would average might want to just add probs?
   }
 }
 

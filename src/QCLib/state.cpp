@@ -61,13 +61,17 @@ const State& State::operator*= (const complex<float_type> x) {
   return *this;
 }
 
+unsigned int State::numBits(){
+	return floorLog2(dim); 
+}
+
 State kron (State& l, State& r){
   StateMap::iterator it_r;
   StateMap::iterator it_l;
 	State ret;
   for (it_l = l.data.begin(); it_l != l.data.end(); ++it_l) {
   	for (it_r = r.data.begin(); it_r != r.data.end(); ++it_r) {
-			ret.data[(it_l->first << floorLog2(r.dim))|(it_r->first)] = it_l->second*it_r->second;
+			ret.data[(it_l->first < r.numBits())|(it_r->first)] = it_l->second*it_r->second;
 		}
 	}
 	ret.dim = l.dim*r.dim;

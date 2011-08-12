@@ -2,5 +2,5 @@ To build the project:
 cd build
 cmake ../src && make install
 Alternativly
-cmake -DCMAKE_BUILD_TYPE=Release ../src/
+cmake -DCMAKE_BUILD_TYPE=<build-type> ../src/
 to select release or debug builds

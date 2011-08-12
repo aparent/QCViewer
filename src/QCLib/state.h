@@ -22,6 +22,7 @@ public:
   const State& operator-= (const State &r);
   const State& operator*= (const std::complex<float_type>);
 	void normalize();
+	unsigned int numBits();
 
 	index_t dim;
   StateMap data;
