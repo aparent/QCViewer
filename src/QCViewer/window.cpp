@@ -26,13 +26,7 @@ QCViewer::QCViewer() {
   set_border_width(0);
   set_default_size(1000,1000);
   state = NULL;
-  NOTicon.type = GateIcon::NOT;
-  Hicon.type = GateIcon::H;
-  Xicon.type = GateIcon::X;
-  Yicon.type = GateIcon::Y;
-  Zicon.type = GateIcon::Z;
-  Ricon.type = GateIcon::R;
-  SWAPicon.type = GateIcon::SWAP;
+  
 
   add(m_vbox);
    m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
@@ -213,13 +207,21 @@ QCViewer::QCViewer() {
   listTargets.push_back(Gtk::TargetEntry ("STRING"));
   listTargets.push_back(Gtk::TargetEntry ("text/plain"));
   c.drag_dest_set (listTargets);
+  Ricon.type = GateIcon::R;
+  setup_gate_button (btn_R, Ricon, listTargets);
+
+	NOTicon.type = GateIcon::NOT;
+  Hicon.type = GateIcon::H;
+  Xicon.type = GateIcon::X;
+  Yicon.type = GateIcon::Y;
+  Zicon.type = GateIcon::Z;
+  SWAPicon.type = GateIcon::SWAP;
 
   setup_gate_button (btn_NOT, NOTicon, listTargets);
   setup_gate_button (btn_H, Hicon, listTargets);
   setup_gate_button (btn_X, Xicon, listTargets);
   setup_gate_button (btn_Y, Yicon, listTargets);
   setup_gate_button (btn_Z, Zicon, listTargets);
-  setup_gate_button (btn_R, Ricon, listTargets);
   setup_gate_button (btn_SWAP, SWAPicon, listTargets);
   m_GatesTable.attach (btn_NOT,0,1,0,1);
   m_GatesTable.attach (btn_H,1,2,0,1);

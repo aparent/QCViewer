@@ -69,7 +69,7 @@ exp:					  NUM								{ $$ = new complex<float>(atof($1),0);}
 							| SQRT  exp 				{ *$2 = sqrt(*$2); $$ = $2 }
 							| exp IMAG					{ $$ = new complex<float>(-imag(*$1),real(*$1)); delete $1;}
 							| MINUS exp 				{ *$2 = -*$2; $$ = $2}
-							| LPAREN exp RPAREN				{ $$ = $2;}
+							| LPAREN exp RPAREN	{ $$ = $2;}
 ;
 %%
 
