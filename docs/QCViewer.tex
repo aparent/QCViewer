@@ -13,8 +13,10 @@ QCViewer is a tool to assist in the design, visualization and simulation of quan
 
 \section{Technical Details}
 \subsection{Simulation}
-We use a spase state vector based simulation method.  Each state is superposition is stored as a 32-bit integer representing the state in the computational basis
-and a complex number representing its amplitude.
+We use a sparse state vector based simulation method.  Each state is superposition is stored (sparsely) as a 32-bit integer representing the state in the computational basis
+and a complex number representing its amplitude. Gates are applied to each basis state individually creating and destroying states in the superposition as needed.
+
+With this method the memory use associated with storing the state vector is dependent on the amount of superposition in the system.
 %uncomment here and in Makefile if there are citations
 %\bibliographystyle{ieeetr}
 %\bibliography{QCViewer.bib}

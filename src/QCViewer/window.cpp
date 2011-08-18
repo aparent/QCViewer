@@ -310,9 +310,22 @@ void QCViewer::on_menu_file_open_circuit () {
   Gtk::FileChooserDialog dialog("Please choose a circuit file",
             Gtk::FILE_CHOOSER_ACTION_OPEN);
   dialog.set_transient_for(*this);
-
   dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+	Gtk::FileFilter qc_filter;
+  qc_filter.set_name("QC files");
+	qc_filter.add_pattern("*.qc");
+	Gtk::FileFilter tfc_filter;
+	tfc_filter.set_name("TFC files");
+	tfc_filter.add_pattern("*.tfc");
+	Gtk::FileFilter all_filter;
+	all_filter.set_name("All files");
+	all_filter.add_pattern("*");
+
+	dialog.add_filter(all_filter);
+	dialog.add_filter(qc_filter);
+	dialog.add_filter(tfc_filter);
+	dialog.set_filter(qc_filter);
 
   int result = dialog.run();
   if (result == Gtk::RESPONSE_OK) {
