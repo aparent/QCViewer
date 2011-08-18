@@ -33,7 +33,7 @@
 %defines "circuit_parser.h"
 %output "circuit_parser.cpp"
 
-%token NEWLINE CIRCUIT WORD LINES INLAB OUTLAB RSBRAC LSBRAC MAPTO COMMA
+%token NEWLINE CIRCUIT WORD LINES INLAB OUTLAB MAPTO COMMA
 %token NUM RPAREN LPAREN MINUS PLUS TIMES DIV EXPONENT SQRT IMAG PI
 
 %type <string> id NUM WORD
@@ -71,13 +71,13 @@ cols: /*empty*/ {$$ = NULL}
       | gates NEWLINE cols {$$ = new col_list_t($1,$3)}
 ;
 gates: WORD maps NEWLINE { $$ = new gate_list_t($1,$2,NULL)}
-			| WORD LSBRAC exps RSBRAC maps NEWLINE { $$ = new gate_list_t($1,$5,$3,NULL)}
+			| WORD LPAREN exps RPAREN maps NEWLINE { $$ = new gate_list_t($1,$5,$3,NULL)}
       | WORD maps NEWLINE gates{ $$ = new gate_list_t($1,$2,$4)}
-      | WORD LSBRAC exps RSBRAC maps NEWLINE gates{ $$ = new gate_list_t($1,$5,$3,$7)}
+      | WORD LPAREN exps RPAREN maps NEWLINE gates{ $$ = new gate_list_t($1,$5,$3,$7)}
 			| WORD vars NEWLINE { $$ = new gate_list_t($1,$2,NULL)}
-			| WORD LSBRAC exps RSBRAC vars NEWLINE { $$ = new gate_list_t($1,$5,$3,NULL)}
+			| WORD LPAREN exps RPAREN vars NEWLINE { $$ = new gate_list_t($1,$5,$3,NULL)}
       | WORD vars NEWLINE gates{ $$ = new gate_list_t($1,$2,$4)}
-      | WORD LSBRAC exps RSBRAC vars NEWLINE gates{ $$ = new gate_list_t($1,$5,$3,$7)}
+      | WORD LPAREN exps RPAREN vars NEWLINE gates{ $$ = new gate_list_t($1,$5,$3,$7)}
 ;
 vars: id {$$ = new var_list_t($1,NULL)}
 			|id vars{$$ = new var_list_t($1,$2)}

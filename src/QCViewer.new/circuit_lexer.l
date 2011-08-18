@@ -20,18 +20,16 @@ num {float}|{int}
 whitespace [ \t]
 comment #.*\n
 %%
-
-
+	/*General*/
+"\n"					return NEWLINE;
+	/*Circuit*/
 "circuit" 		return CIRCUIT;
-"lines"       return LINES;
-"in_labels"   return INLAB;
-"out_lables"	return OUTLAB;
-"["           return LSBRAC;
-"]"           return RSBRAC;
+"\.lines"       return LINES;
+"\.in_labels"   return INLAB;
+"\.out_lables"	return OUTLAB;
 ","           return COMMA;
 "->"          return MAPTO;
-"\n"					return NEWLINE;
-
+	/*Expression*/
 "^"						return EXPONENT;
 "+"           return PLUS;
 "-"           return MINUS;
@@ -42,6 +40,7 @@ comment #.*\n
 ")"						return RPAREN;
 "sqrt"				return SQRT;
 "pi"  				return PI;
+
 {num}					SAVE_TOKEN; return NUM;
 {word}				SAVE_TOKEN; return WORD;
 
