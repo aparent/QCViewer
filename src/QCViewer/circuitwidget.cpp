@@ -76,7 +76,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
       newgate->drawType = Gate::FRED;
       newgate->targets.push_back (target++);
       break;
-    default: cout << "unhandled gate drag and drop" << endl; break;
+    default: newgate = new UGate(((GateIcon*)button->get_image ())->symbol); break;
   }
   if (newgate->targets.size () > circuit->numLines ()) {
     delete newgate;

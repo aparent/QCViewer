@@ -7,6 +7,14 @@ GateIcon::GateIcon () : type(DEFAULT) {
 	set_size_request (20,20);
 }
 
+GateIcon::GateIcon (GateType t) : type(t) {
+	set_size_request (20,20);
+}
+
+GateIcon::GateIcon (string s) : type(DEFAULT), symbol(s)  {
+	set_size_request (20,20);
+}
+
 bool GateIcon::on_expose_event(GdkEventExpose* event) {
   (void)event; // placate compiler..
   Glib::RefPtr<Gdk::Window> window = get_window();
@@ -21,13 +29,9 @@ bool GateIcon::on_expose_event(GdkEventExpose* event) {
 		cr->scale (scale, scale);
 		switch (type) {
       case NOT: drawNOT (cr->cobj(), xc, yc, min(width/2.0, height/2.0),false); break;
-			case H: drawShowU (cr->cobj (), xc, yc, min(width, height), "H"); break;
-			case X: drawShowU (cr->cobj (), xc, yc, min(width, height), "X"); break;
-			case Y: drawShowU (cr->cobj (), xc, yc, min(width, height), "Y"); break; //XXX Y
-			case Z: drawShowU (cr->cobj (), xc, yc, min(width, height), "Z"); break;
 			case R: drawShowRotation (cr->cobj(), xc, yc, min(width/2.0, height/2.0)); break;
 			case SWAP: drawShowFred (cr->cobj(), width/scale, height/scale); break;
-			case DEFAULT: cout << "Error unknown Icon." << endl;
+			case DEFAULT: drawShowU (cr->cobj (), xc, yc, min(width, height), symbol);
 		}
 	}
 	return true;

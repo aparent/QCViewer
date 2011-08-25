@@ -10,8 +10,14 @@
 QCViewer is a tool to assist in the design, visualization and simulation of quantum circuits.
 
 \section{Users Manual}
+\subsection{Creating a Circuit}
+To create a circuit select $circuit\mapsto new$. You can now enter the number of lines which you wish to use in the circuit
+and drag and drop gates into it from the tool bar.
+\subsection{Simulating a Circuit}
+\subsection{Adding a Custom Gate}
 
 \section{Technical Details}
+\subsection{Circuit Specification Format}
 \subsection{Simulation}
 We use a sparse state vector based simulation method.  Each state is superposition is stored (sparsely) as a 32-bit integer representing the state in the computational basis
 and a complex number representing its amplitude. Gates are applied to each basis state individually creating and destroying states in the superposition as needed.

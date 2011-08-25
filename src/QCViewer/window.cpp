@@ -1,15 +1,15 @@
 #include "window.h"
 #include <gtkmm/stock.h>
+#include <gates/UGateLookup.h>
 #include <iostream>
 #include <string>
 #include <state.h>
 #include <dirac.h>
-#include <sstream>
 
-void QCViewer::setup_gate_button (Gtk::Button& btn, GateIcon& g, vector<Gtk::TargetEntry> &listTargets) {
-  btn.set_image (g);
-  btn.drag_source_set (listTargets);
-  btn.signal_drag_data_get().connect(sigc::mem_fun(*this, &QCViewer::dummy));
+void QCViewer::setup_gate_button (Gtk::Button* btn, GateIcon *g, vector<Gtk::TargetEntry> &listTargets) {
+  btn->set_image (*g);
+  btn->drag_source_set (listTargets);
+  btn->signal_drag_data_get().connect(sigc::mem_fun(*this, &QCViewer::dummy));
 }
 
 void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& selection_data, guint, guint){
@@ -27,209 +27,35 @@ QCViewer::QCViewer() {
   set_default_size(1000,1000);
   state = NULL;
   
-
   add(m_vbox);
-   m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
+  m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
 
-  m_refActionGroup = Gtk::ActionGroup::create();
-  m_refActionGroup->add(Gtk::Action::create("File", "File"));
-  m_refActionGroup->add(Gtk::Action::create("Circuit", "Circuit"));
-  m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
-  m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
+  setup_menu_actions();
+  setup_menu_layout(); 
+  
+  gate_icons.push_back(new GateIcon(GateIcon::R));
+	gate_icons.push_back(new GateIcon(GateIcon::NOT));
+  gate_icons.push_back(new GateIcon(GateIcon::SWAP));
 
-  m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_new));
-  m_refActionGroup->add(Gtk::Action::create("ArchNew", Gtk::Stock::NEW, "New", "Create new architecture"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
-
-  m_refActionGroup->add(Gtk::Action::create("CircuitOpen", Gtk::Stock::OPEN, "Open", "Open a circuit file"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_file_open_circuit));
-  m_refActionGroup->add(Gtk::Action::create("ArchOpen", Gtk::Stock::OPEN, "Open", "Open an architecture file"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
-
-  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save",
-                                            "Save the circuit diagram to an image file"));
-  m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_save_circuit));
-  m_refActionGroup->add(Gtk::Action::create("ArchSave", Gtk::Stock::SAVE, "Save", "Save architecture"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
-  m_refActionGroup->add(Gtk::Action::create("DiagramSavePng", "P_NG",
-                                            "Save circuit diagram as a Portable Network Graphics file"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_save_png));
-  m_refActionGroup->add(Gtk::Action::create("DiagramSaveSvg", "S_VG",
-                                            "Save circuit diagram as a Scalable Vector Graphics file"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_save_svg));
-  m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
-                        sigc::mem_fun(*this, &QCViewer::unimplemented));
-
-	m_refActionGroup->add(Gtk::Action::create("SetArch", "Preset Arch"));
-	m_refActionGroup->add(Gtk::Action::create("LNN", "LNN"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_set_arch_LNN));
-
-  m_refActionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT, "Quit"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_file_quit));
-  m_refActionGroup->add(Gtk::Action::create("ZoomIn", Gtk::Stock::ZOOM_IN, "Zoom In"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_in));
-  m_refActionGroup->add(Gtk::Action::create("ZoomOut", Gtk::Stock::ZOOM_OUT, "Zoom Out"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
-  m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("Move", "Move"), sigc::mem_fun(*this, &QCViewer::on_menu_move));
-
-  m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
-  m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_load_state));
-  m_refActionGroup->add(Gtk::Action::create ("SimulateRun", Gtk::Stock::GOTO_LAST, "Run", "Simulate the entire circuit"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_run));
-  m_refActionGroup->add(Gtk::Action::create ("SimulateStep", Gtk::Stock::GO_FORWARD, "Step", "Advance the simulation through a single gate"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_step));
-  m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_reset));
-  m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
-
-  m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramParallel", "Show parallel guides"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
-                        sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
-
-  m_refUIManager = Gtk::UIManager::create();
-  m_refUIManager->insert_action_group(m_refActionGroup);
-
-  add_accel_group(m_refUIManager->get_accel_group());
-
-  //Layout the actions in a menubar and toolbar:
-  Glib::ustring ui_info =
-        "<ui>"
-        "  <menubar name='MenuBar'>"
-        "    <menu action='File'>"
-        "      <menuitem action='FileQuit'/>"
-        "    </menu>"
-        "    <menu action='Circuit'>"
-        "      <menuitem action='CircuitNew'/>"
-        "      <menuitem action='CircuitOpen'/>"
-        "      <menuitem action='CircuitSave'/>"
-        "    </menu>"
-        "    <menu action='Arch'>"
-        "      <menuitem action='ArchNew'/>"
-        "      <menuitem action='ArchOpen'/>"
-        "      <menuitem action='ArchSave'/>"
-        "      <menu action='SetArch'>"
-        "        <menuitem action='LNN'/>"
-        "        <separator/>"
-        "      </menu>"
-        "    </menu>"
-        "    <menu action='Diagram'>"
-        "      <menu action='DiagramSave'>"
-        "        <menuitem action='DiagramSavePng'/>"
-        "        <menuitem action='DiagramSaveSvg'/>"
-        "        <menuitem action='DiagramSavePs'/>"
-        "        <separator/>"
-        "      </menu>"
-        "      <menuitem action='DiagramParallel'/>"
-        "      <menuitem action='DiagramArch'/>"
-        "    </menu>"
-        "    <menu action='SimulateMenu'>"
-        "      <menuitem action='SimulateDisplay'/>"
-        "    </menu>"
-        "  </menubar>"
-        "  <toolbar  name='SimulateToolbar'>"
-        "    <toolitem action='CircuitOpen'/>"
-        "    <separator/>"
-        "    <toolitem action='Zoom100'/>"
-        "    <toolitem action='Move'/>"
-        "    <separator/>"
-        "    <toolitem action='SimulateLoad'/>"
-        "    <toolitem action='SimulateRun'/>"
-        "    <toolitem action='SimulateStep'/>"
-        "    <toolitem action='SimulateReset'/>"
-        "  </toolbar>"
-        "</ui>";
-
-  try
+  vector<string> names = UGateNames();
+  for (int i = 0; i < names.size(); i++)
   {
-    m_refUIManager->add_ui_from_string(ui_info);
+    gate_icons.push_back(new GateIcon(names[i]));
   }
-  catch(const Glib::Error& ex)
+  
+  for (int i = 0, y = 0, x = 0; i < gate_icons.size(); i++)
   {
-    std::cerr << "building menus failed: " <<  ex.what();
-  }
-  Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
-  if(pMenubar)
-    m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
-  m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
- // goto skip;
-
-  m_GatesFrame.set_label ("Gates");
-  m_GatesFrame.add (m_GatesTable);
-  m_GatesTable.resize (2, 4);
-  m_EditSidebar.pack_start (m_GatesFrame, Gtk::PACK_SHRINK);
-  m_EditSidebar.set_homogeneous (false);
-
-  m_SimulationFrame.set_label ("Simulation");
-  m_SimulationFrame.add (m_SimulationTable);
-  m_SimulationTable.resize (1, 1);
-  m_EditSidebar.pack_start (m_SimulationFrame, Gtk::PACK_SHRINK);
-  btn_editbreakpoints.set_label ("Edit Breakpoints");
-  btn_editbreakpoints.signal_clicked ().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
-  m_SimulationTable.attach (btn_editbreakpoints, 0,1,0,1);
-
-  m_PropFrame.set_label ("Properties");
-  m_PropFrame.add (m_PropTable);
-  m_PropTable.resize (3,1);
-  m_EditSidebar.pack_start (m_PropFrame, Gtk::PACK_SHRINK);
-  btn_delete.set_label ("Delete");
-  btn_editcontrols.set_label ("Edit Controls");
-  btn_delete.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::on_menu_delete));
-  btn_editcontrols.signal_clicked().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
-  m_PropTable.attach (btn_delete,0,1,0,1);
-  m_PropTable.attach (btn_editcontrols,0,1,1,2);
-  m_PropTable.attach (m_RGateEditFrame,0,1,2,3);
-
-	m_RGateEditFrame.set_label ("Rotation");
-	m_RGateEditFrame.add (m_RGateEditTable);
-	m_RGateEditTable.resize (3,2);
-	btn_RX.set_group (m_RAxisGroup); btn_RX.set_label ("X");
-	btn_RY.set_group (m_RAxisGroup); btn_RY.set_label ("Y");
-	btn_RZ.set_group (m_RAxisGroup); btn_RZ.set_label ("Z");
-	btn_RX.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
-	btn_RY.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
-	btn_RZ.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
-	m_RValLabel.set_text ("Value: ");
-	m_RValEntry.signal_activate().connect (sigc::mem_fun(*this, &QCViewer::set_rval));
-  m_RGateEditTable.attach (btn_RX, 0,1,0,1);
-  m_RGateEditTable.attach (btn_RY, 1,2,0,1);
-	m_RGateEditTable.attach (btn_RZ, 2,3,0,1);
-	m_RGateEditTable.attach (m_RValLabel, 0,2,1,2);
-	m_RGateEditTable.attach (m_RValEntry, 2,3,1,2);
-
-  listTargets.push_back(Gtk::TargetEntry ("STRING"));
-  listTargets.push_back(Gtk::TargetEntry ("text/plain"));
-  c.drag_dest_set (listTargets);
-  Ricon.type = GateIcon::R;
-  setup_gate_button (btn_R, Ricon, listTargets);
-
-	NOTicon.type = GateIcon::NOT;
-  Hicon.type = GateIcon::H;
-  Xicon.type = GateIcon::X;
-  Yicon.type = GateIcon::Y;
-  Zicon.type = GateIcon::Z;
-  SWAPicon.type = GateIcon::SWAP;
-
-  setup_gate_button (btn_NOT, NOTicon, listTargets);
-  setup_gate_button (btn_H, Hicon, listTargets);
-  setup_gate_button (btn_X, Xicon, listTargets);
-  setup_gate_button (btn_Y, Yicon, listTargets);
-  setup_gate_button (btn_Z, Zicon, listTargets);
-  setup_gate_button (btn_SWAP, SWAPicon, listTargets);
-  m_GatesTable.attach (btn_NOT,0,1,0,1);
-  m_GatesTable.attach (btn_H,1,2,0,1);
-  m_GatesTable.attach (btn_SWAP, 2,3,0,1);
-  m_GatesTable.attach (btn_R, 3,4,0,1);
-  m_GatesTable.attach (btn_X,0,1,1,2);
-  m_GatesTable.attach (btn_Y,1,2,1,2);
-  m_GatesTable.attach (btn_Z,2,3,1,2);
+    gate_buttons.push_back(new Gtk::Button());
+    setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);
+    m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1); 
+    x++;
+    if (x > 3)
+    {
+      x = 0;
+      y++;
+    } 
+  } 
+  
   m_GatesTable.set_homogeneous ();
 
   if (!m_SimulateToolbar) { cout << "warning failed to create toolbar" << endl; return; }
@@ -244,11 +70,6 @@ QCViewer::QCViewer() {
   m_EditVisPane.pack2 (m_VisBox, true, true);
   m_vbox.pack_start (m_EditVisPane);
 
-//  m_vbox.pack_start (m_cmdOut);
-//  m_vbox.pack_start (m_cmdIn, Gtk::PACK_SHRINK);
-//  m_cmdOut.show();
-//  m_cmdOut.set_editable (false);
-//  m_cmdIn.show ();
 skip:
   m_vbox.show();
   m_hbox.show();
@@ -573,4 +394,184 @@ void QCViewer::update_mode () {
     get_window ()->set_cursor ();
     c.set_mode (CircuitWidget::NORMAL);
   }
+}
+
+void QCViewer::setup_menu_actions()
+{
+  m_refActionGroup = Gtk::ActionGroup::create();
+  m_refActionGroup->add(Gtk::Action::create("File", "File"));
+  m_refActionGroup->add(Gtk::Action::create("Circuit", "Circuit"));
+  m_refActionGroup->add(Gtk::Action::create("Arch", "Architecture"));
+  m_refActionGroup->add(Gtk::Action::create("Diagram", "Diagram"));
+
+  m_refActionGroup->add(Gtk::Action::create("CircuitNew", Gtk::Stock::NEW, "New", "Create new circuit"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_new));
+  m_refActionGroup->add(Gtk::Action::create("ArchNew", Gtk::Stock::NEW, "New", "Create new architecture"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+
+  m_refActionGroup->add(Gtk::Action::create("CircuitOpen", Gtk::Stock::OPEN, "Open", "Open a circuit file"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_file_open_circuit));
+  m_refActionGroup->add(Gtk::Action::create("ArchOpen", Gtk::Stock::OPEN, "Open", "Open an architecture file"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
+
+  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save",
+                                            "Save the circuit diagram to an image file"));
+  m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_save_circuit));
+  m_refActionGroup->add(Gtk::Action::create("ArchSave", Gtk::Stock::SAVE, "Save", "Save architecture"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+  m_refActionGroup->add(Gtk::Action::create("DiagramSavePng", "P_NG",
+                                            "Save circuit diagram as a Portable Network Graphics file"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_save_png));
+  m_refActionGroup->add(Gtk::Action::create("DiagramSaveSvg", "S_VG",
+                                            "Save circuit diagram as a Scalable Vector Graphics file"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_save_svg));
+  m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
+                        sigc::mem_fun(*this, &QCViewer::unimplemented));
+
+	m_refActionGroup->add(Gtk::Action::create("SetArch", "Preset Arch"));
+	m_refActionGroup->add(Gtk::Action::create("LNN", "LNN"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_set_arch_LNN));
+
+  m_refActionGroup->add(Gtk::Action::create("FileQuit", Gtk::Stock::QUIT, "Quit"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_file_quit));
+  m_refActionGroup->add(Gtk::Action::create("ZoomIn", Gtk::Stock::ZOOM_IN, "Zoom In"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_in));
+  m_refActionGroup->add(Gtk::Action::create("ZoomOut", Gtk::Stock::ZOOM_OUT, "Zoom Out"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
+  m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("Move", "Move"), sigc::mem_fun(*this, &QCViewer::on_menu_move));
+
+  m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_load_state));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateRun", Gtk::Stock::GOTO_LAST, "Run", "Simulate the entire circuit"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_run));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateStep", Gtk::Stock::GO_FORWARD, "Step", "Advance the simulation through a single gate"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_step));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_reset));
+  m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
+
+  m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramParallel", "Show parallel guides"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
+
+  m_refUIManager = Gtk::UIManager::create();
+  m_refUIManager->insert_action_group(m_refActionGroup);
+
+  add_accel_group(m_refUIManager->get_accel_group());
+}
+
+void QCViewer::setup_menu_layout()
+{
+  Glib::ustring ui_info =
+        "<ui>"
+        "  <menubar name='MenuBar'>"
+        "    <menu action='File'>"
+        "      <menuitem action='FileQuit'/>"
+        "    </menu>"
+        "    <menu action='Circuit'>"
+        "      <menuitem action='CircuitNew'/>"
+        "      <menuitem action='CircuitOpen'/>"
+        "      <menuitem action='CircuitSave'/>"
+        "    </menu>"
+        "    <menu action='Arch'>"
+        "      <menuitem action='ArchNew'/>"
+        "      <menuitem action='ArchOpen'/>"
+        "      <menuitem action='ArchSave'/>"
+        "      <menu action='SetArch'>"
+        "        <menuitem action='LNN'/>"
+        "        <separator/>"
+        "      </menu>"
+        "    </menu>"
+        "    <menu action='Diagram'>"
+        "      <menu action='DiagramSave'>"
+        "        <menuitem action='DiagramSavePng'/>"
+        "        <menuitem action='DiagramSaveSvg'/>"
+        "        <menuitem action='DiagramSavePs'/>"
+        "        <separator/>"
+        "      </menu>"
+        "      <menuitem action='DiagramParallel'/>"
+        "      <menuitem action='DiagramArch'/>"
+        "    </menu>"
+        "    <menu action='SimulateMenu'>"
+        "      <menuitem action='SimulateDisplay'/>"
+        "    </menu>"
+        "  </menubar>"
+        "  <toolbar  name='SimulateToolbar'>"
+        "    <toolitem action='CircuitOpen'/>"
+        "    <separator/>"
+        "    <toolitem action='Zoom100'/>"
+        "    <toolitem action='Move'/>"
+        "    <separator/>"
+        "    <toolitem action='SimulateLoad'/>"
+        "    <toolitem action='SimulateRun'/>"
+        "    <toolitem action='SimulateStep'/>"
+        "    <toolitem action='SimulateReset'/>"
+        "  </toolbar>"
+        "</ui>";
+
+  try
+  {
+    m_refUIManager->add_ui_from_string(ui_info);
+  }
+  catch(const Glib::Error& ex)
+  {
+    std::cerr << "building menus failed: " <<  ex.what();
+  }
+  Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
+  if(pMenubar)
+    m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
+  m_SimulateToolbar = m_refUIManager->get_widget("/SimulateToolbar");
+
+  m_GatesFrame.set_label ("Gates");
+  m_GatesFrame.add (m_GatesTable);
+  m_GatesTable.resize (2, 4);
+  m_EditSidebar.pack_start (m_GatesFrame, Gtk::PACK_SHRINK);
+  m_EditSidebar.set_homogeneous (false);
+
+  m_SimulationFrame.set_label ("Simulation");
+  m_SimulationFrame.add (m_SimulationTable);
+  m_SimulationTable.resize (1, 1);
+  m_EditSidebar.pack_start (m_SimulationFrame, Gtk::PACK_SHRINK);
+  btn_editbreakpoints.set_label ("Edit Breakpoints");
+  btn_editbreakpoints.signal_clicked ().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
+  m_SimulationTable.attach (btn_editbreakpoints, 0,1,0,1);
+
+  m_PropFrame.set_label ("Properties");
+  m_PropFrame.add (m_PropTable);
+  m_PropTable.resize (3,1);
+  m_EditSidebar.pack_start (m_PropFrame, Gtk::PACK_SHRINK);
+  btn_delete.set_label ("Delete");
+  btn_editcontrols.set_label ("Edit Controls");
+  btn_delete.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::on_menu_delete));
+  btn_editcontrols.signal_clicked().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
+  m_PropTable.attach (btn_delete,0,1,0,1);
+  m_PropTable.attach (btn_editcontrols,0,1,1,2);
+  m_PropTable.attach (m_RGateEditFrame,0,1,2,3);
+
+	m_RGateEditFrame.set_label ("Rotation");
+	m_RGateEditFrame.add (m_RGateEditTable);
+	m_RGateEditTable.resize (3,2);
+	btn_RX.set_group (m_RAxisGroup); btn_RX.set_label ("X");
+	btn_RY.set_group (m_RAxisGroup); btn_RY.set_label ("Y");
+	btn_RZ.set_group (m_RAxisGroup); btn_RZ.set_label ("Z");
+	btn_RX.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
+	btn_RY.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
+	btn_RZ.signal_clicked ().connect (sigc::mem_fun(*this, &QCViewer::set_raxis));
+	m_RValLabel.set_text ("Value: ");
+	m_RValEntry.signal_activate().connect (sigc::mem_fun(*this, &QCViewer::set_rval));
+  m_RGateEditTable.attach (btn_RX, 0,1,0,1);
+  m_RGateEditTable.attach (btn_RY, 1,2,0,1);
+	m_RGateEditTable.attach (btn_RZ, 2,3,0,1);
+	m_RGateEditTable.attach (m_RValLabel, 0,2,1,2);
+	m_RGateEditTable.attach (m_RValEntry, 2,3,1,2);
+  listTargets.push_back(Gtk::TargetEntry ("STRING"));
+  listTargets.push_back(Gtk::TargetEntry ("text/plain"));
+  c.drag_dest_set (listTargets);
 }

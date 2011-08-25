@@ -8,6 +8,16 @@ using namespace std;
 
 map<string,gateMatrix*> gateLib;
 
+std::vector<std::string> UGateNames()
+{
+  vector<string> result;
+  map<string,gateMatrix*>::iterator it; 
+  for ( it=gateLib.begin() ; it != gateLib.end(); it++ )
+  {
+    result.push_back((*it).first);
+  }
+  return result;
+}
 gateMatrix *UGateLookup(string name){
 	if ( gateLib.find(name) == gateLib.end() ){
 		cerr << "GATE: " << name << " does not exist" << endl;

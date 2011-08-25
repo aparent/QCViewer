@@ -1,8 +1,4 @@
-#include "circuit.h"
 #include "window.h"
-#include "draw.h"
-#include <gtkmm/main.h>
-#include <gtkmm/window.h>
 #include <gates/UGateLookup.h>
 #include <iostream>
 

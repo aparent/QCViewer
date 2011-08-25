@@ -18,7 +18,7 @@ public:
 	void load_state (State* s);
 protected:
   void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
-  void setup_gate_button (Gtk::Button&, GateIcon&, vector<Gtk::TargetEntry> &);
+  void setup_gate_button (Gtk::Button*, GateIcon*, vector<Gtk::TargetEntry> &);
 
   // Signal handlers:
   void on_menu_file_open_circuit ();
@@ -78,8 +78,10 @@ protected:
   Gtk::VBox        m_EditSidebar;
   Gtk::Frame       m_GatesFrame;
   Gtk::Table       m_GatesTable;
-  Gtk::Button      btn_H, btn_X, btn_Y, btn_Z, btn_NOT, btn_R, btn_SWAP;
-  GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
+  //Gtk::Button      btn_H, btn_X, btn_Y, btn_Z, btn_NOT, btn_R, btn_SWAP;
+  //GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
+  std::vector<Gtk::Button*> gate_buttons;
+  std::vector<GateIcon*>    gate_icons;  
   Gtk::Frame       m_PropFrame;
   Gtk::Table       m_PropTable;
 
@@ -103,6 +105,8 @@ protected:
 
   std::vector<Gtk::TargetEntry> listTargets;
 private:
+  void setup_menu_actions();
+  void setup_menu_layout();
   void update_mode ();
 
   State *state;

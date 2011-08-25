@@ -3,3 +3,4 @@ all:
 #	bibtex QCViewer.aux
 	latex QCViewer.tex
 	latex QCViewer.tex
+	dvipdf QCViewer.dvi
