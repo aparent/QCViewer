@@ -5,7 +5,7 @@
 
 class GateIcon : public Gtk::DrawingArea {
 	public:
-	  enum GateType { NOT, H, X, Y, Z, R, SWAP, DEFAULT };
+	  enum GateType { NOT, R, SWAP, DEFAULT };
     GateIcon ();
     GateIcon (std::string);
     GateIcon (GateType);

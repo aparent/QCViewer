@@ -12,7 +12,7 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() :  circuit (NULL), cx(0), cy(0) {
+CircuitWidget::CircuitWidget() : circuit (NULL), cx(0), cy(0) {
   panning = drawarch = drawparallel = false;
   mode = NORMAL;
   NextGateToSimulate = 0;
@@ -66,10 +66,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
        newgate = new UGate ("X");
        newgate->drawType = Gate::NOT;
        break;
-    case GateIcon::H: newgate = new UGate ("H"); break;
-    case GateIcon::X: newgate = new UGate ("X"); break;
-    case GateIcon::Y: newgate = new UGate ("Y"); break;
-    case GateIcon::Z: newgate = new UGate ("Z"); break;
     case GateIcon::R: newgate = new RGate (1.0, RGate::Z); break;
     case GateIcon::SWAP:
       newgate = new UGate ("F");
@@ -191,9 +187,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
   double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
   double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
   Gate* g;
-  if(event->button == 1 && panning) {
-    panning = false;
-  } else if (event->button == 1) {
+  if (event->button == 1) {
     selecting = false;
     int column_id = -1.0; // before column 0
     double mindist = -1.0;
@@ -204,6 +198,9 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
     vector<Control>::iterator it;
     vector<unsigned int>::iterator it2;
     switch (mode) {
+			case PANNING:
+			  panning = false;
+				break;
       case NORMAL:
         //gateid = pickRect (rects, x, y);
       {  gateRect r;
@@ -218,7 +215,6 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
         r.width = abs(r.width);
         r.height = abs(r.height);
 
-        cout << "w: " << r.width << "\th: " << r.height << "\n";
         selections.clear ();
         selections = pickRects (rects, r);
         //selections.clear ();
@@ -422,6 +418,7 @@ void CircuitWidget::set_drawparallel (bool foo) { drawparallel = foo; force_redr
 void CircuitWidget::save_circuit (string filename) {
 	saveCircuit(circuit,filename);
 }
+
 void CircuitWidget::savepng (string filename) {
   if (!circuit) return;
   double wirestart, wireend;
@@ -449,6 +446,7 @@ void CircuitWidget::savesvg (string filename) {
 }
 
 void CircuitWidget::set_scale (double x) {
+	if (!circuit) return;
   scale = x;
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();

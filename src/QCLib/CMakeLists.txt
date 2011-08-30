@@ -1,6 +1,13 @@
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -ansi")
+
+IF(WIN32)
+	set(CMAKE_CXX_FLAGS "-Wall -pedantic")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic")
+ENDIF(WIN32)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 SET(QCLIB_SRC_FILES
@@ -35,43 +42,41 @@ SET(QCLIB_HEADER_FILES
 	gates/UGateLookup.h
 )
 
-IF(UNIX)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TFCLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
-	)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/diracLexer.l
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/diracLexer.l
-	)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/diracParser.h
-		COMMAND bison -d -v -o diracParser.cpp ${CMAKE_CURRENT_SOURCE_DIR}/diracParser.y
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/diracParser.y
-	)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLLexer.l
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLLexer.l
-	)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.h
-		COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
-	)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/GateLexer.cpp
-		COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateLexer.l
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateLexer.l
-	)
-	add_custom_command (
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/GateParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/GateParser.h
-		COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
-	)
-ENDIF(UNIX)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TFCLexer.cpp
+	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
+)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.cpp
+	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/diracLexer.l
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/diracLexer.l
+)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/diracParser.h
+	COMMAND bison -d -v -o diracParser.cpp ${CMAKE_CURRENT_SOURCE_DIR}/diracParser.y
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/diracParser.y
+)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLLexer.cpp
+	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLLexer.l
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLLexer.l
+)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCLParser.h
+	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLang/QCLParser.y
+)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/GateLexer.cpp
+	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateLexer.l
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateLexer.l
+)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/GateParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/GateParser.h
+	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
+)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 

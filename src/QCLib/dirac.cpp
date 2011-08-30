@@ -49,9 +49,9 @@ diracTerm stringToKet(string value){
 	diracTerm ret;
 	index_t basis = 0;
 	ret.type = KET;
-	for (int i = value.size()-1, j = 0; i>=0; i--,j++){
+	for (int i = 0; i < value.size(); i++){
 		if      (value[i] == '1') {
-			basis = SetRegister(basis,j);
+			basis = SetRegister(basis,i);
 		} else if (value[i] == '0') {
 		} else    {
 			cerr << "ERROR BAD CHAR IN KET: " << value[i] << endl;

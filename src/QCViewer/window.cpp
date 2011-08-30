@@ -22,17 +22,18 @@ QCViewer::QCViewer() {
   std::cerr << "In QCViewer::QCViewer.\n";
   std::cerr << "...skipping\n";
   drawparallel = panning = drawarch = false;
-  set_title("QCViewer-v0.2");
+  set_title("QCViewer");
   set_border_width(0);
   set_default_size(1000,1000);
   state = NULL;
-  
+
   add(m_vbox);
   m_vbox.pack_end(m_statusbar,Gtk::PACK_SHRINK);
 
+	register_stock_items();
   setup_menu_actions();
-  setup_menu_layout(); 
-  
+  setup_menu_layout();
+
   gate_icons.push_back(new GateIcon(GateIcon::R));
 	gate_icons.push_back(new GateIcon(GateIcon::NOT));
   gate_icons.push_back(new GateIcon(GateIcon::SWAP));
@@ -42,20 +43,20 @@ QCViewer::QCViewer() {
   {
     gate_icons.push_back(new GateIcon(names[i]));
   }
-  
+
   for (int i = 0, y = 0, x = 0; i < gate_icons.size(); i++)
   {
     gate_buttons.push_back(new Gtk::Button());
     setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);
-    m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1); 
+    m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1);
     x++;
     if (x > 3)
     {
       x = 0;
       y++;
-    } 
-  } 
-  
+    }
+  }
+
   m_GatesTable.set_homogeneous ();
 
   if (!m_SimulateToolbar) { cout << "warning failed to create toolbar" << endl; return; }
@@ -125,6 +126,18 @@ void QCViewer::set_rval () {
 	}
 	((RGate*)g)->set_rotVal (nr);
 	c.force_redraw ();
+}
+
+void QCViewer::on_menu_about () {
+	vector<Glib::ustring> authors;
+	authors.push_back("Alex Parent <aparent@uwaterloo.ca>");
+	authors.push_back("Jakub Parker <j3parker@uwaterloo.ca>");
+	Gtk::AboutDialog dialog;
+	dialog.set_version("0.2");
+	dialog.set_program_name("QCViewer");
+	dialog.set_website("qcirc.iqc.uwaterloo.ca/viewer");
+	dialog.set_authors(authors);
+	dialog.run();
 }
 
 void QCViewer::on_menu_file_open_circuit () {
@@ -441,7 +454,7 @@ void QCViewer::setup_menu_actions()
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
   m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
-  m_refActionGroup->add(Gtk::ToggleAction::create ("Move", "Move"), sigc::mem_fun(*this, &QCViewer::on_menu_move));
+  m_refActionGroup->add(Gtk::ToggleAction::create ("Move", Gtk::StockID("pan")), sigc::mem_fun(*this, &QCViewer::on_menu_move));
 
   m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
   m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -461,7 +474,11 @@ void QCViewer::setup_menu_actions()
   m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
 
-  m_refUIManager = Gtk::UIManager::create();
+  m_refActionGroup->add(Gtk::Action::create("Help", "Help"));
+  m_refActionGroup->add(Gtk::Action::create ("About", "About"),
+                        sigc::mem_fun(*this, &QCViewer::on_menu_about));
+
+	m_refUIManager = Gtk::UIManager::create();
   m_refUIManager->insert_action_group(m_refActionGroup);
 
   add_accel_group(m_refUIManager->get_accel_group());
@@ -480,15 +497,6 @@ void QCViewer::setup_menu_layout()
         "      <menuitem action='CircuitOpen'/>"
         "      <menuitem action='CircuitSave'/>"
         "    </menu>"
-        "    <menu action='Arch'>"
-        "      <menuitem action='ArchNew'/>"
-        "      <menuitem action='ArchOpen'/>"
-        "      <menuitem action='ArchSave'/>"
-        "      <menu action='SetArch'>"
-        "        <menuitem action='LNN'/>"
-        "        <separator/>"
-        "      </menu>"
-        "    </menu>"
         "    <menu action='Diagram'>"
         "      <menu action='DiagramSave'>"
         "        <menuitem action='DiagramSavePng'/>"
@@ -501,6 +509,9 @@ void QCViewer::setup_menu_layout()
         "    </menu>"
         "    <menu action='SimulateMenu'>"
         "      <menuitem action='SimulateDisplay'/>"
+        "    </menu>"
+        "    <menu action='Help'>"
+        "    	<menuitem action='About'/>"
         "    </menu>"
         "  </menubar>"
         "  <toolbar  name='SimulateToolbar'>"
@@ -574,4 +585,24 @@ void QCViewer::setup_menu_layout()
   listTargets.push_back(Gtk::TargetEntry ("STRING"));
   listTargets.push_back(Gtk::TargetEntry ("text/plain"));
   c.drag_dest_set (listTargets);
+}
+
+void QCViewer::register_stock_items()
+{
+	Glib::RefPtr<Gtk::IconFactory> factory = Gtk::IconFactory::create();
+	add_stock_item(factory, "data/pan.png", "pan", "Pan");
+	factory->add_default(); //Add factory to list of factories.
+}
+void QCViewer::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory, const std::string& filepath,
+											        const Glib::ustring& id, const Glib::ustring& label)
+{
+	Gtk::IconSource source;
+	source.set_pixbuf( Gdk::Pixbuf::create_from_file(filepath) );
+	source.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
+	source.set_size_wildcarded(); //Icon may be scaled.
+	Gtk::IconSet icon_set;
+	icon_set.add_source(source); //More than one source per set is allowed.
+	const Gtk::StockID stock_id(id);
+	factory->add(stock_id, icon_set);
+	Gtk::Stock::add(Gtk::StockItem(stock_id, label));
 }

@@ -33,7 +33,7 @@ const double Upad = 0.9;
 
 void init_fonts(){
 	FT_Init_FreeType( &library );
-	FT_New_Face( library, "fonts/cmbx12.ttf", 0, &ft_face );
+	FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
 	ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 

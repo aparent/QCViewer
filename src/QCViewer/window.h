@@ -25,6 +25,7 @@ protected:
   void on_menu_file_open_arch ();
   void on_menu_mode_edit ();
   void on_menu_new ();
+  void on_menu_about ();
   void on_menu_move ();
   void on_menu_mode_simulate ();
 //  void on_menu_file_save ();
@@ -107,6 +108,8 @@ protected:
 private:
   void setup_menu_actions();
   void setup_menu_layout();
+	void register_stock_items();
+	void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
   void update_mode ();
 
   State *state;
