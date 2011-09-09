@@ -1,4 +1,5 @@
 #include "window.h"
+#include "info.h"
 #include <gtkmm/stock.h>
 #include <gates/UGateLookup.h>
 #include <iostream>
@@ -22,7 +23,7 @@ QCViewer::QCViewer() {
   std::cerr << "In QCViewer::QCViewer.\n";
   std::cerr << "...skipping\n";
   drawparallel = panning = drawarch = false;
-  set_title("QCViewer");
+  set_title(QCV_NAME);
   set_border_width(0);
   set_default_size(1000,1000);
   state = NULL;
@@ -33,31 +34,7 @@ QCViewer::QCViewer() {
 	register_stock_items();
   setup_menu_actions();
   setup_menu_layout();
-
-  gate_icons.push_back(new GateIcon(GateIcon::R));
-	gate_icons.push_back(new GateIcon(GateIcon::NOT));
-  gate_icons.push_back(new GateIcon(GateIcon::SWAP));
-
-  vector<string> names = UGateNames();
-  for (int i = 0; i < names.size(); i++)
-  {
-    gate_icons.push_back(new GateIcon(names[i]));
-  }
-
-  for (int i = 0, y = 0, x = 0; i < gate_icons.size(); i++)
-  {
-    gate_buttons.push_back(new Gtk::Button());
-    setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);
-    m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1);
-    x++;
-    if (x > 3)
-    {
-      x = 0;
-      y++;
-    }
-  }
-
-  m_GatesTable.set_homogeneous ();
+	setup_gate_icons();
 
   if (!m_SimulateToolbar) { cout << "warning failed to create toolbar" << endl; return; }
   m_vbox.pack_start(*m_SimulateToolbar, Gtk::PACK_SHRINK);
@@ -133,9 +110,9 @@ void QCViewer::on_menu_about () {
 	authors.push_back("Alex Parent <aparent@uwaterloo.ca>");
 	authors.push_back("Jakub Parker <j3parker@uwaterloo.ca>");
 	Gtk::AboutDialog dialog;
-	dialog.set_version("0.2");
-	dialog.set_program_name("QCViewer");
-	dialog.set_website("qcirc.iqc.uwaterloo.ca/viewer");
+	dialog.set_version(QCV_VERSION);
+	dialog.set_program_name(QCV_NAME);
+	dialog.set_website(QCV_WEBSITE);
 	dialog.set_authors(authors);
 	dialog.run();
 }
@@ -586,6 +563,32 @@ void QCViewer::setup_menu_layout()
   listTargets.push_back(Gtk::TargetEntry ("text/plain"));
   c.drag_dest_set (listTargets);
 }
+
+void QCViewer::setup_gate_icons()
+{
+	gate_icons.push_back(new GateIcon(GateIcon::R));
+	gate_icons.push_back(new GateIcon(GateIcon::NOT));
+  gate_icons.push_back(new GateIcon(GateIcon::SWAP));
+
+  vector<string> names = UGateNames();
+  for (int i = 0; i < names.size(); i++)
+  {
+    gate_icons.push_back(new GateIcon(names[i]));
+  }
+  for (int i = 0, y = 0, x = 0; i < gate_icons.size(); i++)
+  {
+    gate_buttons.push_back(new Gtk::Button());
+    setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);
+    m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1);
+    x++;
+    if (x > 3){
+      x = 0;
+      y++;
+    }
+  }
+  m_GatesTable.set_homogeneous ();
+}
+
 
 void QCViewer::register_stock_items()
 {

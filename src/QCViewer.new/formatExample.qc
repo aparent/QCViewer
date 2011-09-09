@@ -17,7 +17,7 @@ circuit main
 	a 3->a 2->c 4->b
 
 	rx(pi/2) 4
-end circuit 
+end circuit
 
 gate rot(a,b,c)
 	SYMBOL R

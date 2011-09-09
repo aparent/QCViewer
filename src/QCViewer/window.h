@@ -108,6 +108,7 @@ protected:
 private:
   void setup_menu_actions();
   void setup_menu_layout();
+  void setup_gate_icons();
 	void register_stock_items();
 	void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
   void update_mode ();
