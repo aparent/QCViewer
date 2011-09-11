@@ -14,7 +14,9 @@ std::vector<std::string> UGateNames()
   map<string,gateMatrix*>::iterator it; 
   for ( it=gateLib.begin() ; it != gateLib.end(); it++ )
   {
-    result.push_back((*it).first);
+    if (((*it).first).compare("F") != 0){//TODO: this is very special case
+      result.push_back((*it).first);
+    }
   }
   return result;
 }

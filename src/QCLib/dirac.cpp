@@ -49,7 +49,7 @@ diracTerm stringToKet(string value){
 	diracTerm ret;
 	index_t basis = 0;
 	ret.type = KET;
-	for (int i = 0; i < value.size(); i++){
+	for (unsigned int i = 0; i < value.size(); i++){
 		if      (value[i] == '1') {
 			basis = SetRegister(basis,i);
 		} else if (value[i] == '0') {
