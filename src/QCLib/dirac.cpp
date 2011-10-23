@@ -135,12 +135,31 @@ diracTerm evalTree(parseNode *node){
 			return ret;
 		}
 	}
+	
 
 	if(node->right == NULL){
 		cerr << "ERROR left is NULL."<<endl;
 		return ret;
 	}
 	else left = evalTree(node->left);
+	if (node->type == EXPON){
+		if (left.type == KET){
+			ret.vecValue = State(left.vecValue);
+			ret.vecValue.print();
+			for(unsigned int i = 1; i < (unsigned int)real(right.numValue); i++){	
+				ret.vecValue = kron(ret.vecValue,left.vecValue);
+				cout << i << endl;
+				left.vecValue.print();
+				ret.vecValue.print();
+			}
+			ret.type = KET;
+			return ret;
+		}
+ 		else{
+			cerr << "ERROR exponent must be used on vector and a number"<<endl;
+			return ret;
+		}
+	}
 
 	if (node->type == PLUS){
 		if      (left.type == NUM && right.type == NUM) return constAdd(left,right);

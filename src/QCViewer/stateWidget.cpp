@@ -158,8 +158,8 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
         double lastVal = drawmode == REAL? bucket[0].real () : bucket[0].imag ();
         if (draw_compressed) cr->move_to (xborder, height/2.0);
         for (unsigned int i = 0; i < num_draw; i++) {
-          float_t val = drawmode == REAL ? bucket[i].real() : bucket[i].imag ();
-          float_t eValue = val/maxX;
+          float_type val = drawmode == REAL ? bucket[i].real() : bucket[i].imag ();
+          float_type eValue = val/maxX;
           if (abs(val) > EPS) {
             if (!draw_compressed) {
               cr->rectangle (xborder + (double)i*barWidth, height/2.0, barWidth, -eValue*barHeight/2.0);

@@ -4,6 +4,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -ansi")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(PkgConfig)
+find_package(Freetype)
 pkg_check_modules(GTKMM glib-2.0 gtkmm-2.4 freetype2)
 
 file(GLOB QCVIEWER_SRC_FILES *.cpp)
@@ -19,6 +20,8 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/../QCLib)
 
 include_directories(${GTKMM_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
+include_directories(${Freetype_INCLUDE_DIRS})
+LINK_DIRECTORIES(${Freetype_LIBRARY_DIRS})
 
 add_executable (viewer  ${QCVIEWER_SRC_FILES})
 target_link_libraries(viewer ${GTKMM_LIBRARIES} ${CMAKE_CURRENT_BINARY_DIR}/../QCLib/libQC.a )

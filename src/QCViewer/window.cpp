@@ -571,11 +571,11 @@ void QCViewer::setup_gate_icons()
   gate_icons.push_back(new GateIcon(GateIcon::SWAP));
 
   vector<string> names = UGateNames();
-  for (int i = 0; i < names.size(); i++)
+  for (unsigned int i = 0; i < names.size(); i++)
   {
     gate_icons.push_back(new GateIcon(names[i]));
   }
-  for (int i = 0, y = 0, x = 0; i < gate_icons.size(); i++)
+  for (unsigned int i = 0, y = 0, x = 0; i < gate_icons.size(); i++)
   {
     gate_buttons.push_back(new Gtk::Button());
     setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);

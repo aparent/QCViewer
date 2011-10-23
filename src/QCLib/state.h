@@ -22,11 +22,11 @@ public:
   const State& operator-= (const State &r);
   const State& operator*= (const std::complex<float_type>);
 	void normalize();
-	unsigned int numBits();
+	unsigned int numBits() const;
 
 	index_t dim;
   StateMap data;
 };
 
-State kron (State&,State&);
+State kron (const State &l,const State &r);
 #endif // STATE__INCLUDED

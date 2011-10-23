@@ -61,17 +61,17 @@ const State& State::operator*= (const complex<float_type> x) {
   return *this;
 }
 
-unsigned int State::numBits(){
+unsigned int State::numBits() const{
 	return floorLog2(dim); 
 }
 
-State kron (State& l, State& r){
-  StateMap::iterator it_r;
-  StateMap::iterator it_l;
-	State ret;
+State kron (const State& l, const State& r){
+  StateMap::const_iterator it_r;
+  StateMap::const_iterator it_l;
+  State ret;
   for (it_l = l.data.begin(); it_l != l.data.end(); ++it_l) {
   	for (it_r = r.data.begin(); it_r != r.data.end(); ++it_r) {
-			ret.data[(it_l->first < r.numBits())|(it_r->first)] = it_l->second*it_r->second;
+			ret.data[(it_l->first << r.numBits())|(it_r->first)] = it_l->second*it_r->second;
 		}
 	}
 	ret.dim = l.dim*r.dim;
@@ -80,16 +80,16 @@ State kron (State& l, State& r){
 
 void State::normalize(){
 	StateMap::const_iterator it;
-  float_t norm = 0;
-	float_t real;
-	float_t imag;
+	float_type norm = 0;
+	float_type real;
+	float_type imag;
 	for (it = data.begin(); it != data.end(); ++it) {
-    real = it->second.real ();
+    		real = it->second.real ();
 		imag = it->second.imag ();
 		norm += real*real + imag*imag;
-  }
+  	}	
 	norm = sqrt(norm);
-  for (it = data.begin(); it != data.end(); ++it) {
+	for (it = data.begin(); it != data.end(); ++it) {
 		data[it->first] = (it->second) / complex<float_type>(norm,0);
 	}
 }

@@ -2,11 +2,11 @@ set(CMAKE_CXX_FLAGS "-Wall -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -ansi")
 
-IF(WIN32)
+IF(WIN)
 	set(CMAKE_CXX_FLAGS "-Wall -pedantic")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic")
-ENDIF(WIN32)
+ENDIF(WIN)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

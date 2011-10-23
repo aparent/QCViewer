@@ -126,7 +126,7 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator &it){
 			} else {
 				rot_type = RGate::Z;
 			}
-      float_t rot;
+      float_type rot;
       ss >>  rot;
       newGate = new RGate(rot, rot_type); //sets rotation amount
     } else if (((*it).value[0]) == 'T'){

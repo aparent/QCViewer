@@ -38,7 +38,7 @@ private:
 	bool draw_compressed;
 	unsigned int num_draw; // number of buckets to draw
   index_t bucketID[numBuckets]; // XXX: need to be bitstrings
-	std::complex<float_t> bucket[numBuckets];
+	std::complex<float_type> bucket[numBuckets];
 
 	index_t trace;  // This is a bit string where 1s indicate parts to be included in the expectation
 	float_type traced_bucket[numBuckets];// These hold the expectation value of a traced out state

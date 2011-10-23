@@ -23,6 +23,7 @@
 %left TIMES
 %left DIV
 %left SQRT
+%left EXPON
 
 %%
 input:	/*empty*/
@@ -38,6 +39,7 @@ subex: term
                                        val->value = "*"; val->left = $1; val->right=$2; val->type = TIMES;
                                        $$ = val; }
        | subex DIV NUM               { $2->left = $1; $2->right=$3; $$ = $2; }
+       | subex EXPON NUM               { $2->left = $1; $2->right=$3; $$ = $2; }
        | subex DIV '(' exp ')'       { $2->left = $1; $2->right=$4; $$ = $2; }
        | subex DIV SQRT '(' exp ')'  { $2->left = $1; $2->right=$3; $3->right = $5; $$ = $2; }
        |  SQRT '(' exp ')'           { $1->right = $3; $$ = $1; }
