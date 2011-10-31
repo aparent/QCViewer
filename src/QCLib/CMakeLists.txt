@@ -13,7 +13,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 SET(QCLIB_SRC_FILES
 	circuit.cpp
 	diracLexer.cpp
-	TFCLexer.cpp
+	QCLexer.cpp
 	utility.cpp
 	circuitParser.cpp
 	dirac.cpp
@@ -36,16 +36,16 @@ SET(QCLIB_HEADER_FILES
 	circuitParser.h
 	diracParser.h
   parseNode.h
-	TFCLexer.h
+	QCLexer.h
 	utility.h
   state.h
 	gates/UGateLookup.h
 )
 
 add_custom_command (
-	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TFCLexer.cpp
-	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/TFCLexer.l
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLexer.cpp
+	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLexer.l
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLexer.l
 )
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/diracLexer.cpp

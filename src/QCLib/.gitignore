@@ -13,7 +13,7 @@ libQC.a
 cmake_install.cmake
 diracTest
 Makefile
-TFCLexer.cpp
+QCLexer.cpp
 diracLexer.cpp
 diracParser.cpp
 diracParser.h

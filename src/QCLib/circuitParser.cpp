@@ -8,13 +8,13 @@
 
 using namespace std;
 
-void parseLineNames(Circuit * circ, vector<TFCToken>::iterator &it){
+void parseLineNames(Circuit * circ, vector<QCToken>::iterator &it){
   while((*(++it)).type == VAR_NAME){
     circ->addLine((*it).value);
   }
 }
 
-void parseInputs(Circuit * circ, vector<TFCToken>::iterator &it){
+void parseInputs(Circuit * circ, vector<QCToken>::iterator &it){
   while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
       if ((*it).value.compare(circ->getLine(j)->lineName)==0){
@@ -26,7 +26,7 @@ void parseInputs(Circuit * circ, vector<TFCToken>::iterator &it){
   }
 }
 
-void parseOutputs(Circuit * circ, vector<TFCToken>::iterator &it){
+void parseOutputs(Circuit * circ, vector<QCToken>::iterator &it){
   while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
       if ((*it).value.compare(circ->getLine(j)->lineName)==0){
@@ -38,7 +38,7 @@ void parseOutputs(Circuit * circ, vector<TFCToken>::iterator &it){
   }
 }
 
-void parseOutputLabels(Circuit * circ, vector<TFCToken>::iterator &it){
+void parseOutputLabels(Circuit * circ, vector<QCToken>::iterator &it){
   while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
       if (!circ->getLine(j)->garbage){
@@ -57,7 +57,7 @@ bool inControls(vector<Control> &ctr ,unsigned int n){
 	return false;
 }
 
-bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator &it){
+bool parseGateInputs(Gate *gate, Circuit *circ, vector<QCToken>::iterator &it){
   bool found;
   while((*(++it)).type == GATE_INPUT || (*it).type == GATE_INPUT_N){
     found = false;
@@ -102,7 +102,7 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<TFCToken>::iterator &it){
   return true;
 }
 
-void parseGates(Circuit *circ, vector<TFCToken>::iterator &it){
+void parseGates(Circuit *circ, vector<QCToken>::iterator &it){
   it++;
   while((*it).type != SEC_END){
     Gate *newGate;
@@ -146,7 +146,7 @@ void parseGates(Circuit *circ, vector<TFCToken>::iterator &it){
   }
 }
 
-void parseConstants(Circuit * circ, vector<TFCToken>::iterator &it){
+void parseConstants(Circuit * circ, vector<QCToken>::iterator &it){
   while((*(++it)).type == VAR_NAME){
     for(unsigned int j = 0; j < circ->numLines(); j++){
       if (circ->getLine(j)->constant){
@@ -178,9 +178,9 @@ Circuit *parseCircuit (string file){
 		circ->name = file;
 	}
 
-  vector<TFCToken> *tokens = lexCircuit(file);
+  vector<QCToken> *tokens = lexCircuit(file);
   if (tokens == NULL) return NULL;
-  vector<TFCToken>::iterator it = tokens->begin();
+  vector<QCToken>::iterator it = tokens->begin();
   for(; ;){
     if ((*it).type == SEC_START){
       if (((*it).value).compare("V")     == 0){

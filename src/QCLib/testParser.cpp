@@ -1,5 +1,5 @@
 #include "circuitParser.h"
-#include "TFCLexer.h"
+#include "QCLexer.h"
 
 #include <iostream>
 #include <fstream>

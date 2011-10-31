@@ -3,7 +3,7 @@
 #include <string>
 #include "circuit.h"
 #include "utility.h"
-#include "TFCLexer.h"
+#include "QCLexer.h"
 
 using namespace std;
 
