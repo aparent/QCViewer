@@ -435,6 +435,7 @@ void QCViewer::set_loop_iter () {
     return;
   }
   l->n = n;
+  l->sim_n = n;
   c.force_redraw();
 }
 

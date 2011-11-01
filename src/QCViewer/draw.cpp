@@ -338,7 +338,7 @@ void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects) {
   cairo_move_to(cr, x, y);
   cairo_show_text (cr, ss.str().c_str());
   stringstream ss2;
-  ss2 << l.n;
+  ss2 << l.sim_n;
   cairo_set_font_size(cr, 22);
   cairo_text_extents(cr, ss2.str().c_str(), &extents2);
   x = r.x0 + extents.width + 3.0;

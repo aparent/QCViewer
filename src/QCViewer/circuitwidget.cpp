@@ -464,7 +464,19 @@ bool CircuitWidget::run (bool breaks) {
   if (!circuit || !state) return false;
   if (NextGateToSimulate == circuit->numGates ()) NextGateToSimulate = 0;
   // always step over first breakpoint if it is around
-  while (NextGateToSimulate < circuit->numGates ()) {
+  while (NextGateToSimulate < circuit->numGates () || (is_loop(vector<uint32_t>(1, NextGateToSimulate - 1)) && find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n != 1)) {
+    std::cout << "blah " << NextGateToSimulate << "\n" <<  fflush;
+    vector<uint32_t> foo;
+    foo.push_back(NextGateToSimulate - 1);
+    if (is_loop(foo)) {
+      Loop* l = find_loop(foo);
+      if (l->last == NextGateToSimulate-1 && l->sim_n > 1) {
+        NextGateToSimulate = l->first;
+        l->sim_n -= 1;
+      } else if (l->last == NextGateToSimulate-1 && l->sim_n == 1) {
+        l->sim_n = 0;
+      }
+    }
     *state = ApplyGate (state, circuit->getGate (NextGateToSimulate));
     if (!state) { force_redraw (); return false; }
     NextGateToSimulate++;
@@ -476,13 +488,36 @@ bool CircuitWidget::run (bool breaks) {
     if (it == breakpoints.end ()) continue;
     if (layout[column_id].lastGateID + 1 == NextGateToSimulate) { force_redraw (); return true; }
   }
+  if (circuit->numGates() == NextGateToSimulate &&
+      is_loop(vector<uint32_t>(1,NextGateToSimulate-1)) &&
+      find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 1) {
+    find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 0;
+  }
   force_redraw ();
   return false;
 }
 
 bool CircuitWidget::step () {
   if (!circuit || !state) return false;
-  if (NextGateToSimulate < circuit->numGates ()) {
+  if (circuit->numGates() == NextGateToSimulate &&
+      is_loop(vector<uint32_t>(1,NextGateToSimulate-1)) &&
+      find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 1) {
+    find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 0;
+    return false;
+  }
+  if (NextGateToSimulate < circuit->numGates ()  || (is_loop(vector<uint32_t>(1, NextGateToSimulate - 1)) && find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n != 1)) {
+    vector<uint32_t> foo;
+    foo.push_back(NextGateToSimulate - 1);
+    if (is_loop(foo)) {
+      Loop* l = find_loop(foo);
+      if (l->last == NextGateToSimulate-1 && l->sim_n > 1) {
+        NextGateToSimulate = l->first;
+        l->sim_n -= 1;
+      } else if (l->last == NextGateToSimulate-1 && l->sim_n == 1) {
+        l->sim_n = 0;
+        std::cout << "yoyoyoyoyo\n";
+      }
+    }
     *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
     if (!state) return false;
     NextGateToSimulate++;
@@ -495,6 +530,9 @@ bool CircuitWidget::step () {
 }
 
 void CircuitWidget::reset () {
+  for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); it++) {
+    it->sim_n = it->n;
+  }
   if (circuit && NextGateToSimulate != 0) {
     NextGateToSimulate = 0;
     force_redraw ();
