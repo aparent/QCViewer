@@ -18,47 +18,51 @@
 %x gateVars
 %x gateQoute
 %x gateSet
+%x circ
 
 WHITESPACE [[:blank:]\t]+
 COMMENT #.*
 NAME [[:alnum:]]+
 
 %%
-\.v           					{tokens->push_back(QCToken(SEC_START,"V"));     BEGIN(lineNames);}
-\.i           					{tokens->push_back(QCToken(SEC_START,"I"));     BEGIN(lineNames);}
-\.o           					{tokens->push_back(QCToken(SEC_START,"O"));     BEGIN(lineNames);}
-\.c          					  {tokens->push_back(QCToken(SEC_START,"C"));     BEGIN(lineNames);}
-\.(ol)									{tokens->push_back(QCToken(SEC_START,"OL"));    BEGIN(lineNames);}
-(?i:begin)							{tokens->push_back(QCToken(SEC_START,"GATES")); BEGIN(gates);    }
+\.v		tokens->push_back(QCToken(SEC_START,"V"));BEGIN(lineNames);
+\.i		tokens->push_back(QCToken(SEC_START,"I"));BEGIN(lineNames);
+\.o		tokens->push_back(QCToken(SEC_START,"O"));BEGIN(lineNames);
+\.c		tokens->push_back(QCToken(SEC_START,"C"));BEGIN(lineNames);
+\.(ol)		tokens->push_back(QCToken(SEC_START,"OL"));BEGIN(lineNames);
+(?i:begin)	tokens->push_back(QCToken(SEC_START,"GATES"));BEGIN(circ);
 \n
 
-<lineNames>{NAME}				           {tokens->push_back(QCToken(VAR_NAME,yytext));}
-<lineNames>\"							         {BEGIN(lineQoute);}
+<lineNames>{NAME}			tokens->push_back(QCToken(VAR_NAME,yytext));
+<lineNames>\"				BEGIN(lineQoute);
 <lineNames>,
-<lineNames>\n											 {BEGIN(INITIAL);}
-<lineQoute>[[:alnum:][:space:]]*   {tokens->push_back(QCToken(VAR_NAME,yytext));}
-<lineQoute>\"											 {BEGIN(lineNames);}
+<lineNames>\n				BEGIN(INITIAL);
+<lineQoute>[[:alnum:][:space:]]*	tokens->push_back(QCToken(VAR_NAME,yytext));
+<lineQoute>\"				BEGIN(lineNames);
 
-<gates>(?i:end)         					{tokens->push_back(QCToken(SEC_END,"GATES")); BEGIN(INITIAL);}
-<gates>{NAME}		       						{tokens->push_back(QCToken(VAR_NAME,sToUpper(yytext)));}
-<gates>\(													{BEGIN(gateSet);}
-<gates>[ ]           							{BEGIN(gateVars);}
+<circ>{NAME}				tokens->push_back(QCToken(CIRC_NAME,sToUpper(yytext)));
+<circ>\n				BEGIN(gates);
+
+<gates>(?i:end)	tokens->push_back(QCToken(SEC_END,"GATES")); BEGIN(INITIAL);
+<gates>{NAME}	tokens->push_back(QCToken(VAR_NAME,sToUpper(yytext)));
+<gates>\(	BEGIN(gateSet);
+<gates>[ ]	BEGIN(gateVars);
 <gates>\n
 
-<gateSet>[x-zX-Z]?[0-9]+\.[0-9]+		{tokens->push_back(QCToken(GATE_SET,yytext));}
-<gateSet>[x-zX-Z]?[0-9]+		  			{tokens->push_back(QCToken(GATE_SET,yytext));}
-<gateSet>\)												{BEGIN(gateVars);}
+<gateSet>[x-zX-Z]?[0-9]+\.[0-9]+	tokens->push_back(QCToken(GATE_SET,yytext));
+<gateSet>[x-zX-Z]?[0-9]+		tokens->push_back(QCToken(GATE_SET,yytext));
+<gateSet>\)				BEGIN(gateVars);
 <gateSet>\n
 
-<gateVars>{NAME}/'						{tokens->push_back(QCToken(GATE_INPUT_N,string(yytext)));}
-<gateVars>{NAME} 						{tokens->push_back(QCToken(GATE_INPUT,string(yytext)));}
-<gateVars>\"												{BEGIN(gateQoute);}
+<gateVars>{NAME}/'	tokens->push_back(QCToken(GATE_INPUT_N,string(yytext)));
+<gateVars>{NAME}	tokens->push_back(QCToken(GATE_INPUT,string(yytext)));
+<gateVars>\"		BEGIN(gateQoute);
 <gateVars>'
 <gateVars>,
-<gateVars>\n											 	{BEGIN(gates);}
+<gateVars>\n		BEGIN(gates);
 
-<gateQoute>[[:alnum:][:space:]]*   	{tokens->push_back(QCToken(GATE_INPUT,string(yytext)));}
-<gateQoute>\"											 	{BEGIN(gateVars);}
+<gateQoute>[[:alnum:][:space:]]*	tokens->push_back(QCToken(GATE_INPUT,string(yytext)));
+<gateQoute>\"				BEGIN(gateVars);
 
 <*>{WHITESPACE}
 <*>{COMMENT}

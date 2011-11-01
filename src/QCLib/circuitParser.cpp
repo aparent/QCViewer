@@ -1,5 +1,6 @@
 //Might want to jsut replace this with a bison parser since it would be easier to maintain
 #include "circuitParser.h"
+#include "utility.h"
 #include <fstream>
 #include <vector>
 #include <iostream>
@@ -80,8 +81,15 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<QCToken>::iterator &it){
       }
     }
     if (!found){
-      cerr << "ERROR unknown wire: " << ((*it).value) << ". On:" << gate->getName() << "." << endl;
-    	return false;
+    	circ->addLine((*it).value);
+    	circ->getLine(circ->numLines()-1)->constant=false;
+    	circ->getLine(circ->numLines()-1)->garbage=false;
+	if ((*it).type == GATE_INPUT_N){
+          gate->controls.push_back(Control(circ->numLines()-1,true));
+        }
+        else{
+          gate->controls.push_back(Control(circ->numLines()-1,false));
+	}
     }
   }
   unsigned int numTarg;
@@ -102,7 +110,7 @@ bool parseGateInputs(Gate *gate, Circuit *circ, vector<QCToken>::iterator &it){
   return true;
 }
 
-void parseGates(Circuit *circ, vector<QCToken>::iterator &it){
+void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit> subcircuits){
   it++;
   while((*it).type != SEC_END){
     Gate *newGate;
@@ -135,6 +143,32 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it){
     } else if (((*it).value[0]) == 'F'){
       newGate = new UGate("F");
       newGate->drawType = Gate::FRED;
+    } else if (subcircuits.find((*it).value) != subcircuits.end() ){
+	Circuit c = subcircuits[(*it).value];
+	map<int,int> lineMap;
+	map<int,int>::iterator lit=lineMap.begin();
+	int line = 0;
+  	while((*(++it)).type == GATE_INPUT || (*it).type == GATE_INPUT_N){
+		cout << "test" << endl;
+    		for (unsigned int j = 0; j < circ->numLines(); j++){	
+      			if (((*it).value).compare(circ->getLine(j)->lineName)==0){
+				lineMap.insert (lit, pair<int,int>(line,j));
+				cout << line << "->" << j<< endl;
+			}
+		}
+		line++;
+	}
+	for (unsigned int i = 0; i < c.numGates(); i++) {
+		for (unsigned int j = 0; j < c.getGate(i)->controls.size(); j++){
+			c.getGate(i)->controls[j].wire = lineMap[c.getGate(i)->controls[j].wire];
+		}
+		for (unsigned int j = 0; j < c.getGate(i)->targets.size(); j++){
+			cout << c.getGate(i)->targets[j] << endl;
+			c.getGate(i)->targets[j] = lineMap[c.getGate(i)->targets[j]];
+		}
+		circ->addGate(c.getGate(i));
+	}	
+      continue;
     } else {
       newGate = new UGate((*it).value);
     }
@@ -160,7 +194,7 @@ void parseConstants(Circuit * circ, vector<QCToken>::iterator &it){
 
 Circuit *parseCircuit (string file){
   Circuit *circ = new Circuit;
-
+  map<string,Circuit> subcircuits;
 	//removes the file type from the circuit name
 	bool name_set = false;
 	unsigned int slash=0;
@@ -199,7 +233,18 @@ Circuit *parseCircuit (string file){
         parseConstants(circ,it);
       }
       if (((*it).value).compare("GATES") == 0){
-        parseGates(circ,it);
+	if((*(++it)).type == CIRC_NAME){
+  		Circuit c;
+		c.name=(*it).value;
+        	parseGates(&c,it,subcircuits);
+		subcircuits[c.name]=c;
+		cout << "Adding: " << c.name << endl;
+		it++;//increment past sub-circ end	
+		continue;
+	} else {	
+		it--;
+        	parseGates(circ,it,subcircuits);
+	}
       }
     }
     else if((*it).type == SEC_END){
