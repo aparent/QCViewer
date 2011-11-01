@@ -1,4 +1,5 @@
 #include "circuitwidget.h"
+#include <assert.h>
 #include "GateIcon.h"
 #include <cairomm/context.h>
 #include <circuit.h>
@@ -601,4 +602,65 @@ Gate *CircuitWidget::getSelectedGate () {
 
 void  CircuitWidget::arch_set_LNN(){
 	circuit->arch_set_LNN();
+}
+
+void CircuitWidget::add_loop () {
+  Loop l;
+  l.first = *(std::min_element(selections.begin(), selections.end()));
+  l.last = *(std::max_element(selections.begin(), selections.end()));
+  l.n = 1;
+  l.sim_n = l.n;
+  l.label = "newloop";
+  circuit->add_loop (l);
+}
+
+void CircuitWidget::delete_loop () {
+  assert (is_loop(selections));
+  Loop* l = find_loop(selections);
+  selections.clear();
+  for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); it++) {
+    if (l->first == it->first) { circuit->loops.erase(it); return; }
+  } 
+  assert (0 == 1);
+}
+  
+Loop* CircuitWidget::find_loop (vector<uint32_t> selections) {
+  assert (selections.size() != 0);
+  uint32_t f = *(std::min_element(selections.begin(), selections.end()));
+  uint32_t l = *(std::max_element(selections.begin(), selections.end()));
+  assert (f <= l);
+  for (uint32_t i = 0; i < circuit->loops.size(); i++) {
+    if (f >= circuit->loops[i].first && l <= circuit->loops[i].last) return &circuit->loops[i];
+    if (l < circuit->loops[i].first || f > circuit->loops[i].last) {
+      continue;
+    }
+    assert (0 == 1);
+  }
+  assert(1 == 2);
+}
+
+bool CircuitWidget::is_loop (vector<uint32_t> selections) {
+  assert (selections.size() != 0);
+  uint32_t f = *(std::min_element(selections.begin(), selections.end()));
+  uint32_t l = *(std::max_element(selections.begin(), selections.end()));
+  assert (f <= l);
+  for (uint32_t i = 0; i < circuit->loops.size(); i++) { 
+    if (f >= circuit->loops[i].first && l <= circuit->loops[i].last) return true;
+  }
+  return false;
+}
+
+bool CircuitWidget::could_be_loop (vector<uint32_t> selections) {
+  assert (selections.size() != 0);
+  std::cout << "in could_be_loop\n";
+  uint32_t f = *(std::min_element(selections.begin(), selections.end()));
+  uint32_t l = *(std::max_element(selections.begin(), selections.end()));
+  std::cout << "f: " << f << " l:" << l << "\n" << fflush;
+  assert (f <= l);
+  for (uint32_t i = 0; i < circuit->loops.size(); i++) { 
+    std::cout << "beep\n";
+    if (!(l < circuit->loops[i].first || f > circuit->loops[i].last)) { std::cout << "isn't!\n";return false; }
+  }
+  std::cout << "is!\n";
+  return true;
 }

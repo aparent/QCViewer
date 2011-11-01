@@ -1,4 +1,5 @@
 #include "window.h"
+#include <assert.h>
 #include "info.h"
 #include <gtkmm/stock.h>
 #include <gates/UGateLookup.h>
@@ -21,7 +22,6 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 
 QCViewer::QCViewer() {
   std::cerr << "In QCViewer::QCViewer.\n";
-  std::cerr << "...skipping\n";
   drawparallel = panning = drawarch = false;
   set_title(QCV_NAME);
   set_border_width(0);
@@ -54,6 +54,8 @@ skip:
   m_VisBox.show ();
   show_all_children ();
   m_PropFrame.hide ();
+  m_FlowFrame.hide();
+  m_EditLoop.hide ();
 	m_RGateEditFrame.hide ();
   std::cerr << "Done QCViewer::QCViewer\n";
 }
@@ -331,6 +333,7 @@ void QCViewer::set_selection (vector<uint32_t> s) {
   if (selections.size () == 0) {
     btn_editcontrols.set_active (false);
     m_PropFrame.hide ();
+    m_FlowFrame.hide();
   } else if (selections.size () == 1) {
 		if (c.getSelectedGate()->type == Gate::RGATE) {
 			m_RGateEditFrame.show ();
@@ -351,12 +354,88 @@ void QCViewer::set_selection (vector<uint32_t> s) {
     m_PropFrame.hide ();
     m_RGateEditFrame.show ();
   }
+  // find out if we are in a loop
+  if (selections.size() != 0) {
+    std::cout <<"\n\n------------\n";
+    bool is_loop = c.is_loop (selections);
+    bool could_be_loop = c.could_be_loop (selections);
+    
+    std::cout << "selections.size() = " << selections.size() << "\n";
+    std::cout << "selections[0] = " << selections[0] << "\n" << fflush;
+    assert (!(could_be_loop && is_loop));
+    if (could_be_loop) {
+      std::cout << "could be loop\n";
+      m_FlowFrame.show();
+      m_EditLoop.hide();
+    } else if (is_loop) {
+      std::cout << "is loop\n";
+      m_EditLoop.show();
+      m_FlowFrame.hide();
+      Loop* l = c.find_loop (selections);
+      m_EditLoopNameEntry.set_text(l->label);
+      stringstream ss;
+      ss << l->n;
+      m_EditLoopIterEntry.set_text(ss.str());
+    } else {
+      std::cout << "not loop\n";
+      m_EditLoop.hide();
+    }
+    std::cout <<"------------\n";
+  } else {
+    m_EditLoop.hide();
+    m_FlowFrame.hide();
+  }
+
   btn_editbreakpoints.set_active (false);
 }
 
 void QCViewer::on_menu_move () {
   panning = !panning;
   update_mode ();
+}
+
+void QCViewer::add_loop () {
+  c.add_loop ();
+  set_selection (vector<uint32_t>());
+  m_FlowFrame.hide();
+  c.force_redraw();
+}
+
+void QCViewer::delete_loop() {
+  bool is_loop = c.is_loop (selections);
+  assert (is_loop);
+  //Loop* l = c.find_loop (selections);
+  c.delete_loop();
+  set_selection (vector<uint32_t>()); 
+  c.force_redraw();
+}
+
+void QCViewer::set_loop_label () {
+  bool is_loop = c.is_loop (selections);
+  assert (is_loop);
+  Loop* l = c.find_loop (selections);
+  l->label = m_EditLoopNameEntry.get_text();
+  c.force_redraw(); 
+}
+
+void QCViewer::set_loop_iter () {
+  bool is_loop = c.is_loop (selections);
+  assert (is_loop);
+  Loop* l = c.find_loop (selections);
+  istringstream ss (m_EditLoopIterEntry.get_text ());
+  uint32_t n;
+  ss >> n;
+  if (ss.fail ()) {
+    stringstream ss;
+    ss << l->n;
+    m_EditLoopIterEntry.set_text (ss.str ());
+    Gtk::MessageDialog dialog(*this, "Error");
+    dialog.set_secondary_text("Loop count must be an integer greater than or equal to 0.");
+    dialog.run();
+    return;
+  }
+  l->n = n;
+  c.force_redraw();
 }
 
 void QCViewer::update_mode () {
@@ -523,6 +602,33 @@ void QCViewer::setup_menu_layout()
   m_EditSidebar.pack_start (m_GatesFrame, Gtk::PACK_SHRINK);
   m_EditSidebar.set_homogeneous (false);
 
+  m_FlowFrame.set_label("Flow Control");
+  m_FlowFrame.add (m_FlowTable);
+  m_FlowTable.resize (1,1);
+  m_AddLoop.set_label ("Add Loop");
+  m_AddLoop.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::add_loop));
+  m_FlowTable.attach (m_AddLoop,0,1,0,1);
+  m_EditSidebar.pack_start (m_FlowFrame, Gtk::PACK_SHRINK);
+
+  m_EditLoop.set_label("Edit Loop");
+  m_EditLoop.add(m_EditLoopTable);
+  m_EditLoopTable.resize (3,2);
+  m_EditLoopNameLbl.set_label("Name: ");
+  m_EditLoopIterLbl.set_label("Loop count: ");
+  m_EditLoopDelButton.set_label("Delete");
+  m_EditLoopDelButton.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::delete_loop));
+  m_EditLoopNameEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_loop_label));
+  m_EditLoopIterEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_loop_iter));
+
+
+  m_EditLoopTable.attach(m_EditLoopNameLbl, 0,1,0,1);
+  m_EditLoopTable.attach(m_EditLoopNameEntry, 1,2,0,1);
+  m_EditLoopTable.attach(m_EditLoopIterLbl, 0,1,1,2);
+  m_EditLoopTable.attach(m_EditLoopIterEntry, 1,2,1,2);
+  m_EditLoopTable.attach(m_EditLoopDelButton, 0,2,2,3);
+  
+  m_EditSidebar.pack_start (m_EditLoop, Gtk::PACK_SHRINK);
+
   m_SimulationFrame.set_label ("Simulation");
   m_SimulationFrame.add (m_SimulationTable);
   m_SimulationTable.resize (1, 1);
@@ -609,3 +715,4 @@ void QCViewer::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory, con
 	factory->add(stock_id, icon_set);
 	Gtk::Stock::add(Gtk::StockItem(stock_id, label));
 }
+

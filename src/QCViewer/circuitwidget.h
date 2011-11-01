@@ -48,7 +48,13 @@ public:
 	Gate* getSelectedGate ();
   enum Mode { NORMAL, PANNING, EDIT_CONTROLS, EDIT_BREAKPOINTS };
   void set_mode (Mode);
+  void add_loop ();
+  void delete_loop ();
   void force_redraw ();
+
+  Loop* find_loop(vector<uint32_t>);
+  bool could_be_loop (vector<uint32_t> selections);
+  bool is_loop (vector<uint32_t> selections);
 
 protected:
   //Override default signal handler:

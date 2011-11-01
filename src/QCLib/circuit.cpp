@@ -3,6 +3,7 @@
 #include <map>
 #include <algorithm> // for sort, which we should probably cut out
 #include <fstream>
+#include <iostream>
 
 Circuit::Circuit() : arch(NULL) {}
 
@@ -195,4 +196,21 @@ void Circuit::arch_set_LNN(){
 	for(unsigned int i=0; i < numLines()-1; i++){
 		arch->set(i,i+1);
 	}
+}
+
+void Circuit::add_loop (Loop l) {
+  for (vector<Loop>::iterator it = loops.begin(); it != loops.end(); it++) {
+    // make sure that this loop is either distinct from or contained in every other loop
+    if (l.last < it->first || it->last < l.first) continue; // distinct
+//    if (l.first <= it->first && l.last >= it->last) continue; // i contain this
+//    if (l.first >= it->first && l.last <= it->last) continue; // i am contained   
+// for now loops cannot overlap
+    std::cout << "failed!\n";
+    std::cout << "candidate: " << l.first << " " << l.last <<"\n";
+    std::cout << "opposer: " << it->first << " " << it->last << "\n";
+
+    return; // don't add this loop then
+  }
+  loops.push_back(l);
+  std::cout << "\n\n\nnew loop!\n\n\n";
 }

@@ -30,6 +30,15 @@ private:
   char *graph;
 };
 
+class Loop {
+public:
+  uint32_t first;
+  uint32_t last;
+  uint32_t n;
+  uint32_t sim_n;
+  std::string label;
+};
+
 class Circuit {
   public:
     Circuit ();
@@ -48,6 +57,7 @@ class Circuit {
     unsigned int numGates(); //Returns the number of gates
     void swapGate (unsigned int, unsigned int);
 
+    void add_loop (Loop);
     void newArch ();
     void removeArch ();
     void parseArch (string);
@@ -59,6 +69,7 @@ class Circuit {
     vector<int> getArchWarnings ();
 
     QArch *arch;
+    vector <Loop>            loops;
   private:
     vector <Gate*>           gates;
     vector <Line>            lines;
