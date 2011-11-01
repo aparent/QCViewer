@@ -306,25 +306,45 @@ vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s) {
 }
 
 void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects) {
-  double dashes[] = { 3.0, 3.0 };
-  cairo_set_dash (cr, dashes, 2, 0.0);
-  cairo_set_line_width (cr, 3);
+  double red = 0;
+  double green = 51.0/255.0;
+  double blue = 102.0/255.0;
+  double alpha1 = 0.7;
+  double alpha2 = 0.2;
+  
   gateRect r = rects[l.first];
   for (uint32_t i = l.first; i <= l.last; i++) {
     r = combine_gateRect (r, rects[i]);
   }
-  cairo_set_source_rgba (cr, 0, 0,0,1.0);
+
+  cairo_set_source_rgba (cr, red, green, blue,alpha2);
+  cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+  cairo_fill(cr);
+
+  double dashes[] = { 4.0, 4.0 };
+  cairo_set_dash (cr, dashes, 2, 0.0);
+  cairo_set_line_width (cr, 2);
+  cairo_set_source_rgba (cr, red, green, blue,alpha1);
   cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
   cairo_stroke (cr);
 
   stringstream ss;
-  ss << l.label << " x " << l.n;
-  cairo_text_extents_t extents;
+  ss << l.label << " x ";
+  cairo_set_font_size(cr, 16);
+  cairo_text_extents_t extents, extents2;
   cairo_text_extents(cr, ss.str().c_str(), &extents);
   double x = r.x0;
   double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
   cairo_move_to(cr, x, y);
   cairo_show_text (cr, ss.str().c_str());
+  stringstream ss2;
+  ss2 << l.n;
+  cairo_set_font_size(cr, 22);
+  cairo_text_extents(cr, ss2.str().c_str(), &extents2);
+  x = r.x0 + extents.width + 3.0;
+  y = r.y0 - (-extents2.height - extents2.y_bearing) - 5.0;
+  cairo_move_to(cr, x, y);
+  cairo_show_text (cr, ss2.str().c_str());
 }
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) {

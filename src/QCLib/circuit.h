@@ -35,8 +35,8 @@ public:
   uint32_t first;
   uint32_t last;
   uint32_t n;
-  std::string label;
   uint32_t sim_n;
+  std::string label;
 };
 
 class Circuit {
