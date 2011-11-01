@@ -6,7 +6,7 @@
 
 using namespace std;
 
-enum QCType {SEC_START, SEC_END, VAR_NAME, CIRC_NAME, GATE_INPUT, GATE_INPUT_N, GATE_SET};
+enum QCType {SEC_START, SEC_END, VAR_NAME, CIRC_NAME, GATE_INPUT, GATE_INPUT_N, GATE_SET, EXPONENT, NUM};
 
 struct QCToken{
 	QCType		type;

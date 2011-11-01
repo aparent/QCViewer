@@ -145,30 +145,43 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
       newGate->drawType = Gate::FRED;
     } else if (subcircuits.find((*it).value) != subcircuits.end() ){
 	Circuit c = subcircuits[(*it).value];
+	Loop l;
+	if ((*(++it)).type == EXPONENT){
+		cout << "EXPO" << endl;
+		l.n = atoi((*(++it)).value.c_str());	
+		l.sim_n = l.n;
+	} else {
+		cout << "NO EXPO" << endl;
+		l.n = 1;
+		l.sim_n = 1;
+		it--;
+	}
+	l.first = circ->numGates();
+	l.last = circ->numGates()+c.numGates()-1;
+	l.label = c.name;
+	circ->add_loop(l);
 	map<int,int> lineMap;
 	map<int,int>::iterator lit=lineMap.begin();
 	int line = 0;
   	while((*(++it)).type == GATE_INPUT || (*it).type == GATE_INPUT_N){
-		cout << "test" << endl;
     		for (unsigned int j = 0; j < circ->numLines(); j++){	
       			if (((*it).value).compare(circ->getLine(j)->lineName)==0){
 				lineMap.insert (lit, pair<int,int>(line,j));
-				cout << line << "->" << j<< endl;
 			}
 		}
 		line++;
 	}
+		
 	for (unsigned int i = 0; i < c.numGates(); i++) {
 		for (unsigned int j = 0; j < c.getGate(i)->controls.size(); j++){
 			c.getGate(i)->controls[j].wire = lineMap[c.getGate(i)->controls[j].wire];
 		}
 		for (unsigned int j = 0; j < c.getGate(i)->targets.size(); j++){
-			cout << c.getGate(i)->targets[j] << endl;
 			c.getGate(i)->targets[j] = lineMap[c.getGate(i)->targets[j]];
 		}
 		circ->addGate(c.getGate(i));
-	}	
-      continue;
+	}		
+      	continue;
     } else {
       newGate = new UGate((*it).value);
     }

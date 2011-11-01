@@ -9,6 +9,7 @@
 %{
 	#include "QCLexer.h"
 	#include "utility.h"
+	#include <iostream>
 	vector<QCToken> *tokens = new vector<QCToken>;
 %}
 
@@ -19,6 +20,7 @@
 %x gateQoute
 %x gateSet
 %x circ
+%x loopcount
 
 WHITESPACE [[:blank:]\t]+
 COMMENT #.*
@@ -43,8 +45,10 @@ NAME [[:alnum:]]+
 <circ>{NAME}				tokens->push_back(QCToken(CIRC_NAME,sToUpper(yytext)));
 <circ>\n				BEGIN(gates);
 
+
 <gates>(?i:end)	tokens->push_back(QCToken(SEC_END,"GATES")); BEGIN(INITIAL);
 <gates>{NAME}	tokens->push_back(QCToken(VAR_NAME,sToUpper(yytext)));
+<gates>"^"	tokens->push_back(QCToken(EXPONENT,yytext));BEGIN(loopcount);
 <gates>\(	BEGIN(gateSet);
 <gates>[ ]	BEGIN(gateVars);
 <gates>\n
@@ -52,6 +56,7 @@ NAME [[:alnum:]]+
 <gateSet>[x-zX-Z]?[0-9]+\.[0-9]+	tokens->push_back(QCToken(GATE_SET,yytext));
 <gateSet>[x-zX-Z]?[0-9]+		tokens->push_back(QCToken(GATE_SET,yytext));
 <gateSet>\)				BEGIN(gateVars);
+<gateSet>"^"				tokens->push_back(QCToken(EXPONENT,yytext));BEGIN(loopcount);
 <gateSet>\n
 
 <gateVars>{NAME}/'	tokens->push_back(QCToken(GATE_INPUT_N,string(yytext)));
@@ -60,6 +65,8 @@ NAME [[:alnum:]]+
 <gateVars>'
 <gateVars>,
 <gateVars>\n		BEGIN(gates);
+
+<loopcount>[0-9]+			tokens->push_back(QCToken(NUM,yytext));BEGIN(gateVars);
 
 <gateQoute>[[:alnum:][:space:]]*	tokens->push_back(QCToken(GATE_INPUT,string(yytext)));
 <gateQoute>\"				BEGIN(gateVars);
