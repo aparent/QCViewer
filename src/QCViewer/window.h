@@ -21,7 +21,11 @@ protected:
   void setup_gate_button (Gtk::Button*, GateIcon*, vector<Gtk::TargetEntry> &);
 
   // Signal handlers:
-  void on_menu_file_open_circuit ();
+  void delete_loop();
+  void set_loop_label ();
+  void set_loop_iter ();
+  
+void on_menu_file_open_circuit ();
   void on_menu_file_open_arch ();
   void on_menu_mode_edit ();
   void on_menu_new ();
@@ -79,6 +83,17 @@ protected:
   Gtk::VBox        m_EditSidebar;
   Gtk::Frame       m_GatesFrame;
   Gtk::Table       m_GatesTable;
+  Gtk::Frame       m_FlowFrame;
+  Gtk::Table       m_FlowTable;
+  Gtk::Button      m_AddLoop;
+  Gtk::Frame       m_EditLoop;
+  Gtk::Table       m_EditLoopTable;
+  Gtk::Label       m_EditLoopNameLbl;
+  Gtk::Entry       m_EditLoopNameEntry;
+  Gtk::Label       m_EditLoopIterLbl;
+  Gtk::Entry       m_EditLoopIterEntry;
+  Gtk::Button      m_EditLoopDelButton;
+
   //Gtk::Button      btn_H, btn_X, btn_Y, btn_Z, btn_NOT, btn_R, btn_SWAP;
   //GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
   std::vector<Gtk::Button*> gate_buttons;
@@ -112,6 +127,7 @@ private:
 	void register_stock_items();
 	void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
   void update_mode ();
+  void add_loop();
 
   State *state;
   bool drawparallel;

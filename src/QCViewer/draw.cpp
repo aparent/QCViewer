@@ -305,6 +305,28 @@ vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s) {
   return ans;
 }
 
+void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects) {
+  double dashes[] = { 3.0, 3.0 };
+  cairo_set_dash (cr, dashes, 2, 0.0);
+  cairo_set_line_width (cr, 3);
+  gateRect r = rects[l.first];
+  for (uint32_t i = l.first; i <= l.last; i++) {
+    r = combine_gateRect (r, rects[i]);
+  }
+  cairo_set_source_rgba (cr, 0, 0,0,1.0);
+  cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+  cairo_stroke (cr);
+
+  stringstream ss;
+  ss << l.label << " x " << l.n;
+  cairo_text_extents_t extents;
+  cairo_text_extents(cr, ss.str().c_str(), &extents);
+  double x = r.x0;
+  double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
+  cairo_move_to(cr, x, y);
+  cairo_show_text (cr, ss.str().c_str());
+}
+
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) {
   vector <gateRect> rects;
   cairo_set_source_rgb (cr, 0, 0, 0);
@@ -399,6 +421,13 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     cairo_move_to (cr, x, y);
     cairo_show_text (cr, label.c_str());
   }
+
+
+  // loops
+  for (vector<Loop>::iterator it = c->loops.begin(); it != c->loops.end(); it++) {
+    drawloop (cr, *it, rects);
+  }
+
   return rects;
 }
 
@@ -425,6 +454,7 @@ void drawSelections (cairo_t* cr, vector<gateRect> rects, vector<uint32_t> selec
   }
   //drawRect (cr, r, Colour (0.1,0.2,0.7,0.7), Colour (0.1,0.2,0.7,0.3));
 }
+
 
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext) {
   cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
@@ -478,5 +508,6 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& co
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
   if (selections.size () != 0) drawSelections (cr, rects, selections);
+
   return rects;
 }
