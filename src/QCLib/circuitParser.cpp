@@ -145,21 +145,17 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
       newGate->drawType = Gate::FRED;
     } else if (subcircuits.find((*it).value) != subcircuits.end() ){
 	Circuit c = subcircuits[(*it).value];
-	Loop l;
 	if ((*(++it)).type == EXPONENT){
-		cout << "EXPO" << endl;
+		Loop l;
 		l.n = atoi((*(++it)).value.c_str());	
 		l.sim_n = l.n;
+		l.first = circ->numGates();
+		l.last = circ->numGates()+c.numGates()-1;
+		l.label = c.name;
+		circ->add_loop(l);
 	} else {
-		cout << "NO EXPO" << endl;
-		l.n = 1;
-		l.sim_n = 1;
 		it--;
 	}
-	l.first = circ->numGates();
-	l.last = circ->numGates()+c.numGates()-1;
-	l.label = c.name;
-	circ->add_loop(l);
 	map<int,int> lineMap;
 	map<int,int>::iterator lit=lineMap.begin();
 	int line = 0;
