@@ -55,7 +55,7 @@ NAME [[:alnum:]]+
 <gates>"^"	tokens->push_back(QCToken(EXPONENT,yytext));BEGIN(loopcount);
 <gates>\(	BEGIN(gateSet);
 <gates>[ ]	BEGIN(gateVars);
-<gates>\n
+<gates>\n	tokens->push_back(QCToken(BREAK,yytext));
 
 <gateSet>[x-zX-Z]?[0-9]+\.[0-9]+	tokens->push_back(QCToken(GATE_SET,yytext));
 <gateSet>[x-zX-Z]?[0-9]+		tokens->push_back(QCToken(GATE_SET,yytext));

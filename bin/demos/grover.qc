@@ -3,7 +3,9 @@
 .o a b c d e
 .c
 BEGIN H5
-H a; H b; H c; H d; H e
+H a 
+
+H b; H c; H d; H e
 END H5
 
 BEGIN GroverIterate (a, b, c, d, e, Workspace)

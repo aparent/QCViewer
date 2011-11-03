@@ -114,6 +114,12 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
   it++;
   while((*it).type != SEC_END){
     Gate *newGate;
+    if((*it).type == BREAK){
+	circ->column_breaks.push_back(circ->numGates()-1);
+	cout << "Break:" << circ->numGates()-1 << endl;
+  	it++;
+	continue;
+    }
     if(((*it).value).compare("R") == 0){
       it++;
       if ((*it).type != GATE_SET){
@@ -155,6 +161,10 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
 		circ->add_loop(l);
 	} else {
 		it--;
+	}
+	for(unsigned int i = 0; i < c.column_breaks.size(); i++){
+		circ->column_breaks.push_back(c.column_breaks[i] + circ->numGates()); 
+		cout << "break: " << c.column_breaks[i] + circ->numGates() << endl;
 	}
 	map<int,int> lineMap;
 	map<int,int>::iterator lit=lineMap.begin();
