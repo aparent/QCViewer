@@ -51,7 +51,7 @@ NAME [[:alnum:]]+
 
 
 <gates>(?i:end)	tokens->push_back(QCToken(SEC_END,"GATES")); BEGIN(INITIAL);
-<gates>{NAME}	tokens->push_back(QCToken(VAR_NAME,sToUpper(yytext)));
+<gates>{NAME}	tokens->push_back(QCToken(VAR_NAME,sToUpper(yytext)));//std::cout <<"Gate:" << yytext << endl;
 <gates>"^"	tokens->push_back(QCToken(EXPONENT,yytext));BEGIN(loopcount);
 <gates>\(	BEGIN(gateSet);
 <gates>[ ]	BEGIN(gateVars);
@@ -63,12 +63,14 @@ NAME [[:alnum:]]+
 <gateSet>"^"				tokens->push_back(QCToken(EXPONENT,yytext));BEGIN(loopcount);
 <gateSet>\n
 
-<gateVars>{NAME}/'	tokens->push_back(QCToken(GATE_INPUT_N,string(yytext)));
-<gateVars>{NAME}	tokens->push_back(QCToken(GATE_INPUT,string(yytext)));
-<gateVars>\"		BEGIN(gateQoute);
+<gateVars>{NAME}/'		tokens->push_back(QCToken(GATE_INPUT_N,string(yytext)));//std::cout <<"Neg:" << yytext << endl;
+<gateVars>{NAME}		tokens->push_back(QCToken(GATE_INPUT,string(yytext)));//std::cout<< "Pos:" << yytext << endl;
+<gateVars>\"			BEGIN(gateQoute);
 <gateVars>'
 <gateVars>,
-<gateVars>\n		BEGIN(gates);
+<gateVars>\n			BEGIN(gates);
+<gateVars>[;]+[ ]?		BEGIN(gates);//std::cout <<"Semi" << endl;
+
 
 <loopcount>[0-9]+			tokens->push_back(QCToken(NUM,yytext));BEGIN(gateVars);
 
