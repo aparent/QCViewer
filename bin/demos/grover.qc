@@ -10,10 +10,13 @@ BEGIN GroverIterate (a, b, c, d, e, workspace)
 H workspace
 T a' b' c d e' workspace
 H workspace
+
 H5 a b c d e
+
 X e
 Z a' b' c' d' e
 X e
+
 H5 a b c d e
 END GroverIterate
 
