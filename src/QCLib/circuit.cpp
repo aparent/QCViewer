@@ -135,7 +135,7 @@ vector<int> Circuit::getGreedyParallel(){
       }
       linesUsed[j];
     }
-    if (i == (unsigned int)parallel[k]) { // into next parallel group, so force a column move
+    if (i == (unsigned int)parallel[k] || std::find(column_breaks.begin(), column_breaks.end(), i) != column_breaks.end()) { // into next parallel group, so force a column move
       returnValue.push_back (i);
       k++;
       linesUsed.clear ();

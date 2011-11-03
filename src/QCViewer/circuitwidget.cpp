@@ -618,7 +618,7 @@ void CircuitWidget::generate_layout_rects () {
   unsigned int start_gate = 0;
   for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
     gateRect bounds = rects[start_gate];
-    for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID; gate++) {
+    for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID ; gate++) {
       bounds = combine_gateRect(bounds, rects[gate]);
     }
     bounds.y0 = ext.y;
