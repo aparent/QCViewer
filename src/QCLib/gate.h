@@ -25,16 +25,17 @@ rotation gate we may want the name to be dependent on the rot amount
 */
 
 class Gate {
-	public:
+public:
     enum gateType {RGATE, UGATE};
     enum dType {NOT, FRED, DEFAULT};
-		virtual ~Gate();
-		virtual string getName()=0;
-		virtual State *applyToBasis(index_t)=0;
-		gateType type; //used with enum gateType
-		dType drawType;
-		vector <Control> controls;
-		vector <unsigned int> targets;
+    virtual ~Gate();
+    virtual Gate* clone()=0;
+    virtual string getName()=0;
+    virtual State *applyToBasis(index_t)=0;
+    gateType type; //used with enum gateType
+    dType drawType;
+    vector <Control> controls;
+    vector <unsigned int> targets;
 };
 
 //A gate matrix struct for UGate
@@ -47,6 +48,7 @@ struct gateMatrix{
 class UGate : public Gate {
   public:
 		UGate(string);
+		Gate* clone();
 		string getName();
 		State *applyToBasis(index_t);
 		void setName(string);
@@ -54,7 +56,7 @@ class UGate : public Gate {
 		unsigned int ExtractInput (index_t);
 		index_t BuildBitString (index_t, unsigned int);
 		State* ApplyU(index_t);
-    gateMatrix *matrix;
+    		gateMatrix *matrix;
 		string name;
 };
 
@@ -63,6 +65,7 @@ class RGate : public Gate {
   public:
 		enum Axis { X, Y, Z };
 		RGate(float_type, Axis);
+		Gate* clone();
 		string getName();
 		State *applyToBasis(index_t);
 		float_type get_rotVal (); // XXX: remove float_type, consildate this stuff!!

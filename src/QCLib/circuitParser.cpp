@@ -169,13 +169,14 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
 	}
 		
 	for (unsigned int i = 0; i < c.numGates(); i++) {
+		Gate *g = c.getGate(i)->clone();
 		for (unsigned int j = 0; j < c.getGate(i)->controls.size(); j++){
-			c.getGate(i)->controls[j].wire = lineMap[c.getGate(i)->controls[j].wire];
+			g->controls[j].wire = lineMap[c.getGate(i)->controls[j].wire];
 		}
 		for (unsigned int j = 0; j < c.getGate(i)->targets.size(); j++){
-			c.getGate(i)->targets[j] = lineMap[c.getGate(i)->targets[j]];
+			g->targets[j] = lineMap[c.getGate(i)->targets[j]];
 		}
-		circ->addGate(c.getGate(i));
+		circ->addGate(g);
 	}		
       	continue;
     } else {

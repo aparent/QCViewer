@@ -14,6 +14,13 @@ RGate::RGate(float_type n_rot, Axis a) : rot(n_rot) {
   axis = a;
 }
 
+Gate* RGate::clone(){
+	RGate* g = new RGate(rot,axis);
+	g->controls = controls;
+	g->targets = targets;
+	return g;
+}
+
 string RGate::getName(){
   return "R";
 }

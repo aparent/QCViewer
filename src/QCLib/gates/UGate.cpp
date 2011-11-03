@@ -11,6 +11,14 @@ UGate::UGate(string n_name) : name(n_name) {
 	type = UGATE;
 }
 
+Gate* UGate::clone(){
+	UGate *g = new UGate(name);
+	g->controls = controls;	
+	g->targets = targets;	
+	g->matrix = matrix;
+	return g;
+}
+
 string UGate::getName(){
 	if (drawType == NOT){
 		return "T";
