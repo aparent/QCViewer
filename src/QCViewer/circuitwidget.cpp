@@ -388,6 +388,7 @@ void CircuitWidget::load (string file) {
   layout.clear ();
   breakpoints.clear ();
   cx = cy = 0;
+
   vector<int> parallels = circuit->getGreedyParallel ();
 
   for (unsigned int i = 0; i < parallels.size(); i++) {

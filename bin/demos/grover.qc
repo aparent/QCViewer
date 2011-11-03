@@ -21,5 +21,7 @@ H5 a b c d e
 END GroverIterate
 
 BEGIN
+H5 a b c d e
+
 GroverIterate^4 a b c d e workspace 
 END
