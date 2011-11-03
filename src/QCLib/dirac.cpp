@@ -51,7 +51,7 @@ diracTerm stringToKet(string value){
 	ret.type = KET;
 	for (unsigned int i = 0; i < value.size(); i++){
 		if      (value[i] == '1') {
-			basis = SetRegister(basis,i);
+			basis = SetRegister(basis,value.size()-i-1);
 		} else if (value[i] == '0') {
 		} else    {
 			cerr << "ERROR BAD CHAR IN KET: " << value[i] << endl;
