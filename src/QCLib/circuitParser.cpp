@@ -166,8 +166,7 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
 			}
 		}
 		line++;
-	}
-		
+	}	
 	for (unsigned int i = 0; i < c.numGates(); i++) {
 		Gate *g = c.getGate(i)->clone();
 		for (unsigned int j = 0; j < c.getGate(i)->controls.size(); j++){
@@ -182,7 +181,7 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
     } else {
       newGate = new UGate((*it).value);
     }
-    if(parseGateInputs(newGate,circ,it)){ //Will retun true if it succeeds
+    if(parseGateInputs(newGate,circ,it)){ //Will return true if it succeeds
       circ->addGate(newGate);
     } else {
       cout << "Ommitting gate due to errors" << endl;
@@ -246,6 +245,10 @@ Circuit *parseCircuit (string file){
 	if((*(++it)).type == CIRC_NAME){
   		Circuit c;
 		c.name=(*it).value;
+      		if ((*(++it)).type != NEWLINE){
+			--it;
+        		parseLineNames(&c,it);
+      		}
         	parseGates(&c,it,subcircuits);
 		subcircuits[c.name]=c;
 		cout << "Adding: " << c.name << endl;

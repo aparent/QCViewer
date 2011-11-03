@@ -20,6 +20,7 @@
 %x gateQoute
 %x gateSet
 %x circ
+%x circIn
 %x loopcount
 
 WHITESPACE [[:blank:]\t]+
@@ -42,8 +43,11 @@ NAME [[:alnum:]]+
 <lineQoute>[[:alnum:][:space:]]*	tokens->push_back(QCToken(VAR_NAME,yytext));
 <lineQoute>\"				BEGIN(lineNames);
 
-<circ>{NAME}				tokens->push_back(QCToken(CIRC_NAME,sToUpper(yytext)));
+<circ>{NAME}				tokens->push_back(QCToken(CIRC_NAME,sToUpper(yytext)));BEGIN(circIn);
 <circ>\n				BEGIN(gates);
+
+<circIn>{NAME}			tokens->push_back(QCToken(VAR_NAME,yytext));
+<circIn>\n			tokens->push_back(QCToken(NEWLINE,yytext));BEGIN(gates);
 
 
 <gates>(?i:end)	tokens->push_back(QCToken(SEC_END,"GATES")); BEGIN(INITIAL);
