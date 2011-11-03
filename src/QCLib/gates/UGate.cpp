@@ -16,6 +16,7 @@ Gate* UGate::clone(){
 	g->controls = controls;	
 	g->targets = targets;	
 	g->matrix = matrix;
+	g->drawType = drawType;
 	return g;
 }
 
