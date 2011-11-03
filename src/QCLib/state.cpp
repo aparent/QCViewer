@@ -69,9 +69,9 @@ State kron (const State& l, const State& r){
   StateMap::const_iterator it_r;
   StateMap::const_iterator it_l;
   State ret;
-  for (it_l = l.data.begin(); it_l != l.data.end(); ++it_l) {
-  	for (it_r = r.data.begin(); it_r != r.data.end(); ++it_r) {
-			ret.data[(it_l->first << r.numBits())|(it_r->first)] = it_l->second*it_r->second;
+  for (it_r = r.data.begin(); it_r != r.data.end(); ++it_r) {
+  	for (it_l = l.data.begin(); it_l != l.data.end(); ++it_l) {
+			ret.data[(it_r->first << l.numBits())|(it_l->first)] = it_r->second*it_l->second;
 		}
 	}
 	ret.dim = l.dim*r.dim;

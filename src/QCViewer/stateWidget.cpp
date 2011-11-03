@@ -225,13 +225,9 @@ bool StateWidget::on_expose_event (GdkEventExpose* event) {
 
 string base2enc (unsigned long v, unsigned int len) {
   string result = "";
-  do {
-    result = (char)('0' + (v & 0x1)) + result;
-    v >>= 1;
-  } while(v);
-  if (result.length () < len) {
-    len = len - result.length ();
-    while (len--) result = '0' + result;
+  for(unsigned int i = 0; i < len; i++){
+    	result = result + (char)('0' + (v & 0x1));
+    	v >>= 1;
   }
   return result;
 }
