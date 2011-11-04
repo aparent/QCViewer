@@ -50,8 +50,8 @@ State *RGate::ApplyU (index_t bits){
   switch (axis) {
     case X:
       {
-        float_type cosr = cos (M_PI*rot/2.0);
-        float_type sinr = sin (M_PI*rot/2.0);
+        float_type cosr = cos (M_PI*rot);
+        float_type sinr = sin (M_PI*rot);
         if (GetRegister (bits, targets.at (0))) {
           *answer = State (complex<float_type>(sinr,0),BuildBitString(bits,0));
           *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
@@ -63,8 +63,8 @@ State *RGate::ApplyU (index_t bits){
       break;
     case Y:
       {
-        float_type cosr = cos (M_PI*rot/2.0);
-        float_type sinr = sin (M_PI*rot/2.0);
+        float_type cosr = cos (M_PI*rot);
+        float_type sinr = sin (M_PI*rot);
         if (GetRegister (bits, targets.at (0))) {
           *answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
           *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
@@ -77,7 +77,7 @@ State *RGate::ApplyU (index_t bits){
     case Z:
       {
         if (GetRegister (bits, targets.at(0))){
-          *answer = State(exp(complex<float_type>(0,M_PI*rot/2.0)), bits);// XXX: verify do not need buildbitstring
+          *answer = State(exp(complex<float_type>(0,M_PI*rot)), bits);// XXX: verify do not need buildbitstring
         }
         else{
           *answer = State(1, bits);

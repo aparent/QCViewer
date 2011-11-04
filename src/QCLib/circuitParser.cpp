@@ -116,7 +116,7 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
     Gate *newGate;
     if((*it).type == BREAK){
 	circ->column_breaks.push_back(circ->numGates()-1);
-	cout << "Break:" << circ->numGates()-1 << endl;
+	//cout << "Break:" << circ->numGates()-1 << endl;
   	it++;
 	continue;
     }
@@ -150,6 +150,8 @@ void parseGates(Circuit *circ, vector<QCToken>::iterator &it, map<string,Circuit
       newGate = new UGate("F");
       newGate->drawType = Gate::FRED;
     } else if (subcircuits.find((*it).value) != subcircuits.end() ){
+	circ->column_breaks.push_back(circ->numGates()-1);
+	//cout << "Break:" << circ->numGates()-1 << endl;
 	Circuit c = subcircuits[(*it).value];
 	if ((*(++it)).type == EXPONENT){
 		Loop l;
