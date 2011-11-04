@@ -42,6 +42,7 @@ SET(QCLIB_HEADER_FILES
 	gates/UGateLookup.h
 )
 
+IF(NOT WIN32)
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLexer.cpp
 	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLexer.l
@@ -77,6 +78,7 @@ add_custom_command (
 	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gates/GateParser.y
 )
+ENDIF(NOT WIN32)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 

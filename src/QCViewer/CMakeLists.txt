@@ -23,6 +23,6 @@ LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
 include_directories(${Freetype_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Freetype_LIBRARY_DIRS})
 
-add_executable (viewer  ${QCVIEWER_SRC_FILES})
+add_executable (viewer WIN32  ${QCVIEWER_SRC_FILES})
 target_link_libraries(viewer ${GTKMM_LIBRARIES} ${CMAKE_CURRENT_BINARY_DIR}/../QCLib/libQC.a )
 install(TARGETS viewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
