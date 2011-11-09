@@ -37,7 +37,7 @@ void StateViewWidget::close () {
   vector<StateViewWidget*>::iterator it = find (svwList->begin (), svwList->end (), this);
   if (it == svwList->end ()) cerr << "VERY BAD WARNING\n";
   svwList->erase (it);
-  if (svwList->size () == 0) {
+  if (svwList->empty()) {
     vispane->set_position (3000); // TODO: do this better
   }
 }

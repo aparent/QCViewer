@@ -13,18 +13,20 @@
 
 using namespace std;
 
-CircuitWidget::CircuitWidget() : circuit (NULL), cx(0), cy(0) {
+CircuitWidget::CircuitWidget() {
+  state = NULL;
+  circuit = NULL;
+  win = NULL;
+  cx = cy = 0;
   panning = drawarch = drawparallel = false;
   mode = NORMAL;
   NextGateToSimulate = 0;
   scale = 1.0;
-  state = NULL;
   add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);
   signal_button_press_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_press_event));
   signal_button_release_event().connect(sigc::mem_fun(*this, &CircuitWidget::on_button_release_event) );
   signal_scroll_event().connect( sigc::mem_fun( *this, &CircuitWidget::onScrollEvent ) );
   signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
-	cx = cy = 0;
   wirestart = wireend = 0;
   selecting = false;
 }
@@ -92,7 +94,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
   unsigned int wire = getFirstWire (yy);
   if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
   for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
-  if (columns.size () == 0) {
+  if (columns.empty()) {
     insert_gate_at_front (newgate);
   } else if (column_id == -1) {
     if (yy < columns[0].y0 || yy - columns[0].y0 > columns[0].height) {
@@ -193,7 +195,6 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event) {
     int column_id = -1.0; // before column 0
     double mindist = -1.0;
     int wireid;
-    int gateid;
     double dist;
     unsigned int i;
     vector<Control>::iterator it;
@@ -448,7 +449,7 @@ void CircuitWidget::savesvg (string filename) {
 }
 
 void CircuitWidget::set_scale (double x) {
-	if (!circuit) return;
+  if (!circuit) return;
   scale = x;
   ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
   force_redraw ();
@@ -531,7 +532,7 @@ bool CircuitWidget::step () {
 }
 
 void CircuitWidget::reset () {
-  for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); it++) {
+  for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); ++it) {
     it->sim_n = it->n;
   }
   if (circuit && NextGateToSimulate != 0) {
@@ -657,14 +658,14 @@ void CircuitWidget::delete_loop () {
   assert (is_loop(selections));
   Loop* l = find_loop(selections);
   selections.clear();
-  for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); it++) {
+  for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); ++it) {
     if (l->first == it->first) { circuit->loops.erase(it); return; }
   } 
   assert (0 == 1);
 }
   
 Loop* CircuitWidget::find_loop (vector<uint32_t> selections) {
-  assert (selections.size() != 0);
+  assert (!selections.empty());
   uint32_t f = *(std::min_element(selections.begin(), selections.end()));
   uint32_t l = *(std::max_element(selections.begin(), selections.end()));
   assert (f <= l);
@@ -679,7 +680,7 @@ Loop* CircuitWidget::find_loop (vector<uint32_t> selections) {
 }
 
 bool CircuitWidget::is_loop (vector<uint32_t> selections) {
-  assert (selections.size() != 0);
+  assert (!selections.empty());
   uint32_t f = *(std::min_element(selections.begin(), selections.end()));
   uint32_t l = *(std::max_element(selections.begin(), selections.end()));
   assert (f <= l);
@@ -690,7 +691,7 @@ bool CircuitWidget::is_loop (vector<uint32_t> selections) {
 }
 
 bool CircuitWidget::could_be_loop (vector<uint32_t> selections) {
-  assert (selections.size() != 0);
+  assert (!selections.empty());
   std::cout << "in could_be_loop\n";
   uint32_t f = *(std::min_element(selections.begin(), selections.end()));
   uint32_t l = *(std::max_element(selections.begin(), selections.end()));

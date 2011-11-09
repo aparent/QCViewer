@@ -56,7 +56,7 @@ skip:
   m_PropFrame.hide ();
   m_FlowFrame.hide();
   m_EditLoop.hide ();
-	m_RGateEditFrame.hide ();
+  m_RGateEditFrame.hide ();
   std::cerr << "Done QCViewer::QCViewer\n";
 }
 
@@ -330,7 +330,7 @@ void QCViewer::on_menu_delete () {
 
 void QCViewer::set_selection (vector<uint32_t> s) {
   selections = s;
-  if (selections.size () == 0) {
+  if (selections.empty()) {
     btn_editcontrols.set_active (false);
     m_PropFrame.hide ();
     m_FlowFrame.hide();
@@ -355,7 +355,7 @@ void QCViewer::set_selection (vector<uint32_t> s) {
     m_RGateEditFrame.show ();
   }
   // find out if we are in a loop
-  if (selections.size() != 0) {
+  if (!selections.empty()) {
     std::cout <<"\n\n------------\n";
     bool is_loop = c.is_loop (selections);
     bool could_be_loop = c.could_be_loop (selections);

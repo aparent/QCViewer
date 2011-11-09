@@ -30,7 +30,7 @@ public:
     enum dType {NOT, FRED, DEFAULT};
     virtual ~Gate();
     virtual Gate* clone()=0;
-    virtual string getName()=0;
+    virtual string getName() const=0;
     virtual State *applyToBasis(index_t)=0;
     gateType type; //used with enum gateType
     dType drawType;
@@ -49,7 +49,7 @@ class UGate : public Gate {
   public:
 		UGate(string);
 		Gate* clone();
-		string getName();
+		string getName() const;
 		State *applyToBasis(index_t);
 		void setName(string);
 	private:
@@ -66,11 +66,11 @@ class RGate : public Gate {
 		enum Axis { X, Y, Z };
 		RGate(float_type, Axis);
 		Gate* clone();
-		string getName();
+		string getName() const;
 		State *applyToBasis(index_t);
-		float_type get_rotVal (); // XXX: remove float_type, consildate this stuff!!
+		float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
 		void set_rotVal (float_type);
-		Axis get_axis ();
+		Axis get_axis () const;
 		void set_axis (Axis);
 	private:
     float_type rot;

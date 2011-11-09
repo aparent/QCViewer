@@ -20,7 +20,7 @@ Gate* UGate::clone(){
 	return g;
 }
 
-string UGate::getName(){
+string UGate::getName() const{
 	if (drawType == NOT){
 		return "T";
 	}else{

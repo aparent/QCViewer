@@ -106,7 +106,7 @@ void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative) {
 gateRect drawControls (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ) {
   uint32_t minw, maxw;
   minmaxWire (ctrl, targ, &minw, &maxw);
-  if (ctrl->size() > 0)drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+  if (!ctrl->empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
   for (uint32_t i = 0; i < ctrl->size(); i++) {
     drawDot (cr, xc, wireToY((*ctrl)[i].wire), dotradius, (*ctrl)[i].polarity);
   }
@@ -271,7 +271,7 @@ gateRect drawFred (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint3
     minw = min (minw, (*targ)[i]);
     maxw = max (maxw, (*targ)[i]);
   }
-	if (ctrl->size() == 0) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+	if (ctrl->empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
   return rect;
 }
 
@@ -378,7 +378,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
   uint32_t i = 0;
   double maxX;
-  if (columns.size () == 0) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
+  if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
   for (uint32_t j = 0; j < columns.size(); j++) {
     maxX = 0.0;
     for (; i <= columns[j].lastGateID; i++) {
@@ -444,7 +444,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 
 
   // loops
-  for (vector<Loop>::iterator it = c->loops.begin(); it != c->loops.end(); it++) {
+  for (vector<Loop>::iterator it = c->loops.begin(); it != c->loops.end(); ++it) {
     drawloop (cr, *it, rects);
   }
 
@@ -527,7 +527,7 @@ vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& co
 	cairo_pattern_destroy (group);
   if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
   if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
-  if (selections.size () != 0) drawSelections (cr, rects, selections);
+  if (!selections.empty()) drawSelections (cr, rects, selections);
 
   return rects;
 }

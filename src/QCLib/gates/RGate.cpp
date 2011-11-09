@@ -21,7 +21,7 @@ Gate* RGate::clone(){
 	return g;
 }
 
-string RGate::getName(){
+string RGate::getName() const{
   return "R";
 }
 
@@ -103,7 +103,7 @@ void RGate::set_axis (Axis a) {
   axis = a;
 }
 
-RGate::Axis RGate::get_axis () {
+RGate::Axis RGate::get_axis () const{
   return axis;
 }
 
@@ -111,6 +111,6 @@ void RGate::set_rotVal (float_type r) { // XXX: remove float_type, consildate th
   rot = r;
 }
 
-float_type RGate::get_rotVal () {
+float_type RGate::get_rotVal () const{
   return rot;
 }

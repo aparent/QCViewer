@@ -94,38 +94,31 @@ void on_menu_file_open_circuit ();
   Gtk::Entry       m_EditLoopIterEntry;
   Gtk::Button      m_EditLoopDelButton;
 
-  //Gtk::Button      btn_H, btn_X, btn_Y, btn_Z, btn_NOT, btn_R, btn_SWAP;
-  //GateIcon NOTicon, Hicon, Xicon, Yicon, Zicon, Ricon, SWAPicon;
   std::vector<Gtk::Button*> gate_buttons;
   std::vector<GateIcon*>    gate_icons;  
   Gtk::Frame       m_PropFrame;
   Gtk::Table       m_PropTable;
 
-	Gtk::Button      btn_delete;
-	Gtk::Frame       m_RGateEditFrame;
+  Gtk::Button      btn_delete;
+  Gtk::Frame       m_RGateEditFrame;
   Gtk::Table       m_RGateEditTable;
-	Gtk::RadioButton::Group m_RAxisGroup;
+  Gtk::RadioButton::Group m_RAxisGroup;
   Gtk::RadioButton btn_RX, btn_RY, btn_RZ;
-	Gtk::Label       m_RValLabel;
-	Gtk::Entry       m_RValEntry;
+  Gtk::Label       m_RValLabel;
+  Gtk::Entry       m_RValEntry;
 
   Gtk::Frame       m_SimulationFrame;
   Gtk::Table       m_SimulationTable;
 
   Gtk::ToggleButton btn_editbreakpoints, btn_editcontrols;
 
-  Gtk::ToolItemGroup* group_gates;
-  Gtk::ToolItemGroup* group_prop;
-  Gtk::ToolItemGroup* group_misc;
-
-
   std::vector<Gtk::TargetEntry> listTargets;
 private:
   void setup_menu_actions();
   void setup_menu_layout();
   void setup_gate_icons();
-	void register_stock_items();
-	void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
+  void register_stock_items();
+  void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
   void update_mode ();
   void add_loop();
 
