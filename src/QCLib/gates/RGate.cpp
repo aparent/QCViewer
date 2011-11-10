@@ -22,7 +22,14 @@ Gate* RGate::clone(){
 }
 
 string RGate::getName() const{
-  return "R";
+  switch (axis) {
+    case RGate::X:
+      return "RX:" + floatToString(rot);
+    case RGate::Y:
+      return "RY:" + floatToString(rot);
+    case RGate::Z:
+      return "RZ:" + floatToString(rot);
+  }
 }
 
 /* RGate simulation implimentation */

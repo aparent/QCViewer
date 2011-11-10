@@ -407,11 +407,6 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
           } else { ... } */
 				  if (g->type == Gate::RGATE) {
 				    string lbl = g->getName ();
-						switch (((RGate*)g)->get_axis ()) {
-							case RGate::X: lbl += "X"; break;
-							case RGate::Y: lbl += "Y"; break;
-							case RGate::Z: lbl += "Z"; break;
-						}
 						r = drawCU (cr, xcurr, lbl, &g->controls, &g->targets);
 					} else {
             r = drawCU (cr, xcurr, g->getName(), &g->controls, &g->targets);

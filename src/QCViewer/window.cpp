@@ -484,7 +484,7 @@ void QCViewer::setup_menu_actions()
   m_refActionGroup->add(Gtk::Action::create("ArchOpen", Gtk::Stock::OPEN, "Open", "Open an architecture file"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
 
-  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save",
+  m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save Picture",
                                             "Save the circuit diagram to an image file"));
   m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
                         sigc::mem_fun(*this, &QCViewer::on_menu_save_circuit));

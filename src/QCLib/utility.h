@@ -26,6 +26,7 @@ void tokenize(const string&,
               vector<string>&,
               const string&);
 string intToString(int i);
+string floatToString(float_type i);
 string sToUpper(string);
 
 /* Bit set/get functions */

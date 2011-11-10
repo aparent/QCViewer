@@ -29,6 +29,12 @@ string intToString(int i){
   return ss.str();
 }
 
+string floatToString(float_type i){
+  stringstream ss;
+  ss << i;
+  return ss.str();
+}
+
 string sToUpper(string data){
 	std::transform(data.begin(), data.end(), data.begin(), ::toupper);
 	return data;
