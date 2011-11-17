@@ -5,30 +5,34 @@
 #include <complex>
 using namespace std;
 
-UGate::UGate(string n_name) : name(n_name) {
-	matrix = NULL;
-	drawType = DEFAULT;
-	type = UGATE;
+UGate::UGate(string n_name) : name(n_name)
+{
+    matrix = NULL;
+    drawType = DEFAULT;
+    type = UGATE;
 }
 
-Gate* UGate::clone(){
-	UGate *g = new UGate(name);
-	g->controls = controls;	
-	g->targets = targets;	
-	g->matrix = matrix;
-	g->drawType = drawType;
-	return g;
+Gate* UGate::clone()
+{
+    UGate *g = new UGate(name);
+    g->controls = controls;
+    g->targets = targets;
+    g->matrix = matrix;
+    g->drawType = drawType;
+    return g;
 }
 
-string UGate::getName() const{
-	if (drawType == NOT){
-		return "T";
-	}else{
-		return name;
-	}
+string UGate::getName() const
+{
+    if (drawType == NOT) {
+        return "T";
+    } else {
+        return name;
+    }
 }
-void UGate::setName(string n_name){
-		name = n_name;
+void UGate::setName(string n_name)
+{
+    name = n_name;
 }
 
 /*
@@ -36,68 +40,72 @@ void UGate::setName(string n_name){
 	for all basis states in the superposition.  Note this can return a
 	superpostion.
 */
-State *UGate::applyToBasis(index_t bitString){
-  // First, make sure all of the controls are satisfied.
-  bool ctrl = true;
-  for (unsigned int i = 0; i < controls.size(); i++) {
-    Control c = controls[i];
-    int check = GetRegister (bitString, c.wire);
-    if (!c.polarity != check) {
-      ctrl = false; // control line not satisfied.
-      break;
+State *UGate::applyToBasis(index_t bitString)
+{
+    // First, make sure all of the controls are satisfied.
+    bool ctrl = true;
+    for (unsigned int i = 0; i < controls.size(); i++) {
+        Control c = controls[i];
+        int check = GetRegister (bitString, c.wire);
+        if (!c.polarity != check) {
+            ctrl = false; // control line not satisfied.
+            break;
+        }
     }
-  }
-  if (ctrl) {
-    return ApplyU (bitString);
-  } else {
-    State *answer = new State (1, bitString); // with amplitude 1 the input bitString is unchanged
-    return answer;
-	}
+    if (ctrl) {
+        return ApplyU (bitString);
+    } else {
+        State *answer = new State (1, bitString); // with amplitude 1 the input bitString is unchanged
+        return answer;
+    }
 }
 
 // Takes care of actually applying the matrix by indexing to the correct matrix coloum
-State *UGate::ApplyU (index_t bits){
-	unsigned int input = ExtractInput (bits);
-  // now, go through all rows of the output from the correct column of U
-  State *answer = new State;
-	if (matrix == NULL){
-		matrix = UGateLookup(name);
-		if (matrix == NULL) return NULL;
-	}
-  for (unsigned int i = 0; i < matrix->dim; i++) {
-    if (matrix->data[input*matrix->dim+i] != complex<float_type>(0)){
-			*answer += State(matrix->data[input*matrix->dim+i], BuildBitString (bits, i));
-		}
-  }
-  return answer;
+State *UGate::ApplyU (index_t bits)
+{
+    unsigned int input = ExtractInput (bits);
+    // now, go through all rows of the output from the correct column of U
+    State *answer = new State;
+    if (matrix == NULL) {
+        matrix = UGateLookup(name);
+        if (matrix == NULL) return NULL;
+    }
+    for (unsigned int i = 0; i < matrix->dim; i++) {
+        if (matrix->data[input*matrix->dim+i] != complex<float_type>(0)) {
+            *answer += State(matrix->data[input*matrix->dim+i], BuildBitString (bits, i));
+        }
+    }
+    return answer;
 }
 
 /*
 	This function takes an input bitstring and the mapping of targets and returns
 	the input to the gate, for the purpose of indexing into its matrix.
 */
-unsigned int UGate::ExtractInput (index_t bitString) {
-  unsigned int input = 0;
-  for (unsigned int i = 0; i < targets.size(); i++) {
-    if (GetRegister (bitString, targets.at(i))) {
-      input = SetRegister (input, i);
+unsigned int UGate::ExtractInput (index_t bitString)
+{
+    unsigned int input = 0;
+    for (unsigned int i = 0; i < targets.size(); i++) {
+        if (GetRegister (bitString, targets.at(i))) {
+            input = SetRegister (input, i);
+        }
     }
-  }
-  return input;
+    return input;
 }
 
 /*
 	This function takes an input string, the mapping of targets, and an output for those targets
 	and produces the output bitstring
 */
-index_t UGate::BuildBitString (index_t orig, unsigned int ans) {
-  unsigned int output = orig;
-  for (unsigned int i = 0; i < targets.size (); i++) {
-    if (GetRegister (ans, i)) {
-			output = SetRegister (output, targets.at(i));
-    } else {
-      output = UnsetRegister (output, targets.at(i));
+index_t UGate::BuildBitString (index_t orig, unsigned int ans)
+{
+    unsigned int output = orig;
+    for (unsigned int i = 0; i < targets.size (); i++) {
+        if (GetRegister (ans, i)) {
+            output = SetRegister (output, targets.at(i));
+        } else {
+            output = UnsetRegister (output, targets.at(i));
+        }
     }
-  }
-  return output;
+    return output;
 }

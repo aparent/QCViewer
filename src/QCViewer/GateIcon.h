@@ -3,8 +3,9 @@
 #include <gtkmm.h>
 #include <string>
 
-class GateIcon : public Gtk::DrawingArea {
-    public:
+class GateIcon : public Gtk::DrawingArea
+{
+public:
     enum GateType { NOT, R, SWAP, DEFAULT };
     GateIcon ();
     GateIcon (std::string);

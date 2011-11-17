@@ -6,26 +6,29 @@
 #include <string>
 #include <vector>
 
-class gateRect {
+class gateRect
+{
 public:
-	gateRect() : x0(0),y0(0),width(0),height(0){}
-  double x0, y0;
-  double width, height;
+    gateRect() : x0(0),y0(0),width(0),height(0) {}
+    double x0, y0;
+    double width, height;
 };
 
-class Colour {
-  public:
+class Colour
+{
+public:
     Colour () : r(0.0),g(0.0),b(0.0),a(0.0) {}
     Colour (double rr, double gg, double bb, double aa) : r(rr), g(gg), b(bb), a(aa) {}
     double r, g, b, a;
 };
 
-class LayoutColumn {
+class LayoutColumn
+{
 public:
-	LayoutColumn (uint32_t g, double p) : lastGateID(g), pad(p) {}
-  uint32_t lastGateID;
-  double pad;
-  gateRect bounds;
+    LayoutColumn (uint32_t g, double p) : lastGateID(g), pad(p) {}
+    uint32_t lastGateID;
+    double pad;
+    gateRect bounds;
 };
 
 void init_fonts();
