@@ -21,6 +21,8 @@ CircuitWidget::CircuitWidget()
     cx = cy = 0;
     panning = drawarch = drawparallel = false;
     mode = NORMAL;
+		ext.width=0;
+		ext.height=0;
     NextGateToSimulate = 0;
     scale = 1.0;
     add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);

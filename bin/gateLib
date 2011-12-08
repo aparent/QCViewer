@@ -25,7 +25,7 @@ SYMBOL F
 0 , 1 , 0 , 0
 0 , 0 , 0 , 1
 
-NAME Imag
-SYMBOL Im
-i , 0
-0 , i
+NAME T
+SYMBOL T
+1 , 0
+0 , 1/sqrt(2) + i*1/sqrt(2)
