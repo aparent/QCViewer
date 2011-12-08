@@ -21,8 +21,8 @@ CircuitWidget::CircuitWidget()
     cx = cy = 0;
     panning = drawarch = drawparallel = false;
     mode = NORMAL;
-		ext.width=0;
-		ext.height=0;
+    ext.width=0;
+    ext.height=0;
     NextGateToSimulate = 0;
     scale = 1.0;
     add_events (Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK |Gdk::SCROLL_MASK);
@@ -520,16 +520,20 @@ bool CircuitWidget::run (bool breaks)
     if (!circuit || !state) return false;
     if (NextGateToSimulate == circuit->numGates ()) NextGateToSimulate = 0;
     // always step over first breakpoint if it is around
-    while (NextGateToSimulate < circuit->numGates () || (is_loop(vector<uint32_t>(1, NextGateToSimulate - 1)) && find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n != 1)) {
-        std::cout << "blah " << NextGateToSimulate << "\n" <<  fflush;
+    while (NextGateToSimulate < circuit->numGates () ||
+            (is_loop(vector<uint32_t>(1, NextGateToSimulate - 1)) &&
+             find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n != 0)) {
         vector<uint32_t> foo;
         foo.push_back(NextGateToSimulate - 1);
         if (is_loop(foo)) {
             Loop* l = find_loop(foo);
+            if (l->first == NextGateToSimulate-1 && l->sim_n > 1) {
+                l->sim_n -= 1;
+            }
             if (l->last == NextGateToSimulate-1 && l->sim_n > 1) {
                 NextGateToSimulate = l->first;
-                l->sim_n -= 1;
             } else if (l->last == NextGateToSimulate-1 && l->sim_n == 1) {
+                NextGateToSimulate = l->first;
                 l->sim_n = 0;
             }
         }
@@ -564,27 +568,29 @@ bool CircuitWidget::step ()
     if (!circuit || !state) return false;
     if (circuit->numGates() == NextGateToSimulate &&
             is_loop(vector<uint32_t>(1,NextGateToSimulate-1)) &&
-            find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 1) {
-        find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 0;
+            find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 0) {
         return false;
     }
-    if (NextGateToSimulate < circuit->numGates ()  || (is_loop(vector<uint32_t>(1, NextGateToSimulate - 1)) && find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n != 1)) {
+    if (NextGateToSimulate < circuit->numGates ()
+            || (is_loop(vector<uint32_t>(1, NextGateToSimulate - 1))
+                && find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n != 0)) {
         vector<uint32_t> foo;
         foo.push_back(NextGateToSimulate - 1);
         if (is_loop(foo)) {
             Loop* l = find_loop(foo);
+            if (l->first == NextGateToSimulate-1&&l->sim_n > 1) {
+                l->sim_n -= 1;
+            }
             if (l->last == NextGateToSimulate-1 && l->sim_n > 1) {
                 NextGateToSimulate = l->first;
-                l->sim_n -= 1;
             } else if (l->last == NextGateToSimulate-1 && l->sim_n == 1) {
+                NextGateToSimulate = l->first;
                 l->sim_n = 0;
-                std::cout << "yoyoyoyoyo\n";
             }
         }
         *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
         if (!state) return false;
         NextGateToSimulate++;
-//    state->print();
         force_redraw ();
         return true;
     } else {
@@ -594,12 +600,14 @@ bool CircuitWidget::step ()
 
 void CircuitWidget::reset ()
 {
-    for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); ++it) {
-        it->sim_n = it->n;
-    }
-    if (circuit && NextGateToSimulate != 0) {
-        NextGateToSimulate = 0;
-        force_redraw ();
+    if(circuit!=NULL) {
+        for (vector<Loop>::iterator it = circuit->loops.begin(); it != circuit->loops.end(); ++it) {
+            it->sim_n = it->n;
+        }
+        if (circuit && NextGateToSimulate != 0) {
+            NextGateToSimulate = 0;
+            force_redraw ();
+        }
     }
 }
 
@@ -786,7 +794,6 @@ bool CircuitWidget::is_loop (vector<uint32_t> selections)
 bool CircuitWidget::could_be_loop (vector<uint32_t> selections)
 {
     assert (!selections.empty());
-    std::cout << "in could_be_loop\n";
     uint32_t f = *(std::min_element(selections.begin(), selections.end()));
     uint32_t l = *(std::max_element(selections.begin(), selections.end()));
     std::cout << "f: " << f << " l:" << l << "\n" << fflush;
