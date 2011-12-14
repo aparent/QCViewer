@@ -67,6 +67,8 @@ void CircuitWidget::clear_selection ()
 
 void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time)
 {
+		(void)info; //placate compiler...
+		(void)selection_data; //placate compiler...
     if (!circuit) {
         context->drag_finish(false, false, time);
         return;
@@ -423,18 +425,17 @@ void CircuitWidget::load (string file)
     circuit = parseCircuit(file);
     layout.clear ();
     breakpoints.clear ();
-    cx = cy = 0;
-
+    cx = cy = 0;	
+    if (circuit == NULL) {
+        cout << "Error loading circuit" << endl;
+        return;
+    }
     vector<int> parallels = circuit->getGreedyParallel ();
 
     for (unsigned int i = 0; i < parallels.size(); i++) {
         layout.push_back (LayoutColumn(parallels[i], 0.0));
     }
     layout[parallels.size () - 1].pad = 0.0;
-    if (circuit == NULL) {
-        cout << "Error loading circuit" << endl;
-        return;
-    }
 }
 
 void CircuitWidget::loadArch (string file)
@@ -557,7 +558,7 @@ bool CircuitWidget::run (bool breaks)
     if (circuit->numGates() == NextGateToSimulate &&
             is_loop(vector<uint32_t>(1,NextGateToSimulate-1)) &&
             find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 1) {
-        find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n == 0;
+        find_loop(vector<uint32_t>(1,NextGateToSimulate-1))->sim_n = 0;
     }
     force_redraw ();
     return false;
@@ -622,20 +623,23 @@ double CircuitWidget::get_scale ()
 }
 int CircuitWidget::get_QCost ()
 {
+		if (circuit == NULL) return 0;
     return circuit->QCost();
 }
 int CircuitWidget::get_Depth ()
 {
+		if (circuit == NULL) return 0;
     return circuit->getParallel().size();
 }
 int CircuitWidget::get_NumGates ()
 {
+		if (circuit == NULL) return 0;
     return circuit->numGates();
 }
 unsigned int CircuitWidget::get_NumLines()
 {
-    if (circuit!=NULL) return circuit->numLines();
-    else return 0;
+		if (circuit == NULL) return 0;
+    return circuit->numLines();
 }
 
 void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
@@ -796,15 +800,15 @@ bool CircuitWidget::could_be_loop (vector<uint32_t> selections)
     assert (!selections.empty());
     uint32_t f = *(std::min_element(selections.begin(), selections.end()));
     uint32_t l = *(std::max_element(selections.begin(), selections.end()));
-    std::cout << "f: " << f << " l:" << l << "\n" << fflush;
+    //std::cout << "f: " << f << " l:" << l << "\n" << fflush;
     assert (f <= l);
     for (uint32_t i = 0; i < circuit->loops.size(); i++) {
-        std::cout << "beep\n";
+        //std::cout << "beep\n";
         if (!(l < circuit->loops[i].first || f > circuit->loops[i].last)) {
-            std::cout << "isn't!\n";
+            //std::cout << "isn't!\n";
             return false;
         }
     }
-    std::cout << "is!\n";
+    //std::cout << "is!\n";
     return true;
 }

@@ -41,8 +41,8 @@ string printTree(parseNode *node)
 {
     if (node->type==SQRT) 																							return node->value + "(" + printTree(node->right)+")";
     if (node->left == NULL && node->right == NULL && node->type==KET ) 	return "|" + node->value+">";
-    if (node->left == NULL && node->right == NULL && node->type==CNUM ) return node->value+"i";
     if (node->left == NULL && node->right == NULL ) return node->value;
+    if (node->left == NULL && node->right == NULL && node->type==CNUM ) return node->value+"i";
     return "("+printTree(node->left)+ " " +node->value + " " + printTree(node->right)+")";
 }
 
@@ -152,12 +152,8 @@ diracTerm evalTree(parseNode *node)
     if (node->type == EXPON) {
         if (left.type == KET) {
             ret.vecValue = State(left.vecValue);
-            ret.vecValue.print();
             for(unsigned int i = 1; i < (unsigned int)real(right.numValue); i++) {
                 ret.vecValue = kron(ret.vecValue,left.vecValue);
-                cout << i << endl;
-                left.vecValue.print();
-                ret.vecValue.print();
             }
             ret.type = KET;
             return ret;

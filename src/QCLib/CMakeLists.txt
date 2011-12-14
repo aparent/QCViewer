@@ -12,12 +12,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 SET(QCLIB_SRC_FILES
 	circuit.cpp
-	diracLexer.cpp
-	QCLexer.cpp
 	utility.cpp
-	circuitParser.cpp
 	dirac.cpp
+	diracLexer.cpp
 	diracParser.cpp
+	circuitParser.cpp
+	QCParser.cpp
+	QCLexer.cpp
 	GateParser.cpp
 	GateLexer.cpp
 	gate.cpp
@@ -34,6 +35,7 @@ SET(QCLIB_HEADER_FILES
 	dirac.h
 	circuit.h
 	circuitParser.h
+	QCParserUtils.h
 	diracParser.h
   parseNode.h
 	QCLexer.h
@@ -43,6 +45,11 @@ SET(QCLIB_HEADER_FILES
 )
 
 IF(NOT WIN32)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCParser.h
+	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCParser.y
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCParser.y
+)
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLexer.cpp
 	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLexer.l

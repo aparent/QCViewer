@@ -54,7 +54,6 @@ QCViewer::QCViewer()
     m_EditVisPane.pack2 (m_VisBox, true, true);
     m_vbox.pack_start (m_EditVisPane);
 
-skip:
     m_vbox.show();
     m_hbox.show();
     m_VisBox.show ();
