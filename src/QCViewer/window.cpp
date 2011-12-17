@@ -564,7 +564,7 @@ void QCViewer::setup_menu_actions()
                           sigc::mem_fun(*this, &QCViewer::on_menu_step));
     m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_reset));
-    m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
+    m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay",Gtk::Stock::ADD, "Display state", "Open a graphical display of the current state"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
 
     m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
@@ -623,6 +623,7 @@ void QCViewer::setup_menu_layout()
         "    <toolitem action='SimulateRun'/>"
         "    <toolitem action='SimulateStep'/>"
         "    <toolitem action='SimulateReset'/>"
+        "    <toolitem action='SimulateDisplay'/>"
         "  </toolbar>"
         "</ui>";
 

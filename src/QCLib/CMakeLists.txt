@@ -19,6 +19,9 @@ SET(QCLIB_SRC_FILES
 	circuitParser.cpp
 	QCParser.cpp
 	QCLexer.cpp
+	QCParserUtils.cpp
+	circuit.h
+	circuitParser.h
 	GateParser.cpp
 	GateLexer.cpp
 	gate.cpp

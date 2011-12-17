@@ -67,8 +67,8 @@ void CircuitWidget::clear_selection ()
 
 void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time)
 {
-		(void)info; //placate compiler...
-		(void)selection_data; //placate compiler...
+    (void)info; //placate compiler...
+    (void)selection_data; //placate compiler...
     if (!circuit) {
         context->drag_finish(false, false, time);
         return;
@@ -384,6 +384,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
                 unsigned int j = breakpoints[i];
                 double x = (columns[j].x0+columns[j].width+columns[j+1].x0)/2.0;
                 double y = (0 - height/2.0 + ext.height/2.0)/scale + cy;
+
                 cr->set_source_rgba (0.8,0,0,0.8);
                 cr->move_to (x, y);
                 cr->line_to (x, y+height/scale);
@@ -425,7 +426,7 @@ void CircuitWidget::load (string file)
     circuit = parseCircuit(file);
     layout.clear ();
     breakpoints.clear ();
-    cx = cy = 0;	
+    cx = cy = 0;
     if (circuit == NULL) {
         cout << "Error loading circuit" << endl;
         return;
@@ -623,22 +624,22 @@ double CircuitWidget::get_scale ()
 }
 int CircuitWidget::get_QCost ()
 {
-		if (circuit == NULL) return 0;
+    if (circuit == NULL) return 0;
     return circuit->QCost();
 }
 int CircuitWidget::get_Depth ()
 {
-		if (circuit == NULL) return 0;
+    if (circuit == NULL) return 0;
     return circuit->getParallel().size();
 }
 int CircuitWidget::get_NumGates ()
 {
-		if (circuit == NULL) return 0;
+    if (circuit == NULL) return 0;
     return circuit->numGates();
 }
 unsigned int CircuitWidget::get_NumLines()
 {
-		if (circuit == NULL) return 0;
+    if (circuit == NULL) return 0;
     return circuit->numLines();
 }
 

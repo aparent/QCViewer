@@ -27,11 +27,11 @@ string RGate::getName() const
 {
     switch (axis) {
     case RGate::X:
-        return "RX:" + floatToString(rot);
+        return "RX(" + floatToString(rot) + ")";
     case RGate::Y:
-        return "RY:" + floatToString(rot);
+        return "RY(" + floatToString(rot)+")";
     case RGate::Z:
-        return "RZ:" + floatToString(rot);
+        return "RZ(" + floatToString(rot)+")";
     default:
 	return "R";
     }

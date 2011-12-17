@@ -7,8 +7,9 @@
 %{
 	#include "QCParser.h"
 	#include <iostream>
-	//#define SAVE_TOKEN QC_lval.string = strdup(yytext);
-	#define SAVE_TOKEN QC_lval.string = strdup(yytext); std::cout<< yytext << " ";
+	#include "utility.h"
+	//#define SAVE_TOKEN QC_lval.string = sToUpper(strdup(yytext));
+	#define SAVE_TOKEN QC_lval.string = strdup(sToUpper(yytext).c_str()); std::cout<< yytext << " ";
 	#define TOKEN(t) (QC_lval.token = t)
 	#define printok(t) std::cout<<t<<" ";
 %}
