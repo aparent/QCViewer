@@ -33,7 +33,7 @@ string RGate::getName() const
     case RGate::Z:
         return "RZ(" + floatToString(rot)+")";
     default:
-	return "R";
+        return "R";
     }
 }
 

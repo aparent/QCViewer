@@ -54,13 +54,17 @@ void add_constants (Circuit * circ, name_node *names)
 
 void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit> &subcircuits)
 {
+    if (names == NULL) {
+        cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
+        return;
+    }
     unsigned int start = circ->numGates();
     bool is_subcirc = false;
     Gate *newGate = NULL;
-    if (gateName[0] == 'T'||gateName[0] == 't') {
+    if (gateName[0] == 'T' && (gateName.size()==1 || isdigit(gateName[1]))) {
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
-    } else if (gateName[0] == 'F'||gateName[0] == 'f') {
+    } else if (gateName[0] == 'F') {
         newGate = new UGate("F");
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
