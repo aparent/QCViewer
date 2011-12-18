@@ -309,12 +309,17 @@ void QCViewer::on_menu_load_state ()
     if (result == Gtk::RESPONSE_OK) {
         if (state!=NULL) delete state;
         state = getStateVec (stateEntry.get_text(), true);
-        if (state->numBits() == c.get_NumLines()) {
-            for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
-            c.set_state(state);
+        if (state!=NULL) {
+            if (state->numBits() == c.get_NumLines()) {
+                for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
+                c.set_state(state);
+            } else {
+                Gtk::MessageDialog dialog(*this, "Incorrect Dimension", false , Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
+                dialog.set_secondary_text( "The dimension of the state you input does not match the number of lines in the circuit");
+                dialog.run();
+            }
         } else {
-            Gtk::MessageDialog dialog(*this, "Incorrect Dimension", false , Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
-            dialog.set_secondary_text( "The dimension of the state you input does not match the number of lines in the circuit");
+            Gtk::MessageDialog dialog(*this, "Syntax Error", false , Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
             dialog.run();
         }
     }

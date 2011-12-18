@@ -28,6 +28,7 @@
 %%
 input:	/*empty*/
      		| exp 	{ final = $1; }
+     		| error 	{ if ($1!=NULL) delete $1; final = NULL; }
 ;
 exp:	subex            { $$ = $1;    }
 			| exp PLUS  exp  { $2->left = $1; $2->right=$3; $$ = $2; }
