@@ -6,10 +6,8 @@
 %option prefix="QC_"
 %{
 	#include "QCParser.h"
-	#include <iostream>
 	#include "utility.h"
-	//#define SAVE_TOKEN QC_lval.string = sToUpper(strdup(yytext));
-	#define SAVE_TOKEN QC_lval.string = strdup(sToUpper(yytext).c_str()); std::cout<< yytext << " ";
+	#define SAVE_TOKEN QC_lval.string = strdup(sToUpper(yytext).c_str());
 	#define TOKEN(t) (QC_lval.token = t)
 	#define printok(t) std::cout<<t<<" ";
 %}
@@ -23,18 +21,18 @@ whitespace [ \t]
 comment #.*
 %%
 
-\.v                 printok("V");return TOKEN(VARS);
-\.i                 printok("I");return TOKEN(INPUTS);
-\.o                 printok("O");return TOKEN(OUTPUTS);
-\.c                 printok("C");return TOKEN(CONSTANTS);
-\.ol               	printok("OL"); return TOKEN(OUTLABELS);
-"BEGIN"							printok("BEGIN");return TOKEN(START);
-"END"								printok("END");return TOKEN(END);
-"\n"								std::cout<<std::endl;return TOKEN(NEWLINE);
-"("									printok("LBRAC");return TOKEN(LBRAC);
-")"									printok("RBRAC");return TOKEN(RBRAC);
-"^"									printok("EXPON");return TOKEN(EXPON);
-"'"									printok("APOS");return TOKEN(APOS);
+\.v                 return TOKEN(VARS);
+\.i                 return TOKEN(INPUTS);
+\.o                 return TOKEN(OUTPUTS);
+\.c                 return TOKEN(CONSTANTS);
+\.ol               	return TOKEN(OUTLABELS);
+"BEGIN"							return TOKEN(START);
+"END"								return TOKEN(END);
+"\n"								return TOKEN(NEWLINE);
+"("									return TOKEN(LBRAC);
+")"									return TOKEN(RBRAC);
+"^"									return TOKEN(EXPON);
+"'"									return TOKEN(APOS);
 {num}								SAVE_TOKEN; return NUM;
 {word}							SAVE_TOKEN; return WORD;
 

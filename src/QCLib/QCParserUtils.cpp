@@ -1,5 +1,6 @@
 #include "QCParserUtils.h"
 #include <cstdlib>
+#include <iostream>
 
 int findLine(Circuit *circ, string name)
 {
@@ -18,7 +19,7 @@ void add_lines (Circuit * circ, name_node *names)
         circ->addLine(names->name);
         names = names->next;
     }
-		delete names;
+    delete names;
 }
 
 void add_inputs (Circuit * circ, name_node *names)
@@ -27,7 +28,7 @@ void add_inputs (Circuit * circ, name_node *names)
         circ->getLine(findLine(circ,names->name))->constant=false;
         names = names->next;
     }
-		delete names;
+    delete names;
 }
 
 void add_outputs (Circuit * circ, name_node *names)
@@ -36,7 +37,7 @@ void add_outputs (Circuit * circ, name_node *names)
         circ->getLine(findLine(circ,names->name))->garbage=false;
         names = names->next;
     }
-		delete names;
+    delete names;
 }
 
 void add_outlabels (Circuit * circ, name_node *names)
@@ -122,7 +123,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         l.label = gateName;
         circ->add_loop(l);
     }
-		delete names;
+    delete names;
 }
 
 void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp, double rot)
@@ -155,5 +156,5 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
         l.label = gateName;
         circ->add_loop(l);
     }
-		delete names;
+    delete names;
 }

@@ -6,10 +6,7 @@
 %option prefix="Gate_"
 %{
 	#include "GateParser.h"
-	#include <string>
 	#include <cstdlib>
-	#include <iostream>
-	using namespace std;
 	#define SAVE_TOKEN Gate_lval.string = strdup(yytext)
 	#define TOKEN(t) (Gate_lval.token = t)
 %}
