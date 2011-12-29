@@ -2,11 +2,15 @@
 .i a b c d e Workspace
 .o a b c d e
 .c
-BEGIN H5
-H a; H b; H c; H d; H e
+BEGIN H5(a b c d e)
+H a
+H b
+H c
+H d
+H e
 END H5
 
-BEGIN GroverIterate (a, b, c, d, e, Workspace)
+BEGIN GroverIterate (a b c d e Workspace)
 H Workspace
 T a' b' c d e' Workspace
 H Workspace
