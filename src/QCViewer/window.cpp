@@ -210,6 +210,19 @@ void QCViewer::on_menu_save_png ()
         c.savepng (dialog.get_filename ());
     }
 }
+
+void QCViewer::on_menu_save_ps ()
+{
+    Gtk::FileChooserDialog dialog ("Please choose an eps file to save to",
+                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
+    dialog.set_transient_for (*this);
+    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+    int result = dialog.run ();
+    if (result == Gtk::RESPONSE_OK) {
+        c.saveps (dialog.get_filename ());
+    }
+}
 void QCViewer::on_menu_save_circuit ()
 {
     Gtk::FileChooserDialog dialog ("Please choose a qc file to save to",
@@ -540,7 +553,7 @@ void QCViewer::setup_menu_actions()
                           "Save circuit diagram as a Scalable Vector Graphics file"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_save_svg));
     m_refActionGroup->add(Gtk::Action::create("DiagramSavePs", "_Postscript", "Save circuit diagram as a Postscript file"),
-                          sigc::mem_fun(*this, &QCViewer::unimplemented));
+                          sigc::mem_fun(*this, &QCViewer::on_menu_save_ps));
 
     m_refActionGroup->add(Gtk::Action::create("SetArch", "Preset Arch"));
     m_refActionGroup->add(Gtk::Action::create("LNN", "LNN"),

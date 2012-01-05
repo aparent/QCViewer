@@ -499,6 +499,19 @@ void CircuitWidget::savesvg (string filename)
     cairo_surface_destroy (surface);
 }
 
+void CircuitWidget::saveps (string filename)
+{
+    if (!circuit) return;
+    double wirestart, wireend;
+    cairo_rectangle_t ext = get_circuit_size (circuit, layout, &wirestart, &wireend, 1.0);
+    cairo_surface_t* surface = make_ps_surface (filename, ext);
+    cairo_t* cr = cairo_create(surface);
+    cairo_set_source_surface (cr, surface, 0,0);
+    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<uint32_t>());
+    cairo_destroy (cr);
+    cairo_surface_destroy (surface);
+}
+
 void CircuitWidget::set_scale (double x)
 {
     if (!circuit) return;

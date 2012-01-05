@@ -25,6 +25,7 @@ public:
 
     void savepng (std::string);
     void savesvg (std::string);
+    void saveps (std::string);
     void save_circuit (std::string);
 
     void set_scale (double);
