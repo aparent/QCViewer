@@ -54,7 +54,6 @@ QCViewer::QCViewer()
     m_EditVisPane.pack2 (m_VisBox, true, true);
     m_vbox.pack_start (m_EditVisPane);
 
-skip:
     m_vbox.show();
     m_hbox.show();
     m_VisBox.show ();
@@ -323,12 +322,17 @@ void QCViewer::on_menu_load_state ()
     if (result == Gtk::RESPONSE_OK) {
         if (state!=NULL) delete state;
         state = getStateVec (stateEntry.get_text(), true);
-        if (state->numBits() == c.get_NumLines()) {
-            for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
-            c.set_state(state);
+        if (state!=NULL) {
+            if (state->numBits() == c.get_NumLines()) {
+                for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
+                c.set_state(state);
+            } else {
+                Gtk::MessageDialog dialog(*this, "Incorrect Dimension", false , Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
+                dialog.set_secondary_text( "The dimension of the state you input does not match the number of lines in the circuit");
+                dialog.run();
+            }
         } else {
-            Gtk::MessageDialog dialog(*this, "Incorrect Dimension", false , Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
-            dialog.set_secondary_text( "The dimension of the state you input does not match the number of lines in the circuit");
+            Gtk::MessageDialog dialog(*this, "Syntax Error", false , Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
             dialog.run();
         }
     }
@@ -578,7 +582,7 @@ void QCViewer::setup_menu_actions()
                           sigc::mem_fun(*this, &QCViewer::on_menu_step));
     m_refActionGroup->add(Gtk::Action::create ("SimulateReset", Gtk::Stock::STOP, "Reset", "Reset the simulation to the start of the circuit"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_reset));
-    m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay", "Display state"),
+    m_refActionGroup->add(Gtk::Action::create ("SimulateDisplay",Gtk::Stock::ADD, "Display state", "Open a graphical display of the current state"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_simulate_show_stateView));
 
     m_refActionGroup->add(Gtk::Action::create("ArchitectureMenu", "Architecture"));
@@ -637,6 +641,7 @@ void QCViewer::setup_menu_layout()
         "    <toolitem action='SimulateRun'/>"
         "    <toolitem action='SimulateStep'/>"
         "    <toolitem action='SimulateReset'/>"
+        "    <toolitem action='SimulateDisplay'/>"
         "  </toolbar>"
         "</ui>";
 

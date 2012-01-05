@@ -234,5 +234,5 @@ void Circuit::add_loop (Loop l)
         return; // don't add this loop then
     }
     loops.push_back(l);
-    std::cout << "\n\n\nnew loop!\n\n\n";
+    //std::cout << "\nnew loop!\n";
 }

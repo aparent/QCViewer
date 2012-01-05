@@ -6,11 +6,8 @@
 %option prefix="Gate_"
 %{
 	#include "GateParser.h"
-	#include <string>
 	#include <cstdlib>
-	#include <iostream>
-	using namespace std;
-	#define SAVE_TOKEN Gate_lval.string = strdup(yytext);
+	#define SAVE_TOKEN Gate_lval.string = strdup(yytext)
 	#define TOKEN(t) (Gate_lval.token = t)
 %}
 
@@ -21,7 +18,10 @@ float {int}\.{int}
 num {float}|{int}
 whitespace [ \t]
 comment #.*
+
+%x TEXT
 %%
+
 
 "^"                 return TOKEN(EXPONENT);
 "+"                 return TOKEN(PLUS);
@@ -33,12 +33,13 @@ comment #.*
 ")"									return TOKEN(RPAREN);
 ","									return TOKEN(COMMA);
 "\n"								return TOKEN(NEWLINE);
-"NAME"							return TOKEN(NAME);
-"SYMBOL"						return TOKEN(SYMBOL);
+"NAME"							BEGIN(TEXT); return TOKEN(NAME); 
+"SYMBOL"						BEGIN(TEXT); return TOKEN(SYMBOL); 
+<TEXT>{word}				BEGIN(INITIAL); SAVE_TOKEN; return WORD;
 "sqrt"							return TOKEN(SQRT);
 {num}								SAVE_TOKEN; return NUM;
-{word}							SAVE_TOKEN; return WORD;
 
-{whitespace}
-{comment}
+
+<*>{whitespace}
+<*>{comment}
 %%

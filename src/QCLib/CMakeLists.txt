@@ -2,22 +2,26 @@ set(CMAKE_CXX_FLAGS "-Wall -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -ansi")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -ansi")
 
-IF(WIN)
+IF(WIN32)
 	set(CMAKE_CXX_FLAGS "-Wall -pedantic")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic")
-ENDIF(WIN)
+ENDIF(WIN32)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 SET(QCLIB_SRC_FILES
 	circuit.cpp
-	diracLexer.cpp
-	QCLexer.cpp
 	utility.cpp
-	circuitParser.cpp
 	dirac.cpp
+	diracLexer.cpp
 	diracParser.cpp
+	circuitWriter.cpp
+	QCParser.cpp
+	QCLexer.cpp
+	QCParserUtils.cpp
+	circuit.h
+	circuitParser.h
 	GateParser.cpp
 	GateLexer.cpp
 	gate.cpp
@@ -34,6 +38,7 @@ SET(QCLIB_HEADER_FILES
 	dirac.h
 	circuit.h
 	circuitParser.h
+	QCParserUtils.h
 	diracParser.h
   parseNode.h
 	QCLexer.h
@@ -43,6 +48,11 @@ SET(QCLIB_HEADER_FILES
 )
 
 IF(NOT WIN32)
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCParser.h
+	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCParser.y
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCParser.y
+)
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCLexer.cpp
 	COMMAND flex ${CMAKE_CURRENT_SOURCE_DIR}/QCLexer.l
@@ -88,14 +98,3 @@ ADD_LIBRARY(QC STATIC ${QCLIB_HEADER_FILES} ${QCLIB_SRC_FILES})
 
 
 
-#Some testing stuff, uncomment to use
-#add_executable (diracTest  diracTest.cpp )
-#target_link_libraries(diracTest QC )
-#add_executable (simTest  simTest.cpp )
-#target_link_libraries(simTest QC )
-#add_executable (testParser  testParser.cpp )
-#target_link_libraries(testParser QC )
-#add_executable (QCLang/QCLTest  QCLang/QCLTest.cpp )
-#target_link_libraries(QCLang/QCLTest QC )
-#add_executable (testParser testParser.cpp)
-#target_link_libraries(testParser QCLib)

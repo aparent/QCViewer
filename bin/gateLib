@@ -25,7 +25,7 @@ SYMBOL F
 0 , 1 , 0 , 0
 0 , 0 , 0 , 1
 
-NAME T
-SYMBOL T
+NAME TGate
+SYMBOL Tg
 1 , 0
 0 , 1/sqrt(2) + i*1/sqrt(2)

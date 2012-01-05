@@ -352,7 +352,7 @@ void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects)
 
     stringstream ss;
     ss << l.label << " x ";
-    cairo_set_font_size(cr, 16);
+    cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents, extents2;
     cairo_text_extents(cr, ss.str().c_str(), &extents);
     double x = r.x0;
