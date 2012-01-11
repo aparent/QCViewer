@@ -1,6 +1,5 @@
-all:
-	latex QCViewer.tex
-#	bibtex QCViewer.aux
-	latex QCViewer.tex
-	latex QCViewer.tex
-	dvipdf QCViewer.dvi
+all: 
+	pdflatex QCViewer.tex
+	bibtex QCViewer.aux
+	pdflatex QCViewer.tex
+	pdflatex QCViewer.tex
