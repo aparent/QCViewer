@@ -207,6 +207,7 @@ void QCViewer::on_menu_file_open_arch ()
 }
 void QCViewer::on_menu_simulate_show_stateView()
 {
+    if (viz.size() < 3){
     StateViewWidget* sw = new StateViewWidget (&m_statusbar, &m_VisBox, &viz, &m_EditVisPane);
     sw->set_state (state);
     m_VisBox.add (*sw);
@@ -217,6 +218,7 @@ void QCViewer::on_menu_simulate_show_stateView()
         get_size (w, h);
         m_EditVisPane.set_position (h - 400);
     }
+  }
 }
 
 void QCViewer::on_menu_file_quit ()
