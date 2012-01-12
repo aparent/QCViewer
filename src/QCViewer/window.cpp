@@ -351,7 +351,7 @@ void QCViewer::on_menu_load_state ()
     if (result == Gtk::RESPONSE_OK) {
         if (state!=NULL) delete state;
         state = getStateVec (stateEntry.get_text(), true);
-        if (state!=NULL) {
+        if (state!=NULL && state->numBits()!=0) {
             if (state->numBits() == c.get_NumLines()) {
                 for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
                 c.set_state(state);
