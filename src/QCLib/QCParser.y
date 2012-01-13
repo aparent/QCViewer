@@ -70,7 +70,7 @@ input:	/*empty*/
 				| NEWLINE input
 				| START WORD LBRAC names RBRAC NEWLINE 
 					{ curr_circ = new Circuit();  
-						curr_circ->name = $2;
+						curr_circ->setName($2);
 						add_lines(curr_circ,$4); }
 					gates {subcircuits[$2]= *curr_circ;} END WORD input
 				| START NEWLINE {curr_circ = circuit;} gates END input
@@ -104,7 +104,7 @@ Circuit *parseCircuit(string filename){
           input += line + "\n";
       }
 			//-----------testcode--------------
-			circuit->name="Test";
+			circuit->setName("Test");
 			//---------------------------------
   		char *in = (char*)malloc(input.length() + 1);
   		strcpy(in,input.c_str());

@@ -24,7 +24,7 @@ Institute for Quantum Computing, Quantum Circuits Group
 
 Authors: Alex Parent, Jakub Parker
 ---------------------------------------------------------------------*/
-
+#include "circuit.h"
 #include "simulate.h"
 #include <cmath>
 #include <iostream>

@@ -107,9 +107,9 @@ private:
     float_type rot;
     index_t BuildBitString (index_t, unsigned int);
     State* ApplyU(index_t);
-    string name;
     Axis axis;
 };
+
 
 void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned int *dstmin, unsigned int *dstmax);
 #endif

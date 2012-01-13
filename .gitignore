@@ -6,3 +6,4 @@ CMakeFiles/*
 src/Makefile
 cmake_install.cmake
 .nfs*
+*.orig

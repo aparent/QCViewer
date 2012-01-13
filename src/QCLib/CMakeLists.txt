@@ -28,12 +28,14 @@ SET(QCLIB_SRC_FILES
   state.cpp
   state.cpp
   simulate.cpp
+	subcircuit.cpp
 	gates/UGate.cpp
 	gates/RGate.cpp
 	gates/UGateLookup.cpp
 )
 
 SET(QCLIB_HEADER_FILES
+	subcircuit.h
 	gate.h
 	dirac.h
 	circuit.h

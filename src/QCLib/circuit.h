@@ -28,6 +28,7 @@ Authors: Alex Parent, Jakub Parker
 #define CIRCUIT
 
 #include "gate.h"
+#include "types.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -87,6 +88,8 @@ public:
 
     void   addLine(string line);
     Line*  getLine(int pos);
+		string getName();
+		void setName(string);
     unsigned int numLines();
 
     void addGate(Gate *newGate); //appends to end
@@ -102,7 +105,6 @@ public:
     void parseArch (string);
     void arch_set_LNN();
 
-    string name;
     vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
     vector<int> getGreedyParallel (); // used for drawing gates in the same column
     vector<int> getArchWarnings ();
@@ -111,6 +113,7 @@ public:
     QArch *arch;
     vector <Loop>            loops;
 private:
+    string name;
     vector <Gate*>           gates;
     vector <Line>            lines;
 };

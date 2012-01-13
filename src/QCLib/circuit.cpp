@@ -263,3 +263,13 @@ void Circuit::add_loop (Loop l)
     loops.push_back(l);
     //std::cout << "\nnew loop!\n";
 }
+
+void Circuit::setName(string n_name)
+{
+	this->name = n_name;
+}
+
+string Circuit::getName()
+{
+		return this->name;
+}
