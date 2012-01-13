@@ -207,6 +207,7 @@ void QCViewer::on_menu_file_open_arch ()
 }
 void QCViewer::on_menu_simulate_show_stateView()
 {
+    if (viz.size() < 3){
     StateViewWidget* sw = new StateViewWidget (&m_statusbar, &m_VisBox, &viz, &m_EditVisPane);
     sw->set_state (state);
     m_VisBox.add (*sw);
@@ -217,6 +218,7 @@ void QCViewer::on_menu_simulate_show_stateView()
         get_size (w, h);
         m_EditVisPane.set_position (h - 400);
     }
+  }
 }
 
 void QCViewer::on_menu_file_quit ()
@@ -349,7 +351,7 @@ void QCViewer::on_menu_load_state ()
     if (result == Gtk::RESPONSE_OK) {
         if (state!=NULL) delete state;
         state = getStateVec (stateEntry.get_text(), true);
-        if (state!=NULL) {
+        if (state!=NULL && state->numBits()!=0) {
             if (state->numBits() == c.get_NumLines()) {
                 for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
                 c.set_state(state);
