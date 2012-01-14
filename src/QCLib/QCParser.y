@@ -86,8 +86,8 @@ gates:  /*empty*/
 names:/*empty*/ {$$ = NULL;}
 			|  WORD names {$$ = new name_node($1,$2);} 
 			|  NUM names {$$ = new name_node($1,$2);}
-			|  WORD APOS names {$$ = new name_node($1,$3);}
-			|  NUM APOS names {$$ = new name_node($1,$3); }
+			|  WORD APOS names {$$ = new name_node($1,$3,true);}
+			|  NUM APOS names {$$ = new name_node($1,$3,true); }
 
 nums:/*empty*/ {$$ = NULL;}
 			|  NUM nums {$$ = new name_node($1,$2);}
