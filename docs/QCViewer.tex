@@ -93,17 +93,18 @@ H a; H b; H c; H d; H e
 END 5H
 
 BEGIN GroverIterate (a, b, c, d, e, Workspace)
+H Workspace
 T a' b' c d e' Workspace
+H Workspace
 5H a b c d e
-
 X e
 Z a' b' c' d' e
 X e
-
 5H a b c d e
 END GroverIterate
 
 BEGIN
+H5 a b c d e
 GroverIterate^4 a b c d e Workspace
 END
 \end{verbatim}
