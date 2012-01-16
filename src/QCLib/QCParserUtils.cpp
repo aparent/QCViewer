@@ -93,7 +93,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
     unsigned int start = circ->numGates();
     bool is_subcirc = false;
     Gate *newGate = NULL;
-    if ((gateName[0] == 'T'||gateName[0] == 't') && (gateName.size()==1 || isdigit(gateName[1]))) {
+    if ((gateName[0] == 'T'||gateName[0] == 't') && gateName.size()>1 && isdigit(gateName[1])){
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
     } else if (gateName[0] == 'F'||gateName[0] == 'f') {
