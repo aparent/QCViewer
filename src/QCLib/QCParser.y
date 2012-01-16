@@ -46,6 +46,7 @@ Authors: Alex Parent, Jakub Parker
 %union {
 	char *string;
 	int token;
+	double fnum;
 	name_node *names;
 }
 %name-prefix "QC_"
@@ -55,10 +56,11 @@ Authors: Alex Parent, Jakub Parker
 %defines "QCParser.h"
 %output "QCParser.cpp"
 %start input
-%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON
+%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG
 
 %type <string> WORD NUM
 %type <names> names nums
+%type <fnum> float
 
 %%
 input:	/*empty*/
@@ -78,19 +80,22 @@ input:	/*empty*/
 ;
 gates:  /*empty*/	
 				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,subcircuits);} gates 
-				| WORD LBRAC NUM RBRAC names {add_R_gate(curr_circ,$1,$5,1,atof($3));} NEWLINE gates
+				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
 				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),subcircuits);} gates
-				| WORD LBRAC NUM RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),atof($3));} gates
+				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
 				| NEWLINE gates
 ;
 names:/*empty*/ {$$ = NULL;}
 			|  WORD names {$$ = new name_node($1,$2);} 
 			|  NUM names {$$ = new name_node($1,$2);}
-			|  WORD APOS names {$$ = new name_node($1,$3);}
-			|  NUM APOS names {$$ = new name_node($1,$3); }
+			|  WORD APOS names {$$ = new name_node($1,$3,true);}
+			|  NUM APOS names {$$ = new name_node($1,$3,true); }
 
 nums:/*empty*/ {$$ = NULL;}
 			|  NUM nums {$$ = new name_node($1,$2);}
+
+float: NUM {$$=atof($1);}
+			| NEG NUM {$$=-atof($2)}
 ;
 %%
 

@@ -12,7 +12,7 @@ END H5
 
 BEGIN GroverIterate (a b c d e Workspace)
 H Workspace
-T a' b' c d e' Workspace
+T5 a' b' c d e' Workspace
 H Workspace
 
 H5 a b c d e
