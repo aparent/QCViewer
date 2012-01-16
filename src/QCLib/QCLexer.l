@@ -34,7 +34,7 @@ Authors: Alex Parent, Jakub Parker
 %{
 	#include "QCParser.h"
 	#include "utility.h"
-	#define SAVE_TOKEN QC_lval.string = strdup(sToUpper(yytext).c_str());
+	#define SAVE_TOKEN QC_lval.string = strdup(yytext);
 	#define TOKEN(t) (QC_lval.token = t)
 	#define printok(t) std::cout<<t<<" ";
 %}

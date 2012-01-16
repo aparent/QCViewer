@@ -27,6 +27,7 @@ Authors: Alex Parent, Jakub Parker
 
 #include "QCParserUtils.h"
 #include <cstdlib>
+#include "utility.h"
 #include <iostream>
 
 int findLine(Circuit *circ, string name)
@@ -92,10 +93,10 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
     unsigned int start = circ->numGates();
     bool is_subcirc = false;
     Gate *newGate = NULL;
-    if (gateName[0] == 'T' && (gateName.size()==1 || isdigit(gateName[1]))) {
+    if ((gateName[0] == 'T'||gateName[0] == 't') && (gateName.size()==1 || isdigit(gateName[1]))) {
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
-    } else if (gateName[0] == 'F') {
+    } else if (gateName[0] == 'F'||gateName[0] == 'f') {
         newGate = new UGate("F");
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
@@ -124,6 +125,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
             circ->addGate(g);
         }
     } else {
+        gateName = sToUpper(gateName);
         newGate = new UGate(gateName);
     }
     if (!is_subcirc) {
