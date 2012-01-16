@@ -60,6 +60,7 @@ comment #.*
 ")"									return TOKEN(RBRAC);
 "^"									return TOKEN(EXPON);
 "'"									return TOKEN(APOS);
+"-"									return TOKEN(NEG);
 {num}								SAVE_TOKEN; return NUM;
 {word}							SAVE_TOKEN; return WORD;
 
