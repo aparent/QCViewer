@@ -30,11 +30,11 @@ Authors: Alex Parent, Jakub Parker
 #include "UGateLookup.h"
 #include "utility.h"
 #include <complex>
+#include <iostream>
 using namespace std;
 
 UGate::UGate(string n_name) : name(n_name)
 {
-    matrix = NULL;
     drawType = DEFAULT;
     type = UGATE;
 }
@@ -44,7 +44,6 @@ Gate* UGate::clone()
     UGate *g = new UGate(name);
     g->controls = controls;
     g->targets = targets;
-    g->matrix = matrix;
     g->drawType = drawType;
     return g;
 }
@@ -67,7 +66,7 @@ void UGate::setName(string n_name)
 	for all basis states in the superposition.  Note this can return a
 	superpostion.
 */
-State *UGate::applyToBasis(index_t bitString)
+State UGate::applyToBasis(index_t bitString) const
 {
     // First, make sure all of the controls are satisfied.
     bool ctrl = true;
@@ -82,24 +81,24 @@ State *UGate::applyToBasis(index_t bitString)
     if (ctrl) {
         return ApplyU (bitString);
     } else {
-        State *answer = new State (1, bitString); // with amplitude 1 the input bitString is unchanged
-        return answer;
+        return State (1, bitString);// with amplitude 1 the input bitString is unchanged
     }
 }
 
 // Takes care of actually applying the matrix by indexing to the correct matrix coloum
-State *UGate::ApplyU (index_t bits)
+State UGate::ApplyU (index_t bits) const
 {
     unsigned int input = ExtractInput (bits);
     // now, go through all rows of the output from the correct column of U
-    State *answer = new State;
-    if (matrix == NULL) {
-        matrix = UGateLookup(name);
-        if (matrix == NULL) return NULL;
+    State answer;
+    gateMatrix *matrix = UGateLookup(name);
+        if (matrix == NULL){ 
+					cerr << "Matrix not found!" << endl;
+					return State();
     }
     for (unsigned int i = 0; i < matrix->dim; i++) {
         if (matrix->data[input*matrix->dim+i] != complex<float_type>(0)) {
-            *answer += State(matrix->data[input*matrix->dim+i], BuildBitString (bits, i));
+            answer += State(matrix->data[input*matrix->dim+i], BuildBitString (bits, i));
         }
     }
     return answer;
@@ -109,7 +108,7 @@ State *UGate::ApplyU (index_t bits)
 	This function takes an input bitstring and the mapping of targets and returns
 	the input to the gate, for the purpose of indexing into its matrix.
 */
-unsigned int UGate::ExtractInput (index_t bitString)
+unsigned int UGate::ExtractInput (index_t bitString) const
 {
     unsigned int input = 0;
     for (unsigned int i = 0; i < targets.size(); i++) {
@@ -124,7 +123,7 @@ unsigned int UGate::ExtractInput (index_t bitString)
 	This function takes an input string, the mapping of targets, and an output for those targets
 	and produces the output bitstring
 */
-index_t UGate::BuildBitString (index_t orig, unsigned int ans)
+index_t UGate::BuildBitString (index_t orig, unsigned int ans) const
 {
     unsigned int output = orig;
     for (unsigned int i = 0; i < targets.size (); i++) {

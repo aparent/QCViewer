@@ -31,7 +31,7 @@ Authors: Alex Parent, Jakub Parker
 #include "circuit.h"
 #include "state.h"
 
-State ApplyGate (State* in, Gate* g);
-State ApplyCircuit (State* in, Circuit* circ);
+State ApplyGate (const State &in, const Gate *g);
+State ApplyCircuit (const State &in, const Circuit &circ);
 
 #endif

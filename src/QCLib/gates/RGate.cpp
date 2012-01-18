@@ -63,7 +63,7 @@ string RGate::getName() const
 }
 
 /* RGate simulation implimentation */
-State *RGate::applyToBasis(index_t bitString)
+State RGate::applyToBasis(index_t bitString) const
 {
     // First, make sure all of the controls are satisfied.
     bool ctrl = true;
@@ -78,24 +78,23 @@ State *RGate::applyToBasis(index_t bitString)
     if (ctrl) {
         return ApplyU (bitString);
     } else {
-        State *answer = new State (1, bitString); // with amplitude 1 the input bitString is unchanged
-        return answer;
+        return State (1, bitString);// with amplitude 1 the input bitString is unchanged
     }
 }
 
-State *RGate::ApplyU (index_t bits)
+State RGate::ApplyU (index_t bits) const
 {
-    State *answer = new State;
+    State answer;
     switch (axis) {
     case X: {
         float_type cosr = cos (M_PI*rot);
         float_type sinr = sin (M_PI*rot);
         if (GetRegister (bits, targets.at (0))) {
-            *answer = State (complex<float_type>(sinr,0),BuildBitString(bits,0));
-            *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
+            answer = State (complex<float_type>(sinr,0),BuildBitString(bits,0));
+            answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
         } else {
-            *answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
-            *answer += State (complex<float_type>(sinr,0),BuildBitString(bits,1));
+            answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
+            answer += State (complex<float_type>(sinr,0),BuildBitString(bits,1));
         }
     }
     break;
@@ -103,19 +102,19 @@ State *RGate::ApplyU (index_t bits)
         float_type cosr = cos (M_PI*rot);
         float_type sinr = sin (M_PI*rot);
         if (GetRegister (bits, targets.at (0))) {
-            *answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
-            *answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
+            answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
+            answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
         } else {
-            *answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
-            *answer += State (complex<float_type>(0,sinr),BuildBitString(bits,1));
+            answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
+            answer += State (complex<float_type>(0,sinr),BuildBitString(bits,1));
         }
     }
     break;
     case Z: {
         if (GetRegister (bits, targets.at(0))) {
-            *answer = State(exp(complex<float_type>(0,M_PI*rot)), bits);// XXX: verify do not need buildbitstring
+            answer = State(exp(complex<float_type>(0,M_PI*rot)), bits);// XXX: verify do not need buildbitstring
         } else {
-            *answer = State(1, bits);
+            answer = State(1, bits);
         }
     }
     break;
@@ -124,7 +123,7 @@ State *RGate::ApplyU (index_t bits)
 }
 
 
-index_t RGate::BuildBitString (index_t orig, unsigned int ans)
+index_t RGate::BuildBitString (index_t orig, unsigned int ans) const
 {
     unsigned int output = orig;
     if (ans) {

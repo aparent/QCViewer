@@ -38,7 +38,7 @@ public:
 		Subcircuit(Circuit*, vector <unsigned int> );
     Gate* clone();
     string getName() const;
-    State *applyToBasis(index_t);
+    State applyToBasis(index_t) const;
 private:
 		vector <unsigned int> linemap;
     index_t BuildBitString (index_t, unsigned int);

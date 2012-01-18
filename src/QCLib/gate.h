@@ -60,7 +60,7 @@ public:
     virtual ~Gate();
     virtual Gate* clone()=0;
     virtual string getName() const=0;
-    virtual State *applyToBasis(index_t)=0;
+    virtual State applyToBasis(index_t) const=0;
     gateType type; //used with enum gateType
     dType drawType;
     vector <Control> controls;
@@ -80,13 +80,12 @@ public:
     UGate(string);
     Gate* clone();
     string getName() const;
-    State *applyToBasis(index_t);
+    State applyToBasis(index_t) const;
     void setName(string);
 private:
-    unsigned int ExtractInput (index_t);
-    index_t BuildBitString (index_t, unsigned int);
-    State* ApplyU(index_t);
-    gateMatrix *matrix;
+    unsigned int ExtractInput (index_t) const;
+    index_t BuildBitString (index_t, unsigned int) const;
+    State ApplyU(index_t) const;
     string name;
 };
 
@@ -98,15 +97,15 @@ public:
     RGate(float_type, Axis);
     Gate* clone();
     string getName() const;
-    State *applyToBasis(index_t);
+    State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
     void set_rotVal (float_type);
     Axis get_axis () const;
     void set_axis (Axis);
 private:
     float_type rot;
-    index_t BuildBitString (index_t, unsigned int);
-    State* ApplyU(index_t);
+    index_t BuildBitString (index_t, unsigned int) const;
+    State ApplyU(index_t) const;
     Axis axis;
 };
 

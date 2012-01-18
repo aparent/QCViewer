@@ -95,8 +95,8 @@ public:
     void addGate(Gate *newGate); //appends to end
     void addGate(Gate *newGate, unsigned int pos); //inserts at pos
     void removeGate (unsigned int);
-    Gate* getGate(int pos);
-    unsigned int numGates(); //Returns the number of gates
+    Gate* getGate(int pos) const;
+    unsigned int numGates() const; //Returns the number of gates
     void swapGate (unsigned int, unsigned int);
 
     void add_loop (Loop);

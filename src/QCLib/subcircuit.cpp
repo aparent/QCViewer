@@ -26,6 +26,7 @@ Authors: Alex Parent
 
 
 #include "subcircuit.h"
+#include "simulate.h"
 
 Subcircuit::Subcircuit(Circuit* n_circ, vector <unsigned int> n_linemap)
 {
@@ -47,3 +48,10 @@ string Subcircuit::getName() const
 	if (circ != NULL) return circ->getName();
 	return "NULL";
 }
+
+/*
+State* applyToBasis(index_t){
+	
+State ApplyCircuit (State* in, Circuit* circ);
+}
+*/

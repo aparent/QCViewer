@@ -74,12 +74,12 @@ void Circuit::removeGate (unsigned int pos)
     gates.erase (gates.begin () + pos);
 }
 
-Gate* Circuit::getGate(int pos)
+Gate* Circuit::getGate(int pos) const
 {
     return gates.at(pos);
 }
 
-unsigned int Circuit::numGates()
+unsigned int Circuit::numGates() const
 {
     return gates.size();
 }

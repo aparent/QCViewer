@@ -578,7 +578,7 @@ bool CircuitWidget::run (bool breaks)
                 l->sim_n = 0;
             }
         }
-        *state = ApplyGate (state, circuit->getGate (NextGateToSimulate));
+        *state = ApplyGate (*state, circuit->getGate (NextGateToSimulate));
         if (!state) {
             force_redraw ();
             return false;
@@ -629,7 +629,7 @@ bool CircuitWidget::step ()
                 l->sim_n = 0;
             }
         }
-        *state = ApplyGate(state,circuit->getGate(NextGateToSimulate));
+        *state = ApplyGate(*state,circuit->getGate(NextGateToSimulate));
         if (!state) return false;
         NextGateToSimulate++;
         force_redraw ();
