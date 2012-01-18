@@ -55,7 +55,7 @@ rotation gate we may want the name to be dependent on the rot amount
 class Gate
 {
 public:
-    enum gateType {RGATE, UGATE};
+    enum gateType {RGATE, UGATE, SUBCIRC};
     enum dType {NOT, FRED, DEFAULT};
     virtual ~Gate();
     virtual Gate* clone()=0;

@@ -29,6 +29,7 @@ Authors: Alex Parent
 
 Subcircuit::Subcircuit(Circuit* n_circ, vector <unsigned int> n_linemap)
 {
+ 	type = SUBCIRC;
 	circ = n_circ;
 	linemap = n_linemap;
 }
