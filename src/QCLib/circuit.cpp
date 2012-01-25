@@ -171,7 +171,7 @@ vector<int> Circuit::getGreedyParallel()
     for(unsigned int i = 0; i < numGates(); i++) {
 start:
         Gate *g = getGate(i);
-        minmaxWire (&g->controls, &g->targets, &minw, &maxw);
+        minmaxWire (g->controls, g->targets, minw, maxw);
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {
                 returnValue.push_back(i - 1);
@@ -251,8 +251,6 @@ void Circuit::add_loop (Loop l)
     for (vector<Loop>::iterator it = loops.begin(); it != loops.end(); it++) {
         // make sure that this loop is either distinct from or contained in every other loop
         if (l.last < it->first || it->last < l.first) continue; // distinct
-//    if (l.first <= it->first && l.last >= it->last) continue; // i contain this
-//    if (l.first >= it->first && l.last <= it->last) continue; // i am contained
 // for now loops cannot overlap
         std::cout << "failed!\n";
         std::cout << "candidate: " << l.first << " " << l.last <<"\n";

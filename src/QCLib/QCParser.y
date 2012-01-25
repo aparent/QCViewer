@@ -38,7 +38,6 @@ Authors: Alex Parent, Jakub Parker
   int QC__scan_string(const char*);
   Circuit *circuit;
   Circuit *curr_circ;
-	map<string,Circuit> subcircuits;
 %}
 %code requires{
   #include "QCParserUtils.h"
@@ -74,14 +73,14 @@ input:	/*empty*/
 					{ curr_circ = new Circuit();  
 						curr_circ->setName($2);
 						add_lines(curr_circ,$4); }
-					gates {subcircuits[$2]= *curr_circ;} END WORD input
+					gates {circuit->subcircuits[$2]= curr_circ;} END WORD input
 				| START NEWLINE {curr_circ = circuit;} gates END input
 				| error {circuit = NULL;}
 ;
 gates:  /*empty*/	
-				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,subcircuits);} gates 
+				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits);} gates 
 				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
-				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),subcircuits);} gates
+				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits);} gates
 				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
 				| NEWLINE gates
 ;

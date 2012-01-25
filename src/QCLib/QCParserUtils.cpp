@@ -29,6 +29,7 @@ Authors: Alex Parent, Jakub Parker
 #include <cstdlib>
 #include "utility.h"
 #include <iostream>
+#include "subcircuit.h"
 
 int findLine(Circuit *circ, string name)
 {
@@ -84,14 +85,12 @@ void add_constants (Circuit * circ, name_node *names)
     }
 }
 
-void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit> &subcircuits)
+void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits)
 {
     if (names == NULL) {
         cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
         return;
     }
-    unsigned int start = circ->numGates();
-    bool is_subcirc = false;
     Gate *newGate = NULL;
     if ((gateName[0] == 'T'||gateName[0] == 't') && gateName.size()>1 && isdigit(gateName[1])){
         newGate = new UGate("X");
@@ -100,35 +99,30 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         newGate = new UGate("F");
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
-        is_subcirc = true;
-        Circuit c = subcircuits[gateName];
+        Circuit* c = subcircuits[gateName];
         circ->column_breaks.push_back(circ->numGates()-1);
-        for(unsigned int i = 0; i < c.column_breaks.size(); i++) {
-            circ->column_breaks.push_back(c.column_breaks[i] + circ->numGates());
+        for(unsigned int i = 0; i < c->column_breaks.size(); i++) {
+            circ->column_breaks.push_back(c->column_breaks[i] + circ->numGates());
         }
         map<int,int> lineMap;
         map<int,int>::iterator lit=lineMap.begin();
         int line = 0;
+				name_node* start_names = names;
         while(names) {
             lineMap.insert (lit, pair<int,int>(line,findLine(circ,names->name)));
             line++;
             names = names->next;
         }
-        for (unsigned int i = 0; i < c.numGates(); i++) {
-            Gate *g = c.getGate(i)->clone();
-            for (unsigned int j = 0; j < c.getGate(i)->controls.size(); j++) {
-                g->controls[j].wire = lineMap[c.getGate(i)->controls[j].wire];
-            }
-            for (unsigned int j = 0; j < c.getGate(i)->targets.size(); j++) {
-                g->targets[j] = lineMap[c.getGate(i)->targets[j]];
-            }
-            circ->addGate(g);
-        }
+				newGate = new Subcircuit(c, lineMap,exp);
+				names = start_names;
+        while(names) {
+                newGate->targets.push_back(findLine(circ,names->name));
+            		names = names->next;
+				}
     } else {
         gateName = sToUpper(gateName);
         newGate = new UGate(gateName);
     }
-    if (!is_subcirc) {
         while(names) {
             if (names->next == NULL) {
                 newGate->targets.push_back(findLine(circ,names->name));
@@ -143,15 +137,6 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
             newGate->controls.pop_back();
         }
         circ->addGate(newGate);
-    }
-    if (exp > 1) {
-        Loop l;
-        l.n = l.sim_n = exp;
-        l.first = start;
-        l.last = circ->numGates()-1;
-        l.label = gateName;
-        circ->add_loop(l);
-    }
     delete names;
 }
 

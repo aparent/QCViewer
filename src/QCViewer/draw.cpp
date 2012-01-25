@@ -139,13 +139,13 @@ void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative)
     }
 }
 
-gateRect drawControls (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ)
+gateRect drawControls (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
 {
     uint32_t minw, maxw;
-    minmaxWire (ctrl, targ, &minw, &maxw);
-    if (!ctrl->empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
-    for (uint32_t i = 0; i < ctrl->size(); i++) {
-        drawDot (cr, xc, wireToY((*ctrl)[i].wire), dotradius, (*ctrl)[i].polarity);
+    minmaxWire (ctrl, targ, minw, maxw);
+    if (!ctrl.empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    for (uint32_t i = 0; i < ctrl.size(); i++) {
+        drawDot (cr, xc, wireToY(ctrl[i].wire), dotradius, ctrl[i].polarity);
     }
     gateRect rect;
     rect.x0 = xc-dotradius;
@@ -172,11 +172,11 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     cairo_show_text (cr, name.c_str());
 }
 
-gateRect drawCU (cairo_t *cr, uint32_t xc, string name, vector<Control> *ctrl, vector<uint32_t> *targ)
+gateRect drawCU (cairo_t *cr, uint32_t xc, string name, const vector<Control> &ctrl, const vector<uint32_t> &targ)
 {
     uint32_t minw, maxw;
     vector<Control> dummy;
-    minmaxWire (&dummy, targ, &minw, &maxw); // only the targets
+    minmaxWire (dummy, targ, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.
 
     double dw = wireToY(1)-wireToY(0);
@@ -287,11 +287,11 @@ gateRect drawX (cairo_t *cr, double xc, double yc, double radius)
 }
 
 
-gateRect drawCNOT (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ)
+gateRect drawCNOT (cairo_t *cr, uint32_t xc, vector<Control> &ctrl, vector<uint32_t> &targ)
 {
     gateRect rect = drawControls (cr, xc, ctrl, targ);
-    for (uint32_t i = 0; i < targ->size(); i++) {
-        gateRect recttmp = drawNOT (cr, xc, wireToY((*targ)[i]), radius);
+    for (uint32_t i = 0; i < targ.size(); i++) {
+        gateRect recttmp = drawNOT (cr, xc, wireToY(targ[i]), radius);
         rect = combine_gateRect(rect, recttmp);
     }
     return rect;
@@ -305,18 +305,18 @@ void drawShowFred (cairo_t *cr, double width, double height)
     drawX (cr, width/2, height-Xrad, Xrad);
 }
 
-gateRect drawFred (cairo_t *cr, uint32_t xc, vector<Control> *ctrl, vector<uint32_t> *targ)
+gateRect drawFred (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
 {
     gateRect rect = drawControls (cr, xc, ctrl, targ);
-    uint32_t minw = (*targ)[0];
-    uint32_t maxw = (*targ)[0];
-    for (uint32_t i = 0; i < targ->size(); i++) {
-        gateRect recttmp = drawX (cr, xc, wireToY((*targ)[i]), radius);
+    uint32_t minw = targ[0];
+    uint32_t maxw = targ[0];
+    for (uint32_t i = 0; i < targ.size(); i++) {
+        gateRect recttmp = drawX (cr, xc, wireToY(targ[i]), radius);
         rect = combine_gateRect(rect, recttmp);
-        minw = min (minw, (*targ)[i]);
-        maxw = max (maxw, (*targ)[i]);
+        minw = min (minw, targ[i]);
+        maxw = max (maxw, targ[i]);
     }
-    if (ctrl->empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    if (ctrl.empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
     return rect;
 }
 
@@ -434,13 +434,13 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
         for (; i <= columns[j].lastGateID; i++) {
             Gate* g = c->getGate (i);
             gateRect r;
-            minmaxWire (&g->controls, &g->targets, &mingw, &maxgw);
+            minmaxWire (g->controls, g->targets, mingw, maxgw);
             switch (g->drawType) {
             case Gate::NOT:
-                r = drawCNOT (cr, xcurr, &g->controls, &g->targets);
+                r = drawCNOT (cr, xcurr, g->controls, g->targets);
                 break;
             case Gate::FRED:
-                r = drawFred (cr, xcurr, &g->controls, &g->targets);
+                r = drawFred (cr, xcurr, g->controls, g->targets);
                 break;
             default:
                 // XXX: maybe expose as a setting?
@@ -461,9 +461,9 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
                 } else { ... } */
                 if (g->type == Gate::RGATE) {
                     string lbl = g->getName ();
-                    r = drawCU (cr, xcurr, lbl, &g->controls, &g->targets);
+                    r = drawCU (cr, xcurr, lbl, g->controls, g->targets);
                 } else {
-                    r = drawCU (cr, xcurr, g->getName(), &g->controls, &g->targets);
+                    r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
                 }
                 break;
             }

@@ -31,6 +31,7 @@ Authors: Alex Parent, Jakub Parker
 #include <circuit.h>
 #include <circuitParser.h>
 #include <simulate.h>
+#include <subcircuit.h>
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
@@ -316,12 +317,12 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                 unsigned int col_id;
                 for (col_id = 0; col_id < layout.size () && selections[0] > layout[col_id].lastGateID; col_id++);
                 unsigned int minW, maxW;
-                minmaxWire (&g->controls, &g->targets, &minW, &maxW);
+                minmaxWire (g->controls, g->targets, minW, maxW);
                 unsigned int firstGateID = col_id == 0 ? 0 : layout[col_id - 1].lastGateID + 1;
                 for (unsigned int i = firstGateID; i <= layout[col_id].lastGateID; i++) {
                     Gate* gg = circuit->getGate (i);
                     unsigned int minW2, maxW2;
-                    minmaxWire (&gg->controls, &gg->targets, &minW2, &maxW2);
+                    minmaxWire (gg->controls, gg->targets, minW2, maxW2);
                     if (i != selections[0] && !(minW2 > maxW || maxW2 < minW)) {
                         circuit->swapGate (firstGateID, selections[0]); // pop it out to the left
                         selections[0] = firstGateID;

@@ -27,17 +27,18 @@ Authors: Alex Parent
 
 #include "subcircuit.h"
 #include "simulate.h"
-
-Subcircuit::Subcircuit(Circuit* n_circ, vector <unsigned int> n_linemap)
+#include <iostream> //XXX
+Subcircuit::Subcircuit(Circuit* n_circ, map <int,int> n_linemap, int loops)
 {
  	type = SUBCIRC;
 	circ = n_circ;
-	linemap = n_linemap;
+	lineMap = n_linemap;
+	loop_count = loops;
 }
 
 Gate* Subcircuit::clone()
 {
-    Subcircuit* g = new Subcircuit(circ,linemap);
+    Subcircuit* g = new Subcircuit(circ,lineMap,loop_count);
     g->controls = controls;
     g->targets = targets;
     return g;
@@ -49,9 +50,24 @@ string Subcircuit::getName() const
 	return "NULL";
 }
 
-/*
-State* applyToBasis(index_t){
-	
-State ApplyCircuit (State* in, Circuit* circ);
+int Subcircuit::getLoopCount() const
+{
+	return loop_count; 
 }
-*/
+
+void Subcircuit::setLoopCount(int loops)
+{
+	loop_count = loops;
+}
+
+
+State Subcircuit::applyToBasis(index_t in) const
+{
+	
+	State s = State(1,in); 
+	for (int i = 0; i < loop_count; i++){
+		s = ApplyCircuit (s, *circ);
+	}
+	s.print();
+	return s;
+}

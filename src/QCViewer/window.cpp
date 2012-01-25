@@ -442,9 +442,8 @@ void QCViewer::set_selection (vector<uint32_t> s)
         std::cout <<"\n\n------------\n";
         bool is_loop = c.is_loop (selections);
         bool could_be_loop = c.could_be_loop (selections);
-
-        std::cout << "selections.size() = " << selections.size() << "\n";
-        std::cout << "selections[0] = " << selections[0] << "\n" << fflush;
+        std::cout << "selections.size() = " << selections.size() << std::endl;
+        std::cout << "selections[0] = " << selections[0] << std::endl;
         assert (!(could_be_loop && is_loop));
         if (could_be_loop) {
             std::cout << "could be loop\n";

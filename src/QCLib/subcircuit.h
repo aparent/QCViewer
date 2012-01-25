@@ -30,17 +30,20 @@ Authors: Alex Parent
 #include "gate.h"
 #include "circuit.h"
 #include <string>
-#include <vector>
+#include <map> 
 //A subcircuit gate contains
 class Subcircuit : public Gate
 {
 public:
-		Subcircuit(Circuit*, vector <unsigned int> );
+		Subcircuit(Circuit*, map<int,int>,int);
     Gate* clone();
     string getName() const;
     State applyToBasis(index_t) const;
+		int getLoopCount() const;
+		void setLoopCount(int);
 private:
-		vector <unsigned int> linemap;
+		int loop_count;
+    map<int,int> lineMap;
     index_t BuildBitString (index_t, unsigned int);
     State* ApplyU(index_t);
 		Circuit* circ;

@@ -32,19 +32,18 @@ Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
 Gate::~Gate() {}
 
-void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned *dstmin, unsigned *dstmax)
+void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned &dstmin, unsigned &dstmax)
 {
-    unsigned int minw = (*targ)[0];
-    unsigned int maxw = (*targ)[0];
-    for (unsigned int i = 1; i < targ->size (); i++) {
-        minw = min (minw, (*targ)[i]);
-        maxw = max (maxw, (*targ)[i]);
+    unsigned int minw = targ.at(0);
+    unsigned int maxw = targ.at(0);
+    for (unsigned int i = 1; i < targ.size (); i++) {
+        minw = min (minw, targ[i]);
+        maxw = max (maxw, targ[i]);
     }
-
-    for (unsigned int i = 0; i < ctrl->size (); i++) {
-        minw = min (minw, (*ctrl)[i].wire);
-        maxw = max (maxw, (*ctrl)[i].wire);
+    for (unsigned int i = 0; i < ctrl.size (); i++) {
+        minw = min (minw, ctrl[i].wire);
+        maxw = max (maxw, ctrl[i].wire);
     }
-    *dstmin = minw;
-    *dstmax = maxw;
+    dstmin = minw;
+    dstmax = maxw;
 }

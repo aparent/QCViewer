@@ -31,6 +31,7 @@ Authors: Alex Parent, Jakub Parker
 #include "types.h"
 #include <vector>
 #include <string>
+#include <map>
 using namespace std;
 
 class Line
@@ -109,6 +110,7 @@ public:
     vector<int> getGreedyParallel (); // used for drawing gates in the same column
     vector<int> getArchWarnings ();
     vector<int> column_breaks;
+		map<string,Circuit*> subcircuits;
 
     QArch *arch;
     vector <Loop>            loops;

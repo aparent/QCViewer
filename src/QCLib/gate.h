@@ -110,5 +110,5 @@ private:
 };
 
 
-void minmaxWire (vector<Control>* ctrl, vector<unsigned int>* targ, unsigned int *dstmin, unsigned int *dstmax);
+void minmaxWire (const vector<Control> &ctrl,const vector<unsigned int> &targ, unsigned int &dstmin, unsigned int &dstmax);
 #endif
