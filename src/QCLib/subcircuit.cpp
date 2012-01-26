@@ -28,15 +28,16 @@ Authors: Alex Parent
 #include "subcircuit.h"
 #include "simulate.h"
 #include <iostream> //XXX
-Subcircuit::Subcircuit(Circuit* n_circ, map <int,int> n_linemap, int loops)
+Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linemap, int loops)
 {
+  drawType = DEFAULT;
  	type = SUBCIRC;
 	circ = n_circ;
 	lineMap = n_linemap;
 	loop_count = loops;
 }
 
-Gate* Subcircuit::clone()
+Gate* Subcircuit::clone() const
 {
     Subcircuit* g = new Subcircuit(circ,lineMap,loop_count);
     g->controls = controls;
@@ -62,12 +63,37 @@ void Subcircuit::setLoopCount(int loops)
 
 
 State Subcircuit::applyToBasis(index_t in) const
-{
-	
+{	
 	State s = State(1,in); 
-	for (int i = 0; i < loop_count; i++){
-		s = ApplyCircuit (s, *circ);
-	}
-	s.print();
+	s = applySubcirc (s);
 	return s;
 }
+
+State Subcircuit::applySubcirc(const State& in) const{
+	State s = in;
+	for (int i = 0; i < loop_count; i++){
+    for (unsigned int i = 0; i < circ->numGates(); i++) {
+        s = ApplyGate(s,getGate(i));
+    }
+	}
+	return s;
+}
+
+Gate* Subcircuit::getGate(int pos) const{
+  Gate *g = circ->getGate(pos)->clone();
+  for (unsigned int i = 0; i < g->targets.size(); i++) {
+		map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->targets[i]);
+		if (it!= lineMap.end()){
+			g->targets[i] = it->second;	
+			std::cout << g->targets[i] << ":" << it->second << std::endl;
+		}
+	}
+  for (unsigned int i = 0; i < g->controls.size(); i++) {
+		map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->controls[i].wire);
+		if (it!= lineMap.end()){
+			g->controls[i].wire = it->second;	
+		}
+	}
+	return g;
+}
+

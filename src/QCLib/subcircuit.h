@@ -35,17 +35,18 @@ Authors: Alex Parent
 class Subcircuit : public Gate
 {
 public:
-		Subcircuit(Circuit*, map<int,int>,int);
-    Gate* clone();
+		Subcircuit(Circuit*, map<unsigned int,unsigned int>,int);
+    Gate* clone() const;
     string getName() const;
     State applyToBasis(index_t) const;
+		State applySubcirc(const State&) const;
 		int getLoopCount() const;
 		void setLoopCount(int);
+    Gate* getGate(int pos) const;
 private:
 		int loop_count;
-    map<int,int> lineMap;
+    map<unsigned int,unsigned int> lineMap;
     index_t BuildBitString (index_t, unsigned int);
-    State* ApplyU(index_t);
 		Circuit* circ;
     string name;
 };

@@ -105,6 +105,7 @@ StateWidget::StateWidget(Gtk::Statusbar* ns)
     mousex = mousey = 0;
     drawmode = EXPECTED;
     num_draw = 0;
+    num_draw_traced = 0;
     trace = 63;
     set_size_request (100,100);
 }
@@ -126,7 +127,6 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
         barWidth = (width - 2.0*xborder)/((double)num_draw);
         t_barWidth = (width - 2.0*xborder)/((double)num_draw_traced);
         barHeight = height - 2.0*yborder;
-
         Cairo::RefPtr <Cairo::Context> cr = window->create_cairo_context ();
         cr->rectangle (0, 0, width, height);
         cr->set_source_rgb (1, 1, 1);

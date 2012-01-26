@@ -37,6 +37,8 @@ Circuit::Circuit() : arch(NULL) {}
 Circuit::~Circuit ()
 {
     removeArch ();
+	removeSubcircuits();
+  removeGates();
 }
 
 void Circuit::newArch ()
@@ -50,6 +52,18 @@ void Circuit::removeArch ()
         delete arch;
         arch = NULL;
     }
+}
+void Circuit::removeSubcircuits()
+{
+	for ( map<string,Circuit*>::iterator it = subcircuits.begin() ; it != subcircuits.end(); it++ ){
+    delete (*it).second;
+	}
+}
+
+void Circuit::removeGates(){
+	for(unsigned int i = 0; i < gates.size(); i++){
+		delete gates[i];
+	}
 }
 
 void Circuit::swapGate (unsigned int i, unsigned int j)
@@ -71,6 +85,7 @@ void Circuit::addGate(Gate *newGate, unsigned int pos)
 
 void Circuit::removeGate (unsigned int pos)
 {
+		delete gates[pos];
     gates.erase (gates.begin () + pos);
 }
 

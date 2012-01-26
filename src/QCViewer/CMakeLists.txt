@@ -3,6 +3,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -ansi")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -ansi")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+add_definitions(-DGDK_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DG_DISABLE_DEPRECATED -DPANGO_DISABLE_DEPRECATED)
+
 find_package(PkgConfig)
 find_package(Freetype)
 pkg_check_modules(GTKMM glib-2.0 gtkmm-2.4 freetype2)

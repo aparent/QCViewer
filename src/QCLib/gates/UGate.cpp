@@ -39,7 +39,7 @@ UGate::UGate(string n_name) : name(n_name)
     type = UGATE;
 }
 
-Gate* UGate::clone()
+Gate* UGate::clone() const
 {
     UGate *g = new UGate(name);
     g->controls = controls;

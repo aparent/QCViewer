@@ -58,7 +58,7 @@ public:
     enum gateType {RGATE, UGATE, SUBCIRC};
     enum dType {NOT, FRED, DEFAULT};
     virtual ~Gate();
-    virtual Gate* clone()=0;
+    virtual Gate* clone() const=0;
     virtual string getName() const=0;
     virtual State applyToBasis(index_t) const=0;
     gateType type; //used with enum gateType
@@ -78,7 +78,7 @@ class UGate : public Gate
 {
 public:
     UGate(string);
-    Gate* clone();
+    Gate* clone() const;
     string getName() const;
     State applyToBasis(index_t) const;
     void setName(string);
@@ -95,7 +95,7 @@ class RGate : public Gate
 public:
     enum Axis { X, Y, Z };
     RGate(float_type, Axis);
-    Gate* clone();
+    Gate* clone() const;
     string getName() const;
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!

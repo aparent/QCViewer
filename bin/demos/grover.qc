@@ -27,5 +27,5 @@ END GroverIterate
 BEGIN
 H5 a b c d e
 
-GroverIterate^4 a b c d e Workspace 
+GroverIterate^1 a b c d e Workspace 
 END

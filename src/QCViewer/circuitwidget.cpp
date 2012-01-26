@@ -31,7 +31,6 @@ Authors: Alex Parent, Jakub Parker
 #include <circuit.h>
 #include <circuitParser.h>
 #include <simulate.h>
-#include <subcircuit.h>
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>

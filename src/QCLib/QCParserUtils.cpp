@@ -104,12 +104,12 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         for(unsigned int i = 0; i < c->column_breaks.size(); i++) {
             circ->column_breaks.push_back(c->column_breaks[i] + circ->numGates());
         }
-        map<int,int> lineMap;
-        map<int,int>::iterator lit=lineMap.begin();
+        map<unsigned int,unsigned int> lineMap;
+        map<unsigned int,unsigned int>::iterator lit=lineMap.begin();
         int line = 0;
 				name_node* start_names = names;
         while(names) {
-            lineMap.insert (lit, pair<int,int>(line,findLine(circ,names->name)));
+            lineMap.insert (lit, pair<unsigned int,unsigned int>(line,findLine(circ,names->name)));
             line++;
             names = names->next;
         }

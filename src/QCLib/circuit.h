@@ -99,6 +99,7 @@ public:
     Gate* getGate(int pos) const;
     unsigned int numGates() const; //Returns the number of gates
     void swapGate (unsigned int, unsigned int);
+		void removeGates();
 
     void add_loop (Loop);
     void newArch ();
@@ -110,7 +111,9 @@ public:
     vector<int> getGreedyParallel (); // used for drawing gates in the same column
     vector<int> getArchWarnings ();
     vector<int> column_breaks;
+
 		map<string,Circuit*> subcircuits;
+		void removeSubcircuits();
 
     QArch *arch;
     vector <Loop>            loops;

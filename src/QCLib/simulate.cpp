@@ -44,8 +44,12 @@ gateMatrix getGateMatrix(Gate*);//defined below
 	The application of the gate is left up to the gate class.  This allows per gate class
 	optimization if nessicary. (For a good example of how this works see gates/UGate.cpp
 */
+#include "subcircuit.h"
 State ApplyGate (const State &in, const Gate *g)
 {
+		if (g->type==Gate::SUBCIRC){
+			return ((Subcircuit*)g)->applySubcirc(in);
+		}
     State answer;
     answer.dim = in.dim;
     for (StateMap::const_iterator it = in.data.begin(); it != in.data.end(); ++it) {
@@ -59,9 +63,9 @@ State ApplyGate (const State &in, const Gate *g)
 
 State ApplyCircuit (const State &in, const Circuit &circ)
 {
-		State s;
+		State s = in;
     for (unsigned int i = 0; i < circ.numGates(); i++) {
-        s = ApplyGate(in,circ.getGate(i));
+        s = ApplyGate(s,circ.getGate(i));
     }
     return s;
 }
