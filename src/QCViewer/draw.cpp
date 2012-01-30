@@ -26,6 +26,7 @@ Authors: Alex Parent, Jakub Parker
 
 
 #include "circuit.h"
+#include "subcircuit.h"
 #include <cairo.h>
 #include <cairo-svg.h>
 #include <cairo-ft.h>
@@ -287,7 +288,7 @@ gateRect drawX (cairo_t *cr, double xc, double yc, double radius)
 }
 
 
-gateRect drawCNOT (cairo_t *cr, uint32_t xc, vector<Control> &ctrl, vector<uint32_t> &targ)
+gateRect drawCNOT (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
 {
     gateRect rect = drawControls (cr, xc, ctrl, targ);
     for (uint32_t i = 0; i < targ.size(); i++) {
@@ -353,32 +354,22 @@ vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s)
     return ans;
 }
 
-void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects)
+void drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
 {
     double red = 0;
     double green = 51.0/255.0;
     double blue = 102.0/255.0;
     double alpha1 = 0.7;
-    double alpha2 = 0.2;
-
-    gateRect r = rects[l.first];
-    for (uint32_t i = l.first; i <= l.last; i++) {
-        r = combine_gateRect (r, rects[i]);
-    }
-
-    cairo_set_source_rgba (cr, red, green, blue,alpha2);
-    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
-    cairo_fill(cr);
 
     double dashes[] = { 4.0, 4.0 };
     cairo_set_dash (cr, dashes, 2, 0.0);
     cairo_set_line_width (cr, 2);
-    cairo_set_source_rgba (cr, red, green, blue,alpha1);
     cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
     cairo_stroke (cr);
+    cairo_set_dash (cr, dashes, 0, 0.0);
 
     stringstream ss;
-    ss << l.label << " x ";
+    ss << c->getName() << " x ";
     cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents, extents2;
     cairo_text_extents(cr, ss.str().c_str(), &extents);
@@ -387,7 +378,7 @@ void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects)
     cairo_move_to(cr, x, y);
     cairo_show_text (cr, ss.str().c_str());
     stringstream ss2;
-    ss2 << l.sim_n;
+    ss2 << c->getLoopCount();
     cairo_set_font_size(cr, 22);
     cairo_text_extents(cr, ss2.str().c_str(), &extents2);
     x = r.x0 + extents.width + 3.0;
@@ -395,6 +386,59 @@ void drawloop(cairo_t* cr, Loop l, vector<gateRect> rects)
     cairo_move_to(cr, x, y);
     cairo_show_text (cr, ss2.str().c_str());
 }
+
+void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects)
+{
+						gateRect r;
+						// TODO: Put these in a separate function for subcirc drawing
+    				vector <gateRect> subRects;
+						Subcircuit* subcirc;
+						vector<int> para; 
+						unsigned int currentCol;
+            switch (g->drawType) {
+            case Gate::NOT:
+                r = drawCNOT (cr, xcurr, g->controls, g->targets);
+                break;
+            case Gate::FRED:
+                r = drawFred (cr, xcurr, g->controls, g->targets);
+                break;
+						case Gate::D_SUBCIRC:
+								//TODO make this a function
+								subcirc = (Subcircuit*)g;
+								para = subcirc->getGreedyParallel();
+								currentCol=0;
+								for(int i = 0; i < subcirc->numGates(); i++){
+									drawGate(cr,xcurr,maxX,subcirc->getGate(i),subRects);
+									if(para.size() > currentCol){
+										if (i == para[currentCol]){
+        							xcurr += maxX;
+        							xcurr += gatePad;
+											currentCol++;
+											}
+										}
+									}
+        					xcurr -= maxX;
+        					xcurr -= gatePad;
+									r = subRects[0];
+									for (unsigned int i = 1; i < subRects.size();i++){
+										r = combine_gateRect(r,subRects[i]);
+									} 
+									drawSubCircBox(cr, subcirc, r);
+								break;
+						case Gate::DEFAULT:
+            default:
+                if (g->type == Gate::RGATE) {
+                    string lbl = g->getName ();
+                    r = drawCU (cr, xcurr, lbl, g->controls, g->targets);
+                } else {
+                    r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
+                }
+                break;
+            }
+            rects.push_back(r);
+            maxX = max (maxX, r.width);
+}
+
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal)
 {
@@ -424,8 +468,6 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     // gates
     double xcurr = xinit+2.0*gatePad;
     uint32_t mingw, maxgw;
-// TODO: remove  vector <int> parallels = c->getGreedyParallel ();
-
     uint32_t i = 0;
     double maxX;
     if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
@@ -433,47 +475,14 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
         maxX = 0.0;
         for (; i <= columns[j].lastGateID; i++) {
             Gate* g = c->getGate (i);
-            gateRect r;
             minmaxWire (g->controls, g->targets, mingw, maxgw);
-            switch (g->drawType) {
-            case Gate::NOT:
-                r = drawCNOT (cr, xcurr, g->controls, g->targets);
-                break;
-            case Gate::FRED:
-                r = drawFred (cr, xcurr, g->controls, g->targets);
-                break;
-            default:
-                // XXX: maybe expose as a setting?
-                /*if (g->name.compare ("H") == 0) { // if hadamard
-                  vector<Control> ctrl;
-                  vector<int> targ;
-                  do {
-                    count++;
-                    g = c->getGate (i);
-                    ctrl.insert(ctrl.end(), g->controls.begin(), g->controls.end());
-                    targ.insert(targ.end(), g->targets.begin(), g->targets.end());
-                    i++;
-                  } while (i <= parallels[j] && c->getGate(i)->name.compare("H") == 0);
-                  i--; // restore
-                  count--;
-                  // draw hadamards together. this isn't really cool. proof of concept.
-                  r = drawCU (cr, xcurr, g->name, &ctrl, &targ);
-                } else { ... } */
-                if (g->type == Gate::RGATE) {
-                    string lbl = g->getName ();
-                    r = drawCU (cr, xcurr, lbl, g->controls, g->targets);
-                } else {
-                    r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
-                }
-                break;
-            }
-            rects.push_back(r);
-            maxX = max (maxX, r.width);
+						drawGate(cr,xcurr,maxX,g,rects);        
         }
-        xcurr += maxX;
-        xcurr += gatePad + columns[j].pad;
+				xcurr += maxX;
+        xcurr += gatePad;
     }
-    xcurr -= gatePad;
+		xcurr -= maxX;
+    xcurr += gatePad;
     *wireend = xcurr;
 
     // output labels
@@ -490,13 +499,6 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
         cairo_move_to (cr, x, y);
         cairo_show_text (cr, label.c_str());
     }
-
-
-    // loops
-    for (vector<Loop>::iterator it = c->loops.begin(); it != c->loops.end(); ++it) {
-        drawloop (cr, *it, rects);
-    }
-
     return rects;
 }
 

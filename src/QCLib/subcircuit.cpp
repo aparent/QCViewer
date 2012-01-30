@@ -30,7 +30,7 @@ Authors: Alex Parent
 #include <iostream> //XXX
 Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linemap, int loops)
 {
-  drawType = DEFAULT;
+  drawType = D_SUBCIRC;
  	type = SUBCIRC;
 	circ = n_circ;
 	lineMap = n_linemap;
@@ -97,3 +97,12 @@ Gate* Subcircuit::getGate(int pos) const{
 	return g;
 }
 
+int Subcircuit::numGates() const
+{
+	return circ->numGates();
+}
+
+vector<int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints specifying the last gate in each parallel block.
+{
+	return circ->getGreedyParallel();
+}

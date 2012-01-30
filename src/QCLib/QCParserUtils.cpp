@@ -75,6 +75,7 @@ void add_outlabels (Circuit * circ, name_node *names)
         circ->getLine(findLine(circ,names->name))->outLabel=names->name;
         names = names->next;
     }
+    delete names;
 }
 
 void add_constants (Circuit * circ, name_node *names)
@@ -83,6 +84,7 @@ void add_constants (Circuit * circ, name_node *names)
         circ->getLine(findLine(circ,names->name))->initValue = atoi((names->name).c_str());
         names = names->next;
     }
+    delete names;
 }
 
 void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits)
@@ -92,7 +94,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         return;
     }
     Gate *newGate = NULL;
-    if ((gateName[0] == 'T'||gateName[0] == 't') && gateName.size()>1 && isdigit(gateName[1])){
+    if (sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])){
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
     } else if (gateName[0] == 'F'||gateName[0] == 'f') {

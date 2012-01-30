@@ -107,8 +107,8 @@ public:
     void parseArch (string);
     void arch_set_LNN();
 
-    vector<int> getParallel();  //Returns a vector of ints specifying the last gate in each parallel block.
-    vector<int> getGreedyParallel (); // used for drawing gates in the same column
+    vector<int> getParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
+    vector<int> getGreedyParallel () const; // used for drawing gates in the same column
     vector<int> getArchWarnings ();
     vector<int> column_breaks;
 

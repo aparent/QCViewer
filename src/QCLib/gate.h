@@ -56,7 +56,7 @@ class Gate
 {
 public:
     enum gateType {RGATE, UGATE, SUBCIRC};
-    enum dType {NOT, FRED, DEFAULT};
+    enum dType {NOT, FRED, D_SUBCIRC, DEFAULT};
     virtual ~Gate();
     virtual Gate* clone() const=0;
     virtual string getName() const=0;

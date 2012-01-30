@@ -41,8 +41,10 @@ public:
     State applyToBasis(index_t) const;
 		State applySubcirc(const State&) const;
 		int getLoopCount() const;
+		int numGates() const;
 		void setLoopCount(int);
     Gate* getGate(int pos) const;
+    vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
 private:
 		int loop_count;
     map<unsigned int,unsigned int> lineMap;

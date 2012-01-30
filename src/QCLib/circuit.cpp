@@ -146,7 +146,7 @@ void Circuit::addLine(string lineName)
     lines.push_back(Line(lineName));
 }
 
-vector<int> Circuit::getParallel()
+vector<int> Circuit::getParallel() const
 {
     vector<int>  returnValue;
     map<int,int> linesUsed;
@@ -175,7 +175,7 @@ start:
 }
 
 // TODO: this is pretty akward to have outside the drawing code. Reorganize?
-vector<int> Circuit::getGreedyParallel()
+vector<int> Circuit::getGreedyParallel() const
 {
     vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
     sort (parallel.begin (), parallel.end ());
@@ -193,7 +193,7 @@ start:
                 linesUsed.clear ();
                 goto start;
             }
-            linesUsed[j];
+            linesUsed[j]; //access element so that it exists in map
         }
         if (i == (unsigned int)parallel[k] || std::find(column_breaks.begin(), column_breaks.end(), i) != column_breaks.end()) { // into next parallel group, so force a column move
             returnValue.push_back (i);

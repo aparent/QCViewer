@@ -99,7 +99,7 @@ diracTerm constAdd(diracTerm a, diracTerm b)
 
 diracTerm constSub(diracTerm a, diracTerm b)
 {
-    a.numValue += b.numValue;
+    a.numValue -= b.numValue;
     return a;
 }
 
