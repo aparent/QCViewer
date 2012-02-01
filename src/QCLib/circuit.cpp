@@ -261,21 +261,6 @@ void Circuit::arch_set_LNN()
     }
 }
 
-void Circuit::add_loop (Loop l)
-{
-    for (vector<Loop>::iterator it = loops.begin(); it != loops.end(); it++) {
-        // make sure that this loop is either distinct from or contained in every other loop
-        if (l.last < it->first || it->last < l.first) continue; // distinct
-// for now loops cannot overlap
-        std::cout << "failed!\n";
-        std::cout << "candidate: " << l.first << " " << l.last <<"\n";
-        std::cout << "opposer: " << it->first << " " << it->last << "\n";
-
-        return; // don't add this loop then
-    }
-    loops.push_back(l);
-    //std::cout << "\nnew loop!\n";
-}
 
 void Circuit::setName(string n_name)
 {

@@ -135,3 +135,8 @@ index_t UGate::BuildBitString (index_t orig, unsigned int ans) const
     }
     return output;
 }
+
+int UGate::getLoopCount() const
+{
+	return 0;
+}

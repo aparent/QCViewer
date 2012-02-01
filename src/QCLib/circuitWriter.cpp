@@ -27,8 +27,10 @@ Authors: Alex Parent, Jakub Parker
 
 #include "circuitParser.h"
 #include "utility.h"
+#include "subcircuit.h"
 #include <fstream>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
@@ -43,37 +45,15 @@ string allLines(Circuit &circ)
     return ret;
 }
 
-string getGates(string ret, Circuit &circ, unsigned int a, unsigned int b)
+string getGates(Circuit &circ)
 {
-    for (unsigned int i = a; i <= b; i++) {
-        bool subcirc = false;
-        for (unsigned int j = 0 ; j < circ.loops.size(); j++) {
-            if ( i == circ.loops[j].first && i<circ.loops[j].last) {
-                circ.loops[j].first = -1;
-                ret += circ.loops[j].label + "^" + intToString(circ.loops[j].n) + " " + allLines(circ) + "\n";
-                string sub_s =  "\nBEGIN " + circ.loops[j].label + "(" + allLines(circ) + ")" + "\n";
-                string sub = getGates(sub_s,circ,i,circ.loops[j].last);
-                sub += "END " + circ.loops[j].label + "\n\n";
-                ret = sub + ret;
-                i = circ.loops[j].last;
-                subcirc = true;
-            } else if ( i == circ.loops[j].first && i == circ.loops[j].last) {
-                ret += circ.loops[j].label + "^" + intToString(circ.loops[j].n) ;
-                Gate *gate = circ.getGate(i);
-                for (unsigned int j = 0; j < gate->controls.size() ; j++) {
-                    ret += " " + circ.getLine(gate->controls[j].wire)->lineName;
-                }
-                for (unsigned int j = 0; j < gate->targets.size() ; j++) {
-                    ret += " " + circ.getLine(gate->targets[j])->lineName;
-                }
-                ret += "\n";
-                subcirc = true;
-            }
-            if (subcirc) break;
-        }
-        if (subcirc) continue;
+		string ret;
+    for (unsigned int i = 0; i <= circ.numGates(); i++) {
         Gate *gate = circ.getGate(i);
         ret += gate->getName();
+				if (gate->type==Gate::SUBCIRC){
+					ret+="^"+intToString(((Subcircuit*)gate)->getLoopCount());
+				}
         for (unsigned int j = 0; j < gate->controls.size() ; j++) {
             ret += " " + circ.getLine(gate->controls[j].wire)->lineName;
         }
@@ -85,10 +65,25 @@ string getGates(string ret, Circuit &circ, unsigned int a, unsigned int b)
     return ret;
 }
 
+string getSubcircuits(map<string,Circuit*> subcircs){
+	string ret;
+	for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++){
+			ret += "BEGIN " + (*it).first + " (";
+			for (unsigned int i = 0; i < (*it).second->numLines(); i++) {
+        ret += (*it).second->getLine(i)->lineName + " ";
+			}
+			ret+=")\n";
+			ret += getGates(*((*it).second));
+			ret += "END\n\n";
+	}
+	return ret;
+}
+
 string getGateInfo(Circuit &circ)
 {
     stringstream ret;
-    ret << getGates("BEGIN\n",circ, 0,circ.numGates()-1);
+    ret << "BEGIN\n";
+    ret << getGates(circ);
     ret << "END";
     return ret.str();
 }
@@ -133,7 +128,9 @@ void saveCircuit(Circuit *circ, string filename)
     ofstream f;
     Circuit c = *circ;
     f.open (filename.c_str());
+
     string circInfo = getCircuitInfo(c);
+    string subcircs = getSubcircuits(circ->subcircuits);
     string gateInfo = getGateInfo(c);
     f << circInfo << gateInfo;
     f.close();

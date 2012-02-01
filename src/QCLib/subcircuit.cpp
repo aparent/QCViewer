@@ -35,6 +35,7 @@ Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linema
 	circ = n_circ;
 	lineMap = n_linemap;
 	loop_count = loops;
+	expand = false;
 }
 
 Gate* Subcircuit::clone() const
@@ -49,11 +50,6 @@ string Subcircuit::getName() const
 {
 	if (circ != NULL) return circ->getName();
 	return "NULL";
-}
-
-int Subcircuit::getLoopCount() const
-{
-	return loop_count; 
 }
 
 void Subcircuit::setLoopCount(int loops)
@@ -105,4 +101,9 @@ int Subcircuit::numGates() const
 vector<int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints specifying the last gate in each parallel block.
 {
 	return circ->getGreedyParallel();
+}
+
+int Subcircuit::getLoopCount() const
+{
+	return loop_count;
 }

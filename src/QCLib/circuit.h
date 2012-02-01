@@ -69,16 +69,6 @@ private:
     char *graph;
 };
 
-class Loop
-{
-public:
-    uint32_t first;
-    uint32_t last;
-    uint32_t n;
-    uint32_t sim_n;
-    std::string label;
-};
-
 class Circuit
 {
 public:
@@ -101,7 +91,6 @@ public:
     void swapGate (unsigned int, unsigned int);
 		void removeGates();
 
-    void add_loop (Loop);
     void newArch ();
     void removeArch ();
     void parseArch (string);
@@ -116,7 +105,6 @@ public:
 		void removeSubcircuits();
 
     QArch *arch;
-    vector <Loop>            loops;
 private:
     string name;
     vector <Gate*>           gates;

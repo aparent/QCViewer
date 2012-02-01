@@ -354,37 +354,29 @@ vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s)
     return ans;
 }
 
-void drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
+gateRect drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
 {
-    double red = 0;
-    double green = 51.0/255.0;
-    double blue = 102.0/255.0;
-    double alpha1 = 0.7;
-
-    double dashes[] = { 4.0, 4.0 };
+		double dashes[] = { 4.0, 4.0 };
     cairo_set_dash (cr, dashes, 2, 0.0);
     cairo_set_line_width (cr, 2);
     cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
     cairo_stroke (cr);
     cairo_set_dash (cr, dashes, 0, 0.0);
-
     stringstream ss;
-    ss << c->getName() << " x ";
+    ss << c->getName() << " x "<< c->getLoopCount();
     cairo_set_font_size(cr, 22);
-    cairo_text_extents_t extents, extents2;
+    cairo_text_extents_t extents;
     cairo_text_extents(cr, ss.str().c_str(), &extents);
     double x = r.x0;
     double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
     cairo_move_to(cr, x, y);
     cairo_show_text (cr, ss.str().c_str());
-    stringstream ss2;
-    ss2 << c->getLoopCount();
-    cairo_set_font_size(cr, 22);
-    cairo_text_extents(cr, ss2.str().c_str(), &extents2);
-    x = r.x0 + extents.width + 3.0;
-    y = r.y0 - (-extents2.height - extents2.y_bearing) - 5.0;
-    cairo_move_to(cr, x, y);
-    cairo_show_text (cr, ss2.str().c_str());
+		r.height+=extents.height+10;
+		r.y0-=extents.height+10;
+		if (r.width < extents.width+4){
+			r.width = extents.width+4;
+		}
+		return r;	
 }
 
 void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects)
@@ -405,6 +397,7 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
 						case Gate::D_SUBCIRC:
 								//TODO make this a function
 								subcirc = (Subcircuit*)g;
+								if (subcirc->expand){
 								para = subcirc->getGreedyParallel();
 								currentCol=0;
 								for(int i = 0; i < subcirc->numGates(); i++){
@@ -423,8 +416,9 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
 									for (unsigned int i = 1; i < subRects.size();i++){
 										r = combine_gateRect(r,subRects[i]);
 									} 
-									drawSubCircBox(cr, subcirc, r);
+									r = drawSubCircBox(cr, subcirc, r);
 								break;
+								}
 						case Gate::DEFAULT:
             default:
                 if (g->type == Gate::RGATE) {
@@ -483,7 +477,14 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     }
 		xcurr -= maxX;
     xcurr += gatePad;
-    *wireend = xcurr;
+		gateRect fullCirc;
+		if (rects.size() > 0){
+			fullCirc = rects[0];
+			for (unsigned int i = 1; i < rects.size();i++){
+					fullCirc = combine_gateRect(fullCirc,rects[i]);
+			}
+		}
+    *wireend = *wirestart + fullCirc.width + gatePad*2;
 
     // output labels
     cairo_set_source_rgb (cr, 0, 0, 0);

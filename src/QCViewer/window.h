@@ -111,22 +111,25 @@ protected:
     Gtk::VBox        m_EditSidebar;
     Gtk::Frame       m_GatesFrame;
     Gtk::Table       m_GatesTable;
+
     Gtk::Frame       m_FlowFrame;
     Gtk::Table       m_FlowTable;
     Gtk::Button      m_AddLoop;
-    Gtk::Frame       m_EditLoop;
-    Gtk::Table       m_EditLoopTable;
-    Gtk::Label       m_EditLoopNameLbl;
-    Gtk::Entry       m_EditLoopNameEntry;
-    Gtk::Label       m_EditLoopIterLbl;
-    Gtk::Entry       m_EditLoopIterEntry;
-    Gtk::Button      m_EditLoopDelButton;
+
+    Gtk::Frame       m_Subcirc;
+    Gtk::Table       m_SubcircTable;
+    Gtk::Label       m_SubcircNameLbl;
+    Gtk::Entry       m_SubcircNameEntry;
+    Gtk::Label       m_SubcircIterLbl;
+    Gtk::Entry       m_SubcircIterEntry;
+    Gtk::Button      m_SubcircExpandButton;
 
     std::vector<Gtk::Button*> gate_buttons;
     std::vector<GateIcon*>    gate_icons;
     Gtk::Frame       m_PropFrame;
     Gtk::Table       m_PropTable;
 
+		
     Gtk::Button      btn_delete;
     Gtk::Frame       m_RGateEditFrame;
     Gtk::Table       m_RGateEditTable;
@@ -148,7 +151,7 @@ private:
     void register_stock_items();
     void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
     void update_mode ();
-    void add_loop();
+		void expand_subcirc();
 
     State *state;
     bool drawparallel;

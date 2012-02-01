@@ -165,12 +165,5 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
         names = names->next;
     }
     circ->addGate(newGate);
-    if (exp > 1) {
-        Loop l;
-        l.n = l.sim_n = exp;
-        l.first = circ->numGates()-1;
-        l.label = gateName;
-        circ->add_loop(l);
-    }
     delete names;
 }

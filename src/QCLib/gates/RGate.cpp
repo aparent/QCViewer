@@ -153,3 +153,8 @@ float_type RGate::get_rotVal () const
 {
     return rot;
 }
+
+int RGate::getLoopCount() const
+{
+	return 0;
+}
