@@ -81,7 +81,7 @@ public:
     void force_redraw ();
 
     bool is_subcirc (unsigned int);
-		Gate* getGate(unsigned int);
+    Gate* getGate(unsigned int);
 
 protected:
     //Override default signal handler:

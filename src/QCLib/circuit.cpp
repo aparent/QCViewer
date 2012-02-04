@@ -37,8 +37,8 @@ Circuit::Circuit() : arch(NULL) {}
 Circuit::~Circuit ()
 {
     removeArch ();
-	removeSubcircuits();
-  removeGates();
+    removeSubcircuits();
+    removeGates();
 }
 
 void Circuit::newArch ()
@@ -55,15 +55,16 @@ void Circuit::removeArch ()
 }
 void Circuit::removeSubcircuits()
 {
-	for ( map<string,Circuit*>::iterator it = subcircuits.begin() ; it != subcircuits.end(); it++ ){
-    delete (*it).second;
-	}
+    for ( map<string,Circuit*>::iterator it = subcircuits.begin() ; it != subcircuits.end(); it++ ) {
+        delete (*it).second;
+    }
 }
 
-void Circuit::removeGates(){
-	for(unsigned int i = 0; i < gates.size(); i++){
-		delete gates[i];
-	}
+void Circuit::removeGates()
+{
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        delete gates[i];
+    }
 }
 
 void Circuit::swapGate (unsigned int i, unsigned int j)
@@ -83,9 +84,14 @@ void Circuit::addGate(Gate *newGate, unsigned int pos)
     gates.insert(gates.begin()+pos, newGate);
 }
 
+void Circuit::setGate(Gate *newGate, unsigned int pos)
+{
+    gates.at(pos) = newGate;
+}
+
 void Circuit::removeGate (unsigned int pos)
 {
-		delete gates[pos];
+    delete gates[pos];
     gates.erase (gates.begin () + pos);
 }
 
@@ -104,7 +110,7 @@ int Circuit::QCost()
     return 0;
 }
 
-string Line::getInputLabel()
+string Line::getInputLabel() const
 {
     if (constant) {
         return intToString(initValue);
@@ -112,7 +118,7 @@ string Line::getInputLabel()
     return lineName;
 }
 
-string Line::getOutputLabel()
+string Line::getOutputLabel() const
 {
     if (garbage) {
         return "Garbage";
@@ -123,14 +129,19 @@ string Line::getOutputLabel()
     return outLabel;
 }
 
-unsigned int Circuit::numLines()
+unsigned int Circuit::numLines() const
 {
     return lines.size();
 }
 
-Line* Circuit::getLine(int pos)
+const Line& Circuit::getLine(int pos) const
 {
-    return &lines.at(pos);
+    return lines.at(pos);
+}
+
+Line& Circuit::getLineModify(int pos)
+{
+    return lines.at(pos);
 }
 
 Line::Line(string name)
@@ -264,10 +275,10 @@ void Circuit::arch_set_LNN()
 
 void Circuit::setName(string n_name)
 {
-	this->name = n_name;
+    this->name = n_name;
 }
 
 string Circuit::getName()
 {
-		return this->name;
+    return this->name;
 }

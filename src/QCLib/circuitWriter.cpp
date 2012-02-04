@@ -36,50 +36,56 @@ Authors: Alex Parent, Jakub Parker
 #include <cstdlib>
 
 
-string allLines(Circuit &circ)
+string allLines(const Circuit &circ)
 {
     string ret = "";
     for (unsigned int i = 0 ; i < circ.numLines() ; i++) {
-        ret = ret+ " "+circ.getLine(i)->lineName;
+        ret = ret+ " "+circ.getLine(i).lineName;
     }
     return ret;
 }
 
-string getGates(Circuit &circ)
+string getGates(const Circuit &circ)
 {
-		string ret;
-    for (unsigned int i = 0; i <= circ.numGates(); i++) {
+    string ret;
+    for (unsigned int i = 0; i < circ.numGates(); i++) {
         Gate *gate = circ.getGate(i);
+        cout << gate->getName() << endl;
         ret += gate->getName();
-				if (gate->type==Gate::SUBCIRC){
-					ret+="^"+intToString(((Subcircuit*)gate)->getLoopCount());
-				}
+        if (gate->type==Gate::SUBCIRC) {
+            ret+="^"+intToString(((Subcircuit*)gate)->getLoopCount());
+        }
         for (unsigned int j = 0; j < gate->controls.size() ; j++) {
-            ret += " " + circ.getLine(gate->controls[j].wire)->lineName;
+            ret += " " + circ.getLine(gate->controls[j].wire).lineName;
+            if (gate->controls[j].polarity==true) {
+                ret += "'";
+            }
         }
         for (unsigned int j = 0; j < gate->targets.size() ; j++) {
-            ret += " " + circ.getLine(gate->targets[j])->lineName;
+            ret += " " + circ.getLine(gate->targets[j]).lineName;
         }
         ret += "\n";
     }
     return ret;
 }
 
-string getSubcircuits(map<string,Circuit*> subcircs){
-	string ret;
-	for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++){
-			ret += "BEGIN " + (*it).first + " (";
-			for (unsigned int i = 0; i < (*it).second->numLines(); i++) {
-        ret += (*it).second->getLine(i)->lineName + " ";
-			}
-			ret+=")\n";
-			ret += getGates(*((*it).second));
-			ret += "END\n\n";
-	}
-	return ret;
+string getSubcircuits(const map<string,Circuit*> &subcircs)
+{
+    string ret;
+    for ( map<string,Circuit*>::const_iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+        ret += "BEGIN " + (*it).first + " (";
+        for (unsigned int i = 0; i < (*it).second->numLines(); i++) {
+            ret += (*it).second->getLine(i).lineName + " ";
+        }
+        ret+=")\n";
+        cout << "Getting gates for: " << ((*it).second)->getName() << endl;
+        ret += getGates(*((*it).second));
+        ret += "END " + (*it).first +"\n\n";
+    }
+    return ret;
 }
 
-string getGateInfo(Circuit &circ)
+string getGateInfo(const Circuit &circ)
 {
     stringstream ret;
     ret << "BEGIN\n";
@@ -89,7 +95,7 @@ string getGateInfo(Circuit &circ)
 }
 
 
-string getCircuitInfo(Circuit &circ)
+string getCircuitInfo(const Circuit &circ)
 {
     stringstream v,in,o,ol,c,ret;  //correspond to simlarly named sections in the file
     v << ".v" ;
@@ -97,20 +103,19 @@ string getCircuitInfo(Circuit &circ)
     o << ".o";
     ol << ".ol";
     c << ".c";
-    Line *line;  //for current line
     for (unsigned int i = 0; i< circ.numLines(); i++) {
-        line = circ.getLine(i);
-        v << " " << line->lineName;
-        if (line->constant) {
-            c << " " << line->initValue;
+        Line line = circ.getLine(i);
+        v << " " << line.lineName;
+        if (line.constant) {
+            c << " " << line.initValue;
         } else {
-            in << " " << line->lineName;
+            in << " " << line.lineName;
         }
-        if (!line->garbage) {
-            o << " "<< line->lineName;
+        if (!line.garbage) {
+            o << " "<< line.lineName;
         }
-        if (line->outLabel.compare("")!=0) {
-            ol << " "<< line->lineName;
+        if (line.outLabel.compare("")!=0) {
+            ol << " "<< line.lineName;
         }
     }
     v << "\n";
@@ -126,12 +131,10 @@ string getCircuitInfo(Circuit &circ)
 void saveCircuit(Circuit *circ, string filename)
 {
     ofstream f;
-    Circuit c = *circ;
     f.open (filename.c_str());
-
-    string circInfo = getCircuitInfo(c);
+    string circInfo = getCircuitInfo(*circ);
     string subcircs = getSubcircuits(circ->subcircuits);
-    string gateInfo = getGateInfo(c);
-    f << circInfo << gateInfo;
+    string gateInfo = getGateInfo(*circ);
+    f <<  circInfo << subcircs << gateInfo;
     f.close();
 }

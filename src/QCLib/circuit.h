@@ -38,8 +38,8 @@ class Line
 {
 public:
     Line (string);
-    string getInputLabel ();
-    string getOutputLabel();
+    string getInputLabel () const;
+    string getOutputLabel() const;
     string lineName;
     string outLabel;
     bool constant;
@@ -77,19 +77,21 @@ public:
 
     int QCost();
 
-    void   addLine(string line);
-    Line*  getLine(int pos);
-		string getName();
-		void setName(string);
-    unsigned int numLines();
+    void addLine(string line);
+    const Line& getLine(int pos) const;
+    Line& getLineModify(int pos);
+    string getName();
+    void setName(string);
+    unsigned int numLines() const;
 
     void addGate(Gate *newGate); //appends to end
     void addGate(Gate *newGate, unsigned int pos); //inserts at pos
+    void setGate(Gate *newGate, unsigned int pos);
     void removeGate (unsigned int);
     Gate* getGate(int pos) const;
     unsigned int numGates() const; //Returns the number of gates
     void swapGate (unsigned int, unsigned int);
-		void removeGates();
+    void removeGates();
 
     void newArch ();
     void removeArch ();
@@ -101,8 +103,9 @@ public:
     vector<int> getArchWarnings ();
     vector<int> column_breaks;
 
-		map<string,Circuit*> subcircuits;
-		void removeSubcircuits();
+    map<string,Circuit*> subcircuits;
+
+    void removeSubcircuits();
 
     QArch *arch;
 private:

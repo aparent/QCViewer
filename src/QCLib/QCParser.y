@@ -98,6 +98,7 @@ float: NUM {$$=atof($1);}
 ;
 %%
 
+#include "QCParserUtils.h"
 Circuit *parseCircuit(string filename){
 	circuit = new Circuit();
 	string input,line;
@@ -108,12 +109,13 @@ Circuit *parseCircuit(string filename){
           input += line + "\n";
       }
 			//-----------testcode--------------
-			circuit->setName("Test");
+			circuit->setName("Main");
 			//---------------------------------
   		char *in = (char*)malloc(input.length() + 1);
   		strcpy(in,input.c_str());
   		QC__scan_string(in);
   		QC_parse ();
+//			link_subcircs(circuit);
   }
 	else{ 
 		delete circuit;

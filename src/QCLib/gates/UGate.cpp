@@ -92,9 +92,9 @@ State UGate::ApplyU (index_t bits) const
     // now, go through all rows of the output from the correct column of U
     State answer;
     gateMatrix *matrix = UGateLookup(name);
-        if (matrix == NULL){ 
-					cerr << "Matrix not found!" << endl;
-					return State();
+    if (matrix == NULL) {
+        cerr << "Matrix not found!" << endl;
+        return State();
     }
     for (unsigned int i = 0; i < matrix->dim; i++) {
         if (matrix->data[input*matrix->dim+i] != complex<float_type>(0)) {
@@ -138,5 +138,5 @@ index_t UGate::BuildBitString (index_t orig, unsigned int ans) const
 
 int UGate::getLoopCount() const
 {
-	return 0;
+    return 0;
 }

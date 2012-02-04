@@ -208,18 +208,18 @@ void QCViewer::on_menu_file_open_arch ()
 }
 void QCViewer::on_menu_simulate_show_stateView()
 {
-    if (viz.size() < 3){
-    StateViewWidget* sw = new StateViewWidget (&m_statusbar, &m_VisBox, &viz, &m_EditVisPane);
-    sw->set_state (state);
-    m_VisBox.add (*sw);
-    viz.push_back (sw);
-    sw->show ();
-    if (viz.size() == 1) {
-        int w, h;
-        get_size (w, h);
-        m_EditVisPane.set_position (h - 400);
+    if (viz.size() < 3) {
+        StateViewWidget* sw = new StateViewWidget (&m_statusbar, &m_VisBox, &viz, &m_EditVisPane);
+        sw->set_state (state);
+        m_VisBox.add (*sw);
+        viz.push_back (sw);
+        sw->show ();
+        if (viz.size() == 1) {
+            int w, h;
+            get_size (w, h);
+            m_EditVisPane.set_position (h - 400);
+        }
     }
-  }
 }
 
 void QCViewer::on_menu_file_quit ()
@@ -485,15 +485,6 @@ void QCViewer::delete_loop()
     c.force_redraw();
 }
 
-void QCViewer::set_loop_label ()
-{
-    bool is_loop = c.is_loop (selections);
-    assert (is_loop);
-    Loop* l = c.find_loop (selections);
-    l->label = m_SubcircNameEntry.get_text();
-    c.force_redraw();
-}
-
 void QCViewer::set_loop_iter ()
 {
     bool is_loop = c.is_loop (selections);
@@ -516,13 +507,24 @@ void QCViewer::set_loop_iter ()
     c.force_redraw();
 }
 */
+
+void QCViewer::set_subcircuit_name()
+{
+    Gate* g = c.getSelectedGate();
+    if (g != NULL && g->type==Gate::SUBCIRC) {
+        ((Subcircuit*)g)->setName(m_SubcircNameEntry.get_text());
+        c.force_redraw();
+    }
+}
+
+
 void QCViewer::expand_subcirc()
 {
-	Gate* g = c.getSelectedGate();
-	if (g != NULL && g->type==Gate::SUBCIRC){
-		((Subcircuit*)g)->expand = !((Subcircuit*)g)->expand;
-    c.force_redraw();
-	}
+    Gate* g = c.getSelectedGate();
+    if (g != NULL && g->type==Gate::SUBCIRC) {
+        ((Subcircuit*)g)->expand = !((Subcircuit*)g)->expand;
+        c.force_redraw();
+    }
 }
 
 void QCViewer::update_mode ()
@@ -703,7 +705,7 @@ void QCViewer::setup_menu_layout()
     m_SubcircIterLbl.set_label("Loop count: ");
     m_SubcircExpandButton.set_label ("Expand");
     m_SubcircExpandButton.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::expand_subcirc));
-    //m_SubcircNameEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_loop_label));
+    m_SubcircNameEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_subcircuit_name));
     //m_SubcircIterEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_loop_iter));
 
 

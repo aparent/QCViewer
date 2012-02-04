@@ -57,4 +57,5 @@ void add_constants (Circuit * circ, name_node *names);
 void add_outlabels (Circuit * circ, name_node *names);
 void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp, map<string,Circuit*> &subcircuits);
 void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp, double rot);
+void link_subcircs (Circuit * circ);
 #endif

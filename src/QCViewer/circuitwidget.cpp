@@ -439,10 +439,9 @@ void CircuitWidget::newcircuit (unsigned int numqubits)
         stringstream ss;
         ss << i + 1;
         circuit->addLine (ss.str ());
-        Line* l = circuit->getLine (i);
-        l->outLabel = ss.str ();
-        l->constant = false;
-        l->garbage = false;
+        circuit->getLineModify(i).outLabel = ss.str ();
+        circuit->getLineModify(i).constant = false;
+        circuit->getLineModify(i).garbage = false;
     }
 }
 
@@ -586,7 +585,7 @@ bool CircuitWidget::run (bool breaks)
 bool CircuitWidget::step ()
 {
     if (!circuit || !state) return false;
-    if (NextGateToSimulate < circuit->numGates ()){
+    if (NextGateToSimulate < circuit->numGates ()) {
         vector<uint32_t> foo;
         foo.push_back(NextGateToSimulate - 1);
         *state = ApplyGate(*state,circuit->getGate(NextGateToSimulate));
@@ -741,7 +740,7 @@ void  CircuitWidget::arch_set_LNN()
 
 void CircuitWidget::add_subcirc ()
 {
-		/*
+    /*
     Loop l;
     l.first = *(std::min_element(selections.begin(), selections.end()));
     l.last = *(std::max_element(selections.begin(), selections.end()));
@@ -749,15 +748,15 @@ void CircuitWidget::add_subcirc ()
     l.sim_n = l.n;
     l.label = "newloop";
     circuit->add_loop (l);
-		*/
+    */
 }
 
 bool CircuitWidget::is_subcirc (unsigned int id)
 {
-	return circuit->getGate(id)->type == Gate::SUBCIRC;	
+    return circuit->getGate(id)->type == Gate::SUBCIRC;
 }
 
 Gate* CircuitWidget::getGate(unsigned int id)
 {
-	return circuit->getGate(id);
+    return circuit->getGate(id);
 }

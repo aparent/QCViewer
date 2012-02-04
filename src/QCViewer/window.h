@@ -129,7 +129,7 @@ protected:
     Gtk::Frame       m_PropFrame;
     Gtk::Table       m_PropTable;
 
-		
+
     Gtk::Button      btn_delete;
     Gtk::Frame       m_RGateEditFrame;
     Gtk::Table       m_RGateEditTable;
@@ -151,7 +151,8 @@ private:
     void register_stock_items();
     void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
     void update_mode ();
-		void expand_subcirc();
+    void expand_subcirc();
+    void set_subcircuit_name();
 
     State *state;
     bool drawparallel;

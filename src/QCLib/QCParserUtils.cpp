@@ -34,7 +34,7 @@ Authors: Alex Parent, Jakub Parker
 int findLine(Circuit *circ, string name)
 {
     for(unsigned int j = 0; j < circ->numLines(); j++) {
-        if (name.compare(circ->getLine(j)->lineName)==0) {
+        if (name.compare(circ->getLine(j).lineName)==0) {
             return j;
         }
     }
@@ -54,7 +54,7 @@ void add_lines (Circuit * circ, name_node *names)
 void add_inputs (Circuit * circ, name_node *names)
 {
     while(names) {
-        circ->getLine(findLine(circ,names->name))->constant=false;
+        circ->getLineModify(findLine(circ,names->name)).constant=false;
         names = names->next;
     }
     delete names;
@@ -63,7 +63,7 @@ void add_inputs (Circuit * circ, name_node *names)
 void add_outputs (Circuit * circ, name_node *names)
 {
     while(names) {
-        circ->getLine(findLine(circ,names->name))->garbage=false;
+        circ->getLineModify(findLine(circ,names->name)).garbage=false;
         names = names->next;
     }
     delete names;
@@ -72,7 +72,7 @@ void add_outputs (Circuit * circ, name_node *names)
 void add_outlabels (Circuit * circ, name_node *names)
 {
     while(names) {
-        circ->getLine(findLine(circ,names->name))->outLabel=names->name;
+        circ->getLineModify(findLine(circ,names->name)).outLabel=names->name;
         names = names->next;
     }
     delete names;
@@ -81,7 +81,7 @@ void add_outlabels (Circuit * circ, name_node *names)
 void add_constants (Circuit * circ, name_node *names)
 {
     while(names) {
-        circ->getLine(findLine(circ,names->name))->initValue = atoi((names->name).c_str());
+        circ->getLineModify(findLine(circ,names->name)).initValue = atoi((names->name).c_str());
         names = names->next;
     }
     delete names;
@@ -94,7 +94,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         return;
     }
     Gate *newGate = NULL;
-    if (sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])){
+    if (sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) {
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
     } else if (gateName[0] == 'F'||gateName[0] == 'f') {
@@ -103,42 +103,38 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
         Circuit* c = subcircuits[gateName];
         circ->column_breaks.push_back(circ->numGates()-1);
-        for(unsigned int i = 0; i < c->column_breaks.size(); i++) {
-            circ->column_breaks.push_back(c->column_breaks[i] + circ->numGates());
-        }
         map<unsigned int,unsigned int> lineMap;
-        map<unsigned int,unsigned int>::iterator lit=lineMap.begin();
         int line = 0;
-				name_node* start_names = names;
+        name_node* start_names = names;
         while(names) {
-            lineMap.insert (lit, pair<unsigned int,unsigned int>(line,findLine(circ,names->name)));
+            lineMap.insert (pair<unsigned int,unsigned int>(line,findLine(circ,names->name)));
             line++;
             names = names->next;
         }
-				newGate = new Subcircuit(c, lineMap,exp);
-				names = start_names;
+        newGate = new Subcircuit(c, lineMap,exp);
+        names = start_names;
         while(names) {
-                newGate->targets.push_back(findLine(circ,names->name));
-            		names = names->next;
-				}
+            newGate->targets.push_back(findLine(circ,names->name));
+            names = names->next;
+        }
     } else {
         gateName = sToUpper(gateName);
         newGate = new UGate(gateName);
     }
-        while(names) {
-            if (names->next == NULL) {
-                newGate->targets.push_back(findLine(circ,names->name));
-            } else {
-                newGate->controls.push_back(Control(findLine(circ,names->name),names->neg));
-            }
+    while(names) {
+        if (names->next == NULL) {
+            newGate->targets.push_back(findLine(circ,names->name));
+        } else {
+            newGate->controls.push_back(Control(findLine(circ,names->name),names->neg));
+        }
 
-            names = names->next;
-        }
-        if (newGate->getName().compare("F")==0) {
-            newGate->targets.push_back(newGate->controls.back().wire);
-            newGate->controls.pop_back();
-        }
-        circ->addGate(newGate);
+        names = names->next;
+    }
+    if (newGate->getName().compare("F")==0) {
+        newGate->targets.push_back(newGate->controls.back().wire);
+        newGate->controls.pop_back();
+    }
+    circ->addGate(newGate);
     delete names;
 }
 
@@ -166,4 +162,35 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
     }
     circ->addGate(newGate);
     delete names;
+}
+
+void link_subcircs(Circuit * circ)
+{
+    map<string,Circuit*> subcircs = circ->subcircuits;
+    for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+        Circuit *c = (*it).second;
+        cout << (*it).first << ": " << endl;
+        for (unsigned int i = 0; i < c->numGates(); i++) {
+            Gate *g = c->getGate(i);
+            cout << "Gate: " << g->getName() << endl;
+            if (subcircs.find(g->getName()) != subcircs.end() ) {
+                cout<< "Is Sub: " << g->getName() << endl;
+                map<unsigned int,unsigned int> lineMap;
+                unsigned int line = 0;
+                for(unsigned int j = 0; j < g->controls.size(); j++) {
+                    lineMap.insert (pair<unsigned int,unsigned int>(line,g->controls.at(j).wire));
+                    line++;
+                }
+                for(unsigned int j = 0; j < g->targets.size(); j++) {
+                    lineMap.insert (pair<unsigned int,unsigned int>(line,g->targets.at(j)));
+                    line++;
+                }
+                Gate *n_g = new Subcircuit(subcircs[g->getName()], lineMap,g->getLoopCount());
+                cout << "Changed: " << c->getGate(i)->getName();
+                c->setGate(n_g,i);
+                cout << " To: " << c->getGate(i)->getName() << endl;
+                delete g;
+            }
+        }
+    }
 }

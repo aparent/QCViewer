@@ -156,5 +156,5 @@ float_type RGate::get_rotVal () const
 
 int RGate::getLoopCount() const
 {
-	return 0;
+    return 0;
 }

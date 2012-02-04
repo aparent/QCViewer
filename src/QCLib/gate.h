@@ -61,7 +61,7 @@ public:
     virtual Gate* clone() const=0;
     virtual string getName() const=0;
     virtual State applyToBasis(index_t) const=0;
-		virtual int getLoopCount() const=0;
+    virtual int getLoopCount() const=0;
     gateType type; //used with enum gateType
     dType drawType;
     vector <Control> controls;
@@ -81,8 +81,8 @@ public:
     UGate(string);
     Gate* clone() const;
     string getName() const;
-    State applyToBasis(index_t) const;	
-		int getLoopCount() const;
+    State applyToBasis(index_t) const;
+    int getLoopCount() const;
     void setName(string);
 private:
     unsigned int ExtractInput (index_t) const;
@@ -99,7 +99,7 @@ public:
     RGate(float_type, Axis);
     Gate* clone() const;
     string getName() const;
-		int getLoopCount() const;
+    int getLoopCount() const;
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
     void set_rotVal (float_type);

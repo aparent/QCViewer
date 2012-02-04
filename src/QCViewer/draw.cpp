@@ -356,7 +356,7 @@ vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s)
 
 gateRect drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
 {
-		double dashes[] = { 4.0, 4.0 };
+    double dashes[] = { 4.0, 4.0 };
     cairo_set_dash (cr, dashes, 2, 0.0);
     cairo_set_line_width (cr, 2);
     cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
@@ -371,66 +371,66 @@ gateRect drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
     double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
     cairo_move_to(cr, x, y);
     cairo_show_text (cr, ss.str().c_str());
-		r.height+=extents.height+10;
-		r.y0-=extents.height+10;
-		if (r.width < extents.width+4){
-			r.width = extents.width+4;
-		}
-		return r;	
+    r.height+=extents.height+10;
+    r.y0-=extents.height+10;
+    if (r.width < extents.width+4) {
+        r.width = extents.width+4;
+    }
+    return r;
 }
 
 void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects)
 {
-						gateRect r;
-						// TODO: Put these in a separate function for subcirc drawing
-    				vector <gateRect> subRects;
-						Subcircuit* subcirc;
-						vector<int> para; 
-						unsigned int currentCol;
-            switch (g->drawType) {
-            case Gate::NOT:
-                r = drawCNOT (cr, xcurr, g->controls, g->targets);
-                break;
-            case Gate::FRED:
-                r = drawFred (cr, xcurr, g->controls, g->targets);
-                break;
-						case Gate::D_SUBCIRC:
-								//TODO make this a function
-								subcirc = (Subcircuit*)g;
-								if (subcirc->expand){
-								para = subcirc->getGreedyParallel();
-								currentCol=0;
-								for(int i = 0; i < subcirc->numGates(); i++){
-									drawGate(cr,xcurr,maxX,subcirc->getGate(i),subRects);
-									if(para.size() > currentCol){
-										if (i == para[currentCol]){
-        							xcurr += maxX;
-        							xcurr += gatePad;
-											currentCol++;
-											}
-										}
-									}
-        					xcurr -= maxX;
-        					xcurr -= gatePad;
-									r = subRects[0];
-									for (unsigned int i = 1; i < subRects.size();i++){
-										r = combine_gateRect(r,subRects[i]);
-									} 
-									r = drawSubCircBox(cr, subcirc, r);
-								break;
-								}
-						case Gate::DEFAULT:
-            default:
-                if (g->type == Gate::RGATE) {
-                    string lbl = g->getName ();
-                    r = drawCU (cr, xcurr, lbl, g->controls, g->targets);
-                } else {
-                    r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
+    gateRect r;
+    // TODO: Put these in a separate function for subcirc drawing
+    vector <gateRect> subRects;
+    Subcircuit* subcirc;
+    vector<int> para;
+    unsigned int currentCol;
+    switch (g->drawType) {
+    case Gate::NOT:
+        r = drawCNOT (cr, xcurr, g->controls, g->targets);
+        break;
+    case Gate::FRED:
+        r = drawFred (cr, xcurr, g->controls, g->targets);
+        break;
+    case Gate::D_SUBCIRC:
+        //TODO make this a function
+        subcirc = (Subcircuit*)g;
+        if (subcirc->expand) {
+            para = subcirc->getGreedyParallel();
+            currentCol=0;
+            for(int i = 0; i < subcirc->numGates(); i++) {
+                drawGate(cr,xcurr,maxX,subcirc->getGate(i),subRects);
+                if(para.size() > currentCol) {
+                    if (i == para[currentCol]) {
+                        xcurr += maxX;
+                        xcurr += gatePad;
+                        currentCol++;
+                    }
                 }
-                break;
             }
-            rects.push_back(r);
-            maxX = max (maxX, r.width);
+            xcurr -= maxX;
+            xcurr -= gatePad;
+            r = subRects[0];
+            for (unsigned int i = 1; i < subRects.size(); i++) {
+                r = combine_gateRect(r,subRects[i]);
+            }
+            r = drawSubCircBox(cr, subcirc, r);
+            break;
+        }
+    case Gate::DEFAULT:
+    default:
+        if (g->type == Gate::RGATE) {
+            string lbl = g->getName ();
+            r = drawCU (cr, xcurr, lbl, g->controls, g->targets);
+        } else {
+            r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
+        }
+        break;
+    }
+    rects.push_back(r);
+    maxX = max (maxX, r.width);
 }
 
 
@@ -442,8 +442,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
     // input labels
     double xinit = 0.0;
     for (uint32_t i = 0; i < c->numLines(); i++) {
-        Line *line = c->getLine (i);
-        string label = line->getInputLabel ();
+        string label = c->getLine(i).getInputLabel();
         cairo_text_extents_t extents;
         cairo_text_extents(cr, label.c_str(), &extents);
 
@@ -470,27 +469,26 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
         for (; i <= columns[j].lastGateID; i++) {
             Gate* g = c->getGate (i);
             minmaxWire (g->controls, g->targets, mingw, maxgw);
-						drawGate(cr,xcurr,maxX,g,rects);        
+            drawGate(cr,xcurr,maxX,g,rects);
         }
-				xcurr += maxX;
+        xcurr += maxX;
         xcurr += gatePad;
     }
-		xcurr -= maxX;
+    xcurr -= maxX;
     xcurr += gatePad;
-		gateRect fullCirc;
-		if (rects.size() > 0){
-			fullCirc = rects[0];
-			for (unsigned int i = 1; i < rects.size();i++){
-					fullCirc = combine_gateRect(fullCirc,rects[i]);
-			}
-		}
+    gateRect fullCirc;
+    if (rects.size() > 0) {
+        fullCirc = rects[0];
+        for (unsigned int i = 1; i < rects.size(); i++) {
+            fullCirc = combine_gateRect(fullCirc,rects[i]);
+        }
+    }
     *wireend = *wirestart + fullCirc.width + gatePad*2;
 
     // output labels
     cairo_set_source_rgb (cr, 0, 0, 0);
     for (uint32_t i = 0; i < c->numLines (); i++) {
-        Line *line = c->getLine (i);
-        string label = line->getOutputLabel();
+        string label = c->getLine (i).getOutputLabel();
         cairo_text_extents_t extents;
         cairo_text_extents (cr, label.c_str(), &extents);
 
