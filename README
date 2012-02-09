@@ -1,6 +1,11 @@
-To build the project:
-cd build
-cmake ../src && make install
-Alternativly
-cmake -DCMAKE_BUILD_TYPE=<build-type> ../src/
-to select release or debug builds
+#Build Instructions 
+
+Go into the build directory and choose the folder corresponding to the
+build type you want.  Enter the folder and run ./build.
+
+#Build Dependencies
+
+- lib-gtkmm2.4-dev
+- bison
+- flex
+- cmake
