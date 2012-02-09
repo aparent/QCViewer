@@ -28,8 +28,8 @@ Authors: Alex Parent, Jakub Parker
 #ifndef QC__INCLUDED
 #define QC__INCLUDED
 
-#include <circuit.h>
-#include <circuitParser.h>
-#include <gate.h>
+#include "QCLib/circuit.h"
+#include "QCLib/circuitParser.h"
+#include "QCLib/gate.h"
 
 #endif // QCLIB__INCLUDED

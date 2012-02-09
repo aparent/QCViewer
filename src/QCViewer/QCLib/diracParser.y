@@ -29,7 +29,7 @@ Authors: Alex Parent, Jakub Parker
   #include <stdio.h>
   #include <string.h>
   #include <string>
-  #include "parseNode.h"
+  #include "QCLib/parseNode.h"
   #define YYSTYPE parseNode*
   using namespace std;
   string printTree(parseNode *node);

@@ -28,7 +28,7 @@ Authors: Alex Parent, Jakub Parker
 #include <iostream>
 #include <map>
 #include <complex>
-#include <utility.h>
+#include "QCLib/utility.h"
 #include "stateWidget.h"
 #include <vector>
 

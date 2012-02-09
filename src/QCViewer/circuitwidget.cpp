@@ -28,13 +28,13 @@ Authors: Alex Parent, Jakub Parker
 #include <assert.h>
 #include "GateIcon.h"
 #include <cairomm/context.h>
-#include <circuit.h>
-#include <circuitParser.h>
-#include <simulate.h>
+#include "QCLib/circuit.h"
+#include "QCLib/circuitParser.h"
+#include "QCLib/simulate.h"
 #include <iostream>
 #include "draw.h"
 #include <gtkmm.h>
-#include <gate.h>
+#include "QCLib/gate.h"
 #include "window.h" // slows down compiles, would be nice to not need this (see: clicking, effects toolpalette)
 
 using namespace std;
@@ -139,14 +139,14 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     // translate mouse click coords into circuit diagram coords
     double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
     double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
-
-    int column_id = pickRect (columns, xx, yy);
+    vector<int> select_ids;
+    pickRect (columns, xx, yy, select_ids);
     unsigned int wire = getFirstWire (yy);
     if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
     for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
     if (columns.empty()) {
         insert_gate_at_front (newgate);
-    } else if (column_id == -1) {
+    } else if (select_ids.size() == 0) {
         if (yy < columns[0].y0 || yy - columns[0].y0 > columns[0].height) {
             // bad drag and drop
         } else if (xx < columns[0].x0) {
@@ -164,8 +164,8 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
             }
         }
     } else {
-        unsigned int start = (column_id == 0) ? 0 : layout[column_id - 1].lastGateID + 1;
-        unsigned int end   = layout[column_id].lastGateID;
+        unsigned int start = (select_ids.size()== 0) ? 0 : layout[select_ids.at(0) - 1].lastGateID + 1;
+        unsigned int end   = layout[select_ids.at(0)].lastGateID;
         bool ok = true;
         unsigned int mymaxwire, myminwire;
         mymaxwire = myminwire = newgate->targets[0];
@@ -189,7 +189,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
             if (!(mymaxwire < minwire || myminwire > maxwire)) ok = false;
         }
         if (ok) {
-            insert_gate_in_column (newgate, column_id);
+            insert_gate_in_column (newgate, select_ids.at(0));
         } else {
             insert_gate_in_new_column (newgate, end);
         }

@@ -31,10 +31,10 @@ Authors: Alex Parent, Jakub Parker
 %option unistd
 %option outfile="diracLexer.cpp"
 %{
-	#include "parseNode.h"
+	#include "QCLib/parseNode.h"
 	#include <string>
 	#include <sstream>
-	#include "utility.h"
+	#include "QCLib/utility.h"
 	#define YYSTYPE parseNode*
 	#include "diracParser.h"
 	using namespace std;

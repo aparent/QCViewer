@@ -32,7 +32,7 @@ Authors: Alex Parent, Jakub Parker
 #include <cairo.h>
 #include <cairomm/context.h>
 #include <gtkmm.h>
-#include <state.h>
+#include "QCLib/state.h"
 #include <string>
 #include <vector>
 

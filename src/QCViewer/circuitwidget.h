@@ -29,10 +29,10 @@ Authors: Alex Parent, Jakub Parker
 #define CIRCUITWIDGET__INCLUDED
 
 #include <gtkmm/drawingarea.h>
-#include <circuit.h>
+#include "QCLib/circuit.h"
 #include <string>
-#include <state.h>
-#include <gate.h>
+#include "QCLib/state.h"
+#include "QCLib/gate.h"
 #include "draw.h"
 
 class CircuitWidget : public Gtk::DrawingArea

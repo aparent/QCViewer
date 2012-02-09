@@ -24,8 +24,8 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent, Jakub Parker
 ---------------------------------------------------------------------*/
 
-#include "../gate.h"
-#include "utility.h"
+#include "QCLib/gate.h"
+#include "QCLib/utility.h"
 #include <cmath>
 #include <complex>
 

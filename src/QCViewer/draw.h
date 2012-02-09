@@ -29,16 +29,22 @@ Authors: Alex Parent, Jakub Parker
 #define DRAW__INCLUDED
 
 #include <cairo.h>
-#include <qc.h>
+#include "QCLib/qc.h"
 #include <string>
 #include <vector>
 
 class gateRect
 {
 public:
-    gateRect() : x0(0),y0(0),width(0),height(0) {}
+    gateRect() : x0(0),y0(0),width(0),height(0),subRects(NULL) {}
+    ~gateRect() {
+        if (subRects != NULL) {
+            delete subRects;
+        }
+    }
     double x0, y0;
     double width, height;
+    vector<gateRect> * subRects;
 };
 
 class Colour
@@ -65,10 +71,10 @@ cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
 cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t);
 vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, vector<uint32_t>);
 void write_to_png (cairo_surface_t* surf, string filename);
-int pickRect (vector<gateRect> rects, double x, double y);
+void pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections);
 vector<uint32_t> pickRects (vector<gateRect>, gateRect);
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
-gateRect combine_gateRect (gateRect a, gateRect b);
+gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 int pickWire (double);
 double wireToY (uint32_t);
 

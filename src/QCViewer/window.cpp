@@ -21,20 +21,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
-#include "window.h"
 #include <assert.h>
-#include "info.h"
-#include <gtkmm/stock.h>
-#include <gates/UGateLookup.h>
 #include <iostream>
 #include <string>
-#include <state.h>
-#include <dirac.h>
-#include <subcircuit.h>
+#include "window.h"
+#include "info.h"
+#include <gtkmm/stock.h>
+#include "QCLib/gates/UGateLookup.h"
+#include "QCLib/state.h"
+#include "QCLib/dirac.h"
+#include "QCLib/subcircuit.h"
 
 void QCViewer::setup_gate_button (Gtk::Button* btn, GateIcon *g, vector<Gtk::TargetEntry> &listTargets)
 {
@@ -147,7 +147,7 @@ void QCViewer::on_menu_about ()
 {
     vector<Glib::ustring> authors;
     authors.push_back("Alex Parent <aparent@uwaterloo.ca>");
-    authors.push_back("Jakub Parker <j3parker@uwaterloo.ca>");
+    authors.push_back("Jacob Parker <j3parker@uwaterloo.ca>");
     Gtk::AboutDialog dialog;
     dialog.set_version(QCV_VERSION);
     dialog.set_program_name(QCV_NAME);

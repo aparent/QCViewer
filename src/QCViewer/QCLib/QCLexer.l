@@ -33,7 +33,7 @@ Authors: Alex Parent, Jakub Parker
 %option prefix="QC_"
 %{
 	#include "QCParser.h"
-	#include "utility.h"
+	#include "QCLib/utility.h"
 	#define SAVE_TOKEN QC_lval.string = strdup(yytext);
 	#define TOKEN(t) (QC_lval.token = t)
 	#define printok(t) std::cout<<t<<" ";

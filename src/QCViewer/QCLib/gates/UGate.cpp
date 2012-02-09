@@ -26,9 +26,9 @@ Authors: Alex Parent, Jakub Parker
 
 
 //Implimentation code for the UGate
-#include "../gate.h"
+#include "QCLib/gate.h"
 #include "UGateLookup.h"
-#include "utility.h"
+#include "QCLib/utility.h"
 #include <complex>
 #include <iostream>
 using namespace std;

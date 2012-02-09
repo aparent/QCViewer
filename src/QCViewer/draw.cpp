@@ -25,8 +25,8 @@ Authors: Alex Parent, Jakub Parker
 ---------------------------------------------------------------------*/
 
 
-#include "circuit.h"
-#include "subcircuit.h"
+#include "QCLib/circuit.h"
+#include "QCLib/subcircuit.h"
 #include <cairo.h>
 #include <cairo-svg.h>
 #include <cairo-ft.h>
@@ -112,7 +112,7 @@ void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill)
     cairo_stroke (cr);
 }
 
-gateRect combine_gateRect (gateRect a, gateRect b)
+gateRect combine_gateRect (const gateRect &a, const gateRect &b)
 {
     gateRect c;
     c.x0 = min(a.x0, b.x0);
@@ -333,12 +333,14 @@ void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, do
     }
 }
 
-int pickRect (vector<gateRect> rects, double x, double y)
+void pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)
 {
     for (int i = 0; i < (int)rects.size (); i++) {
-        if (rects[i].x0 <= x && rects[i].x0+rects[i].width >= x && rects[i].y0 <= y && rects[i].y0 + rects[i].height >= y) return i;
+        if (rects[i].x0 <= x && rects[i].x0+rects[i].width >= x && rects[i].y0 <= y && rects[i].y0 + rects[i].height >= y) selections.push_back(i);
+        if (rects[i].subRects!=NULL) {
+            pickRect (*(rects[i].subRects),x,y,selections);
+        }
     }
-    return -1;
 }
 
 vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s)
@@ -383,7 +385,7 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
 {
     gateRect r;
     // TODO: Put these in a separate function for subcirc drawing
-    vector <gateRect> subRects;
+    vector <gateRect>* subRects;
     Subcircuit* subcirc;
     vector<int> para;
     unsigned int currentCol;
@@ -397,11 +399,12 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
     case Gate::D_SUBCIRC:
         //TODO make this a function
         subcirc = (Subcircuit*)g;
+        subRects = new vector<gateRect>;
         if (subcirc->expand) {
             para = subcirc->getGreedyParallel();
             currentCol=0;
             for(int i = 0; i < subcirc->numGates(); i++) {
-                drawGate(cr,xcurr,maxX,subcirc->getGate(i),subRects);
+                drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
                 if(para.size() > currentCol) {
                     if (i == para[currentCol]) {
                         xcurr += maxX;
@@ -412,9 +415,10 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
             }
             xcurr -= maxX;
             xcurr -= gatePad;
-            r = subRects[0];
-            for (unsigned int i = 1; i < subRects.size(); i++) {
-                r = combine_gateRect(r,subRects[i]);
+            r = (*subRects)[0];
+            r.subRects = subRects;
+            for (unsigned int i = 1; i < subRects->size(); i++) {
+                r = combine_gateRect(r,(*subRects)[i]);
             }
             r = drawSubCircBox(cr, subcirc, r);
             break;

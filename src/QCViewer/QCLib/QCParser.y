@@ -32,7 +32,7 @@ Authors: Alex Parent, Jakub Parker
 	#include <fstream>
   #include <string>
   #include <iostream>
-  #include "circuit.h"
+  #include "QCLib/circuit.h"
   void QC_error(const char *s);
   int QC_lex();
   int QC__scan_string(const char*);
@@ -40,7 +40,7 @@ Authors: Alex Parent, Jakub Parker
   Circuit *curr_circ;
 %}
 %code requires{
-  #include "QCParserUtils.h"
+  #include "QCLib/QCParserUtils.h"
 }
 %union {
 	char *string;
@@ -98,7 +98,7 @@ float: NUM {$$=atof($1);}
 ;
 %%
 
-#include "QCParserUtils.h"
+#include "QCLib/QCParserUtils.h"
 Circuit *parseCircuit(string filename){
 	circuit = new Circuit();
 	string input,line;

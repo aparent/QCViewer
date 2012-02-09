@@ -29,7 +29,7 @@ Authors: Alex Parent, Jakub Parker
   #include <stdio.h>
   #include <string>
   #include <string.h>
-  #include "gates/GateParserUtils.h"
+  #include "QCLib/gates/GateParserUtils.h"
   void Gate_error(const char *s);
 	int Gate_lex ();
 	int Gate__scan_string(const char*);
@@ -38,7 +38,7 @@ Authors: Alex Parent, Jakub Parker
 %}
 
 %code requires{
-  #include "gates/GateParserUtils.h"
+  #include "QCLib/gates/GateParserUtils.h"
 }
 %union {
 	std::complex<float> *val;

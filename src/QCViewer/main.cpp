@@ -21,12 +21,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
 #include "window.h"
-#include <gates/UGateLookup.h>
+#include "QCLib/gates/UGateLookup.h"
 #include <iostream>
 
 int main (int argc, char *argv[])
