@@ -8,9 +8,9 @@
 #define panic(str) panic_internal(str, __FILE__, __LINE__, __FUNCTION__)
 
 struct rectangle_t {
-  public:
+public:
     rectangle_t (float x, float y, float w, float h)
-                                         : x0(x), y0(y), width(w), height(h) {}
+        : x0(x), y0(y), width(w), height(h) {}
     rectangle_t& operator+= (const rectangle_t&);
     float x0;
     float y0;

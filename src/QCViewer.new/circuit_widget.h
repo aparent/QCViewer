@@ -5,15 +5,15 @@
 #include "circuit.h"
 
 struct circuit_widget_t : public Gtk::DrawingArea {
-  public:
+public:
     circuit_widget_t ();
     ~circuit_widget_t ();
 
-  protected:
+protected:
     /* Signal handlers */
     virtual bool on_expose_event (GdkEventExpose*);
 
-  private:
+private:
     circuit_t* circuit;
 };
 

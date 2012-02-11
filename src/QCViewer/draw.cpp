@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
@@ -59,6 +59,9 @@ const double wireDist = 40.0;
 const double gatePad = 18.0;
 const double textPad = 5.0;
 const double Upad = 0.9;
+
+void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects);
+void drawExpSubcirc(cairo_t *cr,double &xcurr,double &maxX,const Subcircuit *subcirc, gateRect &r);
 
 void init_fonts()
 {
@@ -356,7 +359,7 @@ vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s)
     return ans;
 }
 
-gateRect drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
+gateRect drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect r)
 {
     double dashes[] = { 4.0, 4.0 };
     cairo_set_dash (cr, dashes, 2, 0.0);
@@ -381,14 +384,10 @@ gateRect drawSubCircBox(cairo_t* cr, Subcircuit* c, gateRect r)
     return r;
 }
 
+
 void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects)
 {
     gateRect r;
-    // TODO: Put these in a separate function for subcirc drawing
-    vector <gateRect>* subRects;
-    Subcircuit* subcirc;
-    vector<int> para;
-    unsigned int currentCol;
     switch (g->drawType) {
     case Gate::NOT:
         r = drawCNOT (cr, xcurr, g->controls, g->targets);
@@ -397,30 +396,8 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
         r = drawFred (cr, xcurr, g->controls, g->targets);
         break;
     case Gate::D_SUBCIRC:
-        //TODO make this a function
-        subcirc = (Subcircuit*)g;
-        subRects = new vector<gateRect>;
-        if (subcirc->expand) {
-            para = subcirc->getGreedyParallel();
-            currentCol=0;
-            for(int i = 0; i < subcirc->numGates(); i++) {
-                drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
-                if(para.size() > currentCol) {
-                    if (i == para[currentCol]) {
-                        xcurr += maxX;
-                        xcurr += gatePad;
-                        currentCol++;
-                    }
-                }
-            }
-            xcurr -= maxX;
-            xcurr -= gatePad;
-            r = (*subRects)[0];
-            r.subRects = subRects;
-            for (unsigned int i = 1; i < subRects->size(); i++) {
-                r = combine_gateRect(r,(*subRects)[i]);
-            }
-            r = drawSubCircBox(cr, subcirc, r);
+        if (((Subcircuit*)g)->expand) {
+            drawExpSubcirc(cr,xcurr,maxX,(Subcircuit*)g, r);
             break;
         }
     case Gate::DEFAULT:
@@ -437,6 +414,31 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
     maxX = max (maxX, r.width);
 }
 
+void drawExpSubcirc(cairo_t *cr,double &xcurr,double &maxX,const Subcircuit *subcirc, gateRect &r)
+{
+    unsigned int currentCol;
+    vector <gateRect>*subRects = new vector<gateRect>;
+    vector<int> para = subcirc->getGreedyParallel();
+    currentCol=0;
+    for(int i = 0; i < subcirc->numGates(); i++) {
+        drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
+        if(para.size() > currentCol) {
+            if (i == para[currentCol]) {
+                xcurr += maxX;
+                xcurr += gatePad;
+                currentCol++;
+            }
+        }
+    }
+    xcurr -= maxX;
+    xcurr -= gatePad;
+    r = (*subRects)[0];
+    r.subRects = subRects;
+    for (unsigned int i = 1; i < subRects->size(); i++) {
+        r = combine_gateRect(r,(*subRects)[i]);
+    }
+    r = drawSubCircBox(cr, subcirc, r);
+}
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal)
 {

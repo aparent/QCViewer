@@ -1,0 +1,3 @@
+#!/bin/bash
+astyle -rn --style=k/r "*.h"
+astyle -rn --style=k/r "*.cpp"

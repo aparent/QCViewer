@@ -37,7 +37,7 @@ UGate::UGate(string n_name) : name(n_name)
 {
     drawType = DEFAULT;
     type = UGATE;
-		loop_count = 1;
+    loop_count = 1;
 }
 
 Gate* UGate::clone() const

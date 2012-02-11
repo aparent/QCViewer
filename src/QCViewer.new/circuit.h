@@ -16,9 +16,9 @@ struct sim_t;
 
 // XXX: use std version
 struct noncopyable {
-  noncopyable() = default;
-  noncopyable(noncopyable const &) = delete;
-  noncopyable & operator=(noncopyable const &) = delete;
+    noncopyable() = default;
+    noncopyable(noncopyable const &) = delete;
+    noncopyable & operator=(noncopyable const &) = delete;
 };
 
 struct drawable_t : private noncopyable {
@@ -33,17 +33,17 @@ struct drawable_t : private noncopyable {
     };
 
     enum param_t { // Boolean drawing settings
-                   PARALLEL_GUIDES,
-                   BREAKPOINTS,
-                   SELECTED,
-                   QUBIT_LABELS,
-                   COMPRESSED,
+        PARALLEL_GUIDES,
+        BREAKPOINTS,
+        SELECTED,
+        QUBIT_LABELS,
+        COMPRESSED,
 
-                   // Spacing
-                   LR_PAD,  // balanced left/right padding
-                   RIGHT_PAD, // extra right padding
-                   COLUMN_CENTRED
-                 };
+        // Spacing
+        LR_PAD,  // balanced left/right padding
+        RIGHT_PAD, // extra right padding
+        COLUMN_CENTRED
+    };
 
     virtual void draw (Cairo::Context) const = 0;
 
@@ -51,15 +51,15 @@ struct drawable_t : private noncopyable {
     void set_param (param_t, p_value_t);
     virtual void set_param_recursive (param_t, p_value_t) = 0;
 
-  private:
+private:
     std::map<param_t, p_value_t> params;
 };
 
 struct sim_t {
     enum state_t {
-      READY,  // No simulation has taken place
-      ACTIVE, // Some simulation has taken place
-      DONE    // Simulation is finished
+        READY,  // No simulation has taken place
+        ACTIVE, // Some simulation has taken place
+        DONE    // Simulation is finished
     };
 
     sim_t () : sim_state (READY) {}
@@ -69,7 +69,7 @@ struct sim_t {
     virtual bool run () = 0;
     state_t simulation_state () const;
 
-  protected:
+protected:
     state_t sim_state;
 };
 
@@ -107,13 +107,13 @@ struct circuit_t : public drawable_t, public sim_t {
     bool step ();
     bool run ();
 
- private:
-   std::vector<qubit_t*> qubits;
-   std::vector<circuit_column_t*> columns;
+private:
+    std::vector<qubit_t*> qubits;
+    std::vector<circuit_column_t*> columns;
 };
 
 struct circuit_column_t : public drawable_t, public sim_t {
-  public:
+public:
     circuit_column_t ();
     ~circuit_column_t ();
 
@@ -123,7 +123,7 @@ struct circuit_column_t : public drawable_t, public sim_t {
     // NOTE: would be nice if we could do const qubit_t* in the vector
     //       ----> figure this out.
     std::vector<circuit_column_t*> reorder_qubits
-      (const std::vector<qubit_t*>&);
+    (const std::vector<qubit_t*>&);
 
     /* Gates */
     bool gate_fits (const gate_t*, const std::vector<qubit_t*>&) const;
@@ -139,29 +139,31 @@ struct circuit_column_t : public drawable_t, public sim_t {
     void draw (Cairo::Context) const;
     void set_param_recursive (param_t, p_value_t);
 
-  private:
+private:
     std::vector<gate_t*> gates;
 };
 
 struct gate_t : public drawable_t, public sim_t {
     enum gate_type_t { UNITARY, SUBCIRCUIT, DUMMY };
     gate_t (gate_type_t g) : breakpoint_start (false),
-                             breakpoint_end (false),
-                             type(g) {}
+        breakpoint_end (false),
+        type(g) {}
 
-    gate_type_t gate_type () const { return type; }
+    gate_type_t gate_type () const {
+        return type;
+    }
 
     /* Qubits */
     struct qubit_usage_t {
-      enum { POSITIVE_CTRL, NEGATIVE_CTRL, TARGET } type;
-      qubit_t* q;
+        enum { POSITIVE_CTRL, NEGATIVE_CTRL, TARGET } type;
+        qubit_t* q;
     };
 
     virtual void delete_qubit (qubit_t*) = 0;
     virtual bool touches_qubit (const qubit_t*) const = 0;
     virtual void reorder_qubits (const std::vector<qubit_t*>&) = 0;
     virtual std::vector<qubit_t*>& get_overlapped_qubits
-      (const std::vector<qubit_t*>&) const = 0;
+    (const std::vector<qubit_t*>&) const = 0;
 
     /* Gates */
     virtual void add_gate (gate_t*) = 0;
@@ -174,7 +176,7 @@ struct gate_t : public drawable_t, public sim_t {
     bool breakpoint_end;
     uint32_t loop_count;
 
-  private:
+private:
     const gate_type_t type;
     std::vector<qubit_usage_t> qubits;
 };

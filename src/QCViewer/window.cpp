@@ -478,7 +478,7 @@ void QCViewer::add_loop ()
 void QCViewer::set_loop_iter ()
 {
     Gate* g = c.getSelectedGate();
-		g->setLoopCount(atoi(m_IterEntry.get_text().c_str()));
+    g->setLoopCount(atoi(m_IterEntry.get_text().c_str()));
 }
 
 void QCViewer::set_subcircuit_name()

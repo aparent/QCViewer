@@ -2,10 +2,11 @@
 #include <gtkmm/window.h>
 #include "window.h"
 
-int main (int argc, char *argv[]) {
-  Gtk::Main kit(argc, argv);
+int main (int argc, char *argv[])
+{
+    Gtk::Main kit(argc, argv);
 
-  window_t window;
-  Gtk::Main::run(window);
-  return 0;
+    window_t window;
+    Gtk::Main::run(window);
+    return 0;
 }

@@ -69,7 +69,7 @@ public:
     vector <Control> controls;
     vector <unsigned int> targets;
 protected:
-	unsigned int loop_count;
+    unsigned int loop_count;
 };
 
 //A gate matrix struct for UGate

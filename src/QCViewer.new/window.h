@@ -5,11 +5,11 @@
 #include "circuit_widget.h"
 
 struct window_t : public Gtk::Window {
-  public:
+public:
     window_t ();
     virtual ~window_t ();
 
-  protected:
+protected:
     /* Signal handlers */
     void on_quit ();
     void on_about ();
@@ -25,7 +25,7 @@ struct window_t : public Gtk::Window {
     Glib::RefPtr<Gtk::UIManager> gtk_ui_manager;
     Glib::RefPtr<Gtk::ActionGroup> gtk_action_group;
 
-  private:
+private:
     void init_menu ();
 };
 

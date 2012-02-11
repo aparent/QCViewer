@@ -38,7 +38,7 @@ RGate::RGate(float_type n_rot, Axis a) : rot(n_rot)
     drawType = DEFAULT;
     type = RGATE;
     axis = a;
-		loop_count = 1;
+    loop_count = 1;
 }
 
 Gate* RGate::clone() const

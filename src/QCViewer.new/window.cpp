@@ -26,23 +26,23 @@ circuit_t* make_circuit ()
 
 window_t::window_t ()
 {
-  set_title("QCViewer");
-  set_border_width(0);
-  set_default_size(1000,1000);
+    set_title("QCViewer");
+    set_border_width(0);
+    set_default_size(1000,1000);
 
-  /* Main layout */
-  add(gtk_layout_vbox);
-  gtk_layout_vbox.pack_end(gtk_layout_hbox);
-  gtk_layout_hbox.pack_end(circuit_widget);
+    /* Main layout */
+    add(gtk_layout_vbox);
+    gtk_layout_vbox.pack_end(gtk_layout_hbox);
+    gtk_layout_hbox.pack_end(circuit_widget);
 
-  /* Menu and toolbar */
-  init_menu ();
-  Gtk::Widget* menubar = gtk_ui_manager->get_widget("/MenuBar");
-  assert (menubar);
-  gtk_layout_vbox.pack_start(*menubar, Gtk::PACK_SHRINK);
+    /* Menu and toolbar */
+    init_menu ();
+    Gtk::Widget* menubar = gtk_ui_manager->get_widget("/MenuBar");
+    assert (menubar);
+    gtk_layout_vbox.pack_start(*menubar, Gtk::PACK_SHRINK);
 
 
-  show_all_children();
+    show_all_children();
 }
 
 window_t::~window_t ()
@@ -51,55 +51,55 @@ window_t::~window_t ()
 
 void window_t::on_quit ()
 {
-  // TODO: prompt for save etc.
-  hide ();
+    // TODO: prompt for save etc.
+    hide ();
 }
 
 void window_t::on_about ()
 {
-  // TODO
+    // TODO
 }
 
 void window_t::init_menu ()
 {
-  gtk_action_group = Gtk::ActionGroup::create();
+    gtk_action_group = Gtk::ActionGroup::create();
 
-  /* File */
-  gtk_action_group->add(Gtk::Action::create("File", "File"));
+    /* File */
+    gtk_action_group->add(Gtk::Action::create("File", "File"));
 
-  gtk_action_group->add(
-    Gtk::Action::create("File_Quit", Gtk::Stock::QUIT, "Quit"),
-    sigc::mem_fun(*this, &window_t::on_quit));
+    gtk_action_group->add(
+        Gtk::Action::create("File_Quit", Gtk::Stock::QUIT, "Quit"),
+        sigc::mem_fun(*this, &window_t::on_quit));
 
-  /* About */
-  gtk_action_group->add(Gtk::Action::create("Help", "Help"));
+    /* About */
+    gtk_action_group->add(Gtk::Action::create("Help", "Help"));
 
-  gtk_action_group->add(
-    Gtk::Action::create("Help_About", Gtk::Stock::ABOUT, "About"),
-    sigc::mem_fun(*this, &window_t::on_about));
+    gtk_action_group->add(
+        Gtk::Action::create("Help_About", Gtk::Stock::ABOUT, "About"),
+        sigc::mem_fun(*this, &window_t::on_about));
 
-  gtk_ui_manager = Gtk::UIManager::create();
-  gtk_ui_manager->insert_action_group(gtk_action_group);
-  add_accel_group(gtk_ui_manager->get_accel_group());
+    gtk_ui_manager = Gtk::UIManager::create();
+    gtk_ui_manager->insert_action_group(gtk_action_group);
+    add_accel_group(gtk_ui_manager->get_accel_group());
 
-  Glib::ustring ui_layout =
-    "<ui>"
-    "  <menubar name='MenuBar'>"
-    "    <menu action='File'>"
-    "      <menuitem action='File_Quit'/>"
-    "    </menu>"
-    "    <menu action='Help'>"
-    "      <menuitem action='Help_About'/>"
-    "    </menu>"
-    "  </menubar>"
-    "</ui>";
+    Glib::ustring ui_layout =
+        "<ui>"
+        "  <menubar name='MenuBar'>"
+        "    <menu action='File'>"
+        "      <menuitem action='File_Quit'/>"
+        "    </menu>"
+        "    <menu action='Help'>"
+        "      <menuitem action='Help_About'/>"
+        "    </menu>"
+        "  </menubar>"
+        "</ui>";
 
-  try {
-    gtk_ui_manager->add_ui_from_string(ui_layout);
-  } catch (const Glib::Error& ex) {
-    std::stringstream reason;
-    reason << "Building menubar/toolbar failed: " << ex.what();
-    panic(reason.str());
-  }
+    try {
+        gtk_ui_manager->add_ui_from_string(ui_layout);
+    } catch (const Glib::Error& ex) {
+        std::stringstream reason;
+        reason << "Building menubar/toolbar failed: " << ex.what();
+        panic(reason.str());
+    }
 
 }
