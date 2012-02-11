@@ -32,6 +32,8 @@ Authors: Alex Parent, Jakub Parker
 #include <fstream>
 #include <iostream>
 
+using namespace std;
+
 Circuit::Circuit() : arch(NULL) {}
 
 Circuit::~Circuit ()

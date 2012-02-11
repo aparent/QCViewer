@@ -28,6 +28,9 @@ Authors: Alex Parent
 #include "subcircuit.h"
 #include "simulate.h"
 #include <iostream> //XXX
+
+using namespace std;
+
 Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linemap, unsigned int loops)
 {
     drawType = D_SUBCIRC;

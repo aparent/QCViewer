@@ -31,7 +31,7 @@ Authors: Alex Parent, Jakub Parker
 
 gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=true);
 void drawShowRotation (cairo_t *cr, double xc, double yc, double radius);
-void drawShowU (cairo_t *cr, double xc, double yc, double width, string name);
+void drawShowU (cairo_t *cr, double xc, double yc, double width, std::string name);
 void drawShowFred (cairo_t *cr, double width, double height);
 
 #endif

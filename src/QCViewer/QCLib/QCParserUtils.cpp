@@ -31,6 +31,8 @@ Authors: Alex Parent, Jakub Parker
 #include <iostream>
 #include "subcircuit.h"
 
+using namespace std;
+
 int findLine(Circuit *circ, string name)
 {
     for(unsigned int j = 0; j < circ->numLines(); j++) {
@@ -134,6 +136,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         newGate->targets.push_back(newGate->controls.back().wire);
         newGate->controls.pop_back();
     }
+    newGate->setLoopCount(exp);
     circ->addGate(newGate);
     delete names;
 }
@@ -160,6 +163,7 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
 
         names = names->next;
     }
+    newGate->setLoopCount(exp);
     circ->addGate(newGate);
     delete names;
 }

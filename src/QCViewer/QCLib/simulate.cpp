@@ -33,6 +33,8 @@ Authors: Alex Parent, Jakub Parker
 #include "gates/UGateLookup.h"
 #include "circuit.h"
 
+using namespace std;
+
 gateMatrix getGateMatrix(Gate*);//defined below
 
 /*

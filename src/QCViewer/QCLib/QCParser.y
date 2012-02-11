@@ -99,10 +99,10 @@ float: NUM {$$=atof($1);}
 %%
 
 #include "QCLib/QCParserUtils.h"
-Circuit *parseCircuit(string filename){
+Circuit *parseCircuit(std::string filename){
 	circuit = new Circuit();
-	string input,line;
-	ifstream myfile(filename.c_str());
+	std::string input,line;
+	std::ifstream myfile(filename.c_str());
   if (myfile.is_open()) {
       while ( myfile.good() ) {
           getline (myfile,line);

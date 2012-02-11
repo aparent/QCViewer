@@ -35,6 +35,7 @@ Authors: Alex Parent, Jakub Parker
 #include <sstream>
 #include <cstdlib>
 
+using namespace std;
 
 string allLines(const Circuit &circ)
 {

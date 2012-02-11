@@ -28,6 +28,8 @@ Authors: Alex Parent, Jakub Parker
 #include "gate.h"
 #include "utility.h"
 
+using namespace std;
+
 Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
 Gate::~Gate() {}

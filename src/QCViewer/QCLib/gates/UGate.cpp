@@ -31,6 +31,7 @@ Authors: Alex Parent, Jakub Parker
 #include "QCLib/utility.h"
 #include <complex>
 #include <iostream>
+
 using namespace std;
 
 UGate::UGate(string n_name) : name(n_name)

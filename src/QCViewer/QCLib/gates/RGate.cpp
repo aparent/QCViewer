@@ -29,6 +29,8 @@ Authors: Alex Parent, Jakub Parker
 #include <cmath>
 #include <complex>
 
+using namespace std;
+
 #ifndef M_PI
 #define M_PI 3.14159265
 #endif

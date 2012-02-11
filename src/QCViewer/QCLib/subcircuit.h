@@ -35,18 +35,18 @@ Authors: Alex Parent
 class Subcircuit : public Gate
 {
 public:
-    Subcircuit(Circuit*, map<unsigned int,unsigned int>,unsigned int);
+    Subcircuit(Circuit*, std::map<unsigned int,unsigned int>,unsigned int);
     Gate* clone() const;
-    string getName() const;
-    void setName(string name);
+    std::string getName() const;
+    void setName(std::string name);
     State applyToBasis(index_t) const;
     State applySubcirc(const State&) const;
     int numGates() const;
     Gate* getGate(int pos) const;
-    vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
+    std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
     bool expand;
 private:
-    map<unsigned int,unsigned int> lineMap;
+    std::map<unsigned int,unsigned int> lineMap;
     index_t BuildBitString (index_t, unsigned int);
     Circuit* circ;
 };

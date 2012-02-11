@@ -40,8 +40,8 @@ class CircuitWidget : public Gtk::DrawingArea
 public:
     CircuitWidget ();
     virtual ~CircuitWidget ();
-    void load (string);
-    void loadArch (string);
+    void load (std::string);
+    void loadArch (std::string);
     void arch_set_LNN();
 
     void clear_selection ();
@@ -95,8 +95,8 @@ protected:
 
 private:
     Mode mode;
-    vector<LayoutColumn> layout;
-    vector<uint32_t> breakpoints;
+    std::vector<LayoutColumn> layout;
+    std::vector<uint32_t> breakpoints;
 
     bool simulation_enabled;
     uint32_t NextGateToSimulate;
@@ -115,9 +115,9 @@ private:
     cairo_rectangle_t ext;
     double wirestart, wireend;
 
-    vector<gateRect> columns;
-    vector<gateRect> rects;
-    vector<uint32_t> selections;
+    std::vector<gateRect> columns;
+    std::vector<gateRect> rects;
+    std::vector<uint32_t> selections;
 
     double scale;
     double cx, cy;

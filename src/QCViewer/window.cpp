@@ -34,8 +34,10 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/gates/UGateLookup.h"
 #include "QCLib/state.h"
 #include "QCLib/dirac.h"
+#include "QCLib/utility.h"
 #include "QCLib/subcircuit.h"
 
+using namespace std;
 void QCViewer::setup_gate_button (Gtk::Button* btn, GateIcon *g, vector<Gtk::TargetEntry> &listTargets)
 {
     btn->set_image (*g);

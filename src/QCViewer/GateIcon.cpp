@@ -30,6 +30,8 @@ Authors: Alex Parent, Jakub Parker
 #include "GateIcon.h"
 #include "draw_internal.h"
 
+using namespace std;
+
 GateIcon::GateIcon () : type(DEFAULT)
 {
     set_size_request (20,20);

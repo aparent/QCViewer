@@ -32,9 +32,8 @@ Authors: Alex Parent, Jakub Parker
 #include "utility.h"
 #include "QCLexer.h"
 
-using namespace std;
 
-Circuit *parseCircuit (string file);
-void saveCircuit(Circuit *circ, string filename);
+Circuit *parseCircuit (std::string file);
+void saveCircuit(Circuit *circ, std::string filename);
 
 #endif

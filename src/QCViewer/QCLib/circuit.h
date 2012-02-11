@@ -32,16 +32,15 @@ Authors: Alex Parent, Jakub Parker
 #include <vector>
 #include <string>
 #include <map>
-using namespace std;
 
 class Line
 {
 public:
-    Line (string);
-    string getInputLabel () const;
-    string getOutputLabel() const;
-    string lineName;
-    string outLabel;
+    Line (std::string);
+    std::string getInputLabel () const;
+    std::string getOutputLabel() const;
+    std::string lineName;
+    std::string outLabel;
     bool constant;
     bool garbage;
     int initValue;
@@ -77,11 +76,11 @@ public:
 
     int QCost();
 
-    void addLine(string line);
+    void addLine(std::string line);
     const Line& getLine(int pos) const;
     Line& getLineModify(int pos);
-    string getName();
-    void setName(string);
+    std::string getName();
+    void setName(std::string);
     unsigned int numLines() const;
 
     void addGate(Gate *newGate); //appends to end
@@ -95,23 +94,23 @@ public:
 
     void newArch ();
     void removeArch ();
-    void parseArch (string);
+    void parseArch (std::string);
     void arch_set_LNN();
 
-    vector<int> getParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
-    vector<int> getGreedyParallel () const; // used for drawing gates in the same column
-    vector<int> getArchWarnings ();
-    vector<int> column_breaks;
+    std::vector<int> getParallel() const;  //Returns a std::vector of ints specifying the last gate in each parallel block.
+    std::vector<int> getGreedyParallel () const; // used for drawing gates in the same column
+    std::vector<int> getArchWarnings ();
+    std::vector<int> column_breaks;
 
-    map<string,Circuit*> subcircuits;
+    std::map<std::string,Circuit*> subcircuits;
 
     void removeSubcircuits();
 
     QArch *arch;
 private:
-    string name;
-    vector <Gate*>           gates;
-    vector <Line>            lines;
+    std::string name;
+    std::vector <Gate*>           gates;
+    std::vector <Line>            lines;
 };
 
 

@@ -44,16 +44,11 @@ Authors: Alex Parent, Jakub Parker
 
 void printIntBin(index_t);
 
-using namespace std;
-
 unsigned int floorLog2(unsigned int n);
 int ipow(int base, int exp);
-void tokenize(const string&,
-              vector<string>&,
-              const string&);
-string intToString(int i);
-string floatToString(float_type i);
-string sToUpper(string);
+std::string intToString(int i);
+std::string floatToString(float_type i);
+std::string sToUpper(std::string);
 
 /* Bit set/get functions */
 //Sets the bit at position reg to 1

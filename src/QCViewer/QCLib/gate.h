@@ -32,9 +32,6 @@ Authors: Alex Parent, Jacob Parker
 #include <vector>
 #include "state.h"
 
-using namespace std;
-
-
 //used to specify a control number and polarity
 class Control
 {
@@ -59,15 +56,15 @@ public:
     enum dType {NOT, FRED, D_SUBCIRC, DEFAULT};
     virtual ~Gate();
     virtual Gate* clone() const=0;
-    virtual string getName() const=0;
+    virtual std::string getName() const=0;
     virtual State applyToBasis(index_t) const=0;
 
     unsigned int getLoopCount() const;
     void setLoopCount(unsigned int count);
     gateType type; //used with enum gateType
     dType drawType;
-    vector <Control> controls;
-    vector <unsigned int> targets;
+    std::vector <Control> controls;
+    std::vector <unsigned int> targets;
 protected:
     unsigned int loop_count;
 };
@@ -75,23 +72,23 @@ protected:
 //A gate matrix struct for UGate
 struct gateMatrix {
     unsigned int dim;
-    complex<float_type> * data;
+    std::complex<float_type> * data;
 };
 
 //A general unitary gate
 class UGate : public Gate
 {
 public:
-    UGate(string);
+    UGate(std::string);
     Gate* clone() const;
-    string getName() const;
+    std::string getName() const;
     State applyToBasis(index_t) const;
-    void setName(string);
+    void setName(std::string);
 private:
     unsigned int ExtractInput (index_t) const;
     index_t BuildBitString (index_t, unsigned int) const;
     State ApplyU(index_t) const;
-    string name;
+    std::string name;
 };
 
 //An arbitrary rotation gate
@@ -101,7 +98,7 @@ public:
     enum Axis { X, Y, Z };
     RGate(float_type, Axis);
     Gate* clone() const;
-    string getName() const;
+    std::string getName() const;
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
     void set_rotVal (float_type);
@@ -115,5 +112,5 @@ private:
 };
 
 
-void minmaxWire (const vector<Control> &ctrl,const vector<unsigned int> &targ, unsigned int &dstmin, unsigned int &dstmax);
+void minmaxWire (const std::vector<Control> &ctrl,const std::vector<unsigned int> &targ, unsigned int &dstmin, unsigned int &dstmax);
 #endif

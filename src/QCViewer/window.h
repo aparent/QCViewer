@@ -41,11 +41,11 @@ public:
     QCViewer ();
     virtual ~QCViewer();
 
-    void set_selection (vector<uint32_t>);
+    void set_selection (std::vector<uint32_t>);
     void load_state (State* s);
 protected:
     void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
-    void setup_gate_button (Gtk::Button*, GateIcon*, vector<Gtk::TargetEntry> &);
+    void setup_gate_button (Gtk::Button*, GateIcon*, std::vector<Gtk::TargetEntry> &);
 
     // Signal handlers:
     void delete_loop();
@@ -158,7 +158,7 @@ private:
     bool drawparallel;
     bool drawarch;
     bool panning;
-    vector<uint32_t> selections;
+    std::vector<uint32_t> selections;
 };
 
 #endif
