@@ -28,7 +28,7 @@ Authors: Alex Parent
 #include "subcircuit.h"
 #include "simulate.h"
 #include <iostream> //XXX
-Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linemap, int loops)
+Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linemap, unsigned int loops)
 {
     drawType = D_SUBCIRC;
     type = SUBCIRC;
@@ -57,12 +57,6 @@ void Subcircuit::setName(string n_name)
     circ->setName(n_name);
 }
 
-void Subcircuit::setLoopCount(int loops)
-{
-    loop_count = loops;
-}
-
-
 State Subcircuit::applyToBasis(index_t in) const
 {
     State s = State(1,in);
@@ -73,7 +67,7 @@ State Subcircuit::applyToBasis(index_t in) const
 State Subcircuit::applySubcirc(const State& in) const
 {
     State s = in;
-    for (int i = 0; i < loop_count; i++) {
+    for (unsigned int i = 0; i < loop_count; i++) {
         for (unsigned int i = 0; i < circ->numGates(); i++) {
             s = ApplyGate(s,getGate(i));
         }
@@ -110,7 +104,4 @@ vector<int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints sp
     return circ->getGreedyParallel();
 }
 
-int Subcircuit::getLoopCount() const
-{
-    return loop_count;
-}
+

@@ -35,20 +35,17 @@ Authors: Alex Parent
 class Subcircuit : public Gate
 {
 public:
-    Subcircuit(Circuit*, map<unsigned int,unsigned int>,int);
+    Subcircuit(Circuit*, map<unsigned int,unsigned int>,unsigned int);
     Gate* clone() const;
     string getName() const;
     void setName(string name);
     State applyToBasis(index_t) const;
     State applySubcirc(const State&) const;
     int numGates() const;
-    void setLoopCount(int);
-    int getLoopCount() const;
     Gate* getGate(int pos) const;
     vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
     bool expand;
 private:
-    int loop_count;
     map<unsigned int,unsigned int> lineMap;
     index_t BuildBitString (index_t, unsigned int);
     Circuit* circ;

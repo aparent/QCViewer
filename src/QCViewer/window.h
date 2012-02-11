@@ -120,8 +120,8 @@ protected:
     Gtk::Table       m_SubcircTable;
     Gtk::Label       m_SubcircNameLbl;
     Gtk::Entry       m_SubcircNameEntry;
-    Gtk::Label       m_SubcircIterLbl;
-    Gtk::Entry       m_SubcircIterEntry;
+    Gtk::Label       m_IterLbl;
+    Gtk::Entry       m_IterEntry;
     Gtk::Button      m_SubcircExpandButton;
 
     std::vector<Gtk::Button*> gate_buttons;

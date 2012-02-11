@@ -433,6 +433,7 @@ void QCViewer::set_selection (vector<uint32_t> s)
         } else {
             m_RGateEditFrame.hide ();
         }
+        m_IterEntry.set_text(intToString(c.getGate(selections[0])->getLoopCount()));
         m_PropFrame.show ();
     } else {
         m_PropFrame.hide ();
@@ -447,7 +448,6 @@ void QCViewer::set_selection (vector<uint32_t> s)
             m_Subcirc.show();
             m_FlowFrame.hide();
             m_SubcircNameEntry.set_text(c.getGate(selections[0])->getName());
-            m_SubcircIterEntry.set_text(intToString(c.getGate(selections[0])->getLoopCount()));
         } else {
             std::cout << "not loop\n";
             m_Subcirc.hide();
@@ -474,39 +474,12 @@ void QCViewer::add_loop ()
     m_FlowFrame.hide();
     c.force_redraw();
 }
-
-void QCViewer::delete_loop()
-{
-    bool is_loop = c.is_loop (selections);
-    assert (is_loop);
-    //Loop* l = c.find_loop (selections);
-    c.delete_loop();
-    set_selection (vector<uint32_t>());
-    c.force_redraw();
-}
-
+*/
 void QCViewer::set_loop_iter ()
 {
-    bool is_loop = c.is_loop (selections);
-    assert (is_loop);
-    Loop* l = c.find_loop (selections);
-    istringstream ss (m_SubcircIterEntry.get_text ());
-    uint32_t n;
-    ss >> n;
-    if (ss.fail ()) {
-        stringstream ss;
-        ss << l->n;
-        m_SubcircIterEntry.set_text (ss.str ());
-        Gtk::MessageDialog dialog(*this, "Error");
-        dialog.set_secondary_text("Loop count must be an integer greater than or equal to 0.");
-        dialog.run();
-        return;
-    }
-    l->n = n;
-    l->sim_n = n;
-    c.force_redraw();
+    Gate* g = c.getSelectedGate();
+		g->setLoopCount(atoi(m_IterEntry.get_text().c_str()));
 }
-*/
 
 void QCViewer::set_subcircuit_name()
 {
@@ -702,17 +675,13 @@ void QCViewer::setup_menu_layout()
     m_Subcirc.add(m_SubcircTable);
     m_SubcircTable.resize (3,2);
     m_SubcircNameLbl.set_label("Name: ");
-    m_SubcircIterLbl.set_label("Loop count: ");
     m_SubcircExpandButton.set_label ("Expand");
     m_SubcircExpandButton.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::expand_subcirc));
     m_SubcircNameEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_subcircuit_name));
-    //m_SubcircIterEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_loop_iter));
 
 
     m_SubcircTable.attach(m_SubcircNameLbl, 0,1,0,1);
-    m_SubcircTable.attach(m_SubcircNameEntry, 1,2,0,1);
-    m_SubcircTable.attach(m_SubcircIterLbl, 0,1,1,2);
-    m_SubcircTable.attach(m_SubcircIterEntry, 1,2,1,2);
+    m_SubcircTable.attach(m_SubcircNameEntry, 1,2,0,2);
     m_SubcircTable.attach(m_SubcircExpandButton,0,2,2,3);
 
     m_EditSidebar.pack_start (m_Subcirc, Gtk::PACK_SHRINK);
@@ -731,11 +700,14 @@ void QCViewer::setup_menu_layout()
     m_EditSidebar.pack_start (m_PropFrame, Gtk::PACK_SHRINK);
     btn_delete.set_label ("Delete");
     btn_editcontrols.set_label ("Edit Controls");
+    m_IterLbl.set_label("Iterations: ");
     btn_delete.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::on_menu_delete));
     btn_editcontrols.signal_clicked().connect (sigc::mem_fun (*this, &QCViewer::update_mode));
-    m_PropTable.attach (btn_delete,0,1,0,1);
-    m_PropTable.attach (btn_editcontrols,0,1,1,2);
-    m_PropTable.attach (m_RGateEditFrame,0,1,2,3);
+    m_IterEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_loop_iter));
+    m_PropTable.attach (btn_delete,0,2,0,1);
+    m_PropTable.attach (btn_editcontrols,0,2,1,2);
+    m_PropTable.attach (m_IterLbl,0,1,2,3);
+    m_PropTable.attach (m_IterEntry,1,2,2,4);
 
     m_RGateEditFrame.set_label ("Rotation");
     m_RGateEditFrame.add (m_RGateEditTable);

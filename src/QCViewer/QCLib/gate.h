@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
@@ -61,11 +61,15 @@ public:
     virtual Gate* clone() const=0;
     virtual string getName() const=0;
     virtual State applyToBasis(index_t) const=0;
-    virtual int getLoopCount() const=0;
+
+    unsigned int getLoopCount() const;
+    void setLoopCount(unsigned int count);
     gateType type; //used with enum gateType
     dType drawType;
     vector <Control> controls;
     vector <unsigned int> targets;
+protected:
+	unsigned int loop_count;
 };
 
 //A gate matrix struct for UGate
@@ -82,7 +86,6 @@ public:
     Gate* clone() const;
     string getName() const;
     State applyToBasis(index_t) const;
-    int getLoopCount() const;
     void setName(string);
 private:
     unsigned int ExtractInput (index_t) const;
@@ -99,7 +102,6 @@ public:
     RGate(float_type, Axis);
     Gate* clone() const;
     string getName() const;
-    int getLoopCount() const;
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
     void set_rotVal (float_type);

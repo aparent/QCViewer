@@ -38,6 +38,7 @@ RGate::RGate(float_type n_rot, Axis a) : rot(n_rot)
     drawType = DEFAULT;
     type = RGATE;
     axis = a;
+		loop_count = 1;
 }
 
 Gate* RGate::clone() const
@@ -154,7 +155,3 @@ float_type RGate::get_rotVal () const
     return rot;
 }
 
-int RGate::getLoopCount() const
-{
-    return 0;
-}

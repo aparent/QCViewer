@@ -32,6 +32,16 @@ Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
 Gate::~Gate() {}
 
+void Gate::setLoopCount(unsigned int loops)
+{
+    loop_count = loops;
+}
+
+unsigned int Gate::getLoopCount() const
+{
+    return loop_count;
+}
+
 void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned &dstmin, unsigned &dstmax)
 {
     unsigned int minw = targ.at(0);

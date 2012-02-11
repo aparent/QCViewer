@@ -37,6 +37,7 @@ UGate::UGate(string n_name) : name(n_name)
 {
     drawType = DEFAULT;
     type = UGATE;
+		loop_count = 1;
 }
 
 Gate* UGate::clone() const
@@ -134,9 +135,4 @@ index_t UGate::BuildBitString (index_t orig, unsigned int ans) const
         }
     }
     return output;
-}
-
-int UGate::getLoopCount() const
-{
-    return 0;
 }
