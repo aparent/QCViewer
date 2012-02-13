@@ -169,23 +169,14 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
         bool ok = true;
         unsigned int mymaxwire, myminwire;
         mymaxwire = myminwire = newgate->targets[0];
-        // TODO: holy crap this is too complicated! use minmaxWire!!!!!!!!!
         for (unsigned int j = 0; j < newgate->targets.size (); j++) {
             mymaxwire = max (mymaxwire, newgate->targets[j]);
             myminwire = min (myminwire, newgate->targets[j]);
         }
         for (unsigned int i = start; i <= end && ok; i++) {
-            Gate* g = circuit->getGate (i);
             unsigned int maxwire, minwire;
-            maxwire = minwire = g->targets[0];
-            for (unsigned int j = 0; j < g->targets.size (); j++) {
-                minwire = min (minwire, g->targets[j]);
-                maxwire = max (maxwire, g->targets[j]);
-            }
-            for (unsigned int j = 0; j < g->controls.size (); j++) {
-                minwire = min (minwire, g->controls[j].wire);
-                maxwire = max (maxwire, g->controls[j].wire);
-            }
+            Gate* g = circuit->getGate (i);
+            minmaxWire (g->controls, g->targets, minwire, maxwire);
             if (!(mymaxwire < minwire || myminwire > maxwire)) ok = false;
         }
         if (ok) {

@@ -44,11 +44,10 @@ unsigned int Gate::getLoopCount() const
     return loop_count;
 }
 
-void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned &dstmin, unsigned &dstmax)
+void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned int &minw, unsigned int &maxw)
 {
-    unsigned int minw = targ.at(0);
-    unsigned int maxw = targ.at(0);
-    for (unsigned int i = 1; i < targ.size (); i++) {
+    maxw = minw = targ.at(0);
+    for (unsigned int i = 0; i < targ.size (); i++) {
         minw = min (minw, targ[i]);
         maxw = max (maxw, targ[i]);
     }
@@ -56,6 +55,4 @@ void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, 
         minw = min (minw, ctrl[i].wire);
         maxw = max (maxw, ctrl[i].wire);
     }
-    dstmin = minw;
-    dstmax = maxw;
 }
