@@ -29,6 +29,7 @@ Authors: Alex Parent, Jakub Parker
 #include "GateIcon.h"
 #include <cairomm/context.h>
 #include "QCLib/circuit.h"
+#include "QCLib/subcircuit.h"
 #include "QCLib/circuitParser.h"
 #include "QCLib/simulate.h"
 #include <iostream>
@@ -281,11 +282,11 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
             // if null, add it as a positive control
             // if ctrl is positive, add as negative
             // if ctrl is negative. remove.
-            if (rects[selections[0]].x0 > x || rects[selections[0]].x0+rects[selections[0]].width < x) return true;
+            if (rects[selections[0].gate].x0 > x || rects[selections[0].gate].x0+rects[selections[0].gate].width < x) return true;
             wireid = pickWire (y);
             if ((unsigned int)wireid >= circuit->numLines()) wireid = -1;
             if (wireid == -1) return true;
-            g = circuit->getGate (selections[0]);
+            g = circuit->getGate (selections[0].gate);
             for (it = g->controls.begin (); it != g->controls.end (); ++it) {
                 if (it->wire == (unsigned int)wireid) {
                     it->polarity = !it->polarity;
@@ -305,7 +306,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                 g->controls.push_back (Control(wireid, false));
                 // now, calculate whether adding this control will make this gate overlap with another.
                 unsigned int col_id;
-                for (col_id = 0; col_id < layout.size () && selections[0] > layout[col_id].lastGateID; col_id++);
+                for (col_id = 0; col_id < layout.size () && selections[0].gate > layout[col_id].lastGateID; col_id++);
                 unsigned int minW, maxW;
                 minmaxWire (g->controls, g->targets, minW, maxW);
                 unsigned int firstGateID = col_id == 0 ? 0 : layout[col_id - 1].lastGateID + 1;
@@ -313,9 +314,9 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                     Gate* gg = circuit->getGate (i);
                     unsigned int minW2, maxW2;
                     minmaxWire (gg->controls, gg->targets, minW2, maxW2);
-                    if (i != selections[0] && !(minW2 > maxW || maxW2 < minW)) {
-                        circuit->swapGate (firstGateID, selections[0]); // pop it out to the left
-                        selections[0] = firstGateID;
+                    if (i != selections[0].gate && !(minW2 > maxW || maxW2 < minW)) {
+                        circuit->swapGate (firstGateID, selections[0].gate); // pop it out to the left
+                        selections[0].gate = firstGateID;
                         ((QCViewer*)win)->set_selection (selections);
                         layout.insert (layout.begin()+col_id, LayoutColumn (firstGateID,0));
                         force_redraw ();
@@ -498,7 +499,7 @@ void CircuitWidget::savepng (string filename)
     cairo_surface_t* surface = make_png_surface (ext);
     cairo_t* cr = cairo_create (surface);
     cairo_set_source_surface (cr, surface, 0, 0);
-    draw_circuit (circuit, cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, vector<uint32_t>());
+    draw_circuit (circuit, cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, vector<Selection>());
     write_to_png (surface, filename);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
@@ -512,7 +513,7 @@ void CircuitWidget::savesvg (string filename)
     cairo_surface_t* surface = make_svg_surface (filename, ext);
     cairo_t* cr = cairo_create (surface);
     cairo_set_source_surface (cr, surface, 0, 0);
-    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<uint32_t>());
+    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>());
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
 }
@@ -525,7 +526,7 @@ void CircuitWidget::saveps (string filename)
     cairo_surface_t* surface = make_ps_surface (filename, ext);
     cairo_t* cr = cairo_create(surface);
     cairo_set_source_surface (cr, surface, 0,0);
-    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<uint32_t>());
+    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>());
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
 }
@@ -715,13 +716,32 @@ void CircuitWidget::set_mode (Mode m)
     mode = m;
 }
 
+Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> *selections)
+{
+    if (!circuit || selections->size () != 1) {
+        if (selections->size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
+        return NULL;
+    }
+    Gate* g = circuit->getGate(selections->at(0).gate);
+    cout << "Subgate: " << g->getName() << endl;
+    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
+        g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+    }
+    return g;
+}
+
 Gate *CircuitWidget::getSelectedGate ()
 {
     if (!circuit || selections.size () != 1) {
         if (selections.size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
         return NULL;
     }
-    return circuit->getGate(selections[0]);
+    Gate* g = circuit->getGate(selections.at(0).gate);
+    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand) {
+        cout << "SELECTED SUBGATE"<< endl;
+        g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+    }
+    return g;
 }
 
 void  CircuitWidget::arch_set_LNN()

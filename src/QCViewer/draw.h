@@ -33,21 +33,10 @@ Authors: Alex Parent, Jakub Parker
 #include <vector>
 #include <stdint.h>
 
+#include "circuitwidget.h"
 #include "QCLib/circuit.h"
+#include "common.h"
 
-class gateRect
-{
-public:
-    gateRect() : x0(0),y0(0),width(0),height(0),subRects(NULL) {}
-    ~gateRect() {
-        if (subRects != NULL) {
-            delete subRects;
-        }
-    }
-    double x0, y0;
-    double width, height;
-    std::vector<gateRect> * subRects;
-};
 
 class Colour
 {
@@ -57,24 +46,15 @@ public:
     double r, g, b, a;
 };
 
-class LayoutColumn
-{
-public:
-    LayoutColumn (uint32_t g, double p) : lastGateID(g), pad(p) {}
-    uint32_t lastGateID;
-    double pad;
-    gateRect bounds;
-};
-
 void init_fonts();
 cairo_rectangle_t get_circuit_size (Circuit *c, std::vector<LayoutColumn>&, double* wirestart, double* wireend, double scale);
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext);
 cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
 cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t);
-std::vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, std::vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, std::vector<uint32_t>);
+std::vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, std::vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, std::vector<Selection>);
 void write_to_png (cairo_surface_t* surf, std::string filename);
 void pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
-std::vector<uint32_t> pickRects (std::vector<gateRect>, gateRect);
+std::vector<Selection> pickRects (const std::vector<gateRect> &rects, const gateRect &s);
 void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
 gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 int pickWire (double);

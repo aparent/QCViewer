@@ -21,36 +21,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
-#ifndef SUBCIRCUIT_H
-#define SUBCIRCUIT_H
+#ifndef __COMMON__INCLUDED
+#define __COMMON__INCLUDED
 
-#include "gate.h"
-#include "circuit.h"
-#include <string>
-#include <map>
-//A subcircuit gate contains
-class Subcircuit : public Gate
+#ifndef NULL
+#define NULL 0
+#endif
+
+#include <stdint.h>
+#include <vector>
+
+class Selection
 {
 public:
-    Subcircuit(Circuit*, std::map<unsigned int,unsigned int>,unsigned int);
-    Gate* clone() const;
-    std::string getName() const;
-    void setName(std::string name);
-    State applyToBasis(index_t) const;
-    State applySubcirc(const State&) const;
-    int numGates() const;
+    ~Selection();
+    Selection();
+    Selection(uint32_t n);
+    Selection(uint32_t n, std::vector<Selection>* s);
+    uint32_t gate;
+    std::vector<Selection> * sub;
+};
 
-    Gate* getGate(int pos) const;
-    Circuit* getCircuit();
-    std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
-    bool expand;
-private:
-    std::map<unsigned int,unsigned int> lineMap;
-    index_t BuildBitString (index_t, unsigned int);
-    Circuit* circ;
+class gateRect
+{
+public:
+    gateRect();
+    ~gateRect();
+    double x0, y0;
+    double width, height;
+    std::vector<gateRect> * subRects;
+};
+
+class LayoutColumn
+{
+public:
+    LayoutColumn (uint32_t g, double p) : lastGateID(g), pad(p) {}
+    uint32_t lastGateID;
+    double pad;
+    gateRect bounds;
+    std::vector<LayoutColumn> *subCols;
 };
 
 

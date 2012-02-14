@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
@@ -34,6 +34,8 @@ Authors: Alex Parent, Jakub Parker
 #include "circuitwidget.h"
 #include "stateWidget.h"
 #include "GateIcon.h"
+#include "common.h"
+
 
 class QCViewer : public Gtk::Window
 {
@@ -41,7 +43,7 @@ public:
     QCViewer ();
     virtual ~QCViewer();
 
-    void set_selection (std::vector<uint32_t>);
+    void set_selection (std::vector<Selection>);
     void load_state (State* s);
 protected:
     void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
@@ -59,7 +61,6 @@ protected:
     void on_menu_about ();
     void on_menu_move ();
     void on_menu_mode_simulate ();
-//  void on_menu_file_save ();
     void on_menu_file_quit ();
     void on_menu_save_png ();
     void on_menu_save_ps ();
@@ -80,14 +81,6 @@ protected:
     void on_menu_simulate_show_stateView ();
     void on_menu_load_state ();
     void on_menu_set_arch_LNN();
-//  void on_architecture_load ();
-
-//  void on_menu_simulation_reset ();
-//  void on_menu_simulation_run ();
-//  void on_menu_simulation_step ();
-
-//  void on_options_arch_warnings ();
-//  void on_options_parallel_guides ();
 
     // Child widgets:
     Gtk::HBox m_VisBox;
@@ -158,7 +151,7 @@ private:
     bool drawparallel;
     bool drawarch;
     bool panning;
-    std::vector<uint32_t> selections;
+    std::vector<Selection> selections;
 };
 
 #endif

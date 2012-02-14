@@ -402,12 +402,12 @@ void QCViewer::on_menu_run ()
 void QCViewer::on_menu_delete ()
 {
     if (selections.size () != 1) return;
-    unsigned int s = (unsigned int)selections[0];
-    set_selection (vector<uint32_t>());
+    unsigned int s = selections[0].gate;
+    set_selection (vector<Selection>());
     c.delete_gate (s);
 }
 
-void QCViewer::set_selection (vector<uint32_t> s)
+void QCViewer::set_selection (vector<Selection> s)
 {
     selections = s;
     if (selections.empty()) {
@@ -415,9 +415,10 @@ void QCViewer::set_selection (vector<uint32_t> s)
         m_PropFrame.hide ();
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
-        if (c.getSelectedGate()->type == Gate::RGATE) {
+        Gate * gate = c.getSelectedGate();
+        if (gate != NULL && gate->type == Gate::RGATE) {
             m_RGateEditFrame.show ();
-            RGate* g = (RGate*)c.getSelectedGate ();
+            RGate* g = (RGate*)gate;
             switch (g->get_axis ()) {
             case RGate::X:
                 btn_RX.set_active ();
@@ -435,7 +436,7 @@ void QCViewer::set_selection (vector<uint32_t> s)
         } else {
             m_RGateEditFrame.hide ();
         }
-        m_IterEntry.set_text(intToString(c.getGate(selections[0])->getLoopCount()));
+        m_IterEntry.set_text(intToString(c.getGate(selections[0].gate)->getLoopCount()));
         m_PropFrame.show ();
     } else {
         m_PropFrame.hide ();
@@ -446,10 +447,10 @@ void QCViewer::set_selection (vector<uint32_t> s)
         if (selections.size()>1) {
             m_FlowFrame.show();
             m_Subcirc.hide();
-        } else if (c.is_subcirc(selections[0])) {
+        } else if (c.is_subcirc(selections[0].gate)) {
             m_Subcirc.show();
             m_FlowFrame.hide();
-            m_SubcircNameEntry.set_text(c.getGate(selections[0])->getName());
+            m_SubcircNameEntry.set_text(c.getGate(selections[0].gate)->getName());
         } else {
             std::cout << "not loop\n";
             m_Subcirc.hide();
@@ -497,6 +498,7 @@ void QCViewer::expand_subcirc()
 {
     Gate* g = c.getSelectedGate();
     if (g != NULL && g->type==Gate::SUBCIRC) {
+        cout << "EXPAND: " << g->getName() << endl;
         ((Subcircuit*)g)->expand = !((Subcircuit*)g)->expand;
         c.force_redraw();
     }

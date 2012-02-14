@@ -25,14 +25,15 @@ Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
-#include "QCLib/circuit.h"
-#include "QCLib/subcircuit.h"
 #include <cairo.h>
 #include <cairo-svg.h>
 #include <cairo-ft.h>
 #include <cairo-ps.h>
 #include <cmath>
 #include <iostream>
+
+#include "QCLib/circuit.h"
+#include "QCLib/subcircuit.h"
 #include "draw.h"
 
 
@@ -346,20 +347,26 @@ void pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &s
     }
 }
 
-vector<uint32_t> pickRects (vector<gateRect> rects, gateRect s)
+vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)
 {
-    vector<uint32_t> ans;
+    vector<Selection> ans;
     for (uint32_t i = 0; i < (uint32_t)rects.size (); i++) {
         if (rects[i].x0 <= s.x0 && rects[i].x0+rects[i].width <= s.x0) continue;
         if (s.x0 <= rects[i].x0 && s.x0+s.width <= rects[i].x0) continue;
         if (rects[i].y0 <= s.y0 && rects[i].y0+rects[i].height <= s.y0) continue;
         if (s.y0 <= rects[i].y0 && s.y0+s.height <= rects[i].y0) continue;
-        ans.push_back (i);
+        if (rects[i].subRects != NULL) {
+            vector<Selection> *sub = new vector<Selection>();
+            *sub = pickRects (*rects[i].subRects, s);
+            ans.push_back (Selection(i,sub));
+        } else {
+            ans.push_back (Selection(i));
+        }
     }
     return ans;
 }
 
-gateRect drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect r)
+void drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect &r)
 {
     double dashes[] = { 4.0, 4.0 };
     cairo_set_dash (cr, dashes, 2, 0.0);
@@ -381,7 +388,6 @@ gateRect drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect r)
     if (r.width < extents.width+4) {
         r.width = extents.width+4;
     }
-    return r;
 }
 
 
@@ -416,10 +422,9 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
 
 void drawExpSubcirc(cairo_t *cr,double &xcurr,double &maxX,const Subcircuit *subcirc, gateRect &r)
 {
-    unsigned int currentCol;
     vector <gateRect>*subRects = new vector<gateRect>;
     vector<int> para = subcirc->getGreedyParallel();
-    currentCol=0;
+    unsigned int currentCol = 0;
     for(int i = 0; i < subcirc->numGates(); i++) {
         drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
         if(para.size() > currentCol) {
@@ -433,11 +438,11 @@ void drawExpSubcirc(cairo_t *cr,double &xcurr,double &maxX,const Subcircuit *sub
     xcurr -= maxX;
     xcurr -= gatePad;
     r = (*subRects)[0];
-    r.subRects = subRects;
     for (unsigned int i = 1; i < subRects->size(); i++) {
         r = combine_gateRect(r,(*subRects)[i]);
     }
-    r = drawSubCircBox(cr, subcirc, r);
+    drawSubCircBox(cr, subcirc, r);
+    r.subRects = subRects;
 }
 
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal)
@@ -524,14 +529,14 @@ void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLi
     }
 }
 
-void drawSelections (cairo_t* cr, vector<gateRect> rects, vector<uint32_t> selections)
+void drawSelections (cairo_t* cr, const vector<gateRect> &rects, const vector<Selection> &selections)
 {
-    //gateRect r = rects[selections[0]];
     for (uint32_t i = 0; i < (uint32_t)selections.size (); i++) {
-        //r = combine_gateRect (r,rects[selections[i]]);
-        drawRect(cr, rects[selections[i]], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
+        drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
+        if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
+            drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
+        }
     }
-    //drawRect (cr, r, Colour (0.1,0.2,0.7,0.7), Colour (0.1,0.2,0.7,0.3));
 }
 
 
@@ -580,7 +585,7 @@ void write_to_png (cairo_surface_t* surf, string filename)
 }
 
 
-vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, vector<uint32_t> selections)
+vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, vector<Selection> selections)
 {
     cairo_scale (cr, scale, scale);
     cairo_set_font_face (cr,ft_default);

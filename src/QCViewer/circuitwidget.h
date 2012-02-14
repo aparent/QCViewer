@@ -29,11 +29,13 @@ Authors: Alex Parent, Jakub Parker
 #define CIRCUITWIDGET__INCLUDED
 
 #include <gtkmm/drawingarea.h>
-#include "QCLib/circuit.h"
 #include <string>
+
+#include "QCLib/circuit.h"
 #include "QCLib/state.h"
 #include "QCLib/gate.h"
 #include "draw.h"
+#include "common.h"
 
 class CircuitWidget : public Gtk::DrawingArea
 {
@@ -106,6 +108,7 @@ private:
     gateRect select_rect;
 
     void toggle_selection (int);
+    Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> *sub);
 
     State *state;
     bool drawarch, drawparallel;
@@ -117,7 +120,7 @@ private:
 
     std::vector<gateRect> columns;
     std::vector<gateRect> rects;
-    std::vector<uint32_t> selections;
+    std::vector<Selection> selections;
 
     double scale;
     double cx, cy;

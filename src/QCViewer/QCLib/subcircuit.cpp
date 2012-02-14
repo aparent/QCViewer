@@ -46,6 +46,7 @@ Gate* Subcircuit::clone() const
     Subcircuit* g = new Subcircuit(circ,lineMap,loop_count);
     g->controls = controls;
     g->targets = targets;
+    g->expand = expand;
     return g;
 }
 
@@ -85,7 +86,6 @@ Gate* Subcircuit::getGate(int pos) const
         map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->targets[i]);
         if (it!= lineMap.end()) {
             g->targets[i] = it->second;
-            std::cout << g->targets[i] << ":" << it->second << std::endl;
         }
     }
     for (unsigned int i = 0; i < g->controls.size(); i++) {
@@ -108,3 +108,7 @@ vector<int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints sp
 }
 
 
+Circuit* Subcircuit::getCircuit()
+{
+    return circ;
+}
