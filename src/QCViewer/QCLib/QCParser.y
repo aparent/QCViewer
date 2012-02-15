@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo, 
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 %{
@@ -82,7 +82,7 @@ gates:  /*empty*/
 				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
 				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits);} gates
 				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
-				| NEWLINE gates
+				| NEWLINE gates {insert_break(curr_circ);}
 ;
 names:/*empty*/ {$$ = NULL;}
 			|  WORD names {$$ = new name_node($1,$2);} 
@@ -94,7 +94,7 @@ nums:/*empty*/ {$$ = NULL;}
 			|  NUM nums {$$ = new name_node($1,$2);}
 
 float: NUM {$$=atof($1);}
-			| NEG NUM {$$=-atof($2)}
+			| NEG NUM {$$=-atof($2);}
 ;
 %%
 

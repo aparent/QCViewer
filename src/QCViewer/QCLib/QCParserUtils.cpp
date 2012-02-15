@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 #include "QCParserUtils.h"
@@ -32,6 +32,25 @@ Authors: Alex Parent, Jakub Parker
 #include "subcircuit.h"
 
 using namespace std;
+
+name_node::name_node(std::string n_name, name_node *n_next)
+{
+    name = n_name;
+    next = n_next;
+    neg = false;
+}
+
+name_node::name_node(std::string n_name, name_node *n_next, bool n_neg)
+{
+    name = n_name;
+    next = n_next;
+    neg = n_neg;
+}
+
+name_node::~name_node()
+{
+    if (next != NULL) delete next;
+}
 
 int findLine(Circuit *circ, string name)
 {
@@ -87,6 +106,11 @@ void add_constants (Circuit * circ, name_node *names)
         names = names->next;
     }
     delete names;
+}
+
+void insert_break(Circuit *circ)
+{
+    circ->column_breaks.push_back(circ->numGates()-1);
 }
 
 void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits)

@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jakub Parker
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 #ifndef QC_PARSER_UTILS
@@ -32,19 +32,9 @@ Authors: Alex Parent, Jakub Parker
 class name_node
 {
 public:
-    name_node(std::string n_name, name_node *n_next) {
-        name = n_name;
-        next = n_next;
-        neg = false;
-    }
-    name_node(std::string n_name, name_node *n_next, bool n_neg) {
-        name = n_name;
-        next = n_next;
-        neg = n_neg;
-    }
-    ~name_node() {
-        if (next != NULL) delete next;
-    }
+    name_node(std::string n_name, name_node *n_next);
+    name_node(std::string n_name, name_node *n_next, bool n_neg);
+    ~name_node();
     std::string name;
     bool neg;
     name_node *next;
@@ -58,4 +48,5 @@ void add_outlabels (Circuit * circ, name_node *names);
 void add_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, std::map<std::string,Circuit*> &subcircuits);
 void add_R_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, double rot);
 void link_subcircs (Circuit * circ);
+void insert_break(Circuit *circ);
 #endif
