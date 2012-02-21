@@ -65,6 +65,7 @@ public:
     dType drawType;
     std::vector <Control> controls;
     std::vector <unsigned int> targets;
+		
 protected:
     unsigned int loop_count;
 };

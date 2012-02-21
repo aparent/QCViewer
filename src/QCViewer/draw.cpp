@@ -62,7 +62,7 @@ const double textPad = 5.0;
 const double Upad = 0.9;
 
 void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects);
-void drawExpSubcirc(cairo_t *cr,double &xcurr,double &maxX,const Subcircuit *subcirc, gateRect &r);
+void drawExpSubcirc(cairo_t *cr,double xcurr,const Subcircuit *subcirc, gateRect &r);
 
 void init_fonts()
 {
@@ -375,8 +375,11 @@ void drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect &r)
     cairo_stroke (cr);
     cairo_set_dash (cr, dashes, 0, 0.0);
     stringstream ss;
-    ss << c->getName() << " x "<< c->getLoopCount();
-    cairo_set_font_size(cr, 22);
+    ss << c->getName();
+		if (c-> getLoopCount() > 1){
+    	ss << " x " << c->getLoopCount();
+		}
+    //cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, ss.str().c_str(), &extents);
     double x = r.x0;
@@ -403,7 +406,7 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
         break;
     case Gate::D_SUBCIRC:
         if (((Subcircuit*)g)->expand) {
-            drawExpSubcirc(cr,xcurr,maxX,(Subcircuit*)g, r);
+            drawExpSubcirc(cr,xcurr,(Subcircuit*)g, r);
             break;
         }
     case Gate::DEFAULT:
@@ -420,19 +423,19 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
     maxX = max (maxX, r.width);
 }
 
-void drawExpSubcirc(cairo_t *cr,double &xcurr,double &maxX,const Subcircuit *subcirc, gateRect &r)
+void drawExpSubcirc(cairo_t *cr,double xcurr,const Subcircuit *subcirc, gateRect &r)
 {
+		double maxX = 0.0;
     vector <gateRect>*subRects = new vector<gateRect>;
     vector<int> para = subcirc->getGreedyParallel();
     unsigned int currentCol = 0;
     for(int i = 0; i < subcirc->numGates(); i++) {
         drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
-        if(para.size() > currentCol) {
-            if (i == para[currentCol]) {
+        if(para.size() > currentCol && i == para[currentCol]) {
                 xcurr += maxX;
+								maxX = 0.0;
                 xcurr += gatePad;
                 currentCol++;
-            }
         }
     }
     xcurr -= maxX;
@@ -482,8 +485,8 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
             minmaxWire (g->controls, g->targets, mingw, maxgw);
             drawGate(cr,xcurr,maxX,g,rects);
         }
-        xcurr += maxX;
         xcurr += gatePad;
+        xcurr += maxX;
     }
     xcurr -= maxX;
     xcurr += gatePad;
@@ -513,14 +516,14 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
 }
 
 
-void drawArchitectureWarnings (cairo_t* cr, vector<gateRect> rects, vector<int> badGates)
+void drawArchitectureWarnings (cairo_t* cr, const vector<gateRect> &rects, const vector<int> &badGates)
 {
     for (uint32_t i = 0; i < badGates.size(); i++) {
         drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
     }
 }
 
-void drawParallelSectionMarkings (cairo_t* cr, vector<gateRect> rects, int numLines, vector<int> pLines)
+void drawParallelSectionMarkings (cairo_t* cr, const vector<gateRect> &rects, int numLines, const vector<int> &pLines)
 {
     for (uint32_t i = 0; i < pLines.size() - 1; i++) {
         int gateNum = pLines[i];
@@ -585,7 +588,7 @@ void write_to_png (cairo_surface_t* surf, string filename)
 }
 
 
-vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, vector<Selection> selections)
+vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections)
 {
     cairo_scale (cr, scale, scale);
     cairo_set_font_face (cr,ft_default);

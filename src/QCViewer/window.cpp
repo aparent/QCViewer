@@ -189,9 +189,10 @@ void QCViewer::on_menu_file_open_circuit ()
         c.set_scale (1);
         btn_editcontrols.set_active (false);
         btn_editcontrols.set_active (false);
-        std::stringstream ss;
-        ss << "Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
-        m_statusbar.push(ss.str());
+        // Commented out because counts are currently incorrect.
+        //std::stringstream ss;
+        //ss << "Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
+        //m_statusbar.push(ss.str());
         c.reset ();
     }
 }
@@ -208,6 +209,7 @@ void QCViewer::on_menu_file_open_arch ()
         c.loadArch (dialog.get_filename ());
     }
 }
+
 void QCViewer::on_menu_simulate_show_stateView()
 {
     if (viz.size() < 3) {
@@ -392,11 +394,8 @@ void QCViewer::on_menu_reset ()
 
 void QCViewer::on_menu_run ()
 {
-//  while (c.step()){
     c.run (true);
     for (unsigned int i = 0; i < viz.size(); i++)  viz[i]->reset ();
-//    while (gtk_events_pending()) gtk_main_iteration(); // yield the cpu to pending ui tasks (e.g. drawing progress)
-//  }
 }
 
 void QCViewer::on_menu_delete ()
@@ -760,13 +759,13 @@ void QCViewer::setup_gate_icons()
     m_GatesTable.set_homogeneous ();
 }
 
-
 void QCViewer::register_stock_items()
 {
     Glib::RefPtr<Gtk::IconFactory> factory = Gtk::IconFactory::create();
     add_stock_item(factory, "data/pan.png", "pan", "Pan");
     factory->add_default(); //Add factory to list of factories.
 }
+
 void QCViewer::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory, const std::string& filepath,
                               const Glib::ustring& id, const Glib::ustring& label)
 {

@@ -51,7 +51,7 @@ cairo_rectangle_t get_circuit_size (Circuit *c, std::vector<LayoutColumn>&, doub
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext);
 cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
 cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t);
-std::vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, std::vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, std::vector<Selection>);
+std::vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, std::vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection>&);
 void write_to_png (cairo_surface_t* surf, std::string filename);
 void pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
 std::vector<Selection> pickRects (const std::vector<gateRect> &rects, const gateRect &s);

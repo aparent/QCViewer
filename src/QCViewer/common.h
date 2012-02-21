@@ -37,8 +37,8 @@ Authors: Alex Parent, Jacob Parker
 class Selection
 {
 public:
-    ~Selection();
     Selection();
+    ~Selection();
     Selection(uint32_t n);
     Selection(uint32_t n, std::vector<Selection>* s);
     uint32_t gate;
