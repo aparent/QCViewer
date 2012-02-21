@@ -197,12 +197,9 @@ void link_subcircs(Circuit * circ)
     map<string,Circuit*> subcircs = circ->subcircuits;
     for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
         Circuit *c = (*it).second;
-        cout << (*it).first << ": " << endl;
         for (unsigned int i = 0; i < c->numGates(); i++) {
             Gate *g = c->getGate(i);
-            cout << "Gate: " << g->getName() << endl;
             if (subcircs.find(g->getName()) != subcircs.end() ) {
-                cout<< "Is Sub: " << g->getName() << endl;
                 map<unsigned int,unsigned int> lineMap;
                 unsigned int line = 0;
                 for(unsigned int j = 0; j < g->controls.size(); j++) {

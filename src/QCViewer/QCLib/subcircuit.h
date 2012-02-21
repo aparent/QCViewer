@@ -47,8 +47,9 @@ public:
     Circuit* getCircuit();
     std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
     bool expand;
-private:
+protected:
     std::map<unsigned int,unsigned int> lineMap;
+private:
     index_t BuildBitString (index_t, unsigned int);
     Circuit* circ;
 };
