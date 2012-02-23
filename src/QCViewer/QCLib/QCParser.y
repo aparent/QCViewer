@@ -115,9 +115,10 @@ Circuit *parseCircuit(std::string filename){
   		strcpy(in,input.c_str());
   		QC__scan_string(in);
   		QC_parse ();
-//			link_subcircs(circuit);
+			link_subcircs(circuit);
   }
 	else{ 
+		std::cout << "File does not exist." << std::endl;	
 		delete circuit;
 		circuit = NULL;
 	}

@@ -56,22 +56,25 @@ add_custom_command (
 ENDIF(NOT WIN32)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-
-add_executable (viewer WIN32  ${QCVIEWER_SRC_FILES})
-target_link_libraries(viewer ${GTKMM_LIBRARIES})
-install(TARGETS viewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-include_directories( ${CMAKE_CURRENT_BINARY_DIR}/../QCLib )
-include_directories( ${QCViewer_SOURCE_DIR}/QCLib)
-
-
 include_directories(${GTKMM_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
 include_directories(${Freetype_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Freetype_LIBRARY_DIRS})
+include_directories( ${QCViewer_SOURCE_DIR}/QCLib)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
+#add_executable (viewer WIN32  ${QCVIEWER_SRC_FILES})
+add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp ${QCVIEWER_SRC_FILES} )
+add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp ${QCVIEWER_SRC_FILES} )
+
+target_link_libraries(qcviewer ${GTKMM_LIBRARIES})
+target_link_libraries(qcimage ${GTKMM_LIBRARIES})
+
+install(TARGETS qcviewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
+install(TARGETS qcimage DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
+
 
 

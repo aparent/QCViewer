@@ -21,38 +21,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent
+Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
-
-#ifndef SUBCIRCUIT_H
-#define SUBCIRCUIT_H
-
-#include "gate.h"
-#include "circuit.h"
-#include <string>
-#include <map>
-//A subcircuit gate contains
-class Subcircuit : public Gate
-{
-public:
-    Subcircuit(Circuit*, const std::map<unsigned int,unsigned int>&,unsigned int);
-    Gate* clone() const;
-    std::string getName() const;
-    void setName(std::string name);
-    State applyToBasis(index_t) const;
-    State applySubcirc(const State&) const;
-    int numGates() const;
-
-    Gate* getGate(int pos) const;
-    Circuit* getCircuit();
-    std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
-    bool expand;
-protected:
-    std::map<unsigned int,unsigned int> lineMap;
-private:
-    index_t BuildBitString (index_t, unsigned int);
-    Circuit* circ;
-};
-
-
-#endif
+#include <iostream>
+#include <QCLib/circuitParser.h>
+#include <circuitwidget.h>
+#include <gtkmm.h>
+using namespace std;
+int main (int argc, char *argv[]){
+  Gtk::Main kit(argc, argv);
+  init_fonts();
+  CircuitWidget c;
+	if (argc > 0){
+		c.load(argv[1]);
+	} else {
+		cout << "No circuit file provided" << endl;
+		return 0;
+	}
+	if (argc > 1){
+		c.savepng(argv[2]);
+	} else {
+	}
+	return 0; 
+}

@@ -196,7 +196,7 @@ void link_subcircs(Circuit * circ)
 {
     map<string,Circuit*> subcircs = circ->subcircuits;
     for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
-        Circuit *c = (*it).second;
+        Circuit *c = it->second;        
         for (unsigned int i = 0; i < c->numGates(); i++) {
             Gate *g = c->getGate(i);
             if (subcircs.find(g->getName()) != subcircs.end() ) {
@@ -210,12 +210,18 @@ void link_subcircs(Circuit * circ)
                     lineMap.insert (pair<unsigned int,unsigned int>(line,g->targets.at(j)));
                     line++;
                 }
-                Gate *n_g = new Subcircuit(subcircs[g->getName()], lineMap,g->getLoopCount());
-                cout << "Changed: " << c->getGate(i)->getName();
+                Gate *n_g = new Subcircuit(subcircs[g->getName()],lineMap,g->getLoopCount());
+                for(unsigned int j = 0; j < g->controls.size(); j++) {
+                    n_g->targets.push_back(g->controls.at(j).wire);
+                }
+                for(unsigned int j = 0; j < g->targets.size(); j++) {
+                    n_g->targets.push_back(g->targets.at(j));
+                }
+                cout << "Set: " << c->getGate(i)->getName() << endl;
                 c->setGate(n_g,i);
-                cout << " To: " << c->getGate(i)->getName() << endl;
-                delete g;
+								//i++;
+                //delete g;
             }
-        }
-    }
+		}
+  }
 }

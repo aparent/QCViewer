@@ -31,7 +31,7 @@ Authors: Alex Parent
 
 using namespace std;
 
-Subcircuit::Subcircuit(Circuit* n_circ, map <unsigned int,unsigned int> n_linemap, unsigned int loops)
+Subcircuit::Subcircuit(Circuit* n_circ, const map <unsigned int,unsigned int>& n_linemap, unsigned int loops)
 {
     drawType = D_SUBCIRC;
     type = SUBCIRC;

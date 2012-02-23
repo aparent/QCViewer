@@ -39,7 +39,7 @@ Authors: Alex Parent, Jacob Parker
 	#define printok(t) std::cout<<t<<" ";
 %}
 
-word [[:alnum:]]+
+word [[:alnum:]\*]+
 digit [0-9]
 int {digit}+
 float {int}\.{int}
