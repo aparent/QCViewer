@@ -10,10 +10,11 @@ ENDIF(WIN32)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-file(GLOB QCVIEWER_SRC_FILES "*.cpp" "QCLib/*.cpp" "QCLib/gates/*.cpp")
-file(GLOB QCVIEWER_HEADER_FILES "*.h" "QCLib/*.h" "QCLib/gates/*.cpp")
 
-LIST(APPEND QCVIEWER_SRC_FILES 
+file(GLOB QCLIB_SRC_FILES "QCLib/*.cpp" "QCLib/gates/*.cpp")
+file(GLOB QCVIEWER_SRC_FILES "*.cpp")
+
+LIST(APPEND QCLIB_SRC_FILES 
 	diracLexer.cpp
 	diracParser.cpp
 	QCParser.cpp
@@ -65,10 +66,13 @@ include_directories( ${QCViewer_SOURCE_DIR}/QCLib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 #add_executable (viewer WIN32  ${QCVIEWER_SRC_FILES})
+add_library(qclib ${QCLIB_SRC_FILES})
 add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp ${QCVIEWER_SRC_FILES} )
 add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp ${QCVIEWER_SRC_FILES} )
 
+target_link_libraries(qcviewer qclib)
 target_link_libraries(qcviewer ${GTKMM_LIBRARIES})
+target_link_libraries(qcimage qclib)
 target_link_libraries(qcimage ${GTKMM_LIBRARIES})
 
 install(TARGETS qcviewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)

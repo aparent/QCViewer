@@ -33,7 +33,6 @@ Authors: Alex Parent, Jacob Parker
 #include <vector>
 #include <stdint.h>
 
-#include "circuitwidget.h"
 #include "QCLib/circuit.h"
 #include "common.h"
 
