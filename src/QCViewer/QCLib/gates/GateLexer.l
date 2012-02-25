@@ -37,7 +37,7 @@ Authors: Alex Parent, Jacob Parker
 	#define TOKEN(t) (Gate_lval.token = t)
 %}
 
-word [[:alnum:]\*]+
+word [[:alnum:]]+"*"?
 digit [0-9]
 int {digit}+
 float {int}\.{int}

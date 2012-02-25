@@ -49,18 +49,16 @@ gateMatrix getGateMatrix(Gate*);//defined below
 #include "subcircuit.h"
 State ApplyGate (const State &in, const Gate *g)
 {
-    if (g->type==Gate::SUBCIRC) {
-        return ((Subcircuit*)g)->applySubcirc(in);
+    State s = in;
+    for (unsigned int i = 0; i <  g->getLoopCount;  i++) {
+        for (StateMap::const_iterator it = s.data.begin(); it != s.data.end(); ++it) {
+            State tmp = g->applyToBasis(it->first);
+            complex<float_type> foo = (*it).second;
+            tmp *= foo;
+            s += tmp;
+        }
     }
-    State answer;
-    answer.dim = in.dim;
-    for (StateMap::const_iterator it = in.data.begin(); it != in.data.end(); ++it) {
-        State tmp = g->applyToBasis(it->first);
-        complex<float_type> foo = (*it).second;
-        tmp *= foo;
-        answer += tmp;
-    }
-    return answer;
+    return s;
 }
 
 State ApplyCircuit (const State &in, const Circuit &circ)

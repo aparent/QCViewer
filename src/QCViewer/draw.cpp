@@ -376,9 +376,9 @@ void drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect &r)
     cairo_set_dash (cr, dashes, 0, 0.0);
     stringstream ss;
     ss << c->getName();
-		if (c-> getLoopCount() > 1){
-    	ss << " x " << c->getLoopCount();
-		}
+    if (c-> getLoopCount() > 1) {
+        ss << " x " << c->getLoopCount();
+    }
     //cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, ss.str().c_str(), &extents);
@@ -425,17 +425,17 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
 
 void drawExpSubcirc(cairo_t *cr,double xcurr,const Subcircuit *subcirc, gateRect &r)
 {
-		double maxX = 0.0;
+    double maxX = 0.0;
     vector <gateRect>*subRects = new vector<gateRect>;
     vector<int> para = subcirc->getGreedyParallel();
     unsigned int currentCol = 0;
     for(int i = 0; i < subcirc->numGates(); i++) {
         drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
         if(para.size() > currentCol && i == para[currentCol]) {
-                xcurr += maxX;
-								maxX = 0.0;
-                xcurr += gatePad;
-                currentCol++;
+            xcurr += maxX;
+            maxX = 0.0;
+            xcurr += gatePad;
+            currentCol++;
         }
     }
     xcurr -= maxX;

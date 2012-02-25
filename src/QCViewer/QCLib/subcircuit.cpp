@@ -71,10 +71,8 @@ State Subcircuit::applyToBasis(index_t in) const
 State Subcircuit::applySubcirc(const State& in) const
 {
     State s = in;
-    for (unsigned int i = 0; i < loop_count; i++) {
-        for (unsigned int i = 0; i < circ->numGates(); i++) {
-            s = ApplyGate(s,getGate(i));
-        }
+    for (unsigned int i = 0; i < circ->numGates(); i++) {
+        s = ApplyGate(s,getGate(i));
     }
     return s;
 }
@@ -89,21 +87,21 @@ Gate* Subcircuit::getGate(int pos) const
         }
     }
     for (unsigned int i = 0; i < g->controls.size(); i++) {
-      	map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->controls[i].wire);
+        map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->controls[i].wire);
         if (it!= lineMap.end()) {
             g->controls[i].wire = it->second;
         }
     }
-		if (g->type == SUBCIRC){ //Combine the maps if it is a subcircuit so we have the correct global map
-			Subcircuit* s = (Subcircuit*)g;
-			map<unsigned int,unsigned int>::iterator it = s->lineMap.begin();
-			for (; it!=s->lineMap.end(); it++){
-				map<unsigned int,unsigned int>::const_iterator currIt = lineMap.find(it->second);
-				if (currIt != lineMap.end()){
-					it->second = currIt->second;
-				}
-			}
-		}
+    if (g->type == SUBCIRC) { //Combine the maps if it is a subcircuit so we have the correct global map
+        Subcircuit* s = (Subcircuit*)g;
+        map<unsigned int,unsigned int>::iterator it = s->lineMap.begin();
+        for (; it!=s->lineMap.end(); it++) {
+            map<unsigned int,unsigned int>::const_iterator currIt = lineMap.find(it->second);
+            if (currIt != lineMap.end()) {
+                it->second = currIt->second;
+            }
+        }
+    }
     return g;
 }
 

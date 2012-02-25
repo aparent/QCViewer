@@ -196,7 +196,7 @@ void link_subcircs(Circuit * circ)
 {
     map<string,Circuit*> subcircs = circ->subcircuits;
     for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
-        Circuit *c = it->second;        
+        Circuit *c = it->second;
         for (unsigned int i = 0; i < c->numGates(); i++) {
             Gate *g = c->getGate(i);
             if (subcircs.find(g->getName()) != subcircs.end() ) {
@@ -219,9 +219,9 @@ void link_subcircs(Circuit * circ)
                 }
                 cout << "Set: " << c->getGate(i)->getName() << endl;
                 c->setGate(n_g,i);
-								//i++;
+                //i++;
                 //delete g;
             }
-		}
-  }
+        }
+    }
 }

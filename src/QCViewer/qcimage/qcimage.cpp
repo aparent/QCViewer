@@ -28,19 +28,20 @@ Authors: Alex Parent
 #include <circuitwidget.h>
 #include <gtkmm.h>
 using namespace std;
-int main (int argc, char *argv[]){
-  Gtk::Main kit(argc, argv);
-  init_fonts();
-  CircuitWidget c;
-	if (argc > 0){
-		c.load(argv[1]);
-	} else {
-		cout << "No circuit file provided" << endl;
-		return 0;
-	}
-	if (argc > 1){
-		c.savepng(argv[2]);
-	} else {
-	}
-	return 0; 
+int main (int argc, char *argv[])
+{
+    Gtk::Main kit(argc, argv);
+    init_fonts();
+    CircuitWidget c;
+    if (argc > 0) {
+        c.load(argv[1]);
+    } else {
+        cout << "No circuit file provided" << endl;
+        return 0;
+    }
+    if (argc > 1) {
+        c.savepng(argv[2]);
+    } else {
+    }
+    return 0;
 }
