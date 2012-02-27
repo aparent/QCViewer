@@ -377,7 +377,7 @@ void drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect &r)
     stringstream ss;
     ss << c->getName();
     if (c-> getLoopCount() > 1) {
-        ss << " x " << c->getLoopCount();
+        ss << " x" << c->getLoopCount();
     }
     //cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents;

@@ -32,6 +32,7 @@ Authors: Alex Parent, Jacob Parker
 #include "utility.h"
 #include "gates/UGateLookup.h"
 #include "circuit.h"
+#include "subcircuit.h"
 
 using namespace std;
 
@@ -46,11 +47,10 @@ gateMatrix getGateMatrix(Gate*);//defined below
 	The application of the gate is left up to the gate class.  This allows per gate class
 	optimization if nessicary. (For a good example of how this works see gates/UGate.cpp
 */
-#include "subcircuit.h"
 State ApplyGate (const State &in, const Gate *g)
 {
     State s = in;
-    for (unsigned int i = 0; i <  g->getLoopCount;  i++) {
+    for (unsigned int i = 0; i <  g->getLoopCount();  i++) {
         for (StateMap::const_iterator it = s.data.begin(); it != s.data.end(); ++it) {
             State tmp = g->applyToBasis(it->first);
             complex<float_type> foo = (*it).second;
