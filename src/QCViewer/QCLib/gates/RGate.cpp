@@ -161,7 +161,7 @@ float_type RGate::get_rotVal () const
 void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects) const
 {
     uint32_t minw, maxw;
-		string name = getName();
+    string name = getName();
     vector<Control> dummy;
     minmaxWire (dummy, targets, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.

@@ -151,8 +151,8 @@ void UGate::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rect
         break;
     case Gate::DEFAULT:
     default:
-			r = drawCU (cr, xcurr);
-      break;
+        r = drawCU (cr, xcurr);
+        break;
     }
     rects.push_back(r);
     maxX = max (maxX, r.width);
@@ -173,7 +173,7 @@ gateRect UGate::drawFred (cairo_t *cr, uint32_t xc) const
     return rect;
 }
 
-gateRect UGate::drawCNOT (cairo_t *cr, uint32_t xc) const 
+gateRect UGate::drawCNOT (cairo_t *cr, uint32_t xc) const
 {
     gateRect rect = drawControls (cr, xc);
     for (uint32_t i = 0; i < targets.size(); i++) {
@@ -183,7 +183,7 @@ gateRect UGate::drawCNOT (cairo_t *cr, uint32_t xc) const
     return rect;
 }
 
-gateRect UGate::drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque) const 
+gateRect UGate::drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque) const
 {
     cairo_set_line_width (cr, thickness);
     // Draw white background
@@ -235,7 +235,7 @@ gateRect UGate::drawX (cairo_t *cr, double xc, double yc, double radius) const
 gateRect UGate::drawCU (cairo_t *cr, uint32_t xc) const
 {
     uint32_t minw, maxw;
-		string name = getName();
+    string name = getName();
     vector<Control> dummy;
     minmaxWire (dummy, targets, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.

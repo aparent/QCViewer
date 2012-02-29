@@ -61,9 +61,6 @@ const double gatePad = 18.0;
 const double textPad = 5.0;
 const double Upad = 0.9;
 
-void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects);
-void drawExpSubcirc(cairo_t *cr,double xcurr,const Subcircuit *subcirc, gateRect &r);
-
 void init_fonts()
 {
     FT_Init_FreeType( &library );
@@ -291,17 +288,6 @@ gateRect drawX (cairo_t *cr, double xc, double yc, double radius)
     return r;
 }
 
-
-gateRect drawCNOT (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
-{
-    gateRect rect = drawControls (cr, xc, ctrl, targ);
-    for (uint32_t i = 0; i < targ.size(); i++) {
-        gateRect recttmp = drawNOT (cr, xc, wireToY(targ[i]), radius);
-        rect = combine_gateRect(rect, recttmp);
-    }
-    return rect;
-}
-
 void drawShowFred (cairo_t *cr, double width, double height)
 {
     double Xrad = min(height/4.3, width/2.0);
@@ -366,88 +352,6 @@ vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)
     return ans;
 }
 
-void drawSubCircBox(cairo_t* cr, const Subcircuit* c, gateRect &r)
-{
-    double dashes[] = { 4.0, 4.0 };
-    cairo_set_dash (cr, dashes, 2, 0.0);
-    cairo_set_line_width (cr, 2);
-    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
-    cairo_stroke (cr);
-    cairo_set_dash (cr, dashes, 0, 0.0);
-    stringstream ss;
-    ss << c->getName();
-    if (c-> getLoopCount() > 1) {
-        ss << " x" << c->getLoopCount();
-    }
-    //cairo_set_font_size(cr, 22);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, ss.str().c_str(), &extents);
-    double x = r.x0;
-    double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
-    cairo_move_to(cr, x, y);
-    cairo_show_text (cr, ss.str().c_str());
-    r.height+=extents.height+10;
-    r.y0-=extents.height+10;
-    if (r.width < extents.width+4) {
-        r.width = extents.width+4;
-    }
-}
-
-
-void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gateRect> &rects)
-{
-    gateRect r;
-    switch (g->drawType) {
-    case Gate::NOT:
-        r = drawCNOT (cr, xcurr, g->controls, g->targets);
-        break;
-    case Gate::FRED:
-        r = drawFred (cr, xcurr, g->controls, g->targets);
-        break;
-    case Gate::D_SUBCIRC:
-        if (((Subcircuit*)g)->expand) {
-            drawExpSubcirc(cr,xcurr,(Subcircuit*)g, r);
-            break;
-        }
-    case Gate::DEFAULT:
-    default:
-        if (g->type == Gate::RGATE) {
-            string lbl = g->getName ();
-            r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
-        } else {
-            r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
-        }
-        break;
-    }
-    rects.push_back(r);
-    maxX = max (maxX, r.width);
-}
-
-void drawExpSubcirc(cairo_t *cr,double xcurr,const Subcircuit *subcirc, gateRect &r)
-{
-    double maxX = 0.0;
-    vector <gateRect>*subRects = new vector<gateRect>;
-    vector<int> para = subcirc->getGreedyParallel();
-    unsigned int currentCol = 0;
-    for(int i = 0; i < subcirc->numGates(); i++) {
-        drawGate(cr,xcurr,maxX,subcirc->getGate(i),*subRects);
-        if(para.size() > currentCol && i == para[currentCol]) {
-            xcurr += maxX;
-            maxX = 0.0;
-            xcurr += gatePad;
-            currentCol++;
-        }
-    }
-    xcurr -= maxX;
-    xcurr -= gatePad;
-    r = (*subRects)[0];
-    for (unsigned int i = 1; i < subRects->size(); i++) {
-        r = combine_gateRect(r,(*subRects)[i]);
-    }
-    drawSubCircBox(cr, subcirc, r);
-    r.subRects = subRects;
-}
-
 vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal)
 {
     vector <gateRect> rects;
@@ -483,7 +387,7 @@ vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, d
         for (; i <= columns[j].lastGateID; i++) {
             Gate* g = c->getGate (i);
             minmaxWire (g->controls, g->targets, mingw, maxgw);
-            drawGate(cr,xcurr,maxX,g,rects);
+            g->draw(cr,xcurr,maxX,rects);
         }
         xcurr += gatePad;
         xcurr += maxX;

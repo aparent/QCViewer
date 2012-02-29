@@ -126,11 +126,11 @@ Circuit* Subcircuit::getCircuit()
 void Subcircuit::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects) const
 {
     gateRect r;
-		if (expand){
-			r = drawExp(cr,xcurr);
-		} else {
-			r = drawBoxed(cr,xcurr);	
-		}
+    if (expand) {
+        r = drawExp(cr,xcurr);
+    } else {
+        r = drawBoxed(cr,xcurr);
+    }
     rects.push_back(r);
     maxX = max (maxX, r.width);
 }
@@ -159,7 +159,7 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     }
     drawSubCircBox(cr, r);
     r.subRects = subRects;
-		return r;
+    return r;
 }
 
 void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
@@ -192,7 +192,7 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
 gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
 {
     uint32_t minw, maxw;
-		string name = getName();
+    string name = getName();
     vector<Control> dummy;
     minmaxWire (dummy, targets, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.
