@@ -28,6 +28,7 @@ Authors: Alex Parent
 #include "subcircuit.h"
 #include "simulate.h"
 #include <iostream> //XXX
+#include "draw_constants.h"
 
 using namespace std;
 
@@ -119,4 +120,112 @@ vector<int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints sp
 Circuit* Subcircuit::getCircuit()
 {
     return circ;
+}
+
+
+void Subcircuit::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects) const
+{
+    gateRect r;
+		if (expand){
+			r = drawExp(cr,xcurr);
+		} else {
+			r = drawBoxed(cr,xcurr);	
+		}
+    rects.push_back(r);
+    maxX = max (maxX, r.width);
+}
+
+gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
+{
+    gateRect r;
+    double maxX = 0.0;
+    vector <gateRect>*subRects = new vector<gateRect>;
+    vector<int> para = getGreedyParallel();
+    unsigned int currentCol = 0;
+    for(int i = 0; i < numGates(); i++) {
+        getGate(i)->draw(cr,xcurr,maxX,*subRects);
+        if(para.size() > currentCol && i == para[currentCol]) {
+            xcurr += maxX;
+            maxX = 0.0;
+            xcurr += gatePad;
+            currentCol++;
+        }
+    }
+    xcurr -= maxX;
+    xcurr -= gatePad;
+    r = (*subRects)[0];
+    for (unsigned int i = 1; i < subRects->size(); i++) {
+        r = combine_gateRect(r,(*subRects)[i]);
+    }
+    drawSubCircBox(cr, r);
+    r.subRects = subRects;
+		return r;
+}
+
+void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
+{
+    double dashes[] = { 4.0, 4.0 };
+    cairo_set_dash (cr, dashes, 2, 0.0);
+    cairo_set_line_width (cr, 2);
+    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+    cairo_stroke (cr);
+    cairo_set_dash (cr, dashes, 0, 0.0);
+    stringstream ss;
+    ss << getName();
+    if (getLoopCount() > 1) {
+        ss << " x" << getLoopCount();
+    }
+    //cairo_set_font_size(cr, 22);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, ss.str().c_str(), &extents);
+    double x = r.x0;
+    double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
+    cairo_move_to(cr, x, y);
+    cairo_show_text (cr, ss.str().c_str());
+    r.height+=extents.height+10;
+    r.y0-=extents.height+10;
+    if (r.width < extents.width+4) {
+        r.width = extents.width+4;
+    }
+}
+
+gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
+{
+    uint32_t minw, maxw;
+		string name = getName();
+    vector<Control> dummy;
+    minmaxWire (dummy, targets, minw, maxw); // only the targets
+    // (XXX) need to do a  check in here re: target wires intermixed with not targets.
+
+    double dw = wireToY(1)-wireToY(0);
+    double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
+    double height = dw*(maxw-minw+Upad);
+
+    // get width of this box
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, name.c_str(), &extents);
+    double width = extents.width+2*textPad;
+    if (width < dw*Upad) {
+        width = dw*Upad;
+    }
+    gateRect rect = drawControls (cr, xc-radius+width/2.0);
+    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
+    cairo_set_source_rgb (cr, 1, 1, 1);
+    cairo_fill(cr);
+    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_set_line_width (cr, thickness);
+    cairo_stroke(cr);
+
+    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
+    double y = yc - extents.height/2 - extents.y_bearing;
+    cairo_move_to(cr, x, y);
+    cairo_show_text (cr, name.c_str());
+    gateRect r;
+    r.x0 = xc - thickness-radius;
+    r.y0 = yc -height/2 - thickness;
+    r.width = width + 2*thickness;
+    r.height = height + 2*thickness;
+    return combine_gateRect(rect, r);
 }

@@ -31,6 +31,8 @@ Authors: Alex Parent, Jacob Parker
 #include <string>
 #include <vector>
 #include "state.h"
+#include "../common.h"
+#include "draw_common.h"
 
 //used to specify a control number and polarity
 class Control
@@ -56,6 +58,7 @@ public:
     enum dType {NOT, FRED, D_SUBCIRC, DEFAULT};
     virtual ~Gate();
     virtual Gate* clone() const=0;
+    virtual void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const=0;
     virtual std::string getName() const=0;
     virtual State applyToBasis(index_t) const=0;
 
@@ -68,6 +71,8 @@ public:
 
 protected:
     unsigned int loop_count;
+		gateRect drawControls (cairo_t *cr,uint32_t xc) const;
+	
 };
 
 //A gate matrix struct for UGate
@@ -85,7 +90,13 @@ public:
     std::string getName() const;
     State applyToBasis(index_t) const;
     void setName(std::string);
+    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
 private:
+		gateRect drawFred (cairo_t *cr, uint32_t xc) const;
+		gateRect drawCNOT (cairo_t *cr, uint32_t xc) const;
+		gateRect drawCU (cairo_t *cr, uint32_t xc) const;
+		gateRect drawX (cairo_t *cr, double xc, double yc, double radius) const;
+		gateRect drawNOT(cairo_t *cr, double xc, double yc, double radius, bool opaque=true) const;
     unsigned int ExtractInput (index_t) const;
     index_t BuildBitString (index_t, unsigned int) const;
     State ApplyU(index_t) const;
@@ -105,6 +116,7 @@ public:
     void set_rotVal (float_type);
     Axis get_axis () const;
     void set_axis (Axis);
+    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
 private:
     float_type rot;
     index_t BuildBitString (index_t, unsigned int) const;

@@ -27,6 +27,7 @@ Authors: Alex Parent, Jacob Parker
 
 #include "gate.h"
 #include "utility.h"
+#include "draw_constants.h"
 
 using namespace std;
 
@@ -44,6 +45,22 @@ unsigned int Gate::getLoopCount() const
     return loop_count;
 }
 
+gateRect Gate::drawControls (cairo_t *cr,uint32_t xc) const
+{
+    uint32_t minw, maxw;
+    minmaxWire (controls, targets, minw, maxw);
+    if (!controls.empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    for (uint32_t i = 0; i < controls.size(); i++) {
+        drawDot (cr, xc, wireToY(controls.at(i).wire), dotradius, controls.at(i).polarity);
+    }
+    gateRect rect;
+    rect.x0 = xc-dotradius;
+    rect.y0 = wireToY(minw)-dotradius;
+    rect.width = 2*dotradius;
+    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
+    return rect;
+}
+
 void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned int &minw, unsigned int &maxw)
 {
     maxw = minw = targ.at(0);
@@ -56,3 +73,5 @@ void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, 
         maxw = max (maxw, ctrl[i].wire);
     }
 }
+
+

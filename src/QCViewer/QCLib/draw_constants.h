@@ -24,39 +24,18 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent
 ---------------------------------------------------------------------*/
 
-#ifndef SUBCIRCUIT_H
-#define SUBCIRCUIT_H
 
-#include "gate.h"
-#include "circuit.h"
-#include <string>
-#include <map>
-//A subcircuit gate contains
-class Subcircuit : public Gate
-{
-public:
-    Subcircuit(Circuit*, const std::map<unsigned int,unsigned int>&,unsigned int);
-    Gate* clone() const;
-    std::string getName() const;
-    void setName(std::string name);
-    State applyToBasis(index_t) const;
-    State applySubcirc(const State&) const;
-    int numGates() const;
-    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
+#ifndef DRAW_CONSTANTS_H
+#define DRAW_CONSTANTS_H
 
-    Gate* getGate(int pos) const;
-    Circuit* getCircuit();
-    std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
-    bool expand;
-protected:
-    std::map<unsigned int,unsigned int> lineMap;
-private:
-		gateRect drawBoxed (cairo_t *cr, uint32_t xc) const;
-		void drawSubCircBox(cairo_t* cr, gateRect &r) const;
-		gateRect drawExp(cairo_t *cr,double xcurr) const;
-    index_t BuildBitString (index_t, unsigned int);
-    Circuit* circ;
-};
-
+const double radius = 15.0;
+const double dotradius = 10.0;
+const double thickness = 2.0;
+const double xoffset = 10.0;
+const double yoffset = 10.0;
+const double wireDist = 40.0;
+const double gatePad = 18.0;
+const double textPad = 5.0;
+const double Upad = 0.9;
 
 #endif

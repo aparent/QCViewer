@@ -24,39 +24,20 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent
 ---------------------------------------------------------------------*/
 
-#ifndef SUBCIRCUIT_H
-#define SUBCIRCUIT_H
 
+#ifndef DRAW_COMMON_H
+#define DRAW_COMMON_H
+
+#include <cairo.h>
+#include <vector>
+#include "types.h"
 #include "gate.h"
-#include "circuit.h"
-#include <string>
-#include <map>
-//A subcircuit gate contains
-class Subcircuit : public Gate
-{
-public:
-    Subcircuit(Circuit*, const std::map<unsigned int,unsigned int>&,unsigned int);
-    Gate* clone() const;
-    std::string getName() const;
-    void setName(std::string name);
-    State applyToBasis(index_t) const;
-    State applySubcirc(const State&) const;
-    int numGates() const;
-    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
+#include "../common.h"
 
-    Gate* getGate(int pos) const;
-    Circuit* getCircuit();
-    std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
-    bool expand;
-protected:
-    std::map<unsigned int,unsigned int> lineMap;
-private:
-		gateRect drawBoxed (cairo_t *cr, uint32_t xc) const;
-		void drawSubCircBox(cairo_t* cr, gateRect &r) const;
-		gateRect drawExp(cairo_t *cr,double xcurr) const;
-    index_t BuildBitString (index_t, unsigned int);
-    Circuit* circ;
-};
-
-
+gateRect combine_gateRect (const gateRect &a, const gateRect &b);
+void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative);
+double wireToY (uint32_t x);
+void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2);
 #endif
+
+

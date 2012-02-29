@@ -413,7 +413,7 @@ void drawGate(cairo_t *cr,double &xcurr,double &maxX,const Gate *g, vector <gate
     default:
         if (g->type == Gate::RGATE) {
             string lbl = g->getName ();
-            r = drawCU (cr, xcurr, lbl, g->controls, g->targets);
+            r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
         } else {
             r = drawCU (cr, xcurr, g->getName(), g->controls, g->targets);
         }

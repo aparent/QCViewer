@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jacob Parker
+Authors: Alex Parent
 ---------------------------------------------------------------------*/
 
 #include "QCParserUtils.h"
@@ -217,10 +217,8 @@ void link_subcircs(Circuit * circ)
                 for(unsigned int j = 0; j < g->targets.size(); j++) {
                     n_g->targets.push_back(g->targets.at(j));
                 }
-                cout << "Set: " << c->getGate(i)->getName() << endl;
                 c->setGate(n_g,i);
-                //i++;
-                //delete g;
+                delete g;
             }
         }
     }

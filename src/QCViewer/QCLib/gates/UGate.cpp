@@ -31,6 +31,7 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/utility.h"
 #include <complex>
 #include <iostream>
+#include "QCLib/draw_constants.h"
 
 using namespace std;
 
@@ -136,4 +137,138 @@ index_t UGate::BuildBitString (index_t orig, unsigned int ans) const
         }
     }
     return output;
+}
+
+void UGate::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects) const
+{
+    gateRect r;
+    switch (drawType) {
+    case NOT:
+        r = drawCNOT (cr, xcurr);
+        break;
+    case FRED:
+        r = drawFred (cr, xcurr);
+        break;
+    case Gate::DEFAULT:
+    default:
+			r = drawCU (cr, xcurr);
+      break;
+    }
+    rects.push_back(r);
+    maxX = max (maxX, r.width);
+}
+
+gateRect UGate::drawFred (cairo_t *cr, uint32_t xc) const
+{
+    gateRect rect = drawControls (cr, xc);
+    uint32_t minw = targets.at(0);
+    uint32_t maxw = targets.at(0);
+    for (uint32_t i = 0; i < targets.size(); i++) {
+        gateRect recttmp = drawX (cr, xc, wireToY(targets.at(i)), radius);
+        rect = combine_gateRect(rect, recttmp);
+        minw = min (minw, targets.at(i));
+        maxw = max (maxw, targets.at(i));
+    }
+    if (controls.empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    return rect;
+}
+
+gateRect UGate::drawCNOT (cairo_t *cr, uint32_t xc) const 
+{
+    gateRect rect = drawControls (cr, xc);
+    for (uint32_t i = 0; i < targets.size(); i++) {
+        gateRect recttmp = drawNOT (cr, xc, wireToY(targets.at(i)), radius);
+        rect = combine_gateRect(rect, recttmp);
+    }
+    return rect;
+}
+
+gateRect UGate::drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque) const 
+{
+    cairo_set_line_width (cr, thickness);
+    // Draw white background
+    if (opaque) {
+        cairo_set_source_rgb (cr, 1, 1, 1);
+        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
+        cairo_fill (cr);
+    }
+    // Draw black border
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
+    cairo_stroke (cr);
+
+    // Draw cross
+    cairo_move_to (cr, xc-radius, yc);
+    cairo_line_to (cr, xc+radius, yc);
+    cairo_stroke (cr);
+    cairo_move_to (cr, xc, yc-radius);
+    cairo_line_to (cr, xc, yc+radius);
+    cairo_stroke (cr);
+
+    gateRect r;
+    r.x0 = xc-radius-thickness;
+    r.y0 = yc-radius-thickness;
+    r.width = 2*(radius+thickness);
+    r.height = r.width;
+    return r;
+}
+
+gateRect UGate::drawX (cairo_t *cr, double xc, double yc, double radius) const
+{
+    // Draw cross
+    radius = radius*sqrt(2)/2;
+    cairo_move_to (cr, xc-radius, yc-radius);
+    cairo_line_to (cr, xc+radius, yc+radius);
+    cairo_stroke (cr);
+    cairo_move_to (cr, xc+radius, yc-radius);
+    cairo_line_to (cr, xc-radius, yc+radius);
+    cairo_stroke (cr);
+
+    gateRect r;
+    r.x0 = xc-radius-thickness;
+    r.y0 = yc-radius-thickness;
+    r.width = 2*(radius+thickness);
+    r.height = r.width;
+    return r;
+}
+
+gateRect UGate::drawCU (cairo_t *cr, uint32_t xc) const
+{
+    uint32_t minw, maxw;
+		string name = getName();
+    vector<Control> dummy;
+    minmaxWire (dummy, targets, minw, maxw); // only the targets
+    // (XXX) need to do a  check in here re: target wires intermixed with not targets.
+
+    double dw = wireToY(1)-wireToY(0);
+    double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
+    double height = dw*(maxw-minw+Upad);
+
+    // get width of this box
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, name.c_str(), &extents);
+    double width = extents.width+2*textPad;
+    if (width < dw*Upad) {
+        width = dw*Upad;
+    }
+    gateRect rect = drawControls (cr, xc-radius+width/2.0);
+    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
+    cairo_set_source_rgb (cr, 1, 1, 1);
+    cairo_fill(cr);
+    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_set_line_width (cr, thickness);
+    cairo_stroke(cr);
+
+    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
+    double y = yc - extents.height/2 - extents.y_bearing;
+    cairo_move_to(cr, x, y);
+    cairo_show_text (cr, name.c_str());
+    gateRect r;
+    r.x0 = xc - thickness-radius;
+    r.y0 = yc -height/2 - thickness;
+    r.width = width + 2*thickness;
+    r.height = height + 2*thickness;
+    return combine_gateRect(rect, r);
 }

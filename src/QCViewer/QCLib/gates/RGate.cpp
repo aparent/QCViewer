@@ -28,6 +28,7 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/utility.h"
 #include <cmath>
 #include <complex>
+#include "QCLib/draw_constants.h"
 
 using namespace std;
 
@@ -157,3 +158,44 @@ float_type RGate::get_rotVal () const
     return rot;
 }
 
+void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects) const
+{
+    uint32_t minw, maxw;
+		string name = getName();
+    vector<Control> dummy;
+    minmaxWire (dummy, targets, minw, maxw); // only the targets
+    // (XXX) need to do a  check in here re: target wires intermixed with not targets.
+
+    double dw = wireToY(1)-wireToY(0);
+    double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
+    double height = dw*(maxw-minw+Upad);
+
+    // get width of this box
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, name.c_str(), &extents);
+    double width = extents.width+2*textPad;
+    if (width < dw*Upad) {
+        width = dw*Upad;
+    }
+    gateRect rect = drawControls (cr, xc-radius+width/2.0);
+    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
+    cairo_set_source_rgb (cr, 1, 1, 1);
+    cairo_fill(cr);
+    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_set_line_width (cr, thickness);
+    cairo_stroke(cr);
+
+    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
+    double y = yc - extents.height/2 - extents.y_bearing;
+    cairo_move_to(cr, x, y);
+    cairo_show_text (cr, name.c_str());
+    gateRect r;
+    r.x0 = xc - thickness-radius;
+    r.y0 = yc -height/2 - thickness;
+    r.width = width + 2*thickness;
+    r.height = height + 2*thickness;
+    rects.push_back(combine_gateRect(rect, r));
+    maxX = max (maxX, r.width);
+}
