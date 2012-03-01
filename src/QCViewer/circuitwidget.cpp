@@ -59,6 +59,16 @@ CircuitWidget::CircuitWidget()
     signal_motion_notify_event().connect (sigc::mem_fun(*this, &CircuitWidget::onMotionEvent));
     wirestart = wireend = 0;
     selecting = false;
+    ft_default = init_fonts();
+}
+
+cairo_font_face_t * CircuitWidget::init_fonts()
+{
+    FT_Library library;
+    FT_Face ft_face;
+    FT_Init_FreeType( &library );
+    FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
+    return cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 
 void CircuitWidget::set_window (Gtk::Window *w)
@@ -388,7 +398,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit != NULL) {
-            rects = draw_circuit (circuit, cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selections);
+            rects = circuit->draw (cr->cobj(), layout, drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
             generate_layout_rects ();
             for (unsigned int i = 0; i < NextGateToSimulate; i++) {
                 drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
@@ -494,12 +504,11 @@ void CircuitWidget::savepng (string filename)
 {
     if (!circuit) return;
     double wirestart, wireend;
-    cairo_rectangle_t ext = get_circuit_size (circuit, layout, &wirestart, &wireend, 1.0);
-
+    cairo_rectangle_t ext = circuit->get_circuit_size (layout, &wirestart, &wireend, 1.0,ft_default);
     cairo_surface_t* surface = make_png_surface (ext);
     cairo_t* cr = cairo_create (surface);
     cairo_set_source_surface (cr, surface, 0, 0);
-    draw_circuit (circuit, cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, vector<Selection>());
+    circuit->draw( cr, layout, drawarch, drawparallel,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
     write_to_png (surface, filename);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
@@ -509,11 +518,11 @@ void CircuitWidget::savesvg (string filename)
 {
     if (!circuit) return;
     double wirestart, wireend;
-    cairo_rectangle_t ext = get_circuit_size (circuit, layout, &wirestart, &wireend, 1.0);
+    cairo_rectangle_t ext = circuit->get_circuit_size (layout, &wirestart, &wireend, 1.0, ft_default);
     cairo_surface_t* surface = make_svg_surface (filename, ext);
     cairo_t* cr = cairo_create (surface);
     cairo_set_source_surface (cr, surface, 0, 0);
-    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>());
+    circuit->draw(cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
 }
@@ -522,11 +531,11 @@ void CircuitWidget::saveps (string filename)
 {
     if (!circuit) return;
     double wirestart, wireend;
-    cairo_rectangle_t ext = get_circuit_size (circuit, layout, &wirestart, &wireend, 1.0);
+    cairo_rectangle_t ext = circuit->get_circuit_size (layout, &wirestart, &wireend, 1.0,ft_default);
     cairo_surface_t* surface = make_ps_surface (filename, ext);
     cairo_t* cr = cairo_create(surface);
     cairo_set_source_surface (cr, surface, 0,0);
-    draw_circuit (circuit, cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>());
+    circuit->draw(cr, layout, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
 }
@@ -535,7 +544,7 @@ void CircuitWidget::set_scale (double x)
 {
     if (!circuit) return;
     scale = x;
-    ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+    ext = circuit->get_circuit_size (layout, &wirestart, &wireend, scale, ft_default);
     force_redraw ();
 }
 
@@ -634,7 +643,7 @@ void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 {
     for (unsigned int j = column_id; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate(g, layout[column_id].lastGateID - 1);
-    ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+    ext = circuit->get_circuit_size (layout, &wirestart, &wireend, scale, ft_default);
     force_redraw ();
     selections.clear ();
     selections.push_back(layout[column_id].lastGateID - 1);
@@ -646,7 +655,7 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
     for (unsigned int j = 0; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate(g, 0);
     layout.insert(layout.begin(), LayoutColumn (0,0));
-    ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+    ext = circuit->get_circuit_size (layout, &wirestart, &wireend, scale, ft_default);
     force_redraw ();
     selections.clear ();
     selections.push_back(0);
@@ -663,7 +672,7 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x)
     for (unsigned int j = i + 1; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate (g, pos);
     layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0));
-    ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+    ext = circuit->get_circuit_size (layout, &wirestart, &wireend, scale, ft_default);
     force_redraw ();
     selections.clear ();
     selections.push_back (pos);
@@ -690,7 +699,7 @@ void CircuitWidget::delete_gate (unsigned int id)
     }
     for (; i < layout.size (); i++) layout[i].lastGateID -= 1;
     circuit->removeGate (id);
-    ext = get_circuit_size (circuit, layout, &wirestart, &wireend, scale);
+    ext = circuit->get_circuit_size (layout, &wirestart, &wireend, scale, ft_default);
     force_redraw ();
 }
 
@@ -700,7 +709,7 @@ void CircuitWidget::generate_layout_rects ()
     if (!circuit || circuit->numGates () == 0) return;
     unsigned int start_gate = 0;
     for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
-        gateRect bounds = rects[start_gate];
+        gateRect bounds = rects.at(start_gate);
         for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID ; gate++) {
             bounds = combine_gateRect(bounds, rects[gate]);
         }

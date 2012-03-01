@@ -35,28 +35,18 @@ Authors: Alex Parent, Jacob Parker
 
 #include "QCLib/circuit.h"
 #include "common.h"
+#include "QCLib/draw_common.h"
 
 
-class Colour
-{
-public:
-    Colour () : r(0.0),g(0.0),b(0.0),a(0.0) {}
-    Colour (double rr, double gg, double bb, double aa) : r(rr), g(gg), b(bb), a(aa) {}
-    double r, g, b, a;
-};
 
 void init_fonts();
 cairo_rectangle_t get_circuit_size (Circuit *c, std::vector<LayoutColumn>&, double* wirestart, double* wireend, double scale);
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext);
 cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
 cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t);
-std::vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, std::vector<LayoutColumn>&, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection>&);
 void write_to_png (cairo_surface_t* surf, std::string filename);
 void pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
 std::vector<Selection> pickRects (const std::vector<gateRect> &rects, const gateRect &s);
-void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
-gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 int pickWire (double);
-double wireToY (uint32_t);
 
 #endif // DRAW__INCLUDED

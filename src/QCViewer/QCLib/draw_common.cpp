@@ -74,3 +74,13 @@ void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
     cairo_line_to (cr, x2, y2);
     cairo_stroke (cr);
 }
+
+void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill)
+{
+    cairo_set_source_rgba (cr, fill.r, fill.g, fill.b, fill.a);
+    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+    cairo_fill (cr);
+    cairo_set_source_rgba (cr, outline.r, outline.g, outline.b, outline.a);
+    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
+    cairo_stroke (cr);
+}

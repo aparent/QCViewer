@@ -126,6 +126,9 @@ private:
     double cx, cy;
 
     uint32_t getFirstWire (double);
+
+    cairo_font_face_t * init_fonts();
+    cairo_font_face_t * ft_default;
 };
 
 #endif

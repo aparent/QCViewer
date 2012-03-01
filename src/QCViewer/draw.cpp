@@ -68,11 +68,6 @@ void init_fonts()
     ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 
-double wireToY (uint32_t x)
-{
-    return yoffset+(x+1)*wireDist;
-}
-
 int pickWire (double y)
 {
     if (y < yoffset+wireDist/2) return -1;
@@ -80,16 +75,6 @@ int pickWire (double y)
     int wire = floor((y-yoffset)/wireDist - 1);
     if ((double)(y - wireToY (wire)) > wireDist/2) return wire + 1;
     return wire;
-}
-
-
-void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
-{
-    cairo_set_line_width (cr, thickness);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_move_to (cr, x1, y1);
-    cairo_line_to (cr, x2, y2);
-    cairo_stroke (cr);
 }
 
 //for parallism wires
@@ -101,44 +86,6 @@ void drawPWire (cairo_t *cr, double x, int numLines)
     cairo_line_to (cr, x, wireToY(numLines-1));
     cairo_stroke (cr);
     cairo_set_source_rgb (cr, 0, 0, 0);
-}
-
-void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill)
-{
-    cairo_set_source_rgba (cr, fill.r, fill.g, fill.b, fill.a);
-    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
-    cairo_fill (cr);
-    cairo_set_source_rgba (cr, outline.r, outline.g, outline.b, outline.a);
-    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
-    cairo_stroke (cr);
-}
-
-gateRect combine_gateRect (const gateRect &a, const gateRect &b)
-{
-    gateRect c;
-    c.x0 = min(a.x0, b.x0);
-    c.y0 = min(a.y0, b.y0);
-    c.width =  max (a.x0-c.x0 + a.width,  b.x0 - c.x0 + b.width);
-    c.height = max (a.y0-c.y0 + a.height, b.y0 - c.y0 + b.height);
-    return c;
-}
-
-
-void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative)
-{
-    if (negative) {
-        cairo_set_source_rgb (cr, 1, 1, 1);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-        cairo_set_source_rgb (cr, 0, 0, 0);
-        cairo_set_line_width(cr, thickness);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_stroke (cr);
-    } else {
-        cairo_set_source_rgb (cr, 0, 0, 0);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-    }
 }
 
 gateRect drawControls (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
@@ -172,46 +119,6 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     double y = (1.0/scale)*(yc) - (1.0/2.0)*extents.y_bearing;
     cairo_move_to (cr, x, y);
     cairo_show_text (cr, name.c_str());
-}
-
-gateRect drawCU (cairo_t *cr, uint32_t xc, string name, const vector<Control> &ctrl, const vector<uint32_t> &targ)
-{
-    uint32_t minw, maxw;
-    vector<Control> dummy;
-    minmaxWire (dummy, targ, minw, maxw); // only the targets
-    // (XXX) need to do a  check in here re: target wires intermixed with not targets.
-
-    double dw = wireToY(1)-wireToY(0);
-    double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
-    double height = dw*(maxw-minw+Upad);
-
-    // get width of this box
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, name.c_str(), &extents);
-    double width = extents.width+2*textPad;
-    if (width < dw*Upad) {
-        width = dw*Upad;
-    }
-    gateRect rect = drawControls (cr, xc-radius+width/2.0, ctrl, targ);
-    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_fill(cr);
-    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_set_line_width (cr, thickness);
-    cairo_stroke(cr);
-
-    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
-    double y = yc - extents.height/2 - extents.y_bearing;
-    cairo_move_to(cr, x, y);
-    cairo_show_text (cr, name.c_str());
-    gateRect r;
-    r.x0 = xc - thickness-radius;
-    r.y0 = yc -height/2 - thickness;
-    r.width = width + 2*thickness;
-    r.height = height + 2*thickness;
-    return combine_gateRect(rect, r);
 }
 
 gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=true)
@@ -352,101 +259,6 @@ vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)
     return ans;
 }
 
-vector<gateRect> draw (cairo_t *cr, Circuit* c, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal)
-{
-    vector <gateRect> rects;
-    cairo_set_source_rgb (cr, 0, 0, 0);
-
-    // input labels
-    double xinit = 0.0;
-    for (uint32_t i = 0; i < c->numLines(); i++) {
-        string label = c->getLine(i).getInputLabel();
-        cairo_text_extents_t extents;
-        cairo_text_extents(cr, label.c_str(), &extents);
-
-        double x = 0, y = 0;
-        if (forreal) {
-            x = *wirestart - extents.width;
-            y = wireToY(i) - (extents.height/2 + extents.y_bearing);
-        }
-        cairo_move_to (cr, x, y);
-        cairo_show_text (cr, label.c_str());
-        xinit = max (xinit, extents.width);
-    }
-
-    if (!forreal) *wirestart = xinit;
-
-    // gates
-    double xcurr = xinit+2.0*gatePad;
-    uint32_t mingw, maxgw;
-    uint32_t i = 0;
-    double maxX;
-    if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
-    for (uint32_t j = 0; j < columns.size(); j++) {
-        maxX = 0.0;
-        for (; i <= columns[j].lastGateID; i++) {
-            Gate* g = c->getGate (i);
-            minmaxWire (g->controls, g->targets, mingw, maxgw);
-            g->draw(cr,xcurr,maxX,rects);
-        }
-        xcurr += gatePad;
-        xcurr += maxX;
-    }
-    xcurr -= maxX;
-    xcurr += gatePad;
-    gateRect fullCirc;
-    if (rects.size() > 0) {
-        fullCirc = rects[0];
-        for (unsigned int i = 1; i < rects.size(); i++) {
-            fullCirc = combine_gateRect(fullCirc,rects[i]);
-        }
-    }
-    *wireend = *wirestart + fullCirc.width + gatePad*2;
-
-    // output labels
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    for (uint32_t i = 0; i < c->numLines (); i++) {
-        string label = c->getLine (i).getOutputLabel();
-        cairo_text_extents_t extents;
-        cairo_text_extents (cr, label.c_str(), &extents);
-
-        double x, y;
-        x = *wireend + xoffset;
-        y = wireToY(i) - (extents.height/2+extents.y_bearing);
-        cairo_move_to (cr, x, y);
-        cairo_show_text (cr, label.c_str());
-    }
-    return rects;
-}
-
-
-void drawArchitectureWarnings (cairo_t* cr, const vector<gateRect> &rects, const vector<int> &badGates)
-{
-    for (uint32_t i = 0; i < badGates.size(); i++) {
-        drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
-    }
-}
-
-void drawParallelSectionMarkings (cairo_t* cr, const vector<gateRect> &rects, int numLines, const vector<int> &pLines)
-{
-    for (uint32_t i = 0; i < pLines.size() - 1; i++) {
-        int gateNum = pLines[i];
-        double x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
-        drawPWire (cr, x, numLines);
-    }
-}
-
-void drawSelections (cairo_t* cr, const vector<gateRect> &rects, const vector<Selection> &selections)
-{
-    for (uint32_t i = 0; i < (uint32_t)selections.size (); i++) {
-        drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
-        if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
-            drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
-        }
-    }
-}
-
-
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext)
 {
     cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
@@ -466,22 +278,6 @@ cairo_surface_t* make_ps_surface (string file, cairo_rectangle_t ext)
     return img_surface;
 }
 
-cairo_rectangle_t get_circuit_size (Circuit *c, vector<LayoutColumn>& columns, double* wirestart, double* wireend, double scale)
-{
-    cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
-    cairo_t *cr = cairo_create(unbounded_rec_surface);
-    cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
-    cairo_scale (cr, scale, scale);
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-    draw (cr, c, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
-    cairo_rectangle_t ext;
-    cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
-    cairo_destroy (cr);
-    cairo_surface_destroy (unbounded_rec_surface);
-    return ext;
-}
-
 void write_to_png (cairo_surface_t* surf, string filename)
 {
     cairo_status_t status = cairo_surface_write_to_png (surf, filename.c_str());
@@ -491,26 +287,3 @@ void write_to_png (cairo_surface_t* surf, string filename)
     }
 }
 
-
-vector<gateRect> draw_circuit (Circuit *c, cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections)
-{
-    cairo_scale (cr, scale, scale);
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-
-    vector<gateRect> rects;
-    //Push the gate drawing into a group so that wireend can be determined and wires can be drawn first
-    cairo_push_group (cr);
-    rects = draw (cr, c, columns, &wirestart, &wireend, true);
-    cairo_pattern_t *group = cairo_pop_group (cr);
-    drawbase (cr, c, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
-    cairo_set_source (cr, group);
-    //Draw the gates
-    cairo_paint(cr);
-    cairo_pattern_destroy (group);
-    if (drawParallel) drawParallelSectionMarkings (cr, rects, c->numLines(),c->getParallel());
-    if (drawArch) drawArchitectureWarnings (cr, rects, c->getArchWarnings());
-    if (!selections.empty()) drawSelections (cr, rects, selections);
-
-    return rects;
-}

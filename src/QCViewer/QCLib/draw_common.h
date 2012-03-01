@@ -34,10 +34,19 @@ Authors: Alex Parent
 #include "gate.h"
 #include "../common.h"
 
+class Colour
+{
+public:
+    Colour () : r(0.0),g(0.0),b(0.0),a(0.0) {}
+    Colour (double rr, double gg, double bb, double aa) : r(rr), g(gg), b(bb), a(aa) {}
+    double r, g, b, a;
+};
+
 gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative);
 double wireToY (uint32_t x);
 void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2);
+void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
 #endif
 
 

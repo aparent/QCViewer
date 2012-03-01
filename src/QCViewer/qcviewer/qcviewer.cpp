@@ -33,8 +33,8 @@ int main (int argc, char *argv[])
 {
     Gtk::Main kit(argc, argv);
 
-    UGateSetup();
     init_fonts();
+    UGateSetup();
     QCViewer window;
     window.set_default_size (800,600);
     std::cerr << "Running window\n";
