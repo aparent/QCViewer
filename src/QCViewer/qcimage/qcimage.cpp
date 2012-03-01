@@ -25,22 +25,24 @@ Authors: Alex Parent
 ---------------------------------------------------------------------*/
 #include <iostream>
 #include <QCLib/circuitParser.h>
-#include <circuitwidget.h>
-#include <gtkmm.h>
+#include <cairo-ft.h>
 using namespace std;
 int main (int argc, char *argv[])
 {
-    Gtk::Main kit(argc, argv);
-    init_fonts();
-    CircuitWidget c;
+    Circuit* c;
     if (argc > 0) {
-        c.load(argv[1]);
+        c = parseCircuit(argv[1]);
     } else {
         cout << "No circuit file provided" << endl;
         return 0;
     }
-    if (argc > 1) {
-        c.savepng(argv[2]);
+    if (argc > 2) {
+        FT_Library library;
+        FT_Face ft_face;
+        FT_Init_FreeType( &library );
+        FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
+        cairo_font_face_t * ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+        c->savepng(argv[2],ft_default);
     } else {
     }
     return 0;

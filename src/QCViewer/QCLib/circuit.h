@@ -99,7 +99,7 @@ public:
     void arch_set_LNN();
 
     std::vector<int> getParallel() const;  //Returns a std::vector of ints specifying the last gate in each parallel block.
-    std::vector<int> getGreedyParallel () const; // used for drawing gates in the same column
+    std::vector<int> getGreedyParallel (); // used for drawing gates in the same column
     std::vector<int> getArchWarnings () const;
     std::vector<int> column_breaks;
 
@@ -110,21 +110,22 @@ public:
     QArch *arch;
 
 
-    std::vector<gateRect> draw (cairo_t* cr, std::vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection> &selections,cairo_font_face_t * ft_default) const;
-    cairo_rectangle_t get_circuit_size (std::vector<LayoutColumn>& columns, double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const;
-    //void savepng (std::string filename, cairo_font_face_t * ft_default) const;
+    std::vector<gateRect> draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection> &selections,cairo_font_face_t * ft_default) const;
+    cairo_rectangle_t get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const;
+    void savepng (std::string filename, cairo_font_face_t * ft_default);
 private:
     std::string name;
     std::vector <Gate*>           gates;
     std::vector <Line>            lines;
+    std::vector <LayoutColumn>    columns;
 
-    std::vector<gateRect> draw_circ (cairo_t *cr, std::vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) const;
+    std::vector<gateRect> draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const;
     void drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const;
     void drawParallelSectionMarkings (cairo_t* cr, const std::vector<gateRect> &rects, int numLines, const std::vector<int> &pLines) const;
     void drawArchitectureWarnings (cairo_t* cr, const std::vector<gateRect> &rects, const std::vector<int> &badGates) const;
     void drawSelections (cairo_t* cr, const std::vector<gateRect> &rects, const std::vector<Selection> &selections) const;
     void drawPWire (cairo_t *cr, double x, int numLines) const;
-    //void write_to_png (cairo_surface_t* surf, std::string filename) const;
+    void write_to_png (cairo_surface_t* surf, std::string filename) const;
 };
 
 

@@ -190,7 +190,7 @@ start:
 }
 
 // TODO: this is pretty akward to have outside the drawing code. Reorganize?
-vector<int> Circuit::getGreedyParallel() const
+vector<int> Circuit::getGreedyParallel()
 {
     vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
     sort (parallel.begin (), parallel.end ());
@@ -221,6 +221,10 @@ start:
     }
     sort (returnValue.begin (), returnValue.end ()); // TODO: needed?
 //  returnValue.push_back (numGates()-1); // for convenience.
+    columns.clear ();
+    for (unsigned int i = 0; i < returnValue.size(); i++) {
+        columns.push_back (LayoutColumn(returnValue[i], 0.0));
+    }
     return returnValue;
 }
 
@@ -288,7 +292,7 @@ string Circuit::getName()
 }
 
 
-vector<gateRect> Circuit::draw (cairo_t* cr, vector<LayoutColumn>& columns, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default) const
+vector<gateRect> Circuit::draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default) const
 {
     cairo_scale (cr, scale, scale);
     cairo_set_font_face (cr,ft_default);
@@ -297,7 +301,7 @@ vector<gateRect> Circuit::draw (cairo_t* cr, vector<LayoutColumn>& columns, bool
     vector<gateRect> rects;
     //Push the gate drawing into a group so that wireend can be determined and wires can be drawn first
     cairo_push_group (cr);
-    rects = draw_circ (cr, columns, &wirestart, &wireend, true);
+    rects = draw_circ (cr, &wirestart, &wireend, true);
     cairo_pattern_t *group = cairo_pop_group (cr);
     drawbase (cr, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
     cairo_set_source (cr, group);
@@ -311,7 +315,7 @@ vector<gateRect> Circuit::draw (cairo_t* cr, vector<LayoutColumn>& columns, bool
     return rects;
 }
 
-vector<gateRect> Circuit::draw_circ (cairo_t *cr, vector<LayoutColumn>& columns, double *wirestart, double *wireend, bool forreal) const
+vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const
 {
     vector <gateRect> rects;
     cairo_set_source_rgb (cr, 0, 0, 0);
@@ -427,7 +431,7 @@ void Circuit::drawSelections (cairo_t* cr, const vector<gateRect> &rects, const 
     }
 }
 
-cairo_rectangle_t Circuit::get_circuit_size (std::vector<LayoutColumn>& columns, double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const
+cairo_rectangle_t Circuit::get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const
 {
     cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
     cairo_t *cr = cairo_create(unbounded_rec_surface);
@@ -435,7 +439,7 @@ cairo_rectangle_t Circuit::get_circuit_size (std::vector<LayoutColumn>& columns,
     cairo_scale (cr, scale, scale);
     cairo_set_font_face (cr,ft_default);
     cairo_set_font_size(cr, 18);
-    draw_circ (cr, columns, wirestart, wireend, false); // XXX fix up these inefficienies!!
+    draw_circ (cr, wirestart, wireend, false); // XXX fix up these inefficienies!!
     cairo_rectangle_t ext;
     cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
     cairo_destroy (cr);
@@ -443,15 +447,15 @@ cairo_rectangle_t Circuit::get_circuit_size (std::vector<LayoutColumn>& columns,
     return ext;
 }
 
-/* ADD LAYOUT TO CIRCUIT CLASS FIRST
-void Circuit::savepng (string filename, cairo_font_face_t * ft_default) const
+void Circuit::savepng (string filename, cairo_font_face_t * ft_default)
 {
     double wirestart, wireend;
-    cairo_rectangle_t ext = get_circuit_size (layout, &wirestart, &wireend, 1.0,ft_default);
-    cairo_surface_t* surface = make_png_surface (ext);
+    getGreedyParallel();
+    cairo_rectangle_t ext = get_circuit_size (&wirestart, &wireend, 1.0,ft_default);
+    cairo_surface_t* surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
     cairo_t* cr = cairo_create (surface);
     cairo_set_source_surface (cr, surface, 0, 0);
-    draw( cr, layout, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
+    draw( cr, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
     write_to_png (surface, filename);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
@@ -465,4 +469,3 @@ void Circuit::write_to_png (cairo_surface_t* surf, string filename) const
         return;
     }
 }
-*/
