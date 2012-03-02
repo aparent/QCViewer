@@ -61,6 +61,7 @@ comment #.*
 "\n"								return TOKEN(NEWLINE);
 "NAME"							BEGIN(TEXT); return TOKEN(NAME); 
 "SYMBOL"						BEGIN(TEXT); return TOKEN(SYMBOL); 
+"COST"							return TOKEN(COST); 
 <TEXT>{word}				BEGIN(INITIAL); SAVE_TOKEN; return WORD;
 "sqrt"							return TOKEN(SQRT);
 {num}								SAVE_TOKEN; return NUM;

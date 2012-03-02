@@ -52,4 +52,6 @@ S1 a b d c
 GroverIterate^1 a b c d e Workspace 
 tof a b c d
 S1 b c d e 
+TOF a b c d
+NOT b c d e
 END

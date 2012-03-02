@@ -97,9 +97,9 @@ void Circuit::setGate(Gate *newGate, unsigned int pos)
 
 void Circuit::removeGate (unsigned int pos)
 {
-   delete gates[pos];
-   gates.erase (gates.begin () + pos);
-   getGreedyParallel();
+    delete gates[pos];
+    gates.erase (gates.begin () + pos);
+    getGreedyParallel();
 }
 
 Gate* Circuit::getGate(int pos) const
@@ -348,18 +348,18 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     uint32_t i = 0;
     double maxX = 0;
     if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
-		if (numGates()>0){
-    for (uint32_t j = 0; j < columns.size(); j++) {
-        maxX = 0.0;
-        for (; i <= columns.at(j).lastGateID; i++) {
-            Gate* g = getGate (i);
-            minmaxWire (g->controls, g->targets, mingw, maxgw);
-            g->draw(cr,xcurr,maxX,rects);
+    if (numGates()>0) {
+        for (uint32_t j = 0; j < columns.size(); j++) {
+            maxX = 0.0;
+            for (; i <= columns.at(j).lastGateID; i++) {
+                Gate* g = getGate (i);
+                minmaxWire (g->controls, g->targets, mingw, maxgw);
+                g->draw(cr,xcurr,maxX,rects);
+            }
+            xcurr += gatePad;
+            xcurr += maxX;
         }
-        xcurr += gatePad;
-        xcurr += maxX;
     }
-		}
     xcurr -= maxX;
     xcurr += gatePad;
     gateRect fullCirc;

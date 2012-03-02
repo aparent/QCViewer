@@ -56,7 +56,7 @@ Authors: Alex Parent, Jacob Parker
 %output "GateParser.cpp"
 
 %token NAME WORD NUM COMMA NEWLINE LPAREN RPAREN
-%token SYMBOL
+%token SYMBOL COST
 
 %left MINUS PLUS
 %left TIMES DIV

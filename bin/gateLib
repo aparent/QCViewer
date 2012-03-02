@@ -36,12 +36,12 @@ SYMBOL T*
 0 , 1/sqrt(2) - i*1/sqrt(2)
 
 NAME TGate
-SYMBOL V
+SYMBOL P
 1 , 0
 0 , i
 
 NAME TGate
-SYMBOL V*
+SYMBOL P*
 1 , 0
 0 , -i
 

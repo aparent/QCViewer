@@ -137,10 +137,15 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         return;
     }
     Gate *newGate = NULL;
-    if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) || (gateName.compare("tof") == 0)|| (gateName.compare("not") == 0) ) {
+    if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) ||
+            (sToUpper(gateName).compare("TOF") == 0)||
+            (sToUpper(gateName).compare("NOT") == 0)||
+            (sToUpper(gateName).compare("CNOT") == 0)) {
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
-    } else if (gateName[0] == 'F'||gateName[0] == 'f') {
+    } else if (gateName[0] == 'F'||gateName[0] == 'f'||
+               (sToUpper(gateName).compare("FRE") == 0)||
+               (sToUpper(gateName).compare("SWAP") == 0)) {
         newGate = new UGate("F");
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
