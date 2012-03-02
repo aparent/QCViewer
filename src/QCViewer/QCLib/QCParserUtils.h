@@ -39,7 +39,7 @@ public:
     bool neg;
     name_node *next;
 };
-
+void cleanup_bad_gates(Circuit * c);
 void add_lines (Circuit * circ, name_node *names);
 void add_inputs (Circuit * circ, name_node *names);
 void add_outputs (Circuit * circ, name_node *names);

@@ -34,3 +34,14 @@ NAME TGate
 SYMBOL T*
 1 , 0
 0 , 1/sqrt(2) - i*1/sqrt(2)
+
+NAME TGate
+SYMBOL V
+1 , 0
+0 , i
+
+NAME TGate
+SYMBOL V*
+1 , 0
+0 , -i
+

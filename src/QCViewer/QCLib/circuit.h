@@ -91,10 +91,8 @@ public:
     Gate* getGate(int pos) const;
     unsigned int numGates() const; //Returns the number of gates
     void swapGate (unsigned int, unsigned int);
-    void removeGates();
 
     void newArch ();
-    void removeArch ();
     void parseArch (std::string);
     void arch_set_LNN();
 
@@ -105,10 +103,7 @@ public:
 
     std::map<std::string,Circuit*> subcircuits;
 
-    void removeSubcircuits();
-
     QArch *arch;
-
 
     std::vector<gateRect> draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection> &selections,cairo_font_face_t * ft_default) const;
     cairo_rectangle_t get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const;
@@ -126,6 +121,13 @@ private:
     void drawSelections (cairo_t* cr, const std::vector<gateRect> &rects, const std::vector<Selection> &selections) const;
     void drawPWire (cairo_t *cr, double x, int numLines) const;
     void write_to_png (cairo_surface_t* surf, std::string filename) const;
+
+    //for deconstructor
+    void removeSubcircuits();
+    void removeArch ();
+    void removeGates();
+
+
 };
 
 

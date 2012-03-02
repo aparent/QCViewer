@@ -3,10 +3,10 @@
 .i first,second,third,fourth,fifth
 .o first,second,third,fourth,fifth
 BEGIN
-t0 first third test #unknown wire
 t1 first,first #double wire ref
 t3 first,second,third,fourth
 f first,second,fourth
 t1 first,fourth
 H second
+R(X5.6) s s f
 END

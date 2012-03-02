@@ -54,7 +54,7 @@ Gate* UGate::clone() const
 string UGate::getName() const
 {
     if (drawType == NOT) {
-        return "T"+intToString(controls.size());
+        return "tof";
     } else {
         return name;
     }

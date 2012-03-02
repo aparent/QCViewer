@@ -6,7 +6,9 @@
 BEGIN S1 (1 2 3 4)
 Y 2
 S2 3 4
-R(0.5) 1
+RX(0.5) 1
+RY(0.5) 1
+RZ(0.5) 1
 H 2
 S2^4 1 3
 H 3
@@ -44,7 +46,10 @@ END GroverIterate
 
 BEGIN
 H5 a b c d e
+tof a b c d
+not b c d e
 S1 a b d c 
 GroverIterate^1 a b c d e Workspace 
+tof a b c d
 S1 b c d e 
 END

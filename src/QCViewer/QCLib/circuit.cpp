@@ -81,11 +81,13 @@ void Circuit::swapGate (unsigned int i, unsigned int j)
 void Circuit::addGate(Gate *newGate)
 {
     gates.push_back(newGate);
+    getGreedyParallel();
 }
 
 void Circuit::addGate(Gate *newGate, unsigned int pos)
 {
     gates.insert(gates.begin()+pos, newGate);
+    getGreedyParallel();
 }
 
 void Circuit::setGate(Gate *newGate, unsigned int pos)
@@ -423,10 +425,12 @@ void Circuit::drawPWire (cairo_t *cr, double x, int numLines) const
 
 void Circuit::drawSelections (cairo_t* cr, const vector<gateRect> &rects, const vector<Selection> &selections) const
 {
-    for (uint32_t i = 0; i < (uint32_t)selections.size (); i++) {
-        drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
-        if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
-            drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
+    for (unsigned int i = 0; i < selections.size (); i++) {
+        if (selections[i].gate < rects.size()) { //XXX Why is this needed?
+            drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
+            if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
+                drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
+            }
         }
     }
 }

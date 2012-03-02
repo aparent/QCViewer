@@ -75,7 +75,7 @@ input:	/*empty*/
 						add_lines(curr_circ,$4); }
 					gates {circuit->subcircuits[$2]= curr_circ;} END WORD input
 				| START NEWLINE {curr_circ = circuit;} gates END input
-				| error {circuit = NULL;}
+				| error {circuit = NULL; return;}
 ;
 gates:  /*empty*/	
 				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits);} gates 
@@ -115,7 +115,9 @@ Circuit *parseCircuit(std::string filename){
   		strcpy(in,input.c_str());
   		QC__scan_string(in);
   		QC_parse ();
+			if (circuit == NULL) return circuit;
 			link_subcircs(circuit);
+			cleanup_bad_gates(circuit);
   }
 	else{ 
 		std::cout << "File does not exist." << std::endl;	

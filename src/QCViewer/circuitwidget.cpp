@@ -463,7 +463,6 @@ void CircuitWidget::load (string file)
     for (unsigned int i = 0; i < parallels.size(); i++) {
         layout.push_back (LayoutColumn(parallels[i], 0.0));
     }
-    //layout[parallels.size () - 1].pad = 0.0;
 }
 
 void CircuitWidget::loadArch (string file)

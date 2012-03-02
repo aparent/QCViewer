@@ -30,6 +30,7 @@ Authors: Alex Parent
 #include "utility.h"
 #include <iostream>
 #include "subcircuit.h"
+#include "QCLib/gates/UGateLookup.h"
 
 using namespace std;
 
@@ -113,6 +114,22 @@ void insert_break(Circuit *circ)
     circ->column_breaks.push_back(circ->numGates()-1);
 }
 
+bool check_dup(name_node *names)
+{
+    if (names == NULL) {
+        return false;
+    } else {
+        name_node *check = names->next;
+        while(check) {
+            if (names->name == check->name) {
+                return true;
+            }
+            check = check->next;
+        }
+    }
+    return check_dup(names->next);
+}
+
 void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits)
 {
     if (names == NULL) {
@@ -120,7 +137,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         return;
     }
     Gate *newGate = NULL;
-    if (sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) {
+    if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) || (gateName.compare("tof") == 0)|| (gateName.compare("not") == 0) ) {
         newGate = new UGate("X");
         newGate->drawType = Gate::NOT;
     } else if (gateName[0] == 'F'||gateName[0] == 'f') {
@@ -147,14 +164,19 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         gateName = sToUpper(gateName);
         newGate = new UGate(gateName);
     }
-    while(names) {
-        if (names->next == NULL) {
-            newGate->targets.push_back(findLine(circ,names->name));
-        } else {
-            newGate->controls.push_back(Control(findLine(circ,names->name),names->neg));
+    if(!check_dup(names)) {
+        while(names) {
+            if (names->next == NULL) {
+                newGate->targets.push_back(findLine(circ,names->name));
+            } else {
+                newGate->controls.push_back(Control(findLine(circ,names->name),names->neg));
+            }
+            names = names->next;
         }
-
-        names = names->next;
+    } else {
+        cout << "Duplicate targets or controls on: " << gateName << endl;
+        delete newGate;
+        return;
     }
     if (newGate->getName().compare("F")==0) {
         newGate->targets.push_back(newGate->controls.back().wire);
@@ -184,7 +206,6 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
         } else {
             newGate->controls.push_back(Control(findLine(circ,names->name),names->neg));
         }
-
         names = names->next;
     }
     newGate->setLoopCount(exp);
@@ -221,5 +242,26 @@ void link_subcircs(Circuit * circ)
                 delete g;
             }
         }
+    }
+}
+
+void remove_bad_gates(Circuit * c)
+{
+    for (unsigned int i = 0; i < c->numGates(); i++) {
+        string name = c->getGate(i)->getName();
+        if (c->getGate(i)->type!=Gate::RGATE && c->getGate(i)->type!=Gate::SUBCIRC && name.compare("tof")!=0 && UGateLookup(name) == NULL ) {
+            cout << "Gate: " << name << " is unrecognized. Excluding." << endl;
+            c->removeGate (i);
+            i--;
+        }
+    }
+}
+
+void cleanup_bad_gates(Circuit * circ)
+{
+    remove_bad_gates (circ);
+    map<string,Circuit*> subcircs = circ->subcircuits;
+    for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+        remove_bad_gates(it->second);
     }
 }
