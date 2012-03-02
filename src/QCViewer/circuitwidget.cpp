@@ -680,7 +680,7 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x)
 
 void CircuitWidget::delete_gate (unsigned int id)
 {
-    if (!circuit) return;
+    if (!circuit || id >= circuit->numGates()) return;
     unsigned int i = 0;
     selections.clear ();
     NextGateToSimulate = 0;

@@ -97,8 +97,9 @@ void Circuit::setGate(Gate *newGate, unsigned int pos)
 
 void Circuit::removeGate (unsigned int pos)
 {
-    delete gates[pos];
-    gates.erase (gates.begin () + pos);
+   delete gates[pos];
+   gates.erase (gates.begin () + pos);
+   getGreedyParallel();
 }
 
 Gate* Circuit::getGate(int pos) const
@@ -345,8 +346,9 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     double xcurr = xinit+2.0*gatePad;
     uint32_t mingw, maxgw;
     uint32_t i = 0;
-    double maxX;
+    double maxX = 0;
     if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
+		if (numGates()>0){
     for (uint32_t j = 0; j < columns.size(); j++) {
         maxX = 0.0;
         for (; i <= columns.at(j).lastGateID; i++) {
@@ -357,6 +359,7 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
         xcurr += gatePad;
         xcurr += maxX;
     }
+		}
     xcurr -= maxX;
     xcurr += gatePad;
     gateRect fullCirc;

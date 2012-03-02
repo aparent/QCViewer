@@ -444,7 +444,7 @@ void QCViewer::set_selection (vector<Selection> s)
     // find out if we are in a loop
     if (!selections.empty()) {
         if (selections.size()>1) {
-            m_FlowFrame.show();
+            //m_FlowFrame.show();
             m_Subcirc.hide();
         } else if (c.is_subcirc(selections[0].gate)) {
             m_Subcirc.show();
@@ -666,13 +666,13 @@ void QCViewer::setup_menu_layout()
     m_EditSidebar.pack_start (m_GatesFrame, Gtk::PACK_SHRINK);
     m_EditSidebar.set_homogeneous (false);
 
-    m_FlowFrame.set_label("Flow Control");
-    m_FlowFrame.add (m_FlowTable);
-    m_FlowTable.resize (1,1);
-    m_AddLoop.set_label ("Add Loop");
+    //m_FlowFrame.set_label("Flow Control");
+    //m_FlowFrame.add (m_FlowTable);
+    //m_FlowTable.resize (1,1);
+    //m_AddLoop.set_label ("Add Loop");
     //m_AddLoop.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::add_loop));
-    m_FlowTable.attach (m_AddLoop,0,1,0,1);
-    m_EditSidebar.pack_start (m_FlowFrame, Gtk::PACK_SHRINK);
+    //m_FlowTable.attach (m_AddLoop,0,1,0,1);
+    //m_EditSidebar.pack_start (m_FlowFrame, Gtk::PACK_SHRINK);
 
     m_Subcirc.set_label("Subcircuit");
     m_Subcirc.add(m_SubcircTable);
