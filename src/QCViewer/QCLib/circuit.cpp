@@ -225,7 +225,7 @@ start:
 //  returnValue.push_back (numGates()-1); // for convenience.
     columns.clear ();
     for (unsigned int i = 0; i < returnValue.size(); i++) {
-        columns.push_back (LayoutColumn(returnValue[i], 0.0));
+        columns.push_back (LayoutColumn(returnValue[i]));
     }
     return returnValue;
 }

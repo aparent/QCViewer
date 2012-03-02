@@ -75,7 +75,7 @@ input:	/*empty*/
 						add_lines(curr_circ,$4); }
 					gates {circuit->subcircuits[$2]= curr_circ;} END WORD input
 				| START NEWLINE {curr_circ = circuit;} gates END input
-				| error {circuit = NULL; return;}
+				| error {circuit = NULL; return -1;}
 ;
 gates:  /*empty*/	
 				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits);} gates 

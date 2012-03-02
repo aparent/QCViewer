@@ -58,11 +58,8 @@ public:
 class LayoutColumn
 {
 public:
-    LayoutColumn (uint32_t g, double p) : lastGateID(g) {} //,pad(p) {}
+    LayoutColumn (uint32_t g) : lastGateID(g) {}
     uint32_t lastGateID;
-    //double pad;
-    //gateRect bounds;
-    //std::vector<LayoutColumn> *subCols;
 };
 
 

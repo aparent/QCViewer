@@ -328,7 +328,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                         circuit->swapGate (firstGateID, selections[0].gate); // pop it out to the left
                         selections[0].gate = firstGateID;
                         ((QCViewer*)win)->set_selection (selections);
-                        layout.insert (layout.begin()+col_id, LayoutColumn (firstGateID,0));
+                        layout.insert (layout.begin()+col_id, LayoutColumn (firstGateID));
                         force_redraw ();
                         return true;
                     }
@@ -461,7 +461,7 @@ void CircuitWidget::load (string file)
     vector<int> parallels = circuit->getGreedyParallel ();
 
     for (unsigned int i = 0; i < parallels.size(); i++) {
-        layout.push_back (LayoutColumn(parallels[i], 0.0));
+        layout.push_back (LayoutColumn(parallels[i]));
     }
 }
 
@@ -653,7 +653,7 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
 {
     for (unsigned int j = 0; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate(g, 0);
-    layout.insert(layout.begin(), LayoutColumn (0,0));
+    layout.insert(layout.begin(), LayoutColumn (0));
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     force_redraw ();
     selections.clear ();
@@ -670,7 +670,7 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x)
     unsigned int pos = layout[i].lastGateID + 1;
     for (unsigned int j = i + 1; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate (g, pos);
-    layout.insert (layout.begin() + i + 1, LayoutColumn (pos, 0));
+    layout.insert (layout.begin() + i + 1, LayoutColumn (pos));
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     force_redraw ();
     selections.clear ();
