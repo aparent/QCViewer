@@ -55,7 +55,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 QCViewer::QCViewer()
 {
     std::cerr << "In QCViewer::QCViewer.\n";
-    drawparallel = panning = drawarch = false;
+    drawparallel = drawarch = false;
     set_title(QCV_NAME);
     set_border_width(0);
     set_default_size(1000,1000);
@@ -451,7 +451,6 @@ void QCViewer::set_selection (vector<Selection> s)
             m_FlowFrame.hide();
             m_SubcircNameEntry.set_text(c.getGate(selections[0].gate)->getName());
         } else {
-            std::cout << "not loop\n";
             m_Subcirc.hide();
         }
     } else {
@@ -460,12 +459,6 @@ void QCViewer::set_selection (vector<Selection> s)
     }
 
     btn_editbreakpoints.set_active (false);
-}
-
-void QCViewer::on_menu_move ()
-{
-    panning = !panning;
-    update_mode ();
 }
 
 /*
@@ -505,12 +498,7 @@ void QCViewer::expand_subcirc()
 
 void QCViewer::update_mode ()
 {
-    if (panning) {
-        btn_editbreakpoints.set_active (false);
-        btn_editcontrols.set_active (false);
-        get_window()->set_cursor (Gdk::Cursor (Gdk::FLEUR));
-        c.set_mode (CircuitWidget::PANNING);
-    } else if (btn_editcontrols.get_active ()) {
+    if (btn_editcontrols.get_active ()) {
         btn_editbreakpoints.set_active (false); // enforce di/trichotomy
         if (selections.size () != 1) {
             cout << "warning: this shouldn't have happened " << __FILE__ << " " << __LINE__ << endl;
@@ -576,7 +564,6 @@ void QCViewer::setup_menu_actions()
                           sigc::mem_fun(*this, &QCViewer::on_menu_zoom_out));
     m_refActionGroup->add(Gtk::Action::create("Zoom100", Gtk::Stock::ZOOM_100, "100%"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_zoom_100));
-    m_refActionGroup->add(Gtk::ToggleAction::create ("Move", Gtk::StockID("pan")), sigc::mem_fun(*this, &QCViewer::on_menu_move));
 
     m_refActionGroup->add(Gtk::Action::create("SimulateMenu", "Simulate"));
     m_refActionGroup->add(Gtk::Action::create ("SimulateLoad", Gtk::Stock::ADD, "Load state", "Enter a state for input into the circuit"),
@@ -640,7 +627,6 @@ void QCViewer::setup_menu_layout()
         "    <toolitem action='CircuitOpen'/>"
         "    <separator/>"
         "    <toolitem action='Zoom100'/>"
-        "    <toolitem action='Move'/>"
         "    <separator/>"
         "    <toolitem action='SimulateLoad'/>"
         "    <toolitem action='SimulateRun'/>"

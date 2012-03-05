@@ -150,7 +150,6 @@ private:
     State *state;
     bool drawparallel;
     bool drawarch;
-    bool panning;
     std::vector<Selection> selections;
 };
 

@@ -112,6 +112,10 @@ unsigned int Circuit::numGates() const
     return gates.size();
 }
 
+unsigned int Circuit::totalGates() const
+{
+	return 0;
+}
 int Circuit::QCost()
 {
     return 0;

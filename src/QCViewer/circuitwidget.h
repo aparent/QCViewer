@@ -77,7 +77,7 @@ public:
     void generate_layout_rects ();
 
     Gate* getSelectedGate ();
-    enum Mode { NORMAL, PANNING, EDIT_CONTROLS, EDIT_BREAKPOINTS };
+    enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
     void set_mode (Mode);
     void add_subcirc ();
     void force_redraw ();
@@ -102,7 +102,7 @@ private:
 
     bool simulation_enabled;
     uint32_t NextGateToSimulate;
-    bool panning, selecting;
+    bool panning;
     double oldmousex, oldmousey;
 
     gateRect select_rect;
