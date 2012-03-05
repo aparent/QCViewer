@@ -90,10 +90,10 @@ public:
     void removeGate (unsigned int);
     Gate* getGate(int pos) const;
 
-		//! Returns the number of gates counting subcircuits as 1 gate
-    unsigned int numGates() const;  
-		//! Returns the total number of gates in the circuit counting all gates in subcircuits
-		unsigned int totalGates() const 
+    //! Returns the number of gates counting subcircuits as 1 gate
+    unsigned int numGates() const;
+    //! Returns the total number of gates in the circuit counting all gates in subcircuits
+    unsigned int totalGates() const;
 
     void swapGate (unsigned int, unsigned int);
 

@@ -26,6 +26,7 @@ Authors: Alex Parent
 #include <iostream>
 #include <QCLib/circuitParser.h>
 #include <cairo-ft.h>
+
 using namespace std;
 int main (int argc, char *argv[])
 {

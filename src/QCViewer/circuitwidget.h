@@ -35,7 +35,7 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/state.h"
 #include "QCLib/gate.h"
 #include "draw.h"
-#include "common.h"
+#include "QCLib/common.h"
 
 class CircuitWidget : public Gtk::DrawingArea
 {

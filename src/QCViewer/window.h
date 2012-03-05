@@ -34,7 +34,7 @@ Authors: Alex Parent, Jacob Parker
 #include "circuitwidget.h"
 #include "stateWidget.h"
 #include "GateIcon.h"
-#include "common.h"
+#include "QCLib/common.h"
 
 
 class QCViewer : public Gtk::Window

@@ -114,7 +114,7 @@ unsigned int Circuit::numGates() const
 
 unsigned int Circuit::totalGates() const
 {
-	return 0;
+    return 0;
 }
 int Circuit::QCost()
 {

@@ -32,7 +32,7 @@ Authors: Alex Parent
 #include <vector>
 #include "types.h"
 #include "gate.h"
-#include "../common.h"
+#include "common.h"
 
 class Colour
 {

@@ -34,7 +34,7 @@ Authors: Alex Parent, Jacob Parker
 #include <stdint.h>
 
 #include "QCLib/circuit.h"
-#include "common.h"
+#include "QCLib/common.h"
 #include "QCLib/draw_common.h"
 
 
