@@ -65,12 +65,21 @@ struct matrix_row {
 struct gate_node {
     gate_node* next;
     std::string name;
+    std::string drawName;
     std::string symbol;
     matrix_row *row;
     gate_node(char* n_name, char* n_symbol, matrix_row *n_row ) {
         next = NULL;
         row = n_row;
         name = std::string(n_name);
+        symbol = std::string(n_symbol);
+        drawName = std::string(n_symbol);
+    }
+    gate_node(char* n_name, char* n_dname, char* n_symbol, matrix_row *n_row ) {
+        next = NULL;
+        row = n_row;
+        name = std::string(n_name);
+        drawName = std::string(n_dname);
         symbol = std::string(n_symbol);
     }
     ~gate_node() {

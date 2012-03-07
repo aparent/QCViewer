@@ -29,6 +29,7 @@ Authors: Alex Parent
 #define DRAW_COMMON_H
 
 #include <cairo.h>
+#include <pango/pangocairo.h>
 #include <vector>
 #include "types.h"
 #include "gate.h"
@@ -42,6 +43,7 @@ public:
     double r, g, b, a;
 };
 
+PangoLayout* create_text_layout(cairo_t *cr,std::string label, double &w, double &h);
 gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative);
 double wireToY (uint32_t x);

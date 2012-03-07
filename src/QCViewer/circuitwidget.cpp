@@ -627,6 +627,7 @@ void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 {
     for (unsigned int j = column_id; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate(g, layout[column_id].lastGateID - 1);
+    circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     force_redraw ();
     selections.clear ();
@@ -638,6 +639,7 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
 {
     for (unsigned int j = 0; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate(g, 0);
+    circuit->getGreedyParallel();
     layout.insert(layout.begin(), LayoutColumn (0));
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     force_redraw ();
@@ -655,6 +657,7 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x)
     unsigned int pos = layout[i].lastGateID + 1;
     for (unsigned int j = i + 1; j < layout.size (); j++) layout[j].lastGateID += 1;
     circuit->addGate (g, pos);
+    circuit->getGreedyParallel();
     layout.insert (layout.begin() + i + 1, LayoutColumn (pos));
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     force_redraw ();

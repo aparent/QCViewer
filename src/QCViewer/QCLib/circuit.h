@@ -117,7 +117,7 @@ private:
     std::string name;
     std::vector <Gate*>           gates;
     std::vector <Line>            lines;
-    std::vector <LayoutColumn>    columns;
+    std::vector <int>    columns;
 
     std::vector<gateRect> draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const;
     void drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const;

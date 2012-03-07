@@ -158,7 +158,7 @@ float_type RGate::get_rotVal () const
     return rot;
 }
 
-void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects) const
+void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
 {
     uint32_t minw, maxw;
     string name = getName();

@@ -33,11 +33,13 @@ Authors: Alex Parent, Jacob Parker
 %{
 	#include "GateParser.h"
 	#include <cstdlib>
-	#define SAVE_TOKEN Gate_lval.string = strdup(yytext)
+	#include <iostream>
+	#define SAVE_TOKEN Gate_lval.string = strdup(yytext); std::cout<<"Parsed: "<<yytext<<std::endl;
 	#define TOKEN(t) (Gate_lval.token = t)
 %}
 
-word [[:alnum:]]+"*"?
+quote [^\"\n]*
+word [[:alnum:]]+\*?
 digit [0-9]
 int {digit}+
 float {int}\.{int}
@@ -46,6 +48,7 @@ whitespace [ \t]
 comment #.*
 
 %x TEXT
+%x QUOTE
 %%
 
 
@@ -60,9 +63,13 @@ comment #.*
 ","									return TOKEN(COMMA);
 "\n"								return TOKEN(NEWLINE);
 "NAME"							BEGIN(TEXT); return TOKEN(NAME); 
+"DRAWNAME"					BEGIN(TEXT); return TOKEN(DRAWNAME); 
 "SYMBOL"						BEGIN(TEXT); return TOKEN(SYMBOL); 
 "COST"							return TOKEN(COST); 
 <TEXT>{word}				BEGIN(INITIAL); SAVE_TOKEN; return WORD;
+<TEXT>\"      			BEGIN(QUOTE);
+<QUOTE>{quote}			SAVE_TOKEN; return WORD;
+<QUOTE>\"      			BEGIN(INITIAL);
 "sqrt"							return TOKEN(SQRT);
 {num}								SAVE_TOKEN; return NUM;
 

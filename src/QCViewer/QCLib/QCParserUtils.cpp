@@ -102,10 +102,10 @@ void add_outlabels (Circuit * circ, name_node *names)
 
 void add_constants (Circuit * circ, name_node *names)
 {
-    while(names) {
-        circ->getLineModify(findLine(circ,names->name)).initValue = atoi((names->name).c_str());
-        names = names->next;
-    }
+    //while(names) {
+    //circ->getLineModify(findLine(circ,names->name)).initValue = atoi((names->name).c_str()); //TODO:FIXME
+    //names = names->next;
+    //}
     delete names;
 }
 

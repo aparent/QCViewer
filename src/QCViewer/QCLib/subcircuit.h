@@ -42,7 +42,7 @@ public:
     State applyToBasis(index_t) const;
     State applySubcirc(const State&) const;
     int numGates() const;
-    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
+    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) ;
 
     Gate* getGate(int pos) const;
     Circuit* getCircuit();

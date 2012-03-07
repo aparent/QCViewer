@@ -123,7 +123,7 @@ Circuit* Subcircuit::getCircuit()
 }
 
 
-void Subcircuit::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects) const
+void Subcircuit::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects)
 {
     gateRect r;
     if (expand) {

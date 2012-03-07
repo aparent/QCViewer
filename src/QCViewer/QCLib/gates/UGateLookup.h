@@ -37,6 +37,7 @@ gate_node *parse_gates(std::string input);
 //Function for looking up the matrix of a given ugate Will return null if no matrix is found
 gateMatrix *UGateLookup(std::string name);
 std::vector<std::string> UGateNames();
+std::vector<std::string> UGateDNames();
 
 //adds a matrix and name
 void UGateLoad(std::string name, gateMatrix mat);

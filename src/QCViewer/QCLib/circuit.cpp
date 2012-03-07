@@ -81,13 +81,11 @@ void Circuit::swapGate (unsigned int i, unsigned int j)
 void Circuit::addGate(Gate *newGate)
 {
     gates.push_back(newGate);
-    getGreedyParallel();
 }
 
 void Circuit::addGate(Gate *newGate, unsigned int pos)
 {
     gates.insert(gates.begin()+pos, newGate);
-    getGreedyParallel();
 }
 
 void Circuit::setGate(Gate *newGate, unsigned int pos)
@@ -196,43 +194,37 @@ start:
     return returnValue;
 }
 
-// TODO: this is pretty akward to have outside the drawing code. Reorganize?
 vector<int> Circuit::getGreedyParallel()
 {
     vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
     sort (parallel.begin (), parallel.end ());
-    vector<int>  returnValue;
     map<int,int> linesUsed;
     unsigned int maxw, minw;
     int k = 0;
+    columns.clear ();
     for(unsigned int i = 0; i < numGates(); i++) {
 start:
         Gate *g = getGate(i);
         minmaxWire (g->controls, g->targets, minw, maxw);
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {
-                returnValue.push_back(i - 1);
+                columns.push_back(i - 1);
                 linesUsed.clear ();
                 goto start;
             }
             linesUsed[j]; //access element so that it exists in map
         }
         if (i == (unsigned int)parallel[k] || std::find(column_breaks.begin(), column_breaks.end(), i) != column_breaks.end()) { // into next parallel group, so force a column move
-            returnValue.push_back (i);
+            columns.push_back (i);
             k++;
             linesUsed.clear ();
         }
     }
     for (; k < (int)parallel.size(); k++) {
-        returnValue.push_back (k);
+        columns.push_back (k);
     }
-    sort (returnValue.begin (), returnValue.end ()); // TODO: needed?
-//  returnValue.push_back (numGates()-1); // for convenience.
-    columns.clear ();
-    for (unsigned int i = 0; i < returnValue.size(); i++) {
-        columns.push_back (LayoutColumn(returnValue[i]));
-    }
-    return returnValue;
+    sort (columns.begin (), columns.end ()); // TODO: needed?
+    return columns;
 }
 
 vector<int> Circuit::getArchWarnings () const
@@ -349,13 +341,13 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     // gates
     double xcurr = xinit+2.0*gatePad;
     uint32_t mingw, maxgw;
-    uint32_t i = 0;
+    int i = 0;
     double maxX = 0;
     if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
     if (numGates()>0) {
         for (uint32_t j = 0; j < columns.size(); j++) {
             maxX = 0.0;
-            for (; i <= columns.at(j).lastGateID; i++) {
+            for (; i <= columns.at(j); i++) {
                 Gate* g = getGate (i);
                 minmaxWire (g->controls, g->targets, mingw, maxgw);
                 g->draw(cr,xcurr,maxX,rects);

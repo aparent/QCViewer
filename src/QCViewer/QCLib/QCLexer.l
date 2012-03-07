@@ -44,7 +44,7 @@ digit [0-9]
 int {digit}+
 float {int}\.{int}
 num {float}|{int}
-whitespace [ \t]
+whitespace [ \t,]
 comment #.*
 %%
 

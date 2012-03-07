@@ -46,6 +46,19 @@ std::vector<std::string> UGateNames()
     }
     return result;
 }
+
+std::vector<std::string> UGateDNames()
+{
+    vector<string> result;
+    map<string,gateMatrix*>::iterator it;
+    for ( it=gateLib.begin() ; it != gateLib.end(); it++ ) {
+        if (((*it).first).compare("F") != 0) { //TODO: this is very special case
+            result.push_back(((*it).second)->drawName);
+        }
+    }
+    return result;
+}
+
 gateMatrix *UGateLookup(string name)
 {
     if ( gateLib.find(name) == gateLib.end() ) {
@@ -104,6 +117,7 @@ gateMatrix *get_matrix(matrix_row *n)
 void add_gates(gate_node *n)
 {
     gateMatrix *g =get_matrix(n->row);
+    g->drawName = n->drawName;
     if (g != NULL) UGateLoad(n->symbol,g);
     if (n->next != NULL) add_gates(n->next);
 }

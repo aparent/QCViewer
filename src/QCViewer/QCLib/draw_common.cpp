@@ -34,6 +34,22 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
+PangoLayout* create_text_layout(cairo_t *cr, string label, double &width, double &height)
+{
+    PangoLayout *layout = pango_cairo_create_layout (cr);
+    PangoFontDescription *desc = pango_font_description_from_string ("ROMAN Bold 12");
+    pango_layout_set_font_description (layout, desc);
+    pango_font_description_free (desc);
+    pango_layout_set_markup (layout, label.c_str(), label.length());
+    int w,h;
+    pango_layout_get_size (layout, &w, &h);
+
+    width = ((double)w/PANGO_SCALE);
+    height = ((double)h/PANGO_SCALE);
+    return layout;
+}
+
+
 void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative)
 {
     if (negative) {

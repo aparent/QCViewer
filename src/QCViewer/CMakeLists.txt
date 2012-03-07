@@ -1,5 +1,5 @@
 set(CMAKE_CXX_FLAGS "-Wall -pedantic ")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -pedantic ")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic ")
 
 IF(WIN32)

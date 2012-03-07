@@ -33,6 +33,7 @@ Authors: Alex Parent, Jacob Parker
 #include <iostream>
 #include "QCLib/draw_constants.h"
 
+
 using namespace std;
 
 UGate::UGate(string n_name) : name(n_name)
@@ -40,6 +41,7 @@ UGate::UGate(string n_name) : name(n_name)
     drawType = DEFAULT;
     type = UGATE;
     loop_count = 1;
+    dname_checked = false;
 }
 
 Gate* UGate::clone() const
@@ -59,6 +61,21 @@ string UGate::getName() const
         return name;
     }
 }
+
+string UGate::getDrawName()
+{
+    if (!dname_checked) {
+        gateMatrix *matrix = UGateLookup(name);
+        if (matrix == NULL) {
+            cerr << "Game matrix not found for " << name  << "!" << endl;
+            dname  = "";
+        } else {
+            dname = matrix->drawName;
+        }
+    }
+    return dname;
+}
+
 void UGate::setName(string n_name)
 {
     name = n_name;
@@ -139,7 +156,7 @@ index_t UGate::BuildBitString (index_t orig, unsigned int ans) const
     return output;
 }
 
-void UGate::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects) const
+void UGate::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects)
 {
     gateRect r;
     switch (drawType) {
@@ -232,10 +249,10 @@ gateRect UGate::drawX (cairo_t *cr, double xc, double yc, double radius) const
     return r;
 }
 
-gateRect UGate::drawCU (cairo_t *cr, uint32_t xc) const
+gateRect UGate::drawCU (cairo_t *cr, uint32_t xc)
 {
     uint32_t minw, maxw;
-    string name = getName();
+    string name = getDrawName();
     vector<Control> dummy;
     minmaxWire (dummy, targets, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.
@@ -244,11 +261,10 @@ gateRect UGate::drawCU (cairo_t *cr, uint32_t xc) const
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
     double height = dw*(maxw-minw+Upad);
 
-    // get width of this box
     cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, name.c_str(), &extents);
-    double width = extents.width+2*textPad;
+    double w,h;
+    PangoLayout *layout = create_text_layout(cr, name, w, h);
+    double width = w+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
     }
@@ -261,10 +277,12 @@ gateRect UGate::drawCU (cairo_t *cr, uint32_t xc) const
     cairo_set_line_width (cr, thickness);
     cairo_stroke(cr);
 
-    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
-    double y = yc - extents.height/2 - extents.y_bearing;
+    double x = (xc - radius + width/2) - w/2;// - extents.x_bearing;
+    double y = yc - h/2; //- extents.y_bearing;
     cairo_move_to(cr, x, y);
-    cairo_show_text (cr, name.c_str());
+
+    pango_cairo_show_layout (cr, layout);
+
     gateRect r;
     r.x0 = xc - thickness-radius;
     r.y0 = yc -height/2 - thickness;

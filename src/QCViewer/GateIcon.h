@@ -34,10 +34,11 @@ class GateIcon : public Gtk::DrawingArea
 public:
     enum GateType { NOT, R, SWAP, DEFAULT };
     GateIcon ();
-    GateIcon (std::string);
+    GateIcon (std::string,std::string);
     GateIcon (GateType);
     GateType type;
     std::string symbol;
+    std::string dname;
     virtual bool on_expose_event(GdkEventExpose* event);
 };
 

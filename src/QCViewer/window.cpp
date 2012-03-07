@@ -729,8 +729,9 @@ void QCViewer::setup_gate_icons()
     gate_icons.push_back(new GateIcon(GateIcon::SWAP));
 
     vector<string> names = UGateNames();
+    vector<string> dnames = UGateDNames();
     for (unsigned int i = 0; i < names.size(); i++) {
-        gate_icons.push_back(new GateIcon(names[i]));
+        gate_icons.push_back(new GateIcon(names[i],dnames[i]));
     }
     for (unsigned int i = 0, y = 0, x = 0; i < gate_icons.size(); i++) {
         gate_buttons.push_back(new Gtk::Button());

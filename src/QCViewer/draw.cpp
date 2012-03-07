@@ -108,17 +108,17 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
 {
     cairo_set_font_face (cr,ft_default);
     cairo_set_font_size(cr, 18);
-    cairo_text_extents_t extents;
-    cairo_text_extents (cr, name.c_str (), &extents);
+    double w,h;
+    PangoLayout *layout = create_text_layout(cr, name, w, h);
     cairo_rectangle (cr, xc - width/2.0, yc- width/2.0, width, width);
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_stroke (cr);
-    double scale = width/(max(extents.width,extents.height)+textPad*2);
+    double scale = width/(max(w,h)+textPad);
     cairo_scale(cr,scale,scale);
-    double x = (1.0/scale)*(xc) - (1.0/2.0)*extents.width;
-    double y = (1.0/scale)*(yc) - (1.0/2.0)*extents.y_bearing;
+    double x = (1.0/scale)*(xc) - (1.0/2.0)*w;
+    double y = (1.0/scale)*(yc)- (1.0/2.0)*h ;
     cairo_move_to (cr, x, y);
-    cairo_show_text (cr, name.c_str());
+    pango_cairo_show_layout (cr, layout);
 }
 
 gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=true)

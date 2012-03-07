@@ -30,21 +30,23 @@ Authors: Alex Parent, Jacob Parker
 #include "GateIcon.h"
 #include "draw_internal.h"
 
+#define G_BUTTON_SIZE 25
+
 using namespace std;
 
 GateIcon::GateIcon () : type(DEFAULT)
 {
-    set_size_request (20,20);
+    set_size_request (G_BUTTON_SIZE,G_BUTTON_SIZE);
 }
 
 GateIcon::GateIcon (GateType t) : type(t)
 {
-    set_size_request (20,20);
+    set_size_request (G_BUTTON_SIZE,G_BUTTON_SIZE);
 }
 
-GateIcon::GateIcon (string s) : type(DEFAULT), symbol(s)
+GateIcon::GateIcon (string s,string d) : type(DEFAULT), symbol(s), dname(d)
 {
-    set_size_request (20,20);
+    set_size_request (G_BUTTON_SIZE,G_BUTTON_SIZE);
 }
 
 bool GateIcon::on_expose_event(GdkEventExpose* event)
@@ -71,7 +73,7 @@ bool GateIcon::on_expose_event(GdkEventExpose* event)
             drawShowFred (cr->cobj(), width/scale, height/scale);
             break;
         case DEFAULT:
-            drawShowU (cr->cobj (), xc, yc, min(width, height), symbol);
+            drawShowU (cr->cobj (), xc, yc, min(width, height), dname);
         }
     }
     return true;

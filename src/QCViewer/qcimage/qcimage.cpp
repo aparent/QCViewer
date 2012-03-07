@@ -33,6 +33,7 @@ int main (int argc, char *argv[])
     Circuit* c;
     if (argc > 0) {
         c = parseCircuit(argv[1]);
+        c->getGreedyParallel();
     } else {
         cout << "No circuit file provided" << endl;
         return 0;
