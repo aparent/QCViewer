@@ -432,22 +432,24 @@ void CircuitWidget::newcircuit (unsigned int numqubits)
     }
 }
 
-void CircuitWidget::load (string file)
+vector<string> CircuitWidget::load (string file)
 {
     if (circuit != NULL) delete circuit;
-    circuit = parseCircuit(file);
+		vector<string> error_log;
+    circuit = parseCircuit(file,error_log);
     layout.clear ();
     breakpoints.clear ();
     cx = cy = 0;
     if (circuit == NULL) {
         cout << "Error loading circuit" << endl;
-        return;
+        return error_log;
     }
     vector<int> parallels = circuit->getGreedyParallel ();
 
     for (unsigned int i = 0; i < parallels.size(); i++) {
         layout.push_back (LayoutColumn(parallels[i]));
     }
+    return error_log;
 }
 
 void CircuitWidget::loadArch (string file)

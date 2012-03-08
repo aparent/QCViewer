@@ -31,6 +31,7 @@ Authors: Alex Parent, Jacob Parker
 	#include <cstdlib>
 	#include <fstream>
   #include <string>
+  #include <vector>
   #include <iostream>
   #include "QCLib/circuit.h"
   void QC_error(const char *s);
@@ -38,6 +39,7 @@ Authors: Alex Parent, Jacob Parker
   int QC__scan_string(const char*);
   Circuit *circuit;
   Circuit *curr_circ;
+	std::vector<std::string> error_log;
 %}
 %code requires{
   #include "QCLib/QCParserUtils.h"
@@ -78,9 +80,9 @@ input:	/*empty*/
 				| error {circuit = NULL; return -1;}
 ;
 gates:  /*empty*/	
-				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits);} gates 
+				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits,error_log);} gates 
 				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
-				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits);} gates
+				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits,error_log);} gates
 				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
 				| NEWLINE gates {insert_break(curr_circ);}
 ;
@@ -99,7 +101,9 @@ float: NUM {$$=atof($1);}
 %%
 
 #include "QCLib/QCParserUtils.h"
-Circuit *parseCircuit(std::string filename){
+Circuit *parseCircuit(std::string filename,std::vector<std::string>& error_log_r )
+{
+	error_log.clear();
 	circuit = new Circuit();
 	std::string input,line;
 	std::ifstream myfile(filename.c_str());
@@ -117,13 +121,14 @@ Circuit *parseCircuit(std::string filename){
   		QC_parse ();
 			if (circuit == NULL) return circuit;
 			link_subcircs(circuit);
-			cleanup_bad_gates(circuit);
+			cleanup_bad_gates(circuit,error_log);
   }
 	else{ 
 		std::cout << "File does not exist." << std::endl;	
 		delete circuit;
 		circuit = NULL;
 	}
+	error_log_r = error_log;
   return circuit;
 }
 
