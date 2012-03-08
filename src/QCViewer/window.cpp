@@ -409,6 +409,7 @@ void QCViewer::on_menu_delete ()
 void QCViewer::set_selection (vector<Selection> s)
 {
     selections = s;
+		cout << "test1" << endl;
     if (selections.empty()) {
         btn_editcontrols.set_active (false);
         m_PropFrame.hide ();
@@ -416,6 +417,7 @@ void QCViewer::set_selection (vector<Selection> s)
     } else if (selections.size () == 1) {
         Gate * gate = c.getSelectedGate();
         if (gate != NULL && gate->type == Gate::RGATE) {
+						cout << "test2" << endl;
             m_RGateEditFrame.show ();
             RGate* g = (RGate*)gate;
             switch (g->get_axis ()) {
@@ -701,6 +703,7 @@ void QCViewer::setup_menu_layout()
     m_RGateEditFrame.set_label ("Rotation");
     m_RGateEditFrame.add (m_RGateEditTable);
     m_RGateEditTable.resize (3,2);
+    m_EditSidebar.pack_start (m_RGateEditFrame, Gtk::PACK_SHRINK);
     btn_RX.set_group (m_RAxisGroup);
     btn_RX.set_label ("X");
     btn_RY.set_group (m_RAxisGroup);

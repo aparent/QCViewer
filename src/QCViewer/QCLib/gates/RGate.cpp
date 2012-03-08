@@ -56,11 +56,11 @@ string RGate::getName() const
 {
     switch (axis) {
     case RGate::X:
-        return "RX(" + floatToString(rot) + ")";
+        return "RX(" + floatToString(rot) + "<i>π</i>" + ")";
     case RGate::Y:
-        return "RY(" + floatToString(rot)+")";
+        return "RY(" + floatToString(rot) + "<i>π</i>"+")";
     case RGate::Z:
-        return "RZ(" + floatToString(rot)+")";
+        return "RZ(" + floatToString(rot) + "<i>π</i>"+")";
     default:
         return "R";
     }
@@ -169,12 +169,10 @@ void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
     double dw = wireToY(1)-wireToY(0);
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
     double height = dw*(maxw-minw+Upad);
-
-    // get width of this box
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, name.c_str(), &extents);
-    double width = extents.width+2*textPad;
+		cairo_set_source_rgb (cr, 0, 0, 0);
+    double w,h;
+    PangoLayout *layout = create_text_layout(cr, name, w, h);
+    double width = w+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
     }
@@ -187,15 +185,18 @@ void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
     cairo_set_line_width (cr, thickness);
     cairo_stroke(cr);
 
-    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
-    double y = yc - extents.height/2 - extents.y_bearing;
+    double x = (xc - radius + width/2) - w/2;// - extents.x_bearing;
+    double y = yc - h/2; //- extents.y_bearing;
     cairo_move_to(cr, x, y);
-    cairo_show_text (cr, name.c_str());
+
+    pango_cairo_show_layout (cr, layout);
+
     gateRect r;
     r.x0 = xc - thickness-radius;
     r.y0 = yc -height/2 - thickness;
     r.width = width + 2*thickness;
     r.height = height + 2*thickness;
+
     rects.push_back(combine_gateRect(rect, r));
     maxX = max (maxX, r.width);
 }
