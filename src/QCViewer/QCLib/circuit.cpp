@@ -33,6 +33,7 @@ Authors: Alex Parent, Jacob Parker
 #include <iostream>
 #include "draw_common.h"
 #include "draw_constants.h"
+#include "simulate.h"
 
 using namespace std;
 
@@ -194,7 +195,7 @@ start:
     return returnValue;
 }
 
-vector<int> Circuit::getGreedyParallel()
+vector<unsigned int> Circuit::getGreedyParallel()
 {
     vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
     sort (parallel.begin (), parallel.end ());
@@ -341,7 +342,7 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     // gates
     double xcurr = xinit+2.0*gatePad;
     uint32_t mingw, maxgw;
-    int i = 0;
+    unsigned int i = 0;
     double maxX = 0;
     if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
     if (numGates()>0) {
@@ -471,4 +472,32 @@ void Circuit::write_to_png (cairo_surface_t* surf, string filename) const
         cout << "Error saving to png." << endl;
         return;
     }
+}
+
+
+
+bool Circuit::run (State& state)
+{
+    if (simState.gate == numGates ()) simState.gate = 0;
+    // always step over first breakpoint if it is around
+    while (simState.gate < numGates ()) {
+        state = ApplyGate (state, getGate (simState.gate));
+        simState.gate++;
+        // check if we have reached a breakpoint
+        // find column that gate is in. if 0, ignore. else, check if gateid is one more than previous layout column last id. if so, return true.
+        unsigned int column_id = findcolumn (simState.gate);
+        vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), column_id );
+        if (it == breakpoints.end ()) continue;
+        if (columns.at(column_id) + 1 == simState.gate) {
+            return true;
+        }
+    }
+    return false;
+}
+
+unsigned int Circuit::findcolumn (unsigned int gate) const
+{
+    unsigned int i;
+    for (i = 0; i < columns.size () && gate > columns.at(i); i++);
+    return i - 1;
 }

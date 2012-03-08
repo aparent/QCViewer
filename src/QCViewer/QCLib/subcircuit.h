@@ -41,12 +41,12 @@ public:
     void setName(std::string name);
     State applyToBasis(index_t) const;
     State applySubcirc(const State&) const;
-    int numGates() const;
+    unsigned int numGates() const;
     void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) ;
 
     Gate* getGate(int pos) const;
     Circuit* getCircuit();
-    std::vector<int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
+    std::vector<unsigned int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
     bool expand;
 protected:
     std::map<unsigned int,unsigned int> lineMap;

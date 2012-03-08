@@ -106,12 +106,12 @@ Gate* Subcircuit::getGate(int pos) const
     return g;
 }
 
-int Subcircuit::numGates() const
+unsigned int Subcircuit::numGates() const
 {
     return circ->numGates();
 }
 
-vector<int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints specifying the last gate in each parallel block.
+vector<unsigned int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints specifying the last gate in each parallel block.
 {
     return circ->getGreedyParallel();
 }
@@ -140,9 +140,9 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     gateRect r;
     double maxX = 0.0;
     vector <gateRect>*subRects = new vector<gateRect>;
-    vector<int> para = getGreedyParallel();
+    vector<unsigned int> para = getGreedyParallel();
     unsigned int currentCol = 0;
-    for(int i = 0; i < numGates(); i++) {
+    for(unsigned int i = 0; i < numGates(); i++) {
         getGate(i)->draw(cr,xcurr,maxX,*subRects);
         if(para.size() > currentCol && i == para[currentCol]) {
             xcurr += maxX;

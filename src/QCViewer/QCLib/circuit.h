@@ -69,6 +69,14 @@ private:
     char *graph;
 };
 
+class SimState
+{
+public:
+   SimState () : gate(0),nextGate(true) {}
+	unsigned int gate;
+	bool nextGate;
+};
+
 class Circuit
 {
 public:
@@ -88,6 +96,7 @@ public:
     void addGate(Gate *newGate, unsigned int pos); //inserts at pos
     void setGate(Gate *newGate, unsigned int pos);
     void removeGate (unsigned int);
+    void swapGate (unsigned int, unsigned int);
     Gate* getGate(int pos) const;
 
     //! Returns the number of gates counting subcircuits as 1 gate
@@ -95,29 +104,42 @@ public:
     //! Returns the total number of gates in the circuit counting all gates in subcircuits
     unsigned int totalGates() const;
 
-    void swapGate (unsigned int, unsigned int);
+    /* Simulation */
+		//! Runs the full circuit on the input state.
+    bool run (State &s);
+		//! Steps the circuit through the next gate.
+    //bool step (State &s);
+		//! Resets current gate to the beginning of the circuit.
+    //void reset ();
 
+		/* architecture */
     void newArch ();
     void parseArch (std::string);
     void arch_set_LNN();
 
-    std::vector<int> getParallel() const;  //Returns a std::vector of ints specifying the last gate in each parallel block.
-    std::vector<int> getGreedyParallel (); // used for drawing gates in the same column
+		//! Returns a std::vector of ints specifying the last gate in each parallel block.
+    std::vector<int> getParallel() const;  
+    std::vector<unsigned int> getGreedyParallel (); // used for drawing gates in the same column
     std::vector<int> getArchWarnings () const;
     std::vector<int> column_breaks;
 
+
+
     std::map<std::string,Circuit*> subcircuits;
 
-    QArch *arch;
 
     std::vector<gateRect> draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection> &selections,cairo_font_face_t * ft_default) const;
     cairo_rectangle_t get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const;
     void savepng (std::string filename, cairo_font_face_t * ft_default);
 private:
+    QArch *arch;
     std::string name;
     std::vector <Gate*>           gates;
     std::vector <Line>            lines;
-    std::vector <int>    columns;
+    std::vector <unsigned int>    columns;
+    std::vector<unsigned int> breakpoints;
+		
+		SimState simState;
 
     std::vector<gateRect> draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const;
     void drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const;
@@ -127,12 +149,11 @@ private:
     void drawPWire (cairo_t *cr, double x, int numLines) const;
     void write_to_png (cairo_surface_t* surf, std::string filename) const;
 
+		unsigned int findcolumn (unsigned int gate) const;
     //for deconstructor
     void removeSubcircuits();
     void removeArch ();
     void removeGates();
-
-
 };
 
 

@@ -443,7 +443,7 @@ void CircuitWidget::load (string file)
         cout << "Error loading circuit" << endl;
         return;
     }
-    vector<int> parallels = circuit->getGreedyParallel ();
+    vector<unsigned int> parallels = circuit->getGreedyParallel ();
 
     for (unsigned int i = 0; i < parallels.size(); i++) {
         layout.push_back (LayoutColumn(parallels[i]));
@@ -543,28 +543,9 @@ unsigned int findcolumn (vector<LayoutColumn>& layout, unsigned int gate)
 bool CircuitWidget::run (bool breaks)
 {
     if (!circuit || !state) return false;
-    if (NextGateToSimulate == circuit->numGates ()) NextGateToSimulate = 0;
-    // always step over first breakpoint if it is around
-    while (NextGateToSimulate < circuit->numGates ()) {
-        *state = ApplyGate (*state, circuit->getGate (NextGateToSimulate));
-        if (!state) {
-            force_redraw ();
-            return false;
-        }
-        NextGateToSimulate++;
-        if (!breaks) continue;
-        // check if we have reached a breakpoint
-        // find column that gate is in. if 0, ignore. else, check if gateid is one more than previous layout column last id. if so, return true.
-        unsigned int column_id = findcolumn (layout, NextGateToSimulate);
-        vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), column_id );
-        if (it == breakpoints.end ()) continue;
-        if (layout[column_id].lastGateID + 1 == NextGateToSimulate) {
-            force_redraw ();
-            return true;
-        }
-    }
+	  bool ret = circuit->run(*state);
     force_redraw ();
-    return false;
+    return ret;
 }
 
 bool CircuitWidget::step ()
