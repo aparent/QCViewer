@@ -51,12 +51,14 @@ State ApplyGate (const State &in, const Gate *g)
 {
     State s = in;
     for (unsigned int i = 0; i <  g->getLoopCount();  i++) {
+				State out = State(s.dim);
         for (StateMap::const_iterator it = s.data.begin(); it != s.data.end(); ++it) {
             State tmp = g->applyToBasis(it->first);
             complex<float_type> foo = (*it).second;
             tmp *= foo;
-            s += tmp;
+            out += tmp;
         }
+				s = out;
     }
     return s;
 }
