@@ -169,7 +169,7 @@ void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
     double dw = wireToY(1)-wireToY(0);
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
     double height = dw*(maxw-minw+Upad);
-		cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_set_source_rgb (cr, 0, 0, 0);
     double w,h;
     PangoLayout *layout = create_text_layout(cr, name, w, h);
     double width = w+2*textPad;
