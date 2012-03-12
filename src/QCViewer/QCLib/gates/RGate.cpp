@@ -54,13 +54,20 @@ Gate* RGate::clone() const
 
 string RGate::getName() const
 {
+    const string pi_str = "<span font=\"SYMBOL bold 14\">π</span>";
+    string rot_str;
+    if (rot == 1.0) {
+        rot_str = "";
+    } else {
+        rot_str = floatToString(rot);
+    }
     switch (axis) {
     case RGate::X:
-        return "RX(" + floatToString(rot) + "<i>π</i>" + ")";
+        return "RX(" + rot_str + pi_str + ")";
     case RGate::Y:
-        return "RY(" + floatToString(rot) + "<i>π</i>"+")";
+        return "RY(" + rot_str + pi_str +")";
     case RGate::Z:
-        return "RZ(" + floatToString(rot) + "<i>π</i>"+")";
+        return "RZ(" + rot_str + pi_str +")";
     default:
         return "R";
     }

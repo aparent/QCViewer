@@ -183,15 +183,15 @@ void QCViewer::on_menu_file_open_circuit ()
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
         vector<string> errors = c.load (dialog.get_filename ());
-				if (errors.size()>1){
-					string error_message;
-					for ( unsigned int i = 0; i < errors.size(); i++){
-						error_message += errors.at(i) + "\n";
-					}
-					Gtk::MessageDialog dialog(*this, "Error");
-        	dialog.set_secondary_text(error_message);
-        	dialog.run();
-				}
+        if (errors.size()>1) {
+            string error_message;
+            for ( unsigned int i = 0; i < errors.size(); i++) {
+                error_message += errors.at(i) + "\n";
+            }
+            Gtk::MessageDialog dialog(*this, "Error");
+            dialog.set_secondary_text(error_message);
+            dialog.run();
+        }
         selections.clear ();
         c.set_drawparallel (drawparallel);
         c.set_drawarch (drawarch);

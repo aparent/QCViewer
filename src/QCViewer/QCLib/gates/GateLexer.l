@@ -34,7 +34,7 @@ Authors: Alex Parent, Jacob Parker
 	#include "GateParser.h"
 	#include <cstdlib>
 	#include <iostream>
-	#define SAVE_TOKEN Gate_lval.string = strdup(yytext); std::cout<<"Parsed: "<<yytext<<std::endl;
+	#define SAVE_TOKEN Gate_lval.string = strdup(yytext);
 	#define TOKEN(t) (Gate_lval.token = t)
 %}
 

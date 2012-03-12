@@ -435,7 +435,7 @@ void CircuitWidget::newcircuit (unsigned int numqubits)
 vector<string> CircuitWidget::load (string file)
 {
     if (circuit != NULL) delete circuit;
-		vector<string> error_log;
+    vector<string> error_log;
     circuit = parseCircuit(file,error_log);
     layout.clear ();
     breakpoints.clear ();

@@ -32,7 +32,7 @@ int main (int argc, char *argv[])
 {
     Circuit* c;
     if (argc > 0) {
-				vector<string> error_log;
+        vector<string> error_log;
         c = parseCircuit(argv[1],error_log);
         c->getGreedyParallel();
     } else {
