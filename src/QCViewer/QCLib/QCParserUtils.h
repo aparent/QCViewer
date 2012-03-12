@@ -39,13 +39,13 @@ public:
     bool neg;
     name_node *next;
 };
-void cleanup_bad_gates(Circuit * c);
+void cleanup_bad_gates(Circuit * c,std::vector<std::string>& error_log);
 void add_lines (Circuit * circ, name_node *names);
 void add_inputs (Circuit * circ, name_node *names);
 void add_outputs (Circuit * circ, name_node *names);
 void add_constants (Circuit * circ, name_node *names);
 void add_outlabels (Circuit * circ, name_node *names);
-void add_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, std::map<std::string,Circuit*> &subcircuits);
+void add_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, std::map<std::string,Circuit*> &subcircuits,std::vector<std::string>& error_log);
 void add_R_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, double rot);
 void link_subcircs (Circuit * circ);
 void insert_break(Circuit *circ);

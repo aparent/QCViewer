@@ -42,7 +42,7 @@ class CircuitWidget : public Gtk::DrawingArea
 public:
     CircuitWidget ();
     virtual ~CircuitWidget ();
-    void load (std::string);
+    std::vector<std::string> load (std::string);
     void loadArch (std::string);
     void arch_set_LNN();
 

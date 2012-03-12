@@ -182,7 +182,16 @@ void QCViewer::on_menu_file_open_circuit ()
 
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
-        c.load (dialog.get_filename ());
+        vector<string> errors = c.load (dialog.get_filename ());
+        if (errors.size()>1) {
+            string error_message;
+            for ( unsigned int i = 0; i < errors.size(); i++) {
+                error_message += errors.at(i) + "\n";
+            }
+            Gtk::MessageDialog dialog(*this, "Error");
+            dialog.set_secondary_text(error_message);
+            dialog.run();
+        }
         selections.clear ();
         c.set_drawparallel (drawparallel);
         c.set_drawarch (drawarch);
@@ -701,6 +710,7 @@ void QCViewer::setup_menu_layout()
     m_RGateEditFrame.set_label ("Rotation");
     m_RGateEditFrame.add (m_RGateEditTable);
     m_RGateEditTable.resize (3,2);
+    m_EditSidebar.pack_start (m_RGateEditFrame, Gtk::PACK_SHRINK);
     btn_RX.set_group (m_RAxisGroup);
     btn_RX.set_label ("X");
     btn_RY.set_group (m_RAxisGroup);

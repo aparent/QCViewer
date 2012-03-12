@@ -29,6 +29,7 @@ Authors: Alex Parent
 #include <cstdlib>
 #include "utility.h"
 #include <iostream>
+#include <vector>
 #include "subcircuit.h"
 #include "QCLib/gates/UGateLookup.h"
 
@@ -130,7 +131,7 @@ bool check_dup(name_node *names)
     return check_dup(names->next);
 }
 
-void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits)
+void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits, vector<string>& error_log)
 {
     if (names == NULL) {
         cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
@@ -250,23 +251,23 @@ void link_subcircs(Circuit * circ)
     }
 }
 
-void remove_bad_gates(Circuit * c)
+void remove_bad_gates(Circuit * c, vector<string>& error_log )
 {
     for (unsigned int i = 0; i < c->numGates(); i++) {
         string name = c->getGate(i)->getName();
         if (c->getGate(i)->type!=Gate::RGATE && c->getGate(i)->type!=Gate::SUBCIRC && name.compare("tof")!=0 && UGateLookup(name) == NULL ) {
-            cout << "Gate: " << name << " is unrecognized. Excluding." << endl;
+            error_log.push_back("Gate: " + name + " is unrecognized. Excluding.");
             c->removeGate (i);
             i--;
         }
     }
 }
 
-void cleanup_bad_gates(Circuit * circ)
+void cleanup_bad_gates(Circuit * circ, vector<string>& error_log)
 {
-    remove_bad_gates (circ);
+    remove_bad_gates (circ,error_log);
     map<string,Circuit*> subcircs = circ->subcircuits;
     for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
-        remove_bad_gates(it->second);
+        remove_bad_gates(it->second, error_log);
     }
 }

@@ -54,13 +54,20 @@ Gate* RGate::clone() const
 
 string RGate::getName() const
 {
+    const string pi_str = "<span font=\"SYMBOL bold 14\">π</span>";
+    string rot_str;
+    if (rot == 1.0) {
+        rot_str = "";
+    } else {
+        rot_str = floatToString(rot);
+    }
     switch (axis) {
     case RGate::X:
-        return "RX(" + floatToString(rot) + ")";
+        return "RX(" + rot_str + pi_str + ")";
     case RGate::Y:
-        return "RY(" + floatToString(rot)+")";
+        return "RY(" + rot_str + pi_str +")";
     case RGate::Z:
-        return "RZ(" + floatToString(rot)+")";
+        return "RZ(" + rot_str + pi_str +")";
     default:
         return "R";
     }
@@ -169,12 +176,10 @@ void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
     double dw = wireToY(1)-wireToY(0);
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
     double height = dw*(maxw-minw+Upad);
-
-    // get width of this box
     cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, name.c_str(), &extents);
-    double width = extents.width+2*textPad;
+    double w,h;
+    PangoLayout *layout = create_text_layout(cr, name, w, h);
+    double width = w+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
     }
@@ -187,15 +192,18 @@ void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
     cairo_set_line_width (cr, thickness);
     cairo_stroke(cr);
 
-    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
-    double y = yc - extents.height/2 - extents.y_bearing;
+    double x = (xc - radius + width/2) - w/2;// - extents.x_bearing;
+    double y = yc - h/2; //- extents.y_bearing;
     cairo_move_to(cr, x, y);
-    cairo_show_text (cr, name.c_str());
+
+    pango_cairo_show_layout (cr, layout);
+
     gateRect r;
     r.x0 = xc - thickness-radius;
     r.y0 = yc -height/2 - thickness;
     r.width = width + 2*thickness;
     r.height = height + 2*thickness;
+
     rects.push_back(combine_gateRect(rect, r));
     maxX = max (maxX, r.width);
 }
