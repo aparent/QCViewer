@@ -396,11 +396,6 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
             for (unsigned int i = 0; i < NextGateToSimulate; i++) {
                 drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
             }
-            if (false) {
-                for (unsigned int i = 0; i < layout.size (); i++) {
-                    drawRect (cr->cobj(), columns[i], Colour (0.3, 0.3,0.3,0.7), Colour (0.3,0.3,0.3,0.3));
-                }
-            }
             for (unsigned int i = 0; i < breakpoints.size (); i++) {
                 unsigned int j = breakpoints[i];
                 double x = (columns[j].x0+columns[j].width+columns[j+1].x0)/2.0;
@@ -545,7 +540,7 @@ unsigned int findcolumn (vector<LayoutColumn>& layout, unsigned int gate)
 bool CircuitWidget::run (bool breaks)
 {
     if (!circuit || !state) return false;
-	  bool ret = circuit->run(*state);
+    bool ret = circuit->run(*state);
     force_redraw ();
     return ret;
 }
@@ -553,26 +548,17 @@ bool CircuitWidget::run (bool breaks)
 bool CircuitWidget::step ()
 {
     if (!circuit || !state) return false;
-    if (NextGateToSimulate < circuit->numGates ()) {
-        vector<uint32_t> foo;
-        foo.push_back(NextGateToSimulate - 1);
-        *state = ApplyGate(*state,circuit->getGate(NextGateToSimulate));
-        if (!state) return false;
-        NextGateToSimulate++;
-        force_redraw ();
-        return true;
-    } else {
-        return false;
-    }
+    bool ret = circuit->step(*state);
+    force_redraw ();
+    return ret;
 }
 
 void CircuitWidget::reset ()
 {
     if(circuit!=NULL) {
-        if (circuit && NextGateToSimulate != 0) {
-            NextGateToSimulate = 0;
-            force_redraw ();
-        }
+        circuit->reset();
+        NextGateToSimulate = 0;
+        force_redraw ();
     }
 }
 

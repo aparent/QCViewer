@@ -26,6 +26,7 @@ Authors: Alex Parent, Jacob Parker
 
 
 #include "circuit.h"
+#include "subcircuit.h"
 #include "utility.h"
 #include <map>
 #include <algorithm> // for sort, which we should probably cut out
@@ -352,6 +353,9 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
                 Gate* g = getGate (i);
                 minmaxWire (g->controls, g->targets, mingw, maxgw);
                 g->draw(cr,xcurr,maxX,rects);
+                if (simState.simulating && simState.gate == i+1) {
+                    drawRect (cr, rects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+                }
             }
             xcurr += gatePad;
             xcurr += maxX;
@@ -451,6 +455,25 @@ cairo_rectangle_t Circuit::get_circuit_size (double* wirestart, double* wireend,
     return ext;
 }
 
+/*
+void Circuit::generate_layout_rects ()
+{
+    columns.clear ();
+    if (!circuit || circuit->numGates () == 0) return;
+    unsigned int start_gate = 0;
+    for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
+        gateRect bounds = rects.at(start_gate);
+        for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID ; gate++) {
+            bounds = combine_gateRect(bounds, rects[gate]);
+        }
+        bounds.y0 = ext.y;
+        bounds.height = max (bounds.height, ext.height);
+        columns.push_back(bounds);
+        start_gate = layout[column].lastGateID + 1;
+    }
+}
+*/
+
 void Circuit::savepng (string filename, cairo_font_face_t * ft_default)
 {
     double wirestart, wireend;
@@ -491,6 +514,38 @@ bool Circuit::run (State& state)
         if (columns.at(column_id) + 1 == simState.gate) {
             return true;
         }
+    }
+    return false;
+}
+
+void Circuit::reset ()
+{
+    simState.gate = 0;
+    simState.nextGate = true;
+    simState.simulating = false;
+    for ( unsigned int i = 0; i < numGates(); i++ ) {
+        Gate* g = getGate(i);
+        if (g->type == Gate::SUBCIRC) {
+            ((Subcircuit*)g)->reset();
+        }
+    }
+}
+
+bool Circuit::step (State& state)
+{
+    simState.simulating = true;
+    if (simState.gate < numGates () ) {
+        Gate* g = getGate(simState.gate);
+        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
+            state = ApplyGate(state,g);
+            simState.gate++;
+        } else {
+            if (! ((Subcircuit*)g)->step(state)) {
+                simState.gate++;
+                step(state);
+            }
+        }
+        return true;
     }
     return false;
 }

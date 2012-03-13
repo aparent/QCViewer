@@ -72,9 +72,11 @@ private:
 class SimState
 {
 public:
-   SimState () : gate(0),nextGate(true) {}
-	unsigned int gate;
-	bool nextGate;
+    SimState () : gate(0),nextGate(true),simulating(false),loop(1) {}
+    unsigned int gate;
+    bool nextGate;
+    bool simulating;
+    unsigned int loop;
 };
 
 class Circuit
@@ -105,20 +107,20 @@ public:
     unsigned int totalGates() const;
 
     /* Simulation */
-		//! Runs the full circuit on the input state.
+    //! Runs the full circuit on the input state.
     bool run (State &s);
-		//! Steps the circuit through the next gate.
-    //bool step (State &s);
-		//! Resets current gate to the beginning of the circuit.
-    //void reset ();
+    //! Steps the circuit through the next gate.
+    bool step (State &s);
+    //! Resets current gate to the beginning of the circuit.
+    void reset ();
 
-		/* architecture */
+    /* architecture */
     void newArch ();
     void parseArch (std::string);
     void arch_set_LNN();
 
-		//! Returns a std::vector of ints specifying the last gate in each parallel block.
-    std::vector<int> getParallel() const;  
+    //! Returns a std::vector of ints specifying the last gate in each parallel block.
+    std::vector<int> getParallel() const;
     std::vector<unsigned int> getGreedyParallel (); // used for drawing gates in the same column
     std::vector<int> getArchWarnings () const;
     std::vector<int> column_breaks;
@@ -138,8 +140,8 @@ private:
     std::vector <Line>            lines;
     std::vector <unsigned int>    columns;
     std::vector<unsigned int> breakpoints;
-		
-		SimState simState;
+
+    SimState simState;
 
     std::vector<gateRect> draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const;
     void drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const;
@@ -149,7 +151,7 @@ private:
     void drawPWire (cairo_t *cr, double x, int numLines) const;
     void write_to_png (cairo_surface_t* surf, std::string filename) const;
 
-		unsigned int findcolumn (unsigned int gate) const;
+    unsigned int findcolumn (unsigned int gate) const;
     //for deconstructor
     void removeSubcircuits();
     void removeArch ();

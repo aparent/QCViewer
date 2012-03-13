@@ -44,6 +44,12 @@ public:
     unsigned int numGates() const;
     void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) ;
 
+    //! Steps the subcircuit through the next gate.
+    bool step (State &s);
+    //! Resets current gate to the beginning of the subcircuit.
+    void reset ();
+
+
     Gate* getGate(int pos) const;
     Circuit* getCircuit();
     std::vector<unsigned int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
@@ -55,6 +61,7 @@ private:
     void drawSubCircBox(cairo_t* cr, gateRect &r) const;
     gateRect drawExp(cairo_t *cr,double xcurr) const;
     index_t BuildBitString (index_t, unsigned int);
+    SimState* simState;
     Circuit* circ;
 };
 

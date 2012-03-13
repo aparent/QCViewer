@@ -40,6 +40,7 @@ Subcircuit::Subcircuit(Circuit* n_circ, const map <unsigned int,unsigned int>& n
     lineMap = n_linemap;
     loop_count = loops;
     expand = false;
+    simState = new SimState();
 }
 
 Gate* Subcircuit::clone() const
@@ -48,6 +49,7 @@ Gate* Subcircuit::clone() const
     g->controls = controls;
     g->targets = targets;
     g->expand = expand;
+    g->simState = simState;
     return g;
 }
 
@@ -150,6 +152,10 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
             xcurr += gatePad;
             currentCol++;
         }
+
+        if (simState->simulating && simState->gate == i + 1 ) {
+            drawRect (cr, subRects->back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+        }
     }
     xcurr -= maxX;
     xcurr -= gatePad;
@@ -172,8 +178,12 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
     cairo_set_dash (cr, dashes, 0, 0.0);
     stringstream ss;
     ss << getName();
+
     if (getLoopCount() > 1) {
         ss << " x" << getLoopCount();
+        if (simState->simulating) {
+            ss << " " << simState->loop << "/" << getLoopCount();
+        }
     }
     //cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents;
@@ -228,4 +238,45 @@ gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
     r.width = width + 2*thickness;
     r.height = height + 2*thickness;
     return combine_gateRect(rect, r);
+}
+
+bool Subcircuit::step (State& state)
+{
+    simState->simulating = true;
+    if (simState->gate < numGates () ) {
+        Gate* g = getGate(simState->gate);
+        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
+            state = ApplyGate(state,g);
+            simState->gate++;
+        } else {
+            if ( ! ((Subcircuit*)g)->step(state)) {
+                simState->gate++;
+                step(state);
+            }
+        }
+        return true;
+    }
+    if (simState->loop < getLoopCount()) {
+        simState->gate = 0;
+        simState->nextGate = true;
+        simState->loop++;
+        step(state);
+        return true;
+    }
+    reset();
+    return false;
+}
+
+void Subcircuit::reset ()
+{
+    simState->gate = 0;
+    simState->loop = 1;
+    simState->nextGate = true;
+    simState->simulating = false;
+    for ( unsigned int i = 0; i < numGates(); i++ ) {
+        Gate* g = getGate(i);
+        if (g->type == Gate::SUBCIRC) {
+            ((Subcircuit*)g)->reset();
+        }
+    }
 }
