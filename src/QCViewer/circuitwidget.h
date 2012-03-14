@@ -118,6 +118,7 @@ private:
     cairo_rectangle_t ext;
     double wirestart, wireend;
 
+    void delete_recs( std::vector<gateRect>& recs);
     std::vector<gateRect> columns;
     std::vector<gateRect> rects;
     std::vector<Selection> selections;

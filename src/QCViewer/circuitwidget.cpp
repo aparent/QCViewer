@@ -661,6 +661,7 @@ void CircuitWidget::delete_gate (unsigned int id)
 
 void CircuitWidget::generate_layout_rects ()
 {
+    delete_recs(columns);
     columns.clear ();
     if (!circuit || circuit->numGates () == 0) return;
     unsigned int start_gate = 0;
@@ -733,4 +734,11 @@ bool CircuitWidget::is_subcirc (unsigned int id)
 Gate* CircuitWidget::getGate(unsigned int id)
 {
     return circuit->getGate(id);
+}
+
+void CircuitWidget::delete_recs(std::vector<gateRect>& recs)
+{
+    for (unsigned int i = 0; i < recs.size(); i++) {
+        recs.at(i).remove();
+    }
 }

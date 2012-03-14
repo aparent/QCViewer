@@ -282,6 +282,7 @@ gateRect UGate::drawCU (cairo_t *cr, uint32_t xc)
     cairo_move_to(cr, x, y);
 
     pango_cairo_show_layout (cr, layout);
+    g_object_unref(layout);
 
     gateRect r;
     r.x0 = xc - thickness-radius;

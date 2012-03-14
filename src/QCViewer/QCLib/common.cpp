@@ -55,10 +55,12 @@ Selection::Selection(uint32_t n, vector<Selection>* s)
     sub = s;
 }
 
-gateRect::~gateRect()
+void gateRect::remove()
 {
     if (subRects != NULL) {
-        //delete subRects; TODO: FIX ME
+        for (int i = 0; i < subRects->size(); i++) {
+            subRects->at(i).remove();
+        }
     }
 }
 

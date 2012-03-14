@@ -119,6 +119,7 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     double y = (1.0/scale)*(yc)- (1.0/2.0)*h ;
     cairo_move_to (cr, x, y);
     pango_cairo_show_layout (cr, layout);
+    g_object_unref(layout);
 }
 
 gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=true)

@@ -49,7 +49,7 @@ class gateRect
 {
 public:
     gateRect();
-    ~gateRect();
+    void remove();
     double x0, y0;
     double width, height;
     std::vector<gateRect> * subRects;
