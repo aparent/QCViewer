@@ -40,6 +40,7 @@ Subcircuit::Subcircuit(Circuit* n_circ, const map <unsigned int,unsigned int>& n
     lineMap = n_linemap;
     loop_count = loops;
     expand = false;
+    unroll = false;
     simState = new SimState();
 }
 
@@ -143,18 +144,22 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     double maxX = 0.0;
     vector <gateRect>*subRects = new vector<gateRect>;
     vector<unsigned int> para = getGreedyParallel();
-    unsigned int currentCol = 0;
-    for(unsigned int i = 0; i < numGates(); i++) {
-        getGate(i)->draw(cr,xcurr,maxX,*subRects);
-        if(para.size() > currentCol && i == para[currentCol]) {
-            xcurr += maxX;
-            maxX = 0.0;
-            xcurr += gatePad;
-            currentCol++;
-        }
+    for(unsigned int j = 0; j <= (unroll * (getLoopCount()-1)); j++) {
+        unsigned int currentCol = 0;
+        for(unsigned int i = 0; i < numGates(); i++) {
+            getGate(i)->draw(cr,xcurr,maxX,*subRects);
+            if(para.size() > currentCol && i == para[currentCol]) {
+                xcurr += maxX;
+                maxX = 0.0;
+                xcurr += gatePad;
+                currentCol++;
+            }
 
-        if (simState->simulating && simState->gate == i + 1 ) {
-            drawRect (cr, subRects->back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+            if (simState->simulating && !unroll && simState->gate == i + 1 ) {
+                drawRect (cr, subRects->back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+            } else if (simState->simulating && unroll && simState->gate +(simState->loop-1)*numGates()  == j*numGates() + i + 1)  {
+                drawRect (cr, subRects->back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+            }
         }
     }
     xcurr -= maxX;

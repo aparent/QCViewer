@@ -53,7 +53,12 @@ public:
     Gate* getGate(int pos) const;
     Circuit* getCircuit();
     std::vector<unsigned int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
+
+    //! Set true is circuit should be draw in expanded mode
     bool expand;
+    //! Set true is circuit should be draw in unrolled mode
+    bool unroll;
+
 protected:
     std::map<unsigned int,unsigned int> lineMap;
 private:

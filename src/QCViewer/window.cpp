@@ -504,6 +504,15 @@ void QCViewer::expand_subcirc()
     }
 }
 
+void QCViewer::unroll_subcirc()
+{
+    Gate* g = c.getSelectedGate();
+    if (g != NULL && g->type==Gate::SUBCIRC) {
+        ((Subcircuit*)g)->unroll = !((Subcircuit*)g)->unroll;
+        c.force_redraw();
+    }
+}
+
 void QCViewer::update_mode ()
 {
     if (btn_editcontrols.get_active ()) {
@@ -674,12 +683,15 @@ void QCViewer::setup_menu_layout()
     m_SubcircNameLbl.set_label("Name: ");
     m_SubcircExpandButton.set_label ("Expand");
     m_SubcircExpandButton.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::expand_subcirc));
+    m_SubcircUnrollButton.set_label ("Unroll");
+    m_SubcircUnrollButton.signal_clicked().connect(sigc::mem_fun(*this, &QCViewer::unroll_subcirc));
     m_SubcircNameEntry.signal_activate().connect(sigc::mem_fun(*this, &QCViewer::set_subcircuit_name));
 
 
     m_SubcircTable.attach(m_SubcircNameLbl, 0,1,0,1);
     m_SubcircTable.attach(m_SubcircNameEntry, 1,2,0,2);
     m_SubcircTable.attach(m_SubcircExpandButton,0,2,2,3);
+    m_SubcircTable.attach(m_SubcircUnrollButton,0,2,3,4);
 
     m_EditSidebar.pack_start (m_Subcirc, Gtk::PACK_SHRINK);
 
