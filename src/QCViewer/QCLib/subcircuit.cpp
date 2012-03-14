@@ -147,7 +147,9 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     for(unsigned int j = 0; j <= (unroll * (getLoopCount()-1)); j++) {
         unsigned int currentCol = 0;
         for(unsigned int i = 0; i < numGates(); i++) {
-            getGate(i)->draw(cr,xcurr,maxX,*subRects);
+            Gate * g = getGate(i);
+            g->draw(cr,xcurr,maxX,*subRects);
+            delete g;
             if(para.size() > currentCol && i == para[currentCol]) {
                 xcurr += maxX;
                 maxX = 0.0;

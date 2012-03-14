@@ -688,7 +688,7 @@ Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> *se
         return NULL;
     }
     Gate* g = circuit->getGate(selections->at(0).gate);
-    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
+    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand&& !((Subcircuit*)g)->unroll ) {
         g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
     }
     return g;
@@ -701,7 +701,7 @@ Gate *CircuitWidget::getSelectedGate ()
         return NULL;
     }
     Gate* g = circuit->getGate(selections.at(0).gate);
-    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand) {
+    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll ) {
         g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
     }
     return g;
