@@ -688,7 +688,6 @@ Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> *se
         return NULL;
     }
     Gate* g = circuit->getGate(selections->at(0).gate);
-    cout << "Subgate: " << g->getName() << endl;
     if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
         g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
     }
@@ -703,7 +702,6 @@ Gate *CircuitWidget::getSelectedGate ()
     }
     Gate* g = circuit->getGate(selections.at(0).gate);
     if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand) {
-        cout << "SELECTED SUBGATE"<< endl;
         g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
     }
     return g;

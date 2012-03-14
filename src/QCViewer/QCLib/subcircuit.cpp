@@ -202,7 +202,11 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
 gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
 {
     uint32_t minw, maxw;
-    string name = getName();
+    stringstream ss;
+    ss << getName();
+    if (getLoopCount() > 1) {
+        ss << " x" << getLoopCount();
+    }
     vector<Control> dummy;
     minmaxWire (dummy, targets, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.
@@ -214,7 +218,7 @@ gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
     // get width of this box
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_text_extents_t extents;
-    cairo_text_extents(cr, name.c_str(), &extents);
+    cairo_text_extents(cr, ss.str().c_str(), &extents);
     double width = extents.width+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
@@ -231,7 +235,7 @@ gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
     double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
     double y = yc - extents.height/2 - extents.y_bearing;
     cairo_move_to(cr, x, y);
-    cairo_show_text (cr, name.c_str());
+    cairo_show_text (cr, ss.str().c_str());
     gateRect r;
     r.x0 = xc - thickness-radius;
     r.y0 = yc -height/2 - thickness;

@@ -499,7 +499,6 @@ void QCViewer::expand_subcirc()
 {
     Gate* g = c.getSelectedGate();
     if (g != NULL && g->type==Gate::SUBCIRC) {
-        cout << "EXPAND: " << g->getName() << endl;
         ((Subcircuit*)g)->expand = !((Subcircuit*)g)->expand;
         c.force_redraw();
     }
