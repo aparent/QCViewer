@@ -777,8 +777,10 @@ void QCViewer::register_stock_items()
 void QCViewer::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory, const std::string& filepath,
                               const Glib::ustring& id, const Glib::ustring& label)
 {
+		Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_file(filepath);
+		if (pixbuf!=NULL){
     Gtk::IconSource source;
-    source.set_pixbuf( Gdk::Pixbuf::create_from_file(filepath) );
+    source.set_pixbuf(pixbuf);
     source.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
     source.set_size_wildcarded(); //Icon may be scaled.
     Gtk::IconSet icon_set;
@@ -786,5 +788,6 @@ void QCViewer::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory, con
     const Gtk::StockID stock_id(id);
     factory->add(stock_id, icon_set);
     Gtk::Stock::add(Gtk::StockItem(stock_id, label));
+	}
 }
 
