@@ -259,11 +259,11 @@ gateRect UGate::drawCU (cairo_t *cr, uint32_t xc)
 
     double dw = wireToY(1)-wireToY(0);
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
-    double height = dw*(maxw-minw+Upad);
 
     cairo_set_source_rgb (cr, 0, 0, 0);
     double w,h;
     PangoLayout *layout = create_text_layout(cr, name, w, h);
+    double height = dw*(maxw-minw+Upad);
     double width = w+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
@@ -278,7 +278,7 @@ gateRect UGate::drawCU (cairo_t *cr, uint32_t xc)
     cairo_stroke(cr);
 
     double x = (xc - radius + width/2) - w/2;// - extents.x_bearing;
-    double y = yc - h/2; //- extents.y_bearing;
+    double y = yc - height/2; //- extents.y_bearing;
     cairo_move_to(cr, x, y);
 
     pango_cairo_show_layout (cr, layout);

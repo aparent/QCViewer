@@ -54,7 +54,9 @@ Gate* RGate::clone() const
 
 string RGate::getName() const
 {
-    const string pi_str = "<span font=\"SYMBOL bold 14\">π</span>";
+    //const string pi_str = "<span font=\"SYMBOL bold 14\">π</span>";
+    const string pi_str = "<span font_desc=\"LMMathItalic12 bold 18\">π</span>";
+    //const string pi_str = "π";
     string rot_str;
     if (rot == 1.0) {
         rot_str = "";
@@ -193,7 +195,7 @@ void RGate::draw(cairo_t *cr,double &xc,double &maxX, vector <gateRect> &rects)
     cairo_stroke(cr);
 
     double x = (xc - radius + width/2) - w/2;// - extents.x_bearing;
-    double y = yc - h/2; //- extents.y_bearing;
+    double y = yc - height/2; //- extents.y_bearing;
     cairo_move_to(cr, x, y);
 
     pango_cairo_show_layout (cr, layout);
