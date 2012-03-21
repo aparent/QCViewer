@@ -198,8 +198,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     context->drag_finish(true, false, time);
 }
 
-
-
 bool CircuitWidget::on_button_press_event (GdkEventButton* event)
 {
     if (!circuit) return true;
@@ -707,6 +705,36 @@ Gate *CircuitWidget::getSelectedGate ()
     }
     return g;
 }
+
+void CircuitWidget::deleteSelectedSubGate (Circuit* circuit, vector<Selection> *selections)
+{
+    if (!circuit || selections->size () != 1) {
+        if (selections->size () > 1) cout << "bad: deleteSelectedGate when multiple gates selected.\n";
+    }
+    Gate* g = circuit->getGate(selections->at(0).gate);
+    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand&& !((Subcircuit*)g)->unroll ) {
+        g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+    } else {
+			circuit->removeGate(selections->at(0).gate);
+		}
+
+}
+void CircuitWidget::deleteSelectedGate ()
+{
+    if (!circuit || selections.size () != 1) {
+        if (selections.size () > 1) cout << "bad: deleteSelectedGate when multiple gates selected.\n";
+    }
+    Gate* g = circuit->getGate(selections.at(0).gate);
+    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll ) {
+        deleteSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+    } else {
+			delete_gate(selections.at(0).gate);
+		}
+		force_redraw();
+}
+
+
+
 
 void  CircuitWidget::arch_set_LNN()
 {

@@ -77,6 +77,7 @@ public:
     void generate_layout_rects ();
 
     Gate* getSelectedGate ();
+		void deleteSelectedGate ();
     enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
     void set_mode (Mode);
     void add_subcirc ();
@@ -109,6 +110,7 @@ private:
 
     void toggle_selection (int);
     Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> *sub);
+		void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> *selections);
 
     State *state;
     bool drawarch, drawparallel;

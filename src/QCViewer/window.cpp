@@ -409,10 +409,8 @@ void QCViewer::on_menu_run ()
 
 void QCViewer::on_menu_delete ()
 {
-    if (selections.size () != 1) return;
-    unsigned int s = selections[0].gate;
+		c.deleteSelectedGate();
     set_selection (vector<Selection>());
-    c.delete_gate (s);
 }
 
 void QCViewer::set_selection (vector<Selection> s)
