@@ -70,14 +70,14 @@ public:
     bool step ();
     bool run (bool);
     void reset ();
-    void insert_gate_in_new_column (Gate *, uint32_t);
+    void insert_gate_in_new_column (Gate *, uint32_t, Circuit *);
     void insert_gate_in_column (Gate *, uint32_t);
     void insert_gate_at_front (Gate*);
     void delete_gate (uint32_t);
     void generate_layout_rects ();
 
     Gate* getSelectedGate ();
-		void deleteSelectedGate ();
+    void deleteSelectedGate ();
     enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
     void set_mode (Mode);
     void add_subcirc ();
@@ -101,6 +101,8 @@ private:
     std::vector<LayoutColumn> layout;
     std::vector<uint32_t> breakpoints;
 
+    void getCircuitAndColPosition (double x, double y, Circuit* c, std::vector<gateRect> &rects, std::string &r_name, int &r_pos);
+
     bool simulation_enabled;
     uint32_t NextGateToSimulate;
     bool panning;
@@ -110,7 +112,7 @@ private:
 
     void toggle_selection (int);
     Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> *sub);
-		void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> *selections);
+    void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> *selections);
 
     State *state;
     bool drawarch, drawparallel;

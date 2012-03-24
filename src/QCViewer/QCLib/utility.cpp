@@ -77,6 +77,14 @@ unsigned int SetRegister (unsigned int bits, unsigned int reg)
     return bits | 1<<reg;
 }
 
+unsigned int invertBits (unsigned int bits, unsigned int numBits){
+	unsigned int ret = 0;
+	for (unsigned int i = numBits; i>0; i --){
+		if (GetRegister(bits,i-1)) ret = SetRegister(ret,numBits-i);
+	}
+	return ret;
+}
+
 //Sets the bit at position reg to 0
 unsigned int UnsetRegister (unsigned int bits, unsigned int reg)
 {

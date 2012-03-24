@@ -58,6 +58,8 @@ unsigned int UnsetRegister (unsigned int bits, unsigned int reg);
 //Returns the value of the bit at position reg
 index_t GetRegister (index_t bits, index_t reg);
 
+unsigned int invertBits (unsigned int bits, unsigned int numBits);
+
 unsigned int  bitcount(unsigned int);
 index_t ExtractBits (index_t target, index_t bitString);
 

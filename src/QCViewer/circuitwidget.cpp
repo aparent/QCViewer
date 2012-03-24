@@ -150,50 +150,61 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
     double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
     vector<int> select_ids;
-    pickRect (columns, xx, yy, select_ids);
-    unsigned int wire = getFirstWire (yy);
-    if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
-    for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
-    if (columns.empty()) {
-        insert_gate_at_front (newgate);
-    } else if (select_ids.size() == 0) {
-        if (yy < columns[0].y0 || yy - columns[0].y0 > columns[0].height) {
-            // bad drag and drop
-        } else if (xx < columns[0].x0) {
+    //------------------test
+    string name;
+    int pos = -1;
+    getCircuitAndColPosition (xx, yy, circuit, rects, name, pos);
+    cout << "Pos: "<<pos << "  Name: "<<name << endl;
+    if (name.compare("Main")==0||pos==-1||name.compare("")==0) {
+        pickRect (columns, xx, yy, select_ids);
+        unsigned int wire = getFirstWire (yy);
+        if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
+        for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
+        if (columns.empty()) {
             insert_gate_at_front (newgate);
-        } else {
-            unsigned int i;
-            for (i = 1; i < columns.size (); i++) {
-                if (xx < columns[i].x0) {
-                    insert_gate_in_new_column (newgate, layout[i-1].lastGateID);
-                    break;
+        } else if (select_ids.size() == 0) {
+            if (yy < columns[0].y0 || yy - columns[0].y0 > columns[0].height) {
+                // bad drag and drop
+            } else if (xx < columns[0].x0) {
+                insert_gate_at_front (newgate);
+            } else {
+                unsigned int i;
+                for (i = 1; i < columns.size (); i++) {
+                    if (xx < columns[i].x0) {
+                        insert_gate_in_new_column (newgate, layout[i-1].lastGateID, circuit);
+                        break;
+                    }
+                }
+                if (i == columns.size ()) { // goes after all columns
+                    insert_gate_in_new_column (newgate, layout[i-1].lastGateID,circuit);
                 }
             }
-            if (i == columns.size ()) { // goes after all columns
-                insert_gate_in_new_column (newgate, layout[i-1].lastGateID);
+        } else {
+            unsigned int start = (select_ids.size()== 0) ? 0 : layout[select_ids.at(0) - 1].lastGateID + 1;
+            unsigned int end   = layout[select_ids.at(0)].lastGateID;
+            bool ok = true;
+            unsigned int mymaxwire, myminwire;
+            mymaxwire = myminwire = newgate->targets[0];
+            for (unsigned int j = 0; j < newgate->targets.size (); j++) {
+                mymaxwire = max (mymaxwire, newgate->targets[j]);
+                myminwire = min (myminwire, newgate->targets[j]);
+            }
+            for (unsigned int i = start; i <= end && ok; i++) {
+                unsigned int maxwire, minwire;
+                Gate* g = circuit->getGate (i);
+                minmaxWire (g->controls, g->targets, minwire, maxwire);
+                if (!(mymaxwire < minwire || myminwire > maxwire)) ok = false;
+            }
+            if (ok) {
+                insert_gate_in_column (newgate, select_ids.at(0));
+            } else {
+                insert_gate_in_new_column (newgate, end,circuit);
             }
         }
     } else {
-        unsigned int start = (select_ids.size()== 0) ? 0 : layout[select_ids.at(0) - 1].lastGateID + 1;
-        unsigned int end   = layout[select_ids.at(0)].lastGateID;
-        bool ok = true;
-        unsigned int mymaxwire, myminwire;
-        mymaxwire = myminwire = newgate->targets[0];
-        for (unsigned int j = 0; j < newgate->targets.size (); j++) {
-            mymaxwire = max (mymaxwire, newgate->targets[j]);
-            myminwire = min (myminwire, newgate->targets[j]);
-        }
-        for (unsigned int i = start; i <= end && ok; i++) {
-            unsigned int maxwire, minwire;
-            Gate* g = circuit->getGate (i);
-            minmaxWire (g->controls, g->targets, minwire, maxwire);
-            if (!(mymaxwire < minwire || myminwire > maxwire)) ok = false;
-        }
-        if (ok) {
-            insert_gate_in_column (newgate, select_ids.at(0));
-        } else {
-            insert_gate_in_new_column (newgate, end);
-        }
+        insert_gate_in_new_column (newgate, pos,circuit->subcircuits[name]);
+        unsigned int wire = getFirstWire (yy);
+        for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
     }
     context->drag_finish(true, false, time);
 }
@@ -389,6 +400,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit != NULL) {
+            delete_recs(rects);
             rects = circuit->draw (cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
             generate_layout_rects ();
             for (unsigned int i = 0; i < NextGateToSimulate; i++) {
@@ -616,21 +628,24 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
 }
 
 // XXX: this may actually be more complicated than necessary now.
-void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x)
+void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x, Circuit* circ)
 {
     if (!circuit) return;
     unsigned int i;
-    for (i = 0; i < layout.size() && layout[i].lastGateID < x; i++);
+    vector<unsigned int> para =  circ->getGreedyParallel();
+    for (i = 0; i < para.size() && para.at(i) < x; i++);
     unsigned int pos = layout[i].lastGateID + 1;
     for (unsigned int j = i + 1; j < layout.size (); j++) layout[j].lastGateID += 1;
-    circuit->addGate (g, pos);
-    circuit->getGreedyParallel();
+    circ->addGate (g, pos);
+    para = circ->getGreedyParallel();
     layout.insert (layout.begin() + i + 1, LayoutColumn (pos));
-    ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    ext = circ->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    //
+    for (unsigned int i = 0; i < para.size(); i++) {
+        layout.push_back (LayoutColumn(para[i]));
+    }
+    //
     force_redraw ();
-    selections.clear ();
-    selections.push_back (pos);
-    ((QCViewer*)win)->set_selection (selections);
 }
 
 void CircuitWidget::delete_gate (unsigned int id)
@@ -715,8 +730,8 @@ void CircuitWidget::deleteSelectedSubGate (Circuit* circuit, vector<Selection> *
     if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand&& !((Subcircuit*)g)->unroll ) {
         g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
     } else {
-			circuit->removeGate(selections->at(0).gate);
-		}
+        circuit->removeGate(selections->at(0).gate);
+    }
 
 }
 void CircuitWidget::deleteSelectedGate ()
@@ -728,9 +743,9 @@ void CircuitWidget::deleteSelectedGate ()
     if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll ) {
         deleteSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
     } else {
-			delete_gate(selections.at(0).gate);
-		}
-		force_redraw();
+        delete_gate(selections.at(0).gate);
+    }
+    force_redraw();
 }
 
 
@@ -762,6 +777,41 @@ bool CircuitWidget::is_subcirc (unsigned int id)
 Gate* CircuitWidget::getGate(unsigned int id)
 {
     return circuit->getGate(id);
+}
+
+
+void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, vector<gateRect> &rects, string &r_name, int &r_pos)
+{
+    vector<int> s;
+    int select = pickRect(rects,x,y,s);
+    if (select != -1) {
+        Gate* g = c->getGate(select);
+        if(g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll && rects.at(select).subRects!=NULL) {
+            getCircuitAndColPosition (x, y, ((Subcircuit*)g)->getCircuit(), *(rects.at(select).subRects), r_name, r_pos );
+        }
+    } else {
+        c->getGreedyParallel();
+        vector<unsigned int> para = c->getGreedyParallel();
+        vector<gateRect> cols;
+        unsigned int start_gate = 0;
+        for (unsigned int column = 0; column < para.size() && start_gate < circuit->numGates (); column++) {
+            gateRect bounds = rects.at(start_gate);
+            for (unsigned int gate = start_gate + 1; gate <= para.at(column); gate++) {
+                bounds = combine_gateRect(bounds, rects.at(gate));
+            }
+            bounds.y0 = ext.y;
+            bounds.height = max (bounds.height, ext.height);
+            cols.push_back(bounds);
+            start_gate = para.at(column) + 1;
+        }
+        for (unsigned int i = 0; i < cols.size (); i++) {
+            if (x < cols.at(i).x0) {
+                r_pos = i;
+                break;
+            }
+        }
+        r_name = c->getName();
+    }
 }
 
 void CircuitWidget::delete_recs(std::vector<gateRect>& recs)

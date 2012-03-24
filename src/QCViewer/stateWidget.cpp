@@ -356,7 +356,12 @@ void StateWidget::parse_state ()
         unsigned int maxID = 0; // XXX: should be bit string
         double maxMag = -1;
         for (unsigned int j = 0; j < skip; j++, n++) {
-            StateMap::iterator it = state->data.find (n);
+						cout << "----------------" << endl  << state->numBits() << endl;
+						printIntBin(n);
+						cout << endl;
+						printIntBin(invertBits (n,state->numBits()));
+						cout << endl;
+            StateMap::iterator it = state->data.find (invertBits (n,state->numBits()));
             if (it == state->data.end ()) continue;
             bucket[i] += it->second;
             double mag = it->second.real()*it->second.real() + it->second.imag()*it->second.imag();

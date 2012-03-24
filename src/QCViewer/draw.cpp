@@ -231,7 +231,7 @@ void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, do
     }
 }
 
-void pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)
+int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)
 {
     for (int i = 0; i < (int)rects.size (); i++) {
         if (rects[i].x0 <= x && rects[i].x0+rects[i].width >= x && rects[i].y0 <= y && rects[i].y0 + rects[i].height >= y) selections.push_back(i);
@@ -239,6 +239,10 @@ void pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &s
             pickRect (*(rects[i].subRects),x,y,selections);
         }
     }
+    if (selections.size() > 0) {
+        return selections.at(0);
+    }
+    return -1;
 }
 
 vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)

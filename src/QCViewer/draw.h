@@ -45,7 +45,7 @@ cairo_surface_t* make_png_surface (cairo_rectangle_t ext);
 cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);
 cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t);
 void write_to_png (cairo_surface_t* surf, std::string filename);
-void pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
+int pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
 std::vector<Selection> pickRects (const std::vector<gateRect> &rects, const gateRect &s);
 int pickWire (double);
 

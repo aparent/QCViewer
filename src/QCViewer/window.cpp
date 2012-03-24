@@ -409,7 +409,7 @@ void QCViewer::on_menu_run ()
 
 void QCViewer::on_menu_delete ()
 {
-		c.deleteSelectedGate();
+    c.deleteSelectedGate();
     set_selection (vector<Selection>());
 }
 
