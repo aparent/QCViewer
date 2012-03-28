@@ -207,6 +207,10 @@ vector<unsigned int> Circuit::getGreedyParallel()
     for(unsigned int i = 0; i < numGates(); i++) {
 start:
         Gate *g = getGate(i);
+				if (g->breakpoint){
+        		columns.push_back (k);
+						continue;
+				}
         minmaxWire (g->controls, g->targets, minw, maxw);
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {
@@ -359,6 +363,14 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
             }
             xcurr += gatePad;
             xcurr += maxX;
+						if (getGate(columns.at(j))->breakpoint){
+								cairo_set_source_rgba (cr,0.8,0,0,0.8);
+                cairo_move_to (cr,xcurr, wireToY(0));
+                cairo_line_to (cr,xcurr, wireToY(numLines()));
+                cairo_stroke (cr);
+    						cairo_set_source_rgb (cr, 0, 0, 0);
+            		xcurr += gatePad;
+						}
         }
     }
     xcurr -= maxX;

@@ -57,7 +57,7 @@ public:
     enum gateType {RGATE, UGATE, SUBCIRC};
     enum dType {NOT, FRED, D_SUBCIRC, DEFAULT};
     virtual ~Gate();
-    Gate():breakpoint(false){};
+    Gate();
     virtual Gate* clone() const=0;
     virtual void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) =0;
     virtual std::string getName() const=0;

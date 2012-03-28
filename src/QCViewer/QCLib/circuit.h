@@ -139,7 +139,7 @@ private:
     std::vector <Gate*>           gates;
     std::vector <Line>            lines;
     std::vector <unsigned int>    columns;
-    std::vector<unsigned int> breakpoints;
+    std::vector <unsigned int> breakpoints;
 
     SimState simState;
 

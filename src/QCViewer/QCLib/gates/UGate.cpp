@@ -36,7 +36,7 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-UGate::UGate(string n_name) : name(n_name)
+UGate::UGate(string n_name) : Gate(), name(n_name)
 {
     drawType = DEFAULT;
     type = UGATE;

@@ -33,6 +33,11 @@ using namespace std;
 
 Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
+Gate::Gate() 
+{
+	breakpoint = false;
+}
+
 Gate::~Gate() {}
 
 void Gate::setLoopCount(unsigned int loops)

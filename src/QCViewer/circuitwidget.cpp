@@ -155,7 +155,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     int pos = -1;
     getCircuitAndColPosition (xx, yy, circuit, rects, name, pos);
     cout << "Pos: "<<pos << "  Name: "<<name << endl;
-    if (name.compare("Main")==0||pos==-1||name.compare("")==0) {
+    if (name.compare("Main")==0||pos==-1||name.compare("")==0) {  //If the click is not in a subcircuit 
         pickRect (columns, xx, yy, select_ids);
         unsigned int wire = getFirstWire (yy);
         if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
@@ -304,9 +304,11 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                     it->polarity = !it->polarity;
                     if (!it->polarity) { // instead of cycling pos/neg, delete if it /was/ neg.
                         g->controls.erase (it);
+												circuit->getGreedyParallel();
                         force_redraw ();
                         return true;
                     }
+										circuit->getGreedyParallel();
                     force_redraw ();
                     return true;
                 }
@@ -331,11 +333,13 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                         selections[0].gate = firstGateID;
                         ((QCViewer*)win)->set_selection (selections);
                         layout.insert (layout.begin()+col_id, LayoutColumn (firstGateID));
+										circuit->getGreedyParallel();
                         force_redraw ();
                         return true;
                     }
                 }
             }
+						circuit->getGreedyParallel();
             force_redraw ();
             return true;
             break;
@@ -638,6 +642,7 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x, Circuit*
     for (unsigned int j = i + 1; j < layout.size (); j++) layout[j].lastGateID += 1;
     circ->addGate (g, pos);
     para = circ->getGreedyParallel();
+		circ->column_breaks.push_back(pos);
     layout.insert (layout.begin() + i + 1, LayoutColumn (pos));
     ext = circ->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     //
@@ -784,11 +789,12 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
 {
     vector<int> s;
     int select = pickRect(rects,x,y,s);
-    if (select != -1) {
-        Gate* g = c->getGate(select);
-        if(g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll && rects.at(select).subRects!=NULL) {
+		Gate* g = NULL;
+		if (select!=-1){
+        g = c->getGate(select);
+		}
+    if (g != NULL && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll && rects.at(select).subRects!=NULL) {
             getCircuitAndColPosition (x, y, ((Subcircuit*)g)->getCircuit(), *(rects.at(select).subRects), r_name, r_pos );
-        }
     } else {
         c->getGreedyParallel();
         vector<unsigned int> para = c->getGreedyParallel();
