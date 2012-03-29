@@ -73,7 +73,6 @@ public:
     void insert_gate_in_new_column (Gate *, uint32_t, Circuit *);
     void insert_gate_in_column (Gate *, uint32_t);
     void insert_gate_at_front (Gate*);
-    void delete_gate (uint32_t);
     void generate_layout_rects ();
 
     Gate* getSelectedGate ();
@@ -98,7 +97,7 @@ protected:
 
 private:
     Mode mode;
-    std::vector<LayoutColumn> layout;
+    //std::vector<LayoutColumn> layout;
     std::vector<uint32_t> breakpoints;
 
     void getCircuitAndColPosition (double x, double y, Circuit* c, std::vector<gateRect> &rects, std::string &r_name, int &r_pos);

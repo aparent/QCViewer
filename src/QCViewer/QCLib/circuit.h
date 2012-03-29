@@ -124,6 +124,7 @@ public:
     std::vector<unsigned int> getGreedyParallel (); // used for drawing gates in the same column
     std::vector<int> getArchWarnings () const;
     std::vector<int> column_breaks;
+    std::vector <unsigned int>    columns;
 
 
 
@@ -138,7 +139,6 @@ private:
     std::string name;
     std::vector <Gate*>           gates;
     std::vector <Line>            lines;
-    std::vector <unsigned int>    columns;
     std::vector <unsigned int> breakpoints;
 
     SimState simState;

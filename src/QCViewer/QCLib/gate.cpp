@@ -33,9 +33,9 @@ using namespace std;
 
 Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
-Gate::Gate() 
+Gate::Gate()
 {
-	breakpoint = false;
+    breakpoint = false;
 }
 
 Gate::~Gate() {}

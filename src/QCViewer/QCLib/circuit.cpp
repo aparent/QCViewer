@@ -207,10 +207,7 @@ vector<unsigned int> Circuit::getGreedyParallel()
     for(unsigned int i = 0; i < numGates(); i++) {
 start:
         Gate *g = getGate(i);
-				if (g->breakpoint){
-        		columns.push_back (k);
-						continue;
-				}
+
         minmaxWire (g->controls, g->targets, minw, maxw);
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {
@@ -224,6 +221,11 @@ start:
             columns.push_back (i);
             k++;
             linesUsed.clear ();
+        } else if (g->breakpoint) {
+            columns.push_back (k);
+            k++;
+            linesUsed.clear ();
+            continue;
         }
     }
     for (; k < (int)parallel.size(); k++) {
@@ -361,16 +363,15 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
                     drawRect (cr, rects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
                 }
             }
-            xcurr += gatePad;
-            xcurr += maxX;
-						if (getGate(columns.at(j))->breakpoint){
-								cairo_set_source_rgba (cr,0.8,0,0,0.8);
+            xcurr += maxX - gatePad/2;
+            if (getGate(columns.at(j))->breakpoint) {
+                cairo_set_source_rgba (cr,0.8,0,0,0.8);
                 cairo_move_to (cr,xcurr, wireToY(0));
-                cairo_line_to (cr,xcurr, wireToY(numLines()));
+                cairo_line_to (cr,xcurr, wireToY(numLines()-1));
                 cairo_stroke (cr);
-    						cairo_set_source_rgb (cr, 0, 0, 0);
-            		xcurr += gatePad;
-						}
+                cairo_set_source_rgb (cr, 0, 0, 0);
+            }
+            xcurr += gatePad*1.5;
         }
     }
     xcurr -= maxX;

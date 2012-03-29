@@ -151,9 +151,16 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
             g->draw(cr,xcurr,maxX,*subRects);
             delete g;
             if(para.size() > currentCol && i == para[currentCol]) {
-                xcurr += maxX;
+                xcurr += maxX - gatePad/2;
+                if (circ->getGate(i)->breakpoint) {
+                    cairo_set_source_rgba (cr,0.8,0,0,0.8);
+                    cairo_move_to (cr,xcurr, wireToY(0));
+                    cairo_line_to (cr,xcurr, wireToY(circ->numLines()-1));
+                    cairo_stroke (cr);
+                    cairo_set_source_rgb (cr, 0, 0, 0);
+                }
+                xcurr += gatePad*1.5;
                 maxX = 0.0;
-                xcurr += gatePad;
                 currentCol++;
             }
 
