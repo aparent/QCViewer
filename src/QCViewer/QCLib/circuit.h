@@ -123,7 +123,6 @@ public:
     std::vector<int> getParallel() const;
     std::vector<unsigned int> getGreedyParallel (); // used for drawing gates in the same column
     std::vector<int> getArchWarnings () const;
-    std::vector<int> column_breaks;
     std::vector <unsigned int>    columns;
 
 

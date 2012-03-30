@@ -36,6 +36,7 @@ Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 Gate::Gate()
 {
     breakpoint = false;
+    colbreak = false;
 }
 
 Gate::~Gate() {}

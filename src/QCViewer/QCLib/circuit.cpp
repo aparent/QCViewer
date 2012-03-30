@@ -212,24 +212,23 @@ start:
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {
                 columns.push_back(i - 1);
+                k++;
                 linesUsed.clear ();
                 goto start;
             }
             linesUsed[j]; //access element so that it exists in map
         }
-        if (i == (unsigned int)parallel[k] || std::find(column_breaks.begin(), column_breaks.end(), i) != column_breaks.end()) { // into next parallel group, so force a column move
+        if (g->breakpoint||g->colbreak) {
+            cout << "Col: " << k << endl;
             columns.push_back (i);
-            k++;
-            linesUsed.clear ();
-        } else if (g->breakpoint) {
-            columns.push_back (k);
             k++;
             linesUsed.clear ();
             continue;
         }
     }
     for (; k < (int)parallel.size(); k++) {
-        columns.push_back (k);
+        cout << "ColP: " << parallel.at(k) << endl;
+        columns.push_back (parallel.at(k) );
     }
     sort (columns.begin (), columns.end ()); // TODO: needed?
     return columns;
@@ -352,9 +351,11 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     unsigned int i = 0;
     double maxX = 0;
     if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
+
     if (numGates()>0) {
         for (uint32_t j = 0; j < columns.size(); j++) {
             maxX = 0.0;
+            cout << "Col " << j << ": " << columns.at(j) << endl;
             for (; i <= columns.at(j); i++) {
                 Gate* g = getGate (i);
                 minmaxWire (g->controls, g->targets, mingw, maxgw);
@@ -374,6 +375,7 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
             xcurr += gatePad*1.5;
         }
     }
+
     xcurr -= maxX;
     xcurr += gatePad;
     gateRect fullCirc;

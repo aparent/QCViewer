@@ -112,7 +112,7 @@ void add_constants (Circuit * circ, name_node *names)
 
 void insert_break(Circuit *circ)
 {
-    circ->column_breaks.push_back(circ->numGates()-1);
+    circ->getGate(circ->numGates()-1)->colbreak = true;
 }
 
 bool check_dup(name_node *names)
@@ -151,7 +151,9 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
         Circuit* c = subcircuits[gateName];
-        circ->column_breaks.push_back(circ->numGates()-1);
+        if (circ->numGates()>0) {
+            circ->getGate(circ->numGates()-1)->colbreak = true;
+        }
         map<unsigned int,unsigned int> lineMap;
         int line = 0;
         name_node* start_names = names;

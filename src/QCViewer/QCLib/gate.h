@@ -70,6 +70,7 @@ public:
     std::vector <Control> controls;
     std::vector <unsigned int> targets;
     bool breakpoint;
+    bool colbreak;
 
 protected:
     unsigned int loop_count;

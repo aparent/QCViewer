@@ -150,7 +150,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
     double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
     vector<int> select_ids;
-    //------------------test
     string name;
     int pos = -1;
     getCircuitAndColPosition (xx, yy, circuit, rects, name, pos);
@@ -180,7 +179,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
                 }
             }
         } else {
-            cout << "test1" << endl;
             cout << select_ids.at(0) << endl;
             unsigned int start = (select_ids.size()== 0) ? 0 : circuit->columns.at(select_ids.at(0));
             unsigned int end;
@@ -189,7 +187,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
             } else {
                 end = start;
             }
-            cout << "test2" << endl;
             bool ok = true;
             unsigned int mymaxwire, myminwire;
             mymaxwire = myminwire = newgate->targets[0];
@@ -397,6 +394,7 @@ bool CircuitWidget::onScrollEvent (GdkEventScroll *event)
 
 bool CircuitWidget::on_expose_event(GdkEventExpose* event)
 {
+
     (void)event; // placate compiler..
     Glib::RefPtr<Gdk::Window> window = get_window();
     if(window) {
@@ -417,12 +415,14 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         if (circuit != NULL) {
             delete_recs(rects);
             rects = circuit->draw (cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
+            cout << "rects: " << rects.size() << " Gates:" << circuit->numGates() << endl;
             generate_layout_rects ();
-            for (unsigned int i = 0; i < NextGateToSimulate; i++) {
+            /*for (unsigned int i = 0; i < NextGateToSimulate; i++) {
                 drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
-            }
+            }*/
         }
     }
+
     return true;
 }
 
@@ -603,13 +603,17 @@ unsigned int CircuitWidget::get_NumLines()
 
 void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 {
-    circuit->addGate(g, circuit->columns.at(column_id) - 1);
+
+    cout << "test1"<< endl;
+    cout << column_id << ":" << circuit->columns.size()<< endl;
+    circuit->addGate(g, column_id);
+    cout << "test2"<< endl;
     circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
-    force_redraw ();
     selections.clear ();
-    selections.push_back(circuit->columns.at(column_id) - 1);
+    selections.push_back(column_id);
     ((QCViewer*)win)->set_selection (selections);
+    force_redraw ();
 }
 
 void CircuitWidget::insert_gate_at_front (Gate *g)
@@ -617,25 +621,27 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
     circuit->addGate(g, 0);
     circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
-    force_redraw ();
     selections.clear ();
     selections.push_back(0);
     ((QCViewer*)win)->set_selection (selections);
+    force_redraw ();
 }
 
-// XXX: this may actually be more complicated than necessary now.
 void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x, Circuit* circ)
 {
     if (!circuit) return;
     unsigned int i;
-    vector<unsigned int> para =  circ->getGreedyParallel();
-    for (i = 0; i < para.size() && para.at(i) < x; i++);
-    unsigned int pos = para.at(i) + 1;
-    circ->addGate (g, pos);
-    para = circ->getGreedyParallel();
-    circ->column_breaks.push_back(pos);
+    //vector<unsigned int> para =  circ->getGreedyParallel();
+    //for (i = 0; i < para.size() && para.at(i) < x; i++);
+    //unsigned int pos = para.at(i);
+    circ->addGate (g, x);
+    //if (pos>0) circ->getGate(pos-1)->colbreak=true;
+    circ->getGreedyParallel();
     ext = circ->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    selections.clear ();
     force_redraw ();
+    selections.push_back(x);
+    ((QCViewer*)win)->set_selection (selections);
 }
 
 void CircuitWidget::generate_layout_rects ()
@@ -643,6 +649,7 @@ void CircuitWidget::generate_layout_rects ()
     delete_recs(columns);
     columns.clear ();
     if (!circuit || circuit->numGates () == 0) return;
+
     unsigned int start_gate = 0;
     for (unsigned int column = 0; column < circuit->columns.size() && start_gate < circuit->numGates (); column++) {
         gateRect bounds = rects.at(start_gate);
