@@ -51,6 +51,7 @@ Gate* Subcircuit::clone() const
     g->targets = targets;
     g->expand = expand;
     g->simState = simState;
+    g->breakpoint = breakpoint;
     return g;
 }
 
@@ -261,8 +262,10 @@ gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
 bool Subcircuit::step (State& state)
 {
     simState->simulating = true;
+		bool bp = false;
     if (simState->gate < numGates () ) {
         Gate* g = getGate(simState->gate);
+				if (g->breakpoint) bp = true;	
         if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
             state = ApplyGate(state,g);
             simState->gate++;
@@ -272,6 +275,10 @@ bool Subcircuit::step (State& state)
                 step(state);
             }
         }
+				if (bp){
+					cout << "SBREAK" << endl;
+					 return false;
+				}
         return true;
     }
     if (simState->loop < getLoopCount()) {

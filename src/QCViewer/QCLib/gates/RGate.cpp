@@ -49,6 +49,7 @@ Gate* RGate::clone() const
     RGate* g = new RGate(rot,axis);
     g->controls = controls;
     g->targets = targets;
+    g->breakpoint = breakpoint;
     return g;
 }
 

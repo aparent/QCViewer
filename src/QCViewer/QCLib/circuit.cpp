@@ -516,17 +516,30 @@ void Circuit::write_to_png (cairo_surface_t* surf, string filename) const
 
 bool Circuit::run (State& state)
 {
+    simState.simulating = true;
     if (simState.gate == numGates ()) simState.gate = 0;
     // always step over first breakpoint if it is around
     while (simState.gate < numGates ()) {
-        state = ApplyGate (state, getGate (simState.gate));
-        simState.gate++;
+				bool bp = false;
         // check if we have reached a breakpoint
-        // find column that gate is in. if 0, ignore. else, check if gateid is one more than previous layout column last id. if so, return true.
-        unsigned int column_id = findcolumn (simState.gate);
-        vector<unsigned int>::iterator it = find (breakpoints.begin (), breakpoints.end (), column_id );
-        if (it == breakpoints.end ()) continue;
-        if (columns.at(column_id) + 1 == simState.gate) {
+				Gate* g = getGate (simState.gate); 
+				if (g->breakpoint) bp = true;	
+			
+        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
+        	state = ApplyGate (state, getGate (simState.gate));
+        	simState.gate++;
+				}	else {
+					while (((Subcircuit*)g)->step(state)){
+						cout << "sStep" << endl;
+					}
+					if( ((Subcircuit*)g)->simState->simulating == false){
+        		simState.gate++;
+					} else {
+						return true;
+					}
+				}
+        if (bp) {
+						cout << "BREAK" << endl;
             return true;
         }
     }
@@ -555,7 +568,7 @@ bool Circuit::step (State& state)
             state = ApplyGate(state,g);
             simState.gate++;
         } else {
-            if (! ((Subcircuit*)g)->step(state)) {
+            if (! ((Subcircuit*)g)->step(state) && !((Subcircuit*)g)->simState->simulating) {	
                 simState.gate++;
                 step(state);
             }

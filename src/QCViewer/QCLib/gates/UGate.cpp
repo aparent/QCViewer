@@ -50,6 +50,7 @@ Gate* UGate::clone() const
     g->controls = controls;
     g->targets = targets;
     g->drawType = drawType;
+    g->breakpoint = breakpoint;
     return g;
 }
 

@@ -58,6 +58,7 @@ public:
     bool expand;
     //! Set true is circuit should be draw in unrolled mode
     bool unroll;
+    SimState* simState;
 
 protected:
     std::map<unsigned int,unsigned int> lineMap;
@@ -66,7 +67,6 @@ private:
     void drawSubCircBox(cairo_t* cr, gateRect &r) const;
     gateRect drawExp(cairo_t *cr,double xcurr) const;
     index_t BuildBitString (index_t, unsigned int);
-    SimState* simState;
     Circuit* circ;
 };
 
