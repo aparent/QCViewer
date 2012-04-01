@@ -367,8 +367,8 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
             xcurr += maxX - gatePad/2;
             if (getGate(columns.at(j))->breakpoint) {
                 cairo_set_source_rgba (cr,0.8,0,0,0.8);
-                cairo_move_to (cr,xcurr, wireToY(0));
-                cairo_line_to (cr,xcurr, wireToY(numLines()-1));
+                cairo_move_to (cr,xcurr, wireToY(-1));
+                cairo_line_to (cr,xcurr, wireToY(numLines()));
                 cairo_stroke (cr);
                 cairo_set_source_rgb (cr, 0, 0, 0);
             }
