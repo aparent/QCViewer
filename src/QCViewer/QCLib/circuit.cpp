@@ -219,7 +219,6 @@ start:
             linesUsed[j]; //access element so that it exists in map
         }
         if (g->breakpoint||g->colbreak) {
-            cout << "Col: " << k << endl;
             columns.push_back (i);
             k++;
             linesUsed.clear ();
@@ -520,26 +519,26 @@ bool Circuit::run (State& state)
     if (simState.gate == numGates ()) simState.gate = 0;
     // always step over first breakpoint if it is around
     while (simState.gate < numGates ()) {
-				bool bp = false;
+        bool bp = false;
         // check if we have reached a breakpoint
-				Gate* g = getGate (simState.gate); 
-				if (g->breakpoint) bp = true;	
-			
+        Gate* g = getGate (simState.gate);
+        if (g->breakpoint) bp = true;
+
         if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
-        	state = ApplyGate (state, getGate (simState.gate));
-        	simState.gate++;
-				}	else {
-					while (((Subcircuit*)g)->step(state)){
-						cout << "sStep" << endl;
-					}
-					if( ((Subcircuit*)g)->simState->simulating == false){
-        		simState.gate++;
-					} else {
-						return true;
-					}
-				}
+            state = ApplyGate (state, getGate (simState.gate));
+            simState.gate++;
+        }	else {
+            while (((Subcircuit*)g)->step(state)) {
+                cout << "sStep" << endl;
+            }
+            if( ((Subcircuit*)g)->simState->simulating == false) {
+                simState.gate++;
+            } else {
+                return true;
+            }
+        }
         if (bp) {
-						cout << "BREAK" << endl;
+            cout << "BREAK" << endl;
             return true;
         }
     }
@@ -568,7 +567,7 @@ bool Circuit::step (State& state)
             state = ApplyGate(state,g);
             simState.gate++;
         } else {
-            if (! ((Subcircuit*)g)->step(state) && !((Subcircuit*)g)->simState->simulating) {	
+            if (! ((Subcircuit*)g)->step(state) && !((Subcircuit*)g)->simState->simulating) {
                 simState.gate++;
                 step(state);
             }

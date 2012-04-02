@@ -154,12 +154,12 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
             if(para.size() > currentCol && i == para[currentCol]) {
                 xcurr += maxX - gatePad/2;
                 if (circ->getGate(i)->breakpoint) {
-										unsigned int maxTarget = 0;
-										for (unsigned int i = 0; i < targets.size(); i++){
-											if (targets.at(i) > maxTarget){
-												maxTarget = targets.at(i);
-											}
-										} 
+                    unsigned int maxTarget = 0;
+                    for (unsigned int i = 0; i < targets.size(); i++) {
+                        if (targets.at(i) > maxTarget) {
+                            maxTarget = targets.at(i);
+                        }
+                    }
                     cairo_set_source_rgba (cr,0.8,0,0,0.8);
                     cairo_move_to (cr,xcurr, wireToY(maxTarget+1));
                     cairo_line_to (cr,xcurr, wireToY(maxTarget - circ->numLines()));
@@ -182,6 +182,7 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     xcurr -= gatePad;
     r = (*subRects)[0];
     for (unsigned int i = 1; i < subRects->size(); i++) {
+        //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
         r = combine_gateRect(r,(*subRects)[i]);
     }
     drawSubCircBox(cr, r);
@@ -268,10 +269,10 @@ gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
 bool Subcircuit::step (State& state)
 {
     simState->simulating = true;
-		bool bp = false;
+    bool bp = false;
     if (simState->gate < numGates () ) {
         Gate* g = getGate(simState->gate);
-				if (g->breakpoint) bp = true;	
+        if (g->breakpoint) bp = true;
         if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
             state = ApplyGate(state,g);
             simState->gate++;
@@ -281,10 +282,13 @@ bool Subcircuit::step (State& state)
                 step(state);
             }
         }
-				if (bp){
-					cout << "SBREAK" << endl;
-					 return false;
-				}
+        if (bp) {
+            cout << "SBREAK" << endl;
+            return false;
+        }
+        if (g->type == Gate::SUBCIRC && ((Subcircuit*)g)->simState->simulating) {
+            return false;
+        }
         return true;
     }
     if (simState->loop < getLoopCount()) {

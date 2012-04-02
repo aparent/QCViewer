@@ -37,7 +37,7 @@ using namespace std;
 PangoLayout* create_text_layout(cairo_t *cr, string label, double &width, double &height)
 {
     PangoLayout *layout = pango_cairo_create_layout (cr);
-    PangoFontDescription *desc = pango_font_description_from_string ("LMRoman12, Roman, Serif bold 18");
+    PangoFontDescription *desc = pango_font_description_from_string ("LM Roman 12, Roman, Serif bold 18");
     pango_layout_set_font_description (layout, desc);
     pango_font_description_free (desc);
     pango_layout_set_markup (layout, label.c_str(), label.length());

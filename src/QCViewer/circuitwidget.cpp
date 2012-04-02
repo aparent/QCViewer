@@ -182,7 +182,9 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
             cout << select_ids.at(0) << endl;
             unsigned int start = (select_ids.size()== 0) ? 0 : circuit->columns.at(select_ids.at(0));
             unsigned int end;
-            if (circuit->columns.size() > select_ids.at(0) +1) {
+            if (circuit->columns.size() > select_ids.at(0)+2) {
+                end = circuit->columns.at(select_ids.at(0)+2);
+            } else if (circuit->columns.size() > select_ids.at(0)+1) {
                 end = circuit->columns.at(select_ids.at(0)+1);
             } else {
                 end = start;
@@ -359,13 +361,14 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
             string name;
             int pos = -1;
             getCircuitAndColPosition (x, y, circuit, rects, name, pos);
-            cout << name << " " << pos << endl;
-            if (name.compare("Main")==0||pos==-1||name.compare("")==0) {  //If the click is not in a subcircuit
-                circuit->getGate(circuit->columns.at(column_id))->breakpoint =!circuit->getGate(circuit->columns.at(column_id))->breakpoint ;
-            } else {
-                Circuit * c = circuit->subcircuits[name];
-                vector<unsigned int> para =  c->getGreedyParallel();
-                c->getGate(para.at(pos))->breakpoint = !c->getGate(para.at(pos))->breakpoint;
+            if (column_id != -1) {
+                if (name.compare("Main")==0||pos==-1||name.compare("")==0) {  //If the click is not in a subcircuit
+                    circuit->getGate(circuit->columns.at(column_id))->breakpoint =!circuit->getGate(circuit->columns.at(column_id))->breakpoint ;
+                } else {
+                    Circuit * c = circuit->subcircuits[name];
+                    vector<unsigned int> para =  c->getGreedyParallel();
+                    c->getGate(para.at(pos))->breakpoint = !c->getGate(para.at(pos))->breakpoint;
+                }
             }
             force_redraw ();
             break;
@@ -604,10 +607,8 @@ unsigned int CircuitWidget::get_NumLines()
 void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 {
 
-    cout << "test1"<< endl;
-    cout << column_id << ":" << circuit->columns.size()<< endl;
+    cout << "In Col: " << column_id <<  endl;
     circuit->addGate(g, column_id);
-    cout << "test2"<< endl;
     circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     selections.clear ();
@@ -618,6 +619,7 @@ void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 
 void CircuitWidget::insert_gate_at_front (Gate *g)
 {
+    cout << "Front: " << endl;
     circuit->addGate(g, 0);
     circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
@@ -629,13 +631,9 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
 
 void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x, Circuit* circ)
 {
+    cout << "New Col: " << x <<  endl;
     if (!circuit) return;
-    unsigned int i;
-    //vector<unsigned int> para =  circ->getGreedyParallel();
-    //for (i = 0; i < para.size() && para.at(i) < x; i++);
-    //unsigned int pos = para.at(i);
     circ->addGate (g, x);
-    //if (pos>0) circ->getGate(pos-1)->colbreak=true;
     circ->getGreedyParallel();
     ext = circ->get_circuit_size (&wirestart, &wireend, scale, ft_default);
     selections.clear ();
@@ -767,7 +765,7 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
         vector<unsigned int> para = c->getGreedyParallel();
         vector<gateRect> cols;
         unsigned int start_gate = 0;
-        for (unsigned int column = 0; column < para.size() && start_gate < circuit->numGates (); column++) {
+        for (unsigned int column = 0; column < para.size() && start_gate < c->numGates(); column++) {
             gateRect bounds = rects.at(start_gate);
             for (unsigned int gate = start_gate + 1; gate <= para.at(column); gate++) {
                 bounds = combine_gateRect(bounds, rects.at(gate));
@@ -779,11 +777,12 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
         }
 
         for (unsigned int i = 0; i < cols.size (); i++) {
-            cout << x << ":" << cols.at(i).x0 << ":" << i << endl;
+            cout << c->getName() << ":" <<  x << ":" << cols.at(i).x0 << ":" << i << endl;
             if (x < cols.at(i).x0) {
                 r_pos = i-1;
                 break;
             }
+            r_pos = i;
         }
         r_name = c->getName();
     }
