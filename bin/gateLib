@@ -47,3 +47,13 @@ SYMBOL P*
 1 , 0
 0 , -i
 
+NAME VGateConj
+SYMBOL V
+0.5 + 0.5i , 0.5 - 0.5i
+0.5 - 0.5i , 0.5 + 0.5i
+
+NAME VGateConj
+DRAWNAME "V<sup>†</sup>"
+SYMBOL V*
+0.5 - 0.5i , 0.5 + 0.5i
+0.5 + 0.5i , 0.5 - 0.5i
