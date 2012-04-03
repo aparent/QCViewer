@@ -179,7 +179,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
                 }
             }
         } else {
-            cout << select_ids.at(0) << endl;
             unsigned int start = (select_ids.size()== 0) ? 0 : circuit->columns.at(select_ids.at(0));
             unsigned int end;
             if (circuit->columns.size() > select_ids.at(0)+2) {

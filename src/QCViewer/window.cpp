@@ -415,12 +415,15 @@ void QCViewer::on_menu_delete ()
 
 void QCViewer::set_selection (vector<Selection> s)
 {
+    cout << "test11" << endl;
     selections = s;
     if (selections.empty()) {
         btn_editcontrols.set_active (false);
         m_PropFrame.hide ();
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
+
+        cout << "test33" << endl;
         Gate * gate = c.getSelectedGate();
         if (gate != NULL && gate->type == Gate::RGATE) {
             m_RGateEditFrame.show ();
@@ -444,6 +447,7 @@ void QCViewer::set_selection (vector<Selection> s)
         }
         m_IterEntry.set_text(intToString(c.getGate(selections[0].gate)->getLoopCount()));
         m_PropFrame.show ();
+        cout << "test22" << endl;
     } else {
         m_PropFrame.hide ();
         m_RGateEditFrame.show ();

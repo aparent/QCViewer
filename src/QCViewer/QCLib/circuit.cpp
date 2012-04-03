@@ -35,6 +35,8 @@ Authors: Alex Parent, Jacob Parker
 #include "draw_common.h"
 #include "draw_constants.h"
 #include "simulate.h"
+#include <cairo-svg.h>
+#include <cairo-ps.h>
 
 using namespace std;
 
@@ -63,6 +65,20 @@ void Circuit::removeSubcircuits()
 {
     for ( map<string,Circuit*>::iterator it = subcircuits.begin() ; it != subcircuits.end(); it++ ) {
         delete (*it).second;
+    }
+}
+
+
+void Circuit::expandAll()
+{
+    for(unsigned int i = 0; i<numGates(); i++) {
+        Gate *g = getGate(i);
+        if (g->type == Gate::SUBCIRC) {
+            ((Subcircuit*)g)->expand = true;
+        }
+    }
+    for ( map<string,Circuit*>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {
+        it->second->expandAll();
     }
 }
 
@@ -375,6 +391,7 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
         }
     }
 
+
     xcurr -= maxX;
     xcurr += gatePad;
     gateRect fullCirc;
@@ -510,6 +527,45 @@ void Circuit::write_to_png (cairo_surface_t* surf, string filename) const
         return;
     }
 }
+
+void Circuit::savesvg (string filename, cairo_font_face_t * ft_default)
+{
+    double wirestart, wireend;
+    cairo_rectangle_t ext = get_circuit_size (&wirestart, &wireend, 1.0, ft_default);
+    cairo_surface_t* surface = make_svg_surface (filename, ext);
+    cairo_t* cr = cairo_create (surface);
+    cairo_set_source_surface (cr, surface, 0, 0);
+    draw(cr, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
+    cairo_destroy (cr);
+    cairo_surface_destroy (surface);
+}
+
+cairo_surface_t* Circuit::make_svg_surface (string file, cairo_rectangle_t ext) const
+{
+    cairo_surface_t *img_surface = cairo_svg_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y); // these measurements should be in points, w/e.
+    return img_surface;
+}
+
+void Circuit::saveps (string filename,cairo_font_face_t * ft_default)
+{
+    double wirestart, wireend;
+    cairo_rectangle_t ext = get_circuit_size (&wirestart, &wireend, 1.0,ft_default);
+    cairo_surface_t* surface = make_ps_surface (filename, ext);
+    cairo_t* cr = cairo_create(surface);
+    cairo_set_source_surface (cr, surface, 0,0);
+    draw(cr, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
+    cairo_destroy (cr);
+    cairo_surface_destroy (surface);
+}
+
+cairo_surface_t* Circuit::make_ps_surface (string file, cairo_rectangle_t ext) const
+{
+    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y);
+    cairo_ps_surface_set_eps (img_surface, true);
+    return img_surface;
+}
+
+
 
 
 

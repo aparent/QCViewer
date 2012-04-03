@@ -26,25 +26,37 @@ Authors: Alex Parent
 #include <iostream>
 #include <QCLib/circuitParser.h>
 #include <cairo-ft.h>
+#include <QCLib/gates/UGateLookup.h>
 
 using namespace std;
 int main (int argc, char *argv[])
 {
     Circuit* c;
+    UGateSetup();
+    FT_Library library;
+    FT_Face ft_face;
+    FT_Init_FreeType( &library );
+    FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
+    cairo_font_face_t * ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+
     if (argc > 0) {
         vector<string> error_log;
         c = parseCircuit(argv[1],error_log);
         c->getGreedyParallel();
+        c->expandAll();
     } else {
         cout << "No circuit file provided" << endl;
         return 0;
     }
-    if (argc > 2) {
-        FT_Library library;
-        FT_Face ft_face;
-        FT_Init_FreeType( &library );
-        FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
-        cairo_font_face_t * ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+    if (argc>3) {
+        if (string(argv[2]).compare("-svg") == 0) {
+            c->savesvg(argv[3],ft_default);
+        } else if (string(argv[2]).compare("-ps") == 0) {
+            c->saveps(argv[3],ft_default);
+        } else if (string(argv[2]).compare("-png") == 0) {
+            c->savepng(argv[3],ft_default);
+        }
+    } else if (argc > 2) {
         c->savepng(argv[2],ft_default);
     } else {
     }

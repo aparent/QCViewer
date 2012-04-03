@@ -99,6 +99,7 @@ public:
     void setGate(Gate *newGate, unsigned int pos);
     void removeGate (unsigned int);
     void swapGate (unsigned int, unsigned int);
+    void expandAll();
     Gate* getGate(int pos) const;
 
     //! Returns the number of gates counting subcircuits as 1 gate
@@ -133,6 +134,8 @@ public:
     std::vector<gateRect> draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection> &selections,cairo_font_face_t * ft_default) const;
     cairo_rectangle_t get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const;
     void savepng (std::string filename, cairo_font_face_t * ft_default);
+    void savesvg (std::string filename, cairo_font_face_t * ft_default);
+    void saveps (std::string filename, cairo_font_face_t * ft_default);
 private:
     QArch *arch;
     std::string name;
@@ -149,6 +152,8 @@ private:
     void drawSelections (cairo_t* cr, const std::vector<gateRect> &rects, const std::vector<Selection> &selections) const;
     void drawPWire (cairo_t *cr, double x, int numLines) const;
     void write_to_png (cairo_surface_t* surf, std::string filename) const;
+    cairo_surface_t* make_svg_surface (std::string filename, cairo_rectangle_t ext) const;
+    cairo_surface_t* make_ps_surface (std::string filename, cairo_rectangle_t ext) const;
 
     unsigned int findcolumn (unsigned int gate) const;
     //for deconstructor

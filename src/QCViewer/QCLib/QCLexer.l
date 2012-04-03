@@ -56,7 +56,7 @@ comment #.*
 "BEGIN"							return TOKEN(START);
 "END"								return TOKEN(END);
 "\n"								return TOKEN(NEWLINE);
-","	   							return TOKEN(NEWLINE);
+";"	   							return TOKEN(NEWLINE);
 "("									return TOKEN(LBRAC);
 ")"									return TOKEN(RBRAC);
 "^"									return TOKEN(EXPON);
