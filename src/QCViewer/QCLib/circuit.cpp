@@ -242,7 +242,6 @@ start:
         }
     }
     for (; k < (int)parallel.size(); k++) {
-        cout << "ColP: " << parallel.at(k) << endl;
         columns.push_back (parallel.at(k) );
     }
     sort (columns.begin (), columns.end ()); // TODO: needed?
@@ -370,7 +369,6 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     if (numGates()>0) {
         for (uint32_t j = 0; j < columns.size(); j++) {
             maxX = 0.0;
-            cout << "Col " << j << ": " << columns.at(j) << endl;
             for (; i <= columns.at(j); i++) {
                 Gate* g = getGate (i);
                 minmaxWire (g->controls, g->targets, mingw, maxgw);
