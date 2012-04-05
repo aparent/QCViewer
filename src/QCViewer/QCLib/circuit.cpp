@@ -26,17 +26,11 @@ Authors: Alex Parent, Jacob Parker
 
 
 #include "circuit.h"
-#include "subcircuit.h"
 #include "utility.h"
 #include <map>
 #include <algorithm> // for sort, which we should probably cut out
 #include <fstream>
 #include <iostream>
-#include "draw_common.h"
-#include "draw_constants.h"
-#include "simulate.h"
-#include <cairo-svg.h>
-#include <cairo-ps.h>
 
 using namespace std;
 
@@ -65,20 +59,6 @@ void Circuit::removeSubcircuits()
 {
     for ( map<string,Circuit*>::iterator it = subcircuits.begin() ; it != subcircuits.end(); it++ ) {
         delete (*it).second;
-    }
-}
-
-
-void Circuit::expandAll()
-{
-    for(unsigned int i = 0; i<numGates(); i++) {
-        Gate *g = getGate(i);
-        if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g)->expand = true;
-        }
-    }
-    for ( map<string,Circuit*>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {
-        it->second->expandAll();
     }
 }
 
@@ -115,7 +95,6 @@ void Circuit::removeGate (unsigned int pos)
 {
     delete gates[pos];
     gates.erase (gates.begin () + pos);
-    getGreedyParallel();
 }
 
 Gate* Circuit::getGate(int pos) const
@@ -128,10 +107,6 @@ unsigned int Circuit::numGates() const
     return gates.size();
 }
 
-unsigned int Circuit::totalGates() const
-{
-    return 0;
-}
 int Circuit::QCost()
 {
     return 0;
@@ -163,6 +138,31 @@ unsigned int Circuit::numLines() const
 
 const Line& Circuit::getLine(int pos) const
 {
+    return lines.at(pos);
+}
+
+Line& Circuit::getLineModify(int pos)
+{
+    return lines.at(pos);
+}
+
+Line::Line(string name)
+{
+    lineName  = name;
+    garbage   = true;
+    constant  = true;
+    initValue = 0;
+}
+
+void Circuit::addLine(string lineName)
+{
+    lines.push_back(Line(lineName));
+}
+
+vector<int> Circuit::getParallel() const
+{
+    vector<int>  returnValue;
+    map<int,int> linesUsed;
     return lines.at(pos);
 }
 
@@ -284,356 +284,3 @@ void Circuit::parseArch (const string filename)
         file >> m;
         for (int j = 0; j < m; j++) {
             int q;
-            file >> q;
-            arch->set (i, q);
-        }
-    }
-    file.close ();
-}
-
-void Circuit::arch_set_LNN()
-{
-    removeArch();
-    arch = new QArch(numLines());
-    for(unsigned int i=0; i < numLines()-1; i++) {
-        arch->set(i,i+1);
-    }
-}
-
-
-void Circuit::setName(string n_name)
-{
-    this->name = n_name;
-}
-
-string Circuit::getName()
-{
-    return this->name;
-}
-
-
-vector<gateRect> Circuit::draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default) const
-{
-    cairo_scale (cr, scale, scale);
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-
-    vector<gateRect> rects;
-    //Push the gate drawing into a group so that wireend can be determined and wires can be drawn first
-    cairo_push_group (cr);
-    rects = draw_circ (cr, &wirestart, &wireend, true);
-    cairo_pattern_t *group = cairo_pop_group (cr);
-    drawbase (cr, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
-    cairo_set_source (cr, group);
-    //Draw the gates
-    cairo_paint(cr);
-    cairo_pattern_destroy (group);
-    if (drawParallel) drawParallelSectionMarkings (cr, rects, numLines(), getParallel());
-    if (drawArch) drawArchitectureWarnings (cr, rects, getArchWarnings());
-    if (!selections.empty()) drawSelections (cr, rects, selections);
-
-    return rects;
-}
-
-vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const
-{
-    vector <gateRect> rects;
-    cairo_set_source_rgb (cr, 0, 0, 0);
-
-    // input labels
-    double xinit = 0.0;
-    for (uint32_t i = 0; i < numLines(); i++) {
-        string label = getLine(i).getInputLabel();
-        cairo_text_extents_t extents;
-        cairo_text_extents(cr, label.c_str(), &extents);
-
-        double x = 0, y = 0;
-        if (forreal) {
-            x = *wirestart - extents.width;
-            y = wireToY(i) - (extents.height/2 + extents.y_bearing);
-        }
-        cairo_move_to (cr, x, y);
-        cairo_show_text (cr, label.c_str());
-        xinit = max (xinit, extents.width);
-    }
-
-    if (!forreal) *wirestart = xinit;
-
-    // gates
-    double xcurr = xinit+2.0*gatePad;
-    uint32_t mingw, maxgw;
-    unsigned int i = 0;
-    double maxX = 0;
-    if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
-
-    if (numGates()>0) {
-        for (uint32_t j = 0; j < columns.size(); j++) {
-            maxX = 0.0;
-            for (; i <= columns.at(j); i++) {
-                Gate* g = getGate (i);
-                minmaxWire (g->controls, g->targets, mingw, maxgw);
-                g->draw(cr,xcurr,maxX,rects);
-                if (simState.simulating && simState.gate == i+1) {
-                    drawRect (cr, rects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
-                }
-            }
-            xcurr += maxX - gatePad/2;
-            if (getGate(columns.at(j))->breakpoint) {
-                cairo_set_source_rgba (cr,0.8,0,0,0.8);
-                cairo_move_to (cr,xcurr, wireToY(-1));
-                cairo_line_to (cr,xcurr, wireToY(numLines()));
-                cairo_stroke (cr);
-                cairo_set_source_rgb (cr, 0, 0, 0);
-            }
-            xcurr += gatePad*1.5;
-        }
-    }
-
-
-    xcurr -= maxX;
-    xcurr += gatePad;
-    gateRect fullCirc;
-    if (rects.size() > 0) {
-        fullCirc = rects[0];
-        for (unsigned int i = 1; i < rects.size(); i++) {
-            fullCirc = combine_gateRect(fullCirc,rects[i]);
-        }
-    }
-    *wireend = *wirestart + fullCirc.width + gatePad*2;
-
-    // output labels
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    for (uint32_t i = 0; i < numLines (); i++) {
-        string label = getLine (i).getOutputLabel();
-        cairo_text_extents_t extents;
-        cairo_text_extents (cr, label.c_str(), &extents);
-
-        double x, y;
-        x = *wireend + xoffset;
-        y = wireToY(i) - (extents.height/2+extents.y_bearing);
-        cairo_move_to (cr, x, y);
-        cairo_show_text (cr, label.c_str());
-    }
-    return rects;
-}
-
-void Circuit::drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const
-{
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_rectangle (cr, 0, 0, w, h); // TODO: document why the scale factors are here
-    cairo_fill (cr);
-
-    for (uint32_t i = 0; i < numLines(); i++) {
-        double y = wireToY (i);
-        drawWire (cr, wirestart+xoffset, y, wireend, y);
-    }
-}
-
-void Circuit::drawArchitectureWarnings (cairo_t* cr, const vector<gateRect> &rects, const vector<int> &badGates) const
-{
-    for (uint32_t i = 0; i < badGates.size(); i++) {
-        drawRect (cr, rects[badGates[i]], Colour(0.8,0.1,0.1,0.7), Colour(0.8,0.4,0.4,0.3));
-    }
-}
-
-void Circuit::drawParallelSectionMarkings (cairo_t* cr, const vector<gateRect> &rects, int numLines, const vector<int> &pLines) const
-{
-    for (uint32_t i = 0; i < pLines.size() - 1; i++) {
-        int gateNum = pLines[i];
-        double x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
-        drawPWire (cr, x, numLines);
-    }
-}
-
-//for parallism wires
-void Circuit::drawPWire (cairo_t *cr, double x, int numLines) const
-{
-    cairo_set_line_width (cr, thickness);
-    cairo_set_source_rgba (cr, 0.4, 0.4, 0.4,0.4);
-    cairo_move_to (cr, x, wireToY(0));
-    cairo_line_to (cr, x, wireToY(numLines-1));
-    cairo_stroke (cr);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-}
-
-void Circuit::drawSelections (cairo_t* cr, const vector<gateRect> &rects, const vector<Selection> &selections) const
-{
-    for (unsigned int i = 0; i < selections.size (); i++) {
-        if (selections[i].gate < rects.size()) { //XXX Why is this needed?
-            drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
-            if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
-                drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
-            }
-        }
-    }
-}
-
-cairo_rectangle_t Circuit::get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const
-{
-    cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
-    cairo_t *cr = cairo_create(unbounded_rec_surface);
-    cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
-    cairo_scale (cr, scale, scale);
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-    draw_circ (cr, wirestart, wireend, false); // XXX fix up these inefficienies!!
-    cairo_rectangle_t ext;
-    cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
-    cairo_destroy (cr);
-    cairo_surface_destroy (unbounded_rec_surface);
-    return ext;
-}
-
-/*
-void Circuit::generate_layout_rects ()
-{
-    columns.clear ();
-    if (!circuit || circuit->numGates () == 0) return;
-    unsigned int start_gate = 0;
-    for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
-        gateRect bounds = rects.at(start_gate);
-        for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID ; gate++) {
-            bounds = combine_gateRect(bounds, rects[gate]);
-        }
-        bounds.y0 = ext.y;
-        bounds.height = max (bounds.height, ext.height);
-        columns.push_back(bounds);
-        start_gate = layout[column].lastGateID + 1;
-    }
-}
-*/
-
-void Circuit::savepng (string filename, cairo_font_face_t * ft_default)
-{
-    double wirestart, wireend;
-    getGreedyParallel();
-    cairo_rectangle_t ext = get_circuit_size (&wirestart, &wireend, 1.0,ft_default);
-    cairo_surface_t* surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
-    cairo_t* cr = cairo_create (surface);
-    cairo_set_source_surface (cr, surface, 0, 0);
-    draw( cr, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
-    write_to_png (surface, filename);
-    cairo_destroy (cr);
-    cairo_surface_destroy (surface);
-}
-
-void Circuit::write_to_png (cairo_surface_t* surf, string filename) const
-{
-    cairo_status_t status = cairo_surface_write_to_png (surf, filename.c_str());
-    if (status != CAIRO_STATUS_SUCCESS) {
-        cout << "Error saving to png." << endl;
-        return;
-    }
-}
-
-void Circuit::savesvg (string filename, cairo_font_face_t * ft_default)
-{
-    double wirestart, wireend;
-    cairo_rectangle_t ext = get_circuit_size (&wirestart, &wireend, 1.0, ft_default);
-    cairo_surface_t* surface = make_svg_surface (filename, ext);
-    cairo_t* cr = cairo_create (surface);
-    cairo_set_source_surface (cr, surface, 0, 0);
-    draw(cr, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
-    cairo_destroy (cr);
-    cairo_surface_destroy (surface);
-}
-
-cairo_surface_t* Circuit::make_svg_surface (string file, cairo_rectangle_t ext) const
-{
-    cairo_surface_t *img_surface = cairo_svg_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y); // these measurements should be in points, w/e.
-    return img_surface;
-}
-
-void Circuit::saveps (string filename,cairo_font_face_t * ft_default)
-{
-    double wirestart, wireend;
-    cairo_rectangle_t ext = get_circuit_size (&wirestart, &wireend, 1.0,ft_default);
-    cairo_surface_t* surface = make_ps_surface (filename, ext);
-    cairo_t* cr = cairo_create(surface);
-    cairo_set_source_surface (cr, surface, 0,0);
-    draw(cr, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
-    cairo_destroy (cr);
-    cairo_surface_destroy (surface);
-}
-
-cairo_surface_t* Circuit::make_ps_surface (string file, cairo_rectangle_t ext) const
-{
-    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y);
-    cairo_ps_surface_set_eps (img_surface, true);
-    return img_surface;
-}
-
-
-
-
-
-bool Circuit::run (State& state)
-{
-    simState.simulating = true;
-    if (simState.gate == numGates ()) simState.gate = 0;
-    // always step over first breakpoint if it is around
-    while (simState.gate < numGates ()) {
-        bool bp = false;
-        // check if we have reached a breakpoint
-        Gate* g = getGate (simState.gate);
-        if (g->breakpoint) bp = true;
-
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
-            state = ApplyGate (state, getGate (simState.gate));
-            simState.gate++;
-        }	else {
-            while (((Subcircuit*)g)->step(state)) {
-                cout << "sStep" << endl;
-            }
-            if( ((Subcircuit*)g)->simState->simulating == false) {
-                simState.gate++;
-            } else {
-                return true;
-            }
-        }
-        if (bp) {
-            cout << "BREAK" << endl;
-            return true;
-        }
-    }
-    return false;
-}
-
-void Circuit::reset ()
-{
-    simState.gate = 0;
-    simState.nextGate = true;
-    simState.simulating = false;
-    for ( unsigned int i = 0; i < numGates(); i++ ) {
-        Gate* g = getGate(i);
-        if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g)->reset();
-        }
-    }
-}
-
-bool Circuit::step (State& state)
-{
-    simState.simulating = true;
-    if (simState.gate < numGates () ) {
-        Gate* g = getGate(simState.gate);
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
-            state = ApplyGate(state,g);
-            simState.gate++;
-        } else {
-            if (! ((Subcircuit*)g)->step(state) && !((Subcircuit*)g)->simState->simulating) {
-                simState.gate++;
-                step(state);
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-unsigned int Circuit::findcolumn (unsigned int gate) const
-{
-    unsigned int i;
-    for (i = 0; i < columns.size () && gate > columns.at(i); i++);
-    return i - 1;
-}

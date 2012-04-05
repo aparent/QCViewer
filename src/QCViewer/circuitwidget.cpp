@@ -672,8 +672,13 @@ Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> *se
         return NULL;
     }
     Gate* g = circuit->getGate(selections->at(0).gate);
-    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand&& !((Subcircuit*)g)->unroll ) {
-        g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
+				if (((Subcircuit*)g)->unroll){
+					selections->at(0).sub->at(0).gate = selections->at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
+        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+				} else {
+        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+				}
     }
     return g;
 }
@@ -685,8 +690,13 @@ Gate *CircuitWidget::getSelectedGate ()
         return NULL;
     }
     Gate* g = circuit->getGate(selections.at(0).gate);
-    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll ) {
-        g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand) {
+				if (((Subcircuit*)g)->unroll){
+					selections.at(0).sub->at(0).gate = selections.at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
+        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+				} else {
+        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+				}
     }
     return g;
 }
@@ -754,11 +764,14 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
 {
     vector<int> s;
     int select = pickRect(rects,x,y,s);
+		if (select >= c->numGates()){
+			select = select % c->numGates();
+		}
     Gate* g = NULL;
     if (select!=-1) {
         g = c->getGate(select);
     }
-    if (g != NULL && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll && rects.at(select).subRects!=NULL) {
+    if (g != NULL && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && rects.at(select).subRects!=NULL) {
         getCircuitAndColPosition (x, y, ((Subcircuit*)g)->getCircuit(), *(rects.at(select).subRects), r_name, r_pos );
     } else {
         vector<unsigned int> para = c->getGreedyParallel();
