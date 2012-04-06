@@ -673,12 +673,12 @@ Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> *se
     }
     Gate* g = circuit->getGate(selections->at(0).gate);
     if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
-				if (((Subcircuit*)g)->unroll){
-					selections->at(0).sub->at(0).gate = selections->at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
-        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
-				} else {
-        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
-				}
+        if (((Subcircuit*)g)->unroll) {
+            selections->at(0).sub->at(0).gate = selections->at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
+            g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+        } else {
+            g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
+        }
     }
     return g;
 }
@@ -691,12 +691,12 @@ Gate *CircuitWidget::getSelectedGate ()
     }
     Gate* g = circuit->getGate(selections.at(0).gate);
     if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand) {
-				if (((Subcircuit*)g)->unroll){
-					selections.at(0).sub->at(0).gate = selections.at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
-        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
-				} else {
-        	g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
-				}
+        if (((Subcircuit*)g)->unroll) {
+            selections.at(0).sub->at(0).gate = selections.at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
+            g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+        } else {
+            g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
+        }
     }
     return g;
 }
@@ -764,9 +764,9 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
 {
     vector<int> s;
     int select = pickRect(rects,x,y,s);
-		if (select >= c->numGates()){
-			select = select % c->numGates();
-		}
+    if (select >= c->numGates()) {
+        select = select % c->numGates();
+    }
     Gate* g = NULL;
     if (select!=-1) {
         g = c->getGate(select);

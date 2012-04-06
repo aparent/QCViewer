@@ -84,7 +84,7 @@ gates:  /*empty*/
 				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
 				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits,error_log);} gates
 				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
-				| NEWLINE gates {insert_break(curr_circ);}
+				| NEWLINE {insert_break(curr_circ);} gates 
 ;
 names:/*empty*/ {$$ = NULL;}
 			|  WORD names {$$ = new name_node($1,$2);} 
@@ -112,9 +112,7 @@ Circuit *parseCircuit(std::string filename,std::vector<std::string>& error_log_r
           getline (myfile,line);
           input += line + "\n";
       }
-			//-----------testcode--------------
 			circuit->setName("Main");
-			//---------------------------------
   		char *in = (char*)malloc(input.length() + 1);
   		strcpy(in,input.c_str());
   		QC__scan_string(in);

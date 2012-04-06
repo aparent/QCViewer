@@ -484,25 +484,6 @@ cairo_rectangle_t Circuit::get_circuit_size (double* wirestart, double* wireend,
     return ext;
 }
 
-/*
-void Circuit::generate_layout_rects ()
-{
-    columns.clear ();
-    if (!circuit || circuit->numGates () == 0) return;
-    unsigned int start_gate = 0;
-    for (unsigned int column = 0; column < layout.size() && start_gate < circuit->numGates (); column++) {
-        gateRect bounds = rects.at(start_gate);
-        for (unsigned int gate = start_gate + 1; gate <= layout[column].lastGateID ; gate++) {
-            bounds = combine_gateRect(bounds, rects[gate]);
-        }
-        bounds.y0 = ext.y;
-        bounds.height = max (bounds.height, ext.height);
-        columns.push_back(bounds);
-        start_gate = layout[column].lastGateID + 1;
-    }
-}
-*/
-
 void Circuit::savepng (string filename, cairo_font_face_t * ft_default)
 {
     double wirestart, wireend;
