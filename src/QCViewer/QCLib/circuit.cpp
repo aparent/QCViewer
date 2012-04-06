@@ -208,7 +208,6 @@ start:
             linesUsed[g->targets[j]];
         }
     }
-    returnValue.push_back (numGates()-1); // for convenience.
     return returnValue;
 }
 
@@ -245,6 +244,7 @@ start:
         columns.push_back (parallel.at(k) );
     }
     sort (columns.begin (), columns.end ()); // TODO: needed?
+    columns.push_back (numGates()-1); // for convenience.
     return columns;
 }
 
