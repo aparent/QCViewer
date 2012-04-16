@@ -417,7 +417,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         if (circuit != NULL) {
             delete_recs(rects);
             rects = circuit->draw (cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
-            cout << "rects: " << rects.size() << " Gates:" << circuit->numGates() << endl;
+            //cout << "rects: " << rects.size() << " Gates:" << circuit->numGates() << endl;
             generate_layout_rects ();
             /*for (unsigned int i = 0; i < NextGateToSimulate; i++) {
                 drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
@@ -595,7 +595,7 @@ int CircuitWidget::get_Depth ()
 int CircuitWidget::get_NumGates ()
 {
     if (circuit == NULL) return 0;
-    return circuit->numGates();
+    return circuit->totalGates();
 }
 unsigned int CircuitWidget::get_NumLines()
 {

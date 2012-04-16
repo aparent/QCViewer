@@ -66,6 +66,11 @@ void Subcircuit::setName(string n_name)
     circ->setName(n_name);
 }
 
+unsigned int Subcircuit::getNumGates() const
+{
+  return circ->totalGates(); 
+}
+
 State Subcircuit::applyToBasis(index_t in) const
 {
     State s = State(1,in);

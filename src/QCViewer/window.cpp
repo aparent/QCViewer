@@ -198,10 +198,9 @@ void QCViewer::on_menu_file_open_circuit ()
         c.set_scale (1);
         btn_editcontrols.set_active (false);
         btn_editcontrols.set_active (false);
-        // Commented out because counts are currently incorrect.
-        //std::stringstream ss;
-        //ss << "Depth: " << c.get_Depth() << " Gates: " << c.get_NumGates();
-        //m_statusbar.push(ss.str());
+        std::stringstream ss;
+        ss << "Gates: " << c.get_NumGates();
+        m_statusbar.push(ss.str());
         c.reset ();
     }
 }
@@ -415,7 +414,6 @@ void QCViewer::on_menu_delete ()
 
 void QCViewer::set_selection (vector<Selection> s)
 {
-    cout << "test11" << endl;
     selections = s;
     if (selections.empty()) {
         btn_editcontrols.set_active (false);
@@ -423,7 +421,6 @@ void QCViewer::set_selection (vector<Selection> s)
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
 
-        cout << "test33" << endl;
         Gate * gate = c.getSelectedGate();
         if (gate != NULL && gate->type == Gate::RGATE) {
             m_RGateEditFrame.show ();
@@ -447,7 +444,6 @@ void QCViewer::set_selection (vector<Selection> s)
         }
         m_IterEntry.set_text(intToString(c.getGate(selections[0].gate)->getLoopCount()));
         m_PropFrame.show ();
-        cout << "test22" << endl;
     } else {
         m_PropFrame.hide ();
         m_RGateEditFrame.show ();
@@ -780,7 +776,7 @@ void QCViewer::add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& factory, con
                               const Glib::ustring& id, const Glib::ustring& label)
 {
     Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_file(filepath);
-    if (pixbuf!=NULL) {
+    if (pixbuf) {
         Gtk::IconSource source;
         source.set_pixbuf(pixbuf);
         source.set_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);

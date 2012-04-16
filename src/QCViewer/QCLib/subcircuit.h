@@ -40,6 +40,7 @@ public:
     std::string getName() const;
     void setName(std::string name);
     State applyToBasis(index_t) const;
+    unsigned int getNumGates() const;
     State applySubcirc(const State&) const;
     unsigned int numGates() const;
     void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) ;

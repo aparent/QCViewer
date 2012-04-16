@@ -24,6 +24,7 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent
 ---------------------------------------------------------------------*/
 #include <iostream>
+#include <fstream>
 #include <QCLib/circuitParser.h>
 #include <cairo-ft.h>
 #include <QCLib/gates/UGateLookup.h>
@@ -44,6 +45,12 @@ int main (int argc, char *argv[])
         c = parseCircuit(argv[1],error_log);
         c->getGreedyParallel();
         c->expandAll();
+				ofstream myfile;
+				string filename = string(argv[1])+".metrics";
+				cout << filename << endl;
+ 				myfile.open (filename.c_str());
+				myfile << "Gates: " << c->totalGates() << endl;
+  			myfile.close();
     } else {
         cout << "No circuit file provided" << endl;
         return 0;

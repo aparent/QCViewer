@@ -64,6 +64,7 @@ public:
     virtual State applyToBasis(index_t) const=0;
 
     unsigned int getLoopCount() const;
+    virtual unsigned int getNumGates() const;
     void setLoopCount(unsigned int count);
     gateType type; //used with enum gateType
     dType drawType;

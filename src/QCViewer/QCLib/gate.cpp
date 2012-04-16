@@ -29,6 +29,8 @@ Authors: Alex Parent, Jacob Parker
 #include "utility.h"
 #include "draw_constants.h"
 
+#include <iostream>
+
 using namespace std;
 
 Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
@@ -49,6 +51,10 @@ void Gate::setLoopCount(unsigned int loops)
 unsigned int Gate::getLoopCount() const
 {
     return loop_count;
+}
+
+unsigned int Gate::getNumGates() const{
+	return 1;
 }
 
 gateRect Gate::drawControls (cairo_t *cr,uint32_t xc) const
