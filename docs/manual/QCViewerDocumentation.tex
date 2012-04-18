@@ -37,6 +37,8 @@
 \usepackage{latexsym}
 \usepackage{amsthm}
 \usepackage{eepic}
+\usepackage{epsfig}
+\usepackage{epstopdf}
 \usepackage{sectsty}
 \usepackage{graphicx}
 \usepackage[usenames]{color}
@@ -228,7 +230,7 @@ What follows is a more in-depth listing of the provided quantum gates in QCViewe
 The rotation gates are exponentiated Pauli matrices that correspond to rotations on the Bloch sphere about the $\hat{x}, \hat{y}$ or $\hat{z}$ axes.
 
 \begin{center}
-\includegraphics{Figures/Gates/RotXGateViewer.png} 
+\includegraphics[scale=.7]{Figures/Gates/RotXGateViewer} 
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:Swap}
     \renewcommand{\arraystretch}{1.25}
@@ -243,7 +245,7 @@ The rotation gates are exponentiated Pauli matrices that correspond to rotations
 \end{center}
 
 \begin{center}
-\includegraphics{Figures/Gates/RotYGateViewer.png} 
+\includegraphics[scale=.7]{Figures/Gates/RotYGateViewer}  
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:Swap}
     \renewcommand{\arraystretch}{1.25}
@@ -258,7 +260,8 @@ R_y(\theta) \equiv e^{-i\theta Y/2} = \cos\frac{\theta}{2} I - i \sin \frac{\the
 \end{center}
 
 \begin{center}
-\includegraphics{Figures/Gates/RotZGateViewer.png} 
+\includegraphics[scale=.7]{Figures/Gates/RotZGateViewer} 
+%\includegraphics{Figures/Gates/test.eps} 
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:Swap}
     \renewcommand{\arraystretch}{1.25}
@@ -290,7 +293,7 @@ The $\oplus$ symbol denotes an addition modulo two operation on two quantum qubi
 The SWAP gate is capable of swapping two quantum states.
 
 \begin{center}
-\includegraphics{Figures/Gates/SwapGateViewer.png} \\
+\includegraphics[scale=.7]{Figures/Gates/SwapGateViewer} \\
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:Swap}
     \renewcommand{\arraystretch}{1.25}
@@ -311,7 +314,7 @@ For instance, if quantum state $\ket{a}$ was traversing the first wire of the ga
 The Hadamard gate acts on a single qubit and maps the basis state $\ket{0}$ to $\frac{1}{\sqrt 2}(\ket{0} + \ket{1})$ and basis state $\ket{1}$ to $\frac{1}{\sqrt 2}(\ket{0} - \ket{1})$. 
 
 \begin{center}
-\includegraphics{Figures/Gates/HadamardViewer.png} \\
+\includegraphics[scale=.7]{Figures/Gates/HadamardViewer} \\
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:Hadamard}
     \renewcommand{\arraystretch}{1.25}
@@ -329,14 +332,22 @@ The Hadamard gate is very typically used as a first step in quantum algorithms s
 
 \item \includegraphics{Figures/Gates/PGate.png} 
 
+\begin{center}
+\includegraphics[scale=.7]{Figures/Gates/PGateViewer} \\
+\end{center}
+
 \item \includegraphics{Figures/Gates/PAdjointGate.png} 
+
+\begin{center}
+\includegraphics[scale=.7]{Figures/Gates/PAdjointGateViewer} \\
+\end{center}
 
 \item \includegraphics{Figures/Gates/TGate.png}  $\frac{\pi}{8}$ Gate
 
 The T-Gate or otherwise known misleadingly as the $\pi/8$-gate, can be represented as a matrix in the following way. 
 
 \begin{center}
-\includegraphics{Figures/Gates/TGateViewer.png} \\
+\includegraphics[scale=.7]{Figures/Gates/TGateViewer} \\
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:XGate}
     \renewcommand{\arraystretch}{1.25}
@@ -352,12 +363,16 @@ T = e^{i \pi/8}\begin{pmatrix} e^{-i\pi/8} & 0 \\ 0 & e^{i\pi/8} \end{pmatrix}
 
 \item \includegraphics{Figures/Gates/TAdjointGate.png} 
 
+\begin{center}
+\includegraphics[scale=.7]{Figures/Gates/TAdjointGateViewer} \\
+\end{center}
+
 \item \includegraphics{Figures/Gates/XGate.png}  Pauli-X Gate
 
 The Pauli-X Gate acts on a single qubits and corresponds to a rotation around the X-axis of the Bloch sphere by $\pi$ radians.
 
 \begin{center}
-\includegraphics{Figures/Gates/XGateViewer.png} \\
+\includegraphics[scale=.7]{Figures/Gates/XGateViewer} \\
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:XGate}
     \renewcommand{\arraystretch}{1.25}
@@ -378,7 +393,7 @@ The Pauli-X Gate is essentially the quantum NOT as it maps the qubit states $\ke
 The Pauli-Y Gate acts on a single qubit and corresponds to a rotation about the Y-axis of the Bloch sphere by $\pi$ radians. The matrix representation of this gate is provided below. 
 
 \begin{center}
-\includegraphics{Figures/Gates/YGateViewer.png} \\
+\includegraphics[scale=.7]{Figures/Gates/YGateViewer} \\
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:YGate}
     \renewcommand{\arraystretch}{1.25}
@@ -399,7 +414,7 @@ It maps the basis states $\ket{0}$ to $i\ket{1}$ and $\ket{1}$ to $-i\ket{0}$.
 The Pauli-Z Gate acts on a single qubit and corresponds to a rotation about the Z-axis of the Bloch sphere by $\pi$ radians. The matrix representation of this gate is provided below.
 
 \begin{center}
-\includegraphics{Figures/Gates/ZGateViewer.png} \\
+\includegraphics[scale=.7]{Figures/Gates/ZGateViewer} \\
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:ZGate}
     \renewcommand{\arraystretch}{1.25}
@@ -517,7 +532,7 @@ The {\bf Help} menu provides additional information about the creators of QCView
 In this section, we'll go through the creation and execution of a simple circuit to illustrate the functionality of QCViewer. The circuit we will use for these examples will be capable of preparing an EPR (Einstein-Podolsky-Rosen) pair as shown below. For further information regarding the behavior of this circuit, please consult~\cite{Nielsen2002Quantum}.
 
 \begin{center}
-\includegraphics{Figures/CreateCircuit/EPRCircuit.png}\\
+\includegraphics[scale=.7]{Figures/CreateCircuit/EPRCircuit}\\
 Circuit for EPR Pair.
 \end{center}
 
@@ -531,14 +546,14 @@ Dialog box asking for number of qubits.
 For our example, we'll put in ``2", but any integer greater than zero can be used. We are then presented with our template circuit.
 
 \begin{center}
-\includegraphics{Figures/CreateCircuit/TemplateCircuit.png}\\
+\includegraphics[scale=.7]{Figures/CreateCircuit/TemplateCircuit}\\
 Template circuit for 2 qubits.
 \end{center}
 
 We may then make use of the gate palette to place the desired circuits onto our canvas. In this case we first need a Hadamard gate. Simply click and drag the \includegraphics{Figures/Gates/Hadamard.png} graphic onto the template. Next follow this action by placing the \includegraphics{Figures/Gates/Mod2.png} graphic to the bottom right of the recently placed Hadamard gate. This should yield a circuit resembling the following
 
 \begin{center}
-\includegraphics{Figures/CreateCircuit/EPRCircuit2.png}
+\includegraphics[scale=.7]{Figures/CreateCircuit/EPRCircuit2}
 \end{center}
 
 Next, we wish to add a control to complete our CNOT gate on the right. This can be accomplished by simply clicking on the \includegraphics[scale=0.60]{Figures/CreateCircuit/CNOT.png} in our main cavas. This modifies the menu on the right and adds a \em Properties \em portion. 
@@ -577,7 +592,7 @@ When you create a circuit in QCViewer, a corresponding .qc file is generated whe
 As an example, given our EPR circuit used in the previous sections:
 
 \begin{center}
-\includegraphics{Figures/QCFiles/EPRCircuit.png} \\
+\includegraphics[scale=.7]{Figures/QCFiles/EPRCircuit} \\
 EPR circuit generated from QCViewer.
 \end{center}
 
@@ -624,7 +639,7 @@ END
 When opening this file in QCViewer, we can see that the wire labels are now a and b opposed to the previous 1 and 2 respectively. We've also provided a name for the circuit (EPR) and refer to this circuit between the main BEGIN and END tags. The respective output from QCViewer is displayed as:
 
 \begin{center}
-\includegraphics{Figures/QCFiles/EPRCircuitLabel.png} \\
+\includegraphics[scale=.7]{Figures/QCFiles/EPRCircuitLabel} \\
 The modified and labeled EPR circuit.
 \end{center}
 
@@ -676,7 +691,7 @@ END
 This circuit consists of two sub-circuits labeled H5 and GroverIterate. They are called between the primary BEGIN and END tags to display the following output in QCViewer:
 
 \begin{center}
-\includegraphics{Figures/SubCircuits/GroverCircuit.png} \\
+\includegraphics[scale=.7]{Figures/SubCircuits/GroverCircuit} \\
 Grover circuit that comes with QCViewer.
 \end{center}
 
@@ -692,7 +707,7 @@ The sub-circuit menu that allows expanding and unrolling the inner content.
 By clicking the \em Expand \em button on the \em Subcircuit \em menu, we see the expanded subcircuit as follows.
 
 \begin{center}
-\includegraphics{Figures/SubCircuits/GroverCircuitExpand.png} \\
+\includegraphics[scale=.7]{Figures/SubCircuits/GroverCircuitExpand} \\
 Grover's circuit expanded.
 \end{center}
 
@@ -704,7 +719,7 @@ The subcircuit can similarly be collapsed by clicking the same button afterward.
 For circuits that have a looping component (covered in greater detail in section~\ref{sec:Miscellaneous}) we may unroll the iterations of the loop using the \em Unroll \em button in the \em Subcircuit \em menu. As we can see from the above image, the Grover Iterate is to repeat 4 times. Unrolling the loop, we are able to view the circuit in its entirety.
 
 \begin{center}
-\includegraphics[width=170mm]{Figures/SubCircuits/GroverCircuitUnroll.png} \\
+\includegraphics[width=170mm]{Figures/SubCircuits/GroverCircuitUnroll} \\
 The loop inside Grover's circuit is unrolled.
 \end{center}
 
