@@ -764,7 +764,7 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
 {
     vector<int> s;
     int select = pickRect(rects,x,y,s);
-    if (select >= c->numGates()) {
+    if (c->numGates()!=0 && select >= c->numGates()) {
         select = select % c->numGates();
     }
     Gate* g = NULL;

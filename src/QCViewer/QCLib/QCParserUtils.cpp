@@ -94,9 +94,11 @@ void add_outputs (Circuit * circ, name_node *names)
 
 void add_outlabels (Circuit * circ, name_node *names)
 {
-    while(names) {
-        circ->getLineModify(findLine(circ,names->name)).outLabel=names->name;
+    int i = 0;
+    while(names&& i < circ->numLines()) {
+        circ->getLineModify(i).outLabel=names->name;
         names = names->next;
+        i++;
     }
     delete names;
 }

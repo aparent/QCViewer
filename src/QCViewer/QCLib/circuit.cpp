@@ -130,7 +130,7 @@ unsigned int Circuit::numGates() const
 
 unsigned int Circuit::totalGates() const
 {
-		unsigned int numGates = 0;
+    unsigned int numGates = 0;
     for(unsigned int i = 0; i < gates.size(); i++) {
         numGates += gates.at(i)->getNumGates();
     }

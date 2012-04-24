@@ -53,8 +53,9 @@ unsigned int Gate::getLoopCount() const
     return loop_count;
 }
 
-unsigned int Gate::getNumGates() const{
-	return 1;
+unsigned int Gate::getNumGates() const
+{
+    return 1;
 }
 
 gateRect Gate::drawControls (cairo_t *cr,uint32_t xc) const
