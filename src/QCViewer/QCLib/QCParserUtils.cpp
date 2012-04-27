@@ -193,8 +193,83 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         newGate->controls.pop_back();
     }
     newGate->setLoopCount(exp);
+    newGate->ctrls = false;
     circ->addGate(newGate);
     delete names;
+}
+
+void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *targets, unsigned int exp,map<string,Circuit*> &subcircuits, vector<string>& error_log)
+{
+    if (targets == NULL) {
+        cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
+        return;
+    }
+    Gate *newGate = NULL;
+    if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) ||
+            (sToUpper(gateName).compare("TOF") == 0)||
+            (sToUpper(gateName).compare("NOT") == 0)||
+            (sToUpper(gateName).compare("CNOT") == 0)) {
+        newGate = new UGate("X");
+        newGate->drawType = Gate::NOT;
+    } else if (gateName[0] == 'F'||gateName[0] == 'f'||
+               (sToUpper(gateName).compare("FRE") == 0)||
+               (sToUpper(gateName).compare("SWAP") == 0)) {
+        newGate = new UGate("F");
+        newGate->drawType = Gate::FRED;
+    } else if (subcircuits.find(gateName) != subcircuits.end() ) {
+        Circuit* c = subcircuits[gateName];
+        if (circ->numGates()>0) {
+            circ->getGate(circ->numGates()-1)->colbreak = true;
+        }
+        map<unsigned int,unsigned int> lineMap;
+        int line = 0;
+        name_node* start_targs = targets;
+        while(targets) {
+            lineMap.insert (pair<unsigned int,unsigned int>(line,findLine(circ,targets->name)));
+            line++;
+            targets = targets->next;
+        }
+        newGate = new Subcircuit(c, lineMap,exp);
+        targets = start_targs;
+        while(targets) {
+            newGate->targets.push_back(findLine(circ,targets->name));
+            cout << "target " << targets->name << " on gate " << gateName << endl;
+            targets = targets->next;
+        }
+        while(controls) {
+            newGate->controls.push_back(Control(findLine(circ,controls->name),controls->neg));
+            cout << "control " << controls->name << " on gate " << gateName << endl;
+            controls = controls->next;
+        }
+    } else {
+        gateName = sToUpper(gateName);
+        newGate = new UGate(gateName);
+    }
+    if(!check_dup(targets)&&!check_dup(controls)) {
+        while(targets) {
+            newGate->targets.push_back(findLine(circ,targets->name));
+            targets = targets->next;
+        }
+        while(controls) {
+            newGate->controls.push_back(Control(findLine(circ,controls->name),controls->neg));
+            controls = controls->next;
+        }
+    } else {
+        cout << "Duplicate targets or controls on: " << gateName << endl;
+        delete newGate;
+        return;
+    }
+    if (newGate->getName().compare("F")==0) {
+        newGate->targets.push_back(newGate->controls.back().wire);
+        newGate->controls.pop_back();
+    }
+    newGate->setLoopCount(exp);
+
+    cout << newGate->getName() << ": t " << newGate->targets.size() << " c " << newGate->controls.size() << endl;
+    newGate->ctrls = true;
+    circ->addGate(newGate);
+    delete targets;
+    delete controls;
 }
 
 void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp, double rot)
@@ -219,6 +294,7 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
         names = names->next;
     }
     newGate->setLoopCount(exp);
+    newGate->ctrls = false;
     circ->addGate(newGate);
     delete names;
 }
@@ -230,6 +306,7 @@ void link_subcircs(Circuit * circ)
         Circuit *c = it->second;
         for (unsigned int i = 0; i < c->numGates(); i++) {
             Gate *g = c->getGate(i);
+            cout << g->getName() << ": t " << g->targets.size() << " c " << g->controls.size() << endl;
             if (subcircs.find(g->getName()) != subcircs.end() ) {
                 map<unsigned int,unsigned int> lineMap;
                 unsigned int line = 0;
@@ -242,8 +319,14 @@ void link_subcircs(Circuit * circ)
                     line++;
                 }
                 Gate *n_g = new Subcircuit(subcircs[g->getName()],lineMap,g->getLoopCount());
-                for(unsigned int j = 0; j < g->controls.size(); j++) {
-                    n_g->targets.push_back(g->controls.at(j).wire);
+                if (g->ctrls) {
+                    for(unsigned int j = 0; j < g->controls.size(); j++) {
+                        n_g->controls.push_back(g->controls.at(j));
+                    }
+                } else {
+                    for(unsigned int j = 0; j < g->controls.size(); j++) {
+                        n_g->targets.push_back(g->controls.at(j).wire);
+                    }
                 }
                 for(unsigned int j = 0; j < g->targets.size(); j++) {
                     n_g->targets.push_back(g->targets.at(j));

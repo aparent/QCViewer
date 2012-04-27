@@ -57,7 +57,7 @@ Authors: Alex Parent, Jacob Parker
 %defines "QCParser.h"
 %output "QCParser.cpp"
 %start input
-%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG
+%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON
 
 %type <string> WORD NUM
 %type <names> names nums
@@ -81,6 +81,7 @@ input:	/*empty*/
 ;
 gates:  /*empty*/	
 				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits,error_log);} gates 
+				| WORD names COLON names NEWLINE {add_gate(curr_circ,$1,$2,$4,1,circuit->subcircuits,error_log);} gates 
 				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
 				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits,error_log);} gates
 				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates

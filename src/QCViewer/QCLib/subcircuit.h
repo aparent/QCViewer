@@ -61,6 +61,7 @@ public:
     bool unroll;
     SimState* simState;
 
+
 protected:
     std::map<unsigned int,unsigned int> lineMap;
 private:

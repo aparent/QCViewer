@@ -41,6 +41,7 @@ Subcircuit::Subcircuit(Circuit* n_circ, const map <unsigned int,unsigned int>& n
     loop_count = loops;
     expand = false;
     unroll = false;
+    ctrls = false;
     simState = new SimState();
 }
 
@@ -205,7 +206,6 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
     cairo_set_dash (cr, dashes, 0, 0.0);
     stringstream ss;
     ss << getName();
-
     if (getLoopCount() > 1) {
         ss << " x" << getLoopCount();
         if (simState->simulating) {
@@ -228,6 +228,7 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
 
 gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
 {
+    //cout << getName() << ": t " << targets.size() << " c " << controls.size() << endl;
     uint32_t minw, maxw;
     stringstream ss;
     ss << getName();

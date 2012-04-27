@@ -73,6 +73,7 @@ public:
     bool breakpoint;
     bool colbreak;
 
+    bool ctrls;
 protected:
     unsigned int loop_count;
     gateRect drawControls (cairo_t *cr,uint32_t xc) const;
