@@ -310,9 +310,11 @@ void link_subcircs(Circuit * circ)
             if (subcircs.find(g->getName()) != subcircs.end() ) {
                 map<unsigned int,unsigned int> lineMap;
                 unsigned int line = 0;
-                for(unsigned int j = 0; j < g->controls.size(); j++) {
-                    lineMap.insert (pair<unsigned int,unsigned int>(line,g->controls.at(j).wire));
-                    line++;
+                if (!g->ctrls) {
+                    for(unsigned int j = 0; j < g->controls.size(); j++) {
+                        lineMap.insert (pair<unsigned int,unsigned int>(line,g->controls.at(j).wire));
+                        line++;
+                    }
                 }
                 for(unsigned int j = 0; j < g->targets.size(); j++) {
                     lineMap.insert (pair<unsigned int,unsigned int>(line,g->targets.at(j)));

@@ -153,7 +153,6 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     string name;
     int pos = -1;
     getCircuitAndColPosition (xx, yy, circuit, rects, name, pos);
-    cout << "Pos: "<<pos << "  Name: "<<name << endl;
     if (name.compare("Main")==0||pos==-1||name.compare("")==0) {  //If the click is not in a subcircuit
         pickRect (columns, xx, yy, select_ids);
         unsigned int wire = getFirstWire (yy);
@@ -175,7 +174,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
                     }
                 }
                 if (i == columns.size ()) { // goes after all columns
-                    insert_gate_in_new_column (newgate, circuit->columns.at(i-1),circuit);
+                    insert_gate_in_new_column (newgate, circuit->columns.at(i-1)+1,circuit);
                 }
             }
         } else {

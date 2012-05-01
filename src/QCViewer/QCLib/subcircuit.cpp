@@ -228,7 +228,6 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
 
 gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const
 {
-    //cout << getName() << ": t " << targets.size() << " c " << controls.size() << endl;
     uint32_t minw, maxw;
     stringstream ss;
     ss << getName();
