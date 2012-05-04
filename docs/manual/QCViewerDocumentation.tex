@@ -1,6 +1,7 @@
 \documentclass[10pt]{article}
 \usepackage[pdftex]{graphicx}
 \usepackage{epstopdf}
+\usepackage[utf8x]{inputenc}
 
 %-----------------------------------------------------------------------------%
 % Margins:
@@ -209,6 +210,9 @@ The QCViewer program.
 
 It allows users to test new circuit designs and make publication quality diagrams with an easy to use graphical interface. Supported features also include simulation of the circuit while graphically displaying the current state. Additional information on QCViewer can be found \href{http://qcirc.iqc.uwaterloo.ca/QCViewer/QCViewer.pdf}{here}, and the most recent version and changelog can be found \href{http://qcirc.iqc.uwaterloo.ca/index.php?n=Projects.QCViewer}{here}~\cite{Parent2011Quantum}. 
 
+\section{Constuction and Simulation of a Basic Circuit}
+To provide a basic overview of QCViewer in this section we will walk through the constuction and simulation of a small example.
+
 %% QCViewer Components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{QCViewer Components}\label{sec:QCViewerComponents}
@@ -234,7 +238,7 @@ The rotation gates are exponentiated Pauli matrices that correspond to rotations
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/RotXGateViewer} 
   \begin{minipage}{.9\linewidth}
-    \begin{equation*} \label{mat:Swap}
+    \begin{equation*} \label{mat:rotX}
     \renewcommand{\arraystretch}{1.25}
  R_x(\theta) \equiv e^{-i\theta X/2} = \cos\frac{\theta}{2} I - i \sin \frac{\theta}{2} X =  \begin{pmatrix} \cos \frac{\theta}{2} & -i\sin\frac{\theta}{2} \\ -i\sin\frac{\theta}{2} & \cos\frac{\theta}{2}\end{pmatrix}
     \end{equation*}
@@ -249,7 +253,7 @@ The rotation gates are exponentiated Pauli matrices that correspond to rotations
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/RotYGateViewer}  
   \begin{minipage}{.9\linewidth}
-    \begin{equation*} \label{mat:Swap}
+    \begin{equation*} \label{mat:rotY}
     \renewcommand{\arraystretch}{1.25}
 R_y(\theta) \equiv e^{-i\theta Y/2} = \cos\frac{\theta}{2} I - i \sin \frac{\theta}{2} Y =  \begin{pmatrix} \cos \frac{\theta}{2} & -\sin\frac{\theta}{2} \\ \sin\frac{\theta}{2} & \cos\frac{\theta}{2}\end{pmatrix}
     \end{equation*}
@@ -265,7 +269,7 @@ R_y(\theta) \equiv e^{-i\theta Y/2} = \cos\frac{\theta}{2} I - i \sin \frac{\the
 \includegraphics[scale=.7]{Figures/Gates/RotZGateViewer} 
 %\includegraphics{Figures/Gates/test.eps} 
   \begin{minipage}{.9\linewidth}
-    \begin{equation*} \label{mat:Swap}
+    \begin{equation*} \label{mat:RotZ}
     \renewcommand{\arraystretch}{1.25}
 R_z(\theta) \equiv e^{-i\theta Z/2} = \cos\frac{\theta}{2} I - i \sin \frac{\theta}{2} Z =  \begin{pmatrix} e^{-i\theta/2} & 0 \\ 0 & e^{i \theta/2}\end{pmatrix}
     \end{equation*}
@@ -351,7 +355,7 @@ The T-Gate or otherwise known misleadingly as the $\pi/8$-gate, can be represent
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/TGateViewer} \\
   \begin{minipage}{.9\linewidth}
-    \begin{equation*} \label{mat:XGate}
+    \begin{equation*} \label{mat:TGate}
     \renewcommand{\arraystretch}{1.25}
 T = e^{i \pi/8}\begin{pmatrix} e^{-i\pi/8} & 0 \\ 0 & e^{i\pi/8} \end{pmatrix}
     \end{equation*}
@@ -729,25 +733,41 @@ Similarly, by pressing the \em Unroll \em button afterward, the circuit is colla
 
 %% Miscellaneous
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{File Specifications}
+
+\subsection{Circuit File}
+
+\subsection{Gate Library}
+The gate libary file allows you to specify additional gates.  An example gate specification follows:
+
+\small
+\begin{verbatim}
+
+NAME TGateConj
+DRAWNAME "T<sup>†</sup>"
+SYMBOL T*
+1 , 0
+0 , 1/sqrt(2) - i*1/sqrt(2)
+
+\end{verbatim}
+\normalsize
+
+This encodes the $T^\dagger$ gate. The top three tags give basic information about the gate and 
+are followed by a matrix which gives the unitary which the gate preforms.  The functions of the 
+tags are discribed below:
+\begin{description}
+\item[NAME] \hfill \\
+The full name of the gate.  Currently this tag does not do anything.
+\item[DRAWNAME] \hfill \\
+The name to be used while drawing.  This can be any unicode charactor 
+and can include sub/super-script tages (<sub>/<super>).
+\item[SYMBOL] \hfill \\
+\end{description}
+
+
 \section{Miscellaneous}\label{sec:Miscellaneous}
 
 In this section, a number of miscellaneous features of QCViewer are mentioned.
-
-\subsection{Loops}
-
-Certain algorithms, such as Grover's quantum search algorithm for instance, make use of a quantum circuit with repeated components. To conserve screen space and redundant circuit creation in QCViewer, one can simply create a loop to iterate over a specific portion of the existing circuit. By clicking and dragging a window over the circuits you wish to iterate over, a menu appears to the left that allows the user to dictate flow control.
-
-\begin{center}
-\includegraphics{Figures/Misc/LoopsMenu.png}
-\end{center}
-
-Once the assortment of gates have been selected, choosing the \em Add Loop \em option under the \em Flow Control \em menu automatically puts a loop around the selected portion. 
-
-\begin{center}
-\includegraphics{Figures/Misc/LoopCount.png}
-\end{center}
-
-This prompts the above menu to appear. This allows this user to specify a name for reference for the loop as well as determine how many times the loop iterates over the previously specified portion of gates. 
 
 \subsection{Deleting Gates}
 
