@@ -29,6 +29,7 @@
 
 \usepackage{hyperref}
 \hypersetup{pdfpagemode=UseNone}
+\usepackage[all]{hypcap}
 
 %-----------------------------------------------------------------------------%
 % Various packages:
@@ -158,6 +159,11 @@
 \def\H{\mathcal{H}}
 \def\yes{\text{yes}}
 \def\no{\text{no}}
+
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{program}{h}{lop}
+\floatname{program}{Listing }
 
 \begin{document}
 
@@ -602,11 +608,23 @@ As an example, given our EPR circuit used in the previous sections:
 EPR circuit generated from QCViewer.
 \end{center}
 
-the respective output of the .qc file is shown below.
+The output of the .qc file associated with this circuit is shown in listing \ref{qc:epr}.
 
-\begin{center}
-\includegraphics{Figures/QCFiles/EPRQCFile.png}
-\end{center}
+\begin{program}
+\caption{.qc file generated for epr circuit}
+\label{qc:epr}
+\begin{verbatim}
+.v 1 2
+.i 1 2
+.o 1 2
+.ol 1 2
+.c
+BEGIN
+H 1
+tof 1 2
+END
+\end{verbatim}
+\end{program}
 
 The header information consists of the following content:
 
@@ -622,9 +640,11 @@ The primary circuit is represented between BEGIN and END tags. The circuit name 
 
 \subsection{Labeling Circuits}\label{sec:LabelingCircuits}
 
-One may wish to provide labels to the circuit wires and to the collection of gates for succinctness. For example, we may modify the names of the circuit wires and circuit name of the EPR circuit by modifying the respective .qc file as such
+One may wish to provide labels to the circuit wires and to the collection of gates for succinctness. For example, we may modify the names of the circuit wires and circuit name of the EPR circuit by modifying the respective .qc file as shown in listing \ref{qc:eprl}.
 
-\small
+\begin{program}
+\caption{ .qc file generated for labeled epr circuit}
+\label{qc:eprl}
 \begin{verbatim}
 .v a b
 .i a b
@@ -640,7 +660,7 @@ BEGIN
 EPR a b
 END
 \end{verbatim}
-\normalsize
+\end{program}
 
 When opening this file in QCViewer, we can see that the wire labels are now a and b opposed to the previous 1 and 2 respectively. We've also provided a name for the circuit (EPR) and refer to this circuit between the main BEGIN and END tags. The respective output from QCViewer is displayed as:
 
@@ -655,9 +675,11 @@ In the next section, we will consider how sub-circuits behave in QCViewer. For m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Sub-Circuits}\label{sec:SubCircuits}
 
-It is often convenient to group gates with a specific functionality together as a sub-circuit for the main circuit. In the \em demos \em folder provided with your distribution of QCViewer there exists a number of demo circuits to try and view. The attention of this section will be focused on the \em grover.qc \em file provided in this distribution. Looking at the .qc file we have:
+It is often convenient to group gates with a specific functionality together as a sub-circuit for the main circuit. In the \em demos \em folder provided with your distribution of QCViewer there exists a number of demo circuits to try and view. The attention of this section will be focused on the \em grover.qc \em file provided in this distribution (See listing \ref{qc:grover}).
 
-\small
+\begin{program}
+\caption{ .qc file for the grover circuit}
+\label{qc:grover}
 \begin{verbatim}
 .v a b c d e Workspace
 .i a b c d e Workspace
@@ -692,14 +714,17 @@ GroverIterate^4 a b c d e Workspace
 END
 
 \end{verbatim}
-\normalsize
+\end{program}
 
-This circuit consists of two sub-circuits labeled H5 and GroverIterate. They are called between the primary BEGIN and END tags to display the following output in QCViewer:
+This circuit consists of two sub-circuits labeled H5 and GroverIterate. They are called between the primary BEGIN and END tags to display the following output in figure \ref{f:grover}.
 
-\begin{center}
-\includegraphics[scale=.7]{Figures/SubCircuits/GroverCircuit} \\
-Grover circuit that comes with QCViewer.
-\end{center}
+\begin{figure}
+\capstart
+\centering
+\includegraphics[scale=.5]{Figures/SubCircuits/GroverCircuit}
+\caption{Grover circuit}
+\label{f:grover}
+\end{figure}
 
 You can see that these sub-circuits consist of the labels provided in the .qc file. If we wished to expand one of the subcircuits to view the inner content, we may click on the sub-circuit of choice which brings up the subcircuit menu.
 
@@ -710,24 +735,30 @@ The sub-circuit menu that allows expanding and unrolling the inner content.
 
 \subsection{Expanding Sub-Circuits}\label{sec:ExpandingSubCircuits}
 
-By clicking the \em Expand \em button on the \em Subcircuit \em menu, we see the expanded subcircuit as follows.
+By clicking the \em Expand \em button on the \em Subcircuit \em menu, we see the expanded subcircuit in figure \ref{f:groverex}.
 
-\begin{center}
-\includegraphics[scale=.7]{Figures/SubCircuits/GroverCircuitExpand} \\
-Grover's circuit expanded.
-\end{center}
+\begin{figure}
+\capstart
+\centering
+\includegraphics[scale=.5]{Figures/SubCircuits/GroverCircuitExpand}
+\caption{Grover's circuit expanded.}
+\label{f:groverex}
+\end{figure}
 
 The subcircuit can similarly be collapsed by clicking the same button afterward.
 
 
 \subsection{Unrolling Sub-Circuits}\label{sec:UnrollingSubCircuits}
 
-For circuits that have a looping component (covered in greater detail in section~\ref{sec:Miscellaneous}) we may unroll the iterations of the loop using the \em Unroll \em button in the \em Subcircuit \em menu. As we can see from the above image, the Grover Iterate is to repeat 4 times. Unrolling the loop, we are able to view the circuit in its entirety.
+For circuits that have a looping component (covered in greater detail in section~\ref{sec:Miscellaneous}) we may unroll the iterations of the loop using the \em Unroll \em button in the \em Subcircuit \em menu. As we can see from figure \ref{f:groverex}, the Grover Iterate is to repeat 4 times. Unrolling the loop, we are able to view the circuit in its entirety (figure \ref{f:groverunroll}).
 
-\begin{center}
-\includegraphics[width=170mm]{Figures/SubCircuits/GroverCircuitUnroll} \\
-The loop inside Grover's circuit is unrolled.
-\end{center}
+\begin{figure}
+\capstart
+\centering
+\includegraphics[width=170mm]{Figures/SubCircuits/GroverCircuitUnroll}
+\caption{Grover's circuit unrolled.}
+\label{f:groverunroll}
+\end{figure}
 
 Similarly, by pressing the \em Unroll \em button afterward, the circuit is collapsed to its previous state. 
 
@@ -736,9 +767,41 @@ Similarly, by pressing the \em Unroll \em button afterward, the circuit is colla
 \section{File Specifications}
 
 \subsection{Circuit File}
+Circuit files are used to specify a .qc circuit. They are designed to be very human readable and
+writeable.  To see a larger example circuit which uses most of the file features discussed in this example
+look at the euclid.qc file in the demos folder.
+
+Circuit files begin with a specification of qubits. A description of the labels used follows:
+\begin{description}
+\item[.v] \hfill \\
+This label must come first and gives the line names in order.  These are the names by which the lines
+will be referenced in the rest of the circuit.
+\item[.i] \hfill \\
+Lines listed here are circuit inputs (i.e. not pre-initialized ancilla).
+\item[.o] \hfill \\
+Lines listed here are circuit outputs (i.e. not garbage).
+\item[.ol] \hfill \\
+Lines listed here are alternate output labels which are used if you want a 
+line to have a different label on the output side then the input side.
+\item[.c] \hfill \\
+This is a list of initial values for lines which are not inputs.
+\end{description}
+
+This is followed by the specification of any subcircuits that will be needed by the primary circuit.
+Subcircuits are specified between the tags:
+\begin{description}
+\item[BEGIN <circuitName> (<lineListing>)] \hfill \\
+\item[END <circuitName>] \hfill \\
+\end{description}
+Here "<circuitName>" is the name of the subcircuit and "<lineListing>" is a space separated list of line names
+used in the subcircuit. 
+
+
+
+For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
 
 \subsection{Gate Library}
-The gate libary file allows you to specify additional gates.  An example gate specification follows:
+The gate library file allows you to specify additional gates.  An example gate specification follows:
 
 \small
 \begin{verbatim}
@@ -754,15 +817,19 @@ SYMBOL T*
 
 This encodes the $T^\dagger$ gate. The top three tags give basic information about the gate and 
 are followed by a matrix which gives the unitary which the gate preforms.  The functions of the 
-tags are discribed below:
+tags are described below:
 \begin{description}
 \item[NAME] \hfill \\
 The full name of the gate.  Currently this tag does not do anything.
 \item[DRAWNAME] \hfill \\
-The name to be used while drawing.  This can be any unicode charactor 
-and can include sub/super-script tages (<sub>/<super>).
+The name to be used while drawing.  This can be any unicode character 
+and can include sub/super-script tags (<sub>/<super>).
 \item[SYMBOL] \hfill \\
+This gives the name that the gate is referenced by in the .qc file.  It is also used as the drawname if one is not
+specified.
 \end{description}
+Below the tags the gate matrix is specified.  This matrix is used to simulate the gate.  Columns are separated by commas
+and rows are separated by newlines.
 
 
 \section{Miscellaneous}\label{sec:Miscellaneous}
