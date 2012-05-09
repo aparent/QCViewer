@@ -25,6 +25,12 @@ Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
+/*! \file window.h
+    \brief Defines the main window of the GUI
+
+*/
+
+
 #ifndef WINDOW__INCLUDED
 #define WINDOW__INCLUDED
 

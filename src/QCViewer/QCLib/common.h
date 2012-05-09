@@ -24,6 +24,10 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
+/*! \file common.h
+    \brief Defines some classes used by many parts of the code
+*/
+
 #ifndef __COMMON__INCLUDED
 #define __COMMON__INCLUDED
 
@@ -45,13 +49,26 @@ public:
     std::vector<Selection> * sub;
 };
 
+/*! \brief Rectangle that defines the area taken up by a gate
+
+	 Can also contain subrectangles in the case where the gate is
+	a subcircuit
+*/
 class gateRect
 {
 public:
     gateRect();
+    //! Frees all subRects.
     void remove();
-    double x0, y0;
-    double width, height;
+    //! The x position of the rectangle
+    double x0;
+    //! The y position of the rectangle
+    double y0;
+    //! The width of the rectangle
+    double width;
+    //! The height of the rectangle
+    double height;
+    //! Contains subrectangles in the case of an expanded subcircuit
     std::vector<gateRect> * subRects;
 };
 

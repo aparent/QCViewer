@@ -97,10 +97,7 @@ index_t GetRegister (index_t bits, index_t reg)
 {
     return (bits & (1 << reg)) >> reg;
 }
-/**
-* Returns the floor form of binary logarithm for a 32 bit integer.
-* −1 is returned if ''n'' is 0.
-*/
+
 unsigned int floorLog2(unsigned int n)
 {
     if (n == 0)

@@ -24,6 +24,11 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
+/*! \file utility.h
+    \brief Utility functions
+
+*/
+
 #ifndef UTILITY_FUNCS
 #define UTILITY_FUNCS
 
@@ -44,18 +49,30 @@ Authors: Alex Parent, Jacob Parker
 
 void printIntBin(index_t);
 
+/*!
+ \brief Returns the floored form of the binary logarithm for a 32 bit integer.
+
+ -1 is returned if ''n'' is 0.
+*/
 unsigned int floorLog2(unsigned int n);
+
 int ipow(int base, int exp);
 std::string intToString(int i);
 std::string floatToString(float_type i);
 std::string sToUpper(std::string);
 
 /* Bit set/get functions */
-//Sets the bit at position reg to 1
+/*!
+	\brief Sets the bit at position reg to 1
+*/
 unsigned int SetRegister (unsigned int bits, unsigned int reg);
-//Sets the bit at position reg to 0
+/*!
+  \brief Sets the bit at position reg to 0
+*/
 unsigned int UnsetRegister (unsigned int bits, unsigned int reg);
-//Returns the value of the bit at position reg
+/*!
+  \brief Returns the value of the bit at position reg
+*/
 index_t GetRegister (index_t bits, index_t reg);
 
 unsigned int invertBits (unsigned int bits, unsigned int numBits);
