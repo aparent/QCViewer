@@ -728,6 +728,11 @@ void CircuitWidget::deleteSelectedGate ()
 }
 
 
+void  CircuitWidget::expand_all()
+{
+    circuit->expandAll();
+    force_redraw();
+}
 
 
 void  CircuitWidget::arch_set_LNN()

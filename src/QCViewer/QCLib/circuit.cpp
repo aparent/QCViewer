@@ -44,6 +44,7 @@ Circuit::Circuit() : arch(NULL) {}
 
 Circuit::~Circuit ()
 {
+    allExpanded = false;
     removeArch ();
     removeSubcircuits();
     removeGates();
@@ -71,10 +72,11 @@ void Circuit::removeSubcircuits()
 
 void Circuit::expandAll()
 {
+    allExpanded = !(allExpanded);
     for(unsigned int i = 0; i<numGates(); i++) {
         Gate *g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g)->expand = true;
+            ((Subcircuit*)g)->expand = allExpanded;
         }
     }
     for ( map<string,Circuit*>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {

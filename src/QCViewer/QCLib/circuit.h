@@ -211,6 +211,8 @@ private:
 
     SimState simState;
 
+    bool allExpanded;
+
     std::vector<gateRect> draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const;
     void drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const;
     void drawParallelSectionMarkings (cairo_t* cr, const std::vector<gateRect> &rects, int numLines, const std::vector<int> &pLines) const;

@@ -81,6 +81,7 @@ public:
     void set_mode (Mode);
     void add_subcirc ();
     void force_redraw ();
+    void expand_all ();
 
     bool is_subcirc (unsigned int);
     Gate* getGate(unsigned int);

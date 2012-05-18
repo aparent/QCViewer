@@ -123,6 +123,7 @@ protected:
     Gtk::Entry       m_IterEntry;
     Gtk::Button      m_SubcircExpandButton;
     Gtk::Button      m_SubcircUnrollButton;
+    Gtk::Button      m_SubcircExpandAllButton;
 
     std::vector<Gtk::Button*> gate_buttons;
     std::vector<GateIcon*>    gate_icons;
@@ -152,6 +153,7 @@ private:
     void add_stock_item(const Glib::RefPtr<Gtk::IconFactory>& , const std::string& , const Glib::ustring& , const Glib::ustring& );
     void update_mode ();
     void expand_subcirc();
+    void expand_all_subcirc();
     void unroll_subcirc();
     void set_subcircuit_name();
 

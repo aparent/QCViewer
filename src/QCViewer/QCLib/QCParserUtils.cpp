@@ -154,7 +154,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
         Circuit* c = subcircuits[gateName];
         if (circ->numGates()>0) {
-            circ->getGate(circ->numGates()-1)->colbreak = true;
+            //circ->getGate(circ->numGates()-1)->colbreak = true;
         }
         map<unsigned int,unsigned int> lineMap;
         int line = 0;
@@ -219,7 +219,7 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
         Circuit* c = subcircuits[gateName];
         if (circ->numGates()>0) {
-            circ->getGate(circ->numGates()-1)->colbreak = true;
+            //circ->getGate(circ->numGates()-1)->colbreak = true;
         }
         map<unsigned int,unsigned int> lineMap;
         int line = 0;
