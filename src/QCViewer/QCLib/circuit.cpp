@@ -445,7 +445,7 @@ void Circuit::drawArchitectureWarnings (cairo_t* cr, const vector<gateRect> &rec
 
 void Circuit::drawParallelSectionMarkings (cairo_t* cr, const vector<gateRect> &rects, int numLines, const vector<int> &pLines) const
 {
-    for (uint32_t i = 0; i < pLines.size() - 1; i++) {
+    for (uint32_t i = 0; i < pLines.size(); i++) {
         int gateNum = pLines[i];
         double x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
         drawPWire (cr, x, numLines);

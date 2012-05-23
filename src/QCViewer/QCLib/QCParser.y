@@ -41,7 +41,7 @@ Authors: Alex Parent, Jacob Parker
   Circuit *circuit;
   Circuit *curr_circ;
   std::vector<std::string> error_log;
-  #define CHECK_NAMES(names,id) if(!check_names(circuit,names,error_log,id)){circuit=NULL;return -1;}
+  #define CHECK_NAMES(names,id) if(!check_names(curr_circ,names,error_log,id)){circuit=NULL;return -1;}
 %}
 %code requires{
   #include "QCLib/QCParserUtils.h"
@@ -109,6 +109,7 @@ Circuit *parseCircuit(std::string filename,std::vector<std::string>& error_log_r
 {
 	error_log.clear();
 	circuit = new Circuit();
+	curr_circ = circuit;
 	std::string input,line;
 	std::ifstream myfile(filename.c_str());
   if (myfile.is_open()) {
