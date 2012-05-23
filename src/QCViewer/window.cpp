@@ -183,7 +183,7 @@ void QCViewer::on_menu_file_open_circuit ()
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
         vector<string> errors = c.load (dialog.get_filename ());
-        if (errors.size()>1) {
+        if (errors.size()>0) {
             string error_message;
             for ( unsigned int i = 0; i < errors.size(); i++) {
                 error_message += errors.at(i) + "\n";

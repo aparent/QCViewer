@@ -43,6 +43,10 @@ int main (int argc, char *argv[])
     if (argc > 0) {
         vector<string> error_log;
         c = parseCircuit(argv[1],error_log);
+        if (c == NULL) {
+            cout << "Parse Error" << endl;
+            return -1;
+        }
         c->getGreedyParallel();
         c->expandAll();
         ofstream myfile;

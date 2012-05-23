@@ -190,7 +190,7 @@
 
 % Bottom of the page
 {\large \today}
-{\large Version 0.5}
+{\large Version 0.7}
 
 \end{center}
 
@@ -200,7 +200,7 @@
 \newpage
 
     \begin{flushright}
-    QCViewer 0.5 Documentation
+    QCViewer 0.7 Documentation
     \end{flushright}
 
 %% Introduction
@@ -219,28 +219,27 @@ It allows users to test new circuit designs and make publication quality diagram
 %% Creating a Circuit
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Creating a Circuit} \label{sec:CreatingaCircuit}
-In this section, we'll go through the creation and execution of a simple circuit to illustrate the functionality of QCViewer. The circuit we will use for these examples will be capable of preparing an EPR (Einstein-Podolsky-Rosen) pair as shown below. For further information regarding the behavior of this circuit, please consult~\cite{Nielsen2002Quantum}.
-
+In this section, we'll go through the creation and execution of a simple circuit to illustrate the functionality of QCViewer. We will be preparing a simple EPR (Einstein-Podolsky-Rosen) circuit as shown below.
 \begin{center}
 \includegraphics[scale=.7]{Figures/CreateCircuit/EPRCircuit}\\
 Circuit for EPR Pair.
 \end{center}
 
-In order to pictorially depict this circuit in QCViewer, from the Circuit menu \includegraphics{Figures/CreateCircuit/New.png} select \em New \em. A dialog box asking how many qubits you wish to have in your circuit appears. 
+From the Circuit menu \includegraphics{Figures/CreateCircuit/New.png} select \em New \em. A dialog box asking how many qubits you wish to have in your circuit appears. 
 
 \begin{center}
 \includegraphics{Figures/CreateCircuit/NumberOfQubits.png}\\
 Dialog box asking for number of qubits.
 \end{center}
 
-For our example, we'll put in ``2", but any integer greater than zero can be used. We are then presented with our template circuit.
+The circuit in this example uses 2 qubits so you may enter ``2'' here. We are then presented with our template circuit.
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/CreateCircuit/TemplateCircuit}\\
 Template circuit for 2 qubits.
 \end{center}
 
-We may then make use of the gate palette to place the desired circuits onto our canvas. In this case we first need a Hadamard gate. Simply click and drag the \includegraphics{Figures/Gates/Hadamard.png} graphic onto the template. Next follow this action by placing the \includegraphics{Figures/Gates/Mod2.png} graphic to the bottom right of the recently placed Hadamard gate. This should yield a circuit resembling the following
+We may then make use of the gate palette to place the desired gates onto our circuit. In this case we first need a Hadamard gate. Simply click and drag the \includegraphics{Figures/Gates/Hadamard.png} graphic onto the template. Next follow this action by placing the \includegraphics{Figures/Gates/Mod2.png} graphic to the bottom right of the recently placed Hadamard gate. This should yield a circuit resembling the following
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/CreateCircuit/EPRCircuit2}
@@ -252,10 +251,10 @@ Next, we wish to add a control to complete our CNOT gate on the right. This can 
 \includegraphics{Figures/CreateCircuit/Properties.png}
 \end{center}
 
-By selecting the \em Edit Controls \em option under the \em Properties \em menu, the mouse cursor is changed to \includegraphics[scale=0.5]{Figures/CreateCircuit/Cursor.png}. You may now click where you wish to place this control on the circuit. This completes the pictorial representation of the EPR pair circuit. 
+By selecting the \em Edit Controls \em option under the \em Properties \em menu, the mouse cursor is changed to \includegraphics[scale=0.5]{Figures/CreateCircuit/Cursor.png}. You may now click where you wish to place this control on the circuit. This completes our EPR circuit. 
 
 \subsection{Circuit Simulation}\label{sub:CircuitSimulation}
-Now that we have created the circuit, we can simulate the behavior of this circuit given a particular state. Since we are dealing with a circuit consisting of two wires, the dimensionality of our quantum system must abide by this dimensionality as well. Specifically as input to our quantum circuit we could have the following possible input states: $\ket{00}, \ket{01} \ket{10}$ or $\ket{11}$. 
+Now that we have created the circuit, we can simulate the behavior of this circuit given a particular state. Since we are dealing with a circuit consisting of two wires, the dimensionality of our quantum system must abide by this dimensionality as well.
 
 To load a particular quantum state, click the \includegraphics[scale=0.60]{Figures/Navigation/LoadState.png} icon to prompt the following dialog box to appear.
 
@@ -271,6 +270,22 @@ To specify a particular state to enter, the ket formalism is represented by pref
 
 In order to observe the progression of our state through the circuit step by step, we manipulate the \includegraphics[scale=0.60]{Figures/Navigation/Step.png} button. Using this button highlights the current gate the qubits are interacting with, and display the corresponding states through \em Display State \em. Running the entire course of the circuit can also be done by simply using the \includegraphics[scale=0.60]{Figures/Navigation/Run.png} button. By using the reset \includegraphics[scale=0.60]{Figures/Navigation/Reset.png} button, one may reset the configuration back to its initial state.
 
+\subsubsection{Example: Grover}
+
+Figure \ref{f:simulate} shows the results of simultating the circuit show in figure \ref{f:groverex} 
+(the specification of this circuit can be seen in listing \ref{qc:grover}).  This simulation is done by loading
+the state $(H|0\rangle)^{\otimes 5}|1\rangle$.  The first image shows the inital state and the following images 
+show the sate after each iteration.
+
+\begin{figure}
+\capstart
+\centering
+\includegraphics[scale=.35]{Figures/simulate}
+\caption{The first row shows the state $(H|0\rangle)^{\otimes 5}|1\rangle$, 
+and the subsequent rows show the state as it goes through four iterations of the Grover's iterate. The
+diagram for the circuit that generated these pictures can be seen in Figure \ref{f:groverex}.}
+\label{f:simulate}
+\end{figure}
 
 %% QCViewer Components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -326,7 +341,6 @@ R_y(\theta) \equiv e^{-i\theta Y/2} = \cos\frac{\theta}{2} I - i \sin \frac{\the
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/RotZGateViewer} 
-%\includegraphics{Figures/Gates/test.eps} 
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:RotZ}
     \renewcommand{\arraystretch}{1.25}
@@ -372,8 +386,6 @@ SWAP = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 
   \end{minipage}
 \end{center}
 
-For instance, if quantum state $\ket{a}$ was traversing the first wire of the gate, and quantum state $\ket{b}$ was traversing the second, the final state of the gate would flip the wires these qubits were on. 
-
 \item \includegraphics{Figures/Gates/Hadamard.png}  Hadamard Gate
 
 The Hadamard gate acts on a single qubit and maps the basis state $\ket{0}$ to $\frac{1}{\sqrt 2}(\ket{0} + \ket{1})$ and basis state $\ket{1}$ to $\frac{1}{\sqrt 2}(\ket{0} - \ket{1})$. 
@@ -393,23 +405,42 @@ H =  \frac{1}{\sqrt 2}\begin{pmatrix} 1 & 1 \\ 1 & \textnormal{-}1 \end{pmatrix}
   \end{minipage}
 \end{center}
 
-The Hadamard gate is very typically used as a first step in quantum algorithms since it equally maps initialized qubits in the $\ket{0}$ basis state to a superposition of all $2^n$ orthogonal positions in the standard $\{\ket{0}, \ket{1}\}$ basis.
-
 \item \includegraphics{Figures/Gates/PGate.png} 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/PGateViewer} \\
+
+\begin{minipage}{.9\linewidth}
+    \begin{equation*} \label{mat:PGate}
+    \renewcommand{\arraystretch}{1.25}
+P = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}
+    \end{equation*}
+  \end{minipage}\hspace{-2.5cm}
+  \begin{minipage}{.2\linewidth}
+  \vspace*{3pt}
+    \begin{align}
+    \end{align}
+  \end{minipage}
 \end{center}
 
 \item \includegraphics{Figures/Gates/PAdjointGate.png} 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/PAdjointGateViewer} \\
+\begin{minipage}{.9\linewidth}
+    \begin{equation*} \label{mat:PGateAdjoint}
+    \renewcommand{\arraystretch}{1.25}
+P^\dagger = \begin{pmatrix} 1 & 0 \\ 0 & -i \end{pmatrix}
+    \end{equation*}
+  \end{minipage}\hspace{-2.5cm}
+  \begin{minipage}{.2\linewidth}
+  \vspace*{3pt}
+    \begin{align}
+    \end{align}
+  \end{minipage}
 \end{center}
 
 \item \includegraphics{Figures/Gates/TGate.png}  $\frac{\pi}{8}$ Gate
-
-The T-Gate or otherwise known misleadingly as the $\pi/8$-gate, can be represented as a matrix in the following way. 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/TGateViewer} \\
@@ -431,6 +462,19 @@ T = e^{i \pi/8}\begin{pmatrix} e^{-i\pi/8} & 0 \\ 0 & e^{i\pi/8} \end{pmatrix}
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/TAdjointGateViewer} \\
+
+\begin{minipage}{.9\linewidth}
+    \begin{equation*} \label{mat:TGateAjoint}
+    \renewcommand{\arraystretch}{1.25}
+T^\dagger = e^{i \pi/8}\begin{pmatrix} e^{i\pi/8} & 0 \\ 0 & e^{-i\pi/8} \end{pmatrix}
+    \end{equation*}
+  \end{minipage}\hspace{-2.5cm}
+  \begin{minipage}{.2\linewidth}
+  \vspace*{3pt}
+    \begin{align}
+    \end{align}
+  \end{minipage}
+
 \end{center}
 
 \item \includegraphics{Figures/Gates/XGate.png}  Pauli-X Gate
@@ -494,7 +538,7 @@ Z = \begin{pmatrix} 1 & 0 \\ 0 & \textnormal{-}1 \end{pmatrix}
   \end{minipage}
 \end{center}
 
-It maps the basis states $\ket{0}$ to an unchanged $\ket{0}$ and maps $\ket{1}$ to $\ket{-1}$. 
+It maps the basis states $\ket{0}$ to an unchanged $\ket{0}$ and maps $\ket{1}$ to $-\ket{1}$. 
 
 \end{itemize}
 
@@ -520,10 +564,6 @@ If no circuits have been previously saved by the user, QCViewer does come with a
 \item \includegraphics{Figures/Navigation/Ratio.png}\\ 
 
 Depending on the number of elements in the QCViewer window, clicking this graphic provides a 1:1 perspective on what exists in the window. For instance if you zoom too far in or out (via the mouse scroll wheel), then clicking this will bring you back to viewing the contents in a 1:1 ratio. 
-
-\item \includegraphics{Figures/Navigation/Pan.png}\\ 
-
-Clicking this graphic will enable the pan feature and turn the button to \includegraphics[scale=0.60]{Figures/Navigation/PanEnabled.png}. While this is enabled, clicking and dragging the contents in the QCViewer window will pan whatever way the mouse is navigated. Clicking this icon again disables the functionality. 
 
 \item \includegraphics{Figures/Navigation/LoadState.png} \\ 
 
@@ -793,11 +833,12 @@ Subcircuits are specified between the tags:
 \item[END <circuitName>] \hfill \\
 \end{description}
 Here "<circuitName>" is the name of the subcircuit and "<lineListing>" is a space separated list of line names
-used in the subcircuit. 
+used in the subcircuit. For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
 
-
-
-For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
+In between the circuit tags is the gate listing.  Each line is formatted "<gateName> <lineListing>".  By
+default the last line listed is the target.  For subcircuits the targets and controls must be explicitly
+separated using a colon (see the subtractor in the inside of the "iter" subcircuit in euclid.qc for an example).
+Blank lines add breaks in the layout (i.e. gates after a blank line will not stack with gates before one).
 
 \subsection{Gate Library}
 The gate library file allows you to specify additional gates.  An example gate specification follows:

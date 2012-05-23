@@ -34,12 +34,14 @@ Authors: Alex Parent, Jacob Parker
   #include <vector>
   #include <iostream>
   #include "QCLib/circuit.h"
+  #include "QCLib/QCParserUtils.h"
   void QC_error(const char *s);
   int QC_lex();
   int QC__scan_string(const char*);
   Circuit *circuit;
   Circuit *curr_circ;
-	std::vector<std::string> error_log;
+  std::vector<std::string> error_log;
+  #define CHECK_NAMES(names,id) if(!check_names(circuit,names,error_log,id)){circuit=NULL;return -1;}
 %}
 %code requires{
   #include "QCLib/QCParserUtils.h"
@@ -63,12 +65,13 @@ Authors: Alex Parent, Jacob Parker
 %type <names> names nums
 %type <fnum> float
 
+
 %%
 input:	/*empty*/
      		| VARS names NEWLINE {add_lines(circuit,$2);} input
-     		| INPUTS names NEWLINE {add_inputs(circuit,$2);} input
-     		| OUTPUTS names NEWLINE {add_outputs(circuit,$2);} input
-     		| CONSTANTS nums NEWLINE {add_constants(circuit,$2);} input
+     		| INPUTS names NEWLINE {CHECK_NAMES($2,"inputs");add_inputs(circuit,$2);} input
+     		| OUTPUTS names NEWLINE {CHECK_NAMES($2,"outputs");add_outputs(circuit,$2); } input
+     		| CONSTANTS nums NEWLINE {add_constants(circuit,$2); } input
      		| OUTLABELS names NEWLINE {add_outlabels(circuit,$2);} input
 				| NEWLINE input
 				| START WORD LBRAC names RBRAC NEWLINE 
@@ -80,11 +83,11 @@ input:	/*empty*/
 				| error {circuit = NULL; return -1;}
 ;
 gates:  /*empty*/	
-				| WORD names NEWLINE {add_gate(curr_circ,$1,$2,1,circuit->subcircuits,error_log);} gates 
-				| WORD names COLON names NEWLINE {add_gate(curr_circ,$1,$2,$4,1,circuit->subcircuits,error_log);} gates 
-				| WORD LBRAC float RBRAC names {add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
-				| WORD EXPON NUM names NEWLINE {add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits,error_log);} gates
-				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
+				| WORD names NEWLINE {CHECK_NAMES($2,$1);add_gate(curr_circ,$1,$2,1,circuit->subcircuits,error_log);} gates 
+				| WORD names COLON names NEWLINE {CHECK_NAMES($2,$1);CHECK_NAMES($4,$1);add_gate(curr_circ,$1,$2,$4,1,circuit->subcircuits,error_log);} gates 
+				| WORD LBRAC float RBRAC names {CHECK_NAMES($5,$1);add_R_gate(curr_circ,$1,$5,1,$3);} NEWLINE gates
+				| WORD EXPON NUM names NEWLINE {CHECK_NAMES($4,$1);add_gate(curr_circ,$1,$4,atoi($3),circuit->subcircuits,error_log);} gates
+				| WORD LBRAC float RBRAC EXPON NUM names NEWLINE {CHECK_NAMES($7,$1);add_R_gate(curr_circ,$1,$7,atoi($6),$3);} gates
 				| NEWLINE {insert_break(curr_circ);} gates 
 ;
 names:/*empty*/ {$$ = NULL;}
@@ -118,7 +121,10 @@ Circuit *parseCircuit(std::string filename,std::vector<std::string>& error_log_r
   		strcpy(in,input.c_str());
   		QC__scan_string(in);
   		QC_parse ();
-			if (circuit == NULL) return circuit;
+			if (circuit == NULL){
+				error_log_r = error_log;
+				return circuit;
+			}
 			link_subcircs(circuit);
 			cleanup_bad_gates(circuit,error_log);
   }
