@@ -58,7 +58,7 @@ Selection::Selection(uint32_t n, vector<Selection>* s)
 void gateRect::remove()
 {
     if (subRects != NULL) {
-        for (int i = 0; i < subRects->size(); i++) {
+        for (unsigned int i = 0; i < subRects->size(); i++) {
             subRects->at(i).remove();
         }
     }

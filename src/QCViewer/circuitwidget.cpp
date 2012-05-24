@@ -154,58 +154,18 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     int pos = -1;
     getCircuitAndColPosition (xx, yy, circuit, rects, name, pos);
     if (name.compare("Main")==0||pos==-1||name.compare("")==0) {  //If the click is not in a subcircuit
-        pickRect (columns, xx, yy, select_ids);
+        vector<unsigned int> para =  circuit->getGreedyParallel();
         unsigned int wire = getFirstWire (yy);
         if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
         for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
-        if (columns.empty()) {
+        if (columns.empty()||pos==-1) {
             insert_gate_at_front (newgate);
-        } else if (select_ids.size() == 0) {
-            if (yy < columns[0].y0 || yy - columns[0].y0 > columns[0].height) {
-                // bad drag and drop
-            } else if (xx < columns[0].x0) {
-                insert_gate_at_front (newgate);
-            } else {
-                unsigned int i;
-                for (i = 1; i < columns.size (); i++) {
-                    if (xx < columns[i].x0) {
-                        insert_gate_in_new_column (newgate, circuit->columns.at(i-1), circuit);
-                        break;
-                    }
-                }
-                if (i == columns.size ()) { // goes after all columns
-                    insert_gate_in_new_column (newgate, circuit->columns.at(i-1)+1,circuit);
-                }
-            }
+        } else if (pos >= (int)para.size()) {
+            insert_gate_in_new_column (newgate, circuit->numGates(),circuit);
         } else {
-            unsigned int start = (select_ids.size()== 0) ? 0 : circuit->columns.at(select_ids.at(0));
-            unsigned int end;
-            if (circuit->columns.size() > select_ids.at(0)+2) {
-                end = circuit->columns.at(select_ids.at(0)+2);
-            } else if (circuit->columns.size() > select_ids.at(0)+1) {
-                end = circuit->columns.at(select_ids.at(0)+1);
-            } else {
-                end = start;
-            }
-            bool ok = true;
-            unsigned int mymaxwire, myminwire;
-            mymaxwire = myminwire = newgate->targets[0];
-            for (unsigned int j = 0; j < newgate->targets.size (); j++) {
-                mymaxwire = max (mymaxwire, newgate->targets[j]);
-                myminwire = min (myminwire, newgate->targets[j]);
-            }
-            for (unsigned int i = start; i <= end && ok; i++) {
-                unsigned int maxwire, minwire;
-                Gate* g = circuit->getGate (i);
-                minmaxWire (g->controls, g->targets, minwire, maxwire);
-                if (!(mymaxwire < minwire || myminwire > maxwire)) ok = false;
-            }
-            if (ok) {
-                insert_gate_in_column (newgate, end);
-            } else {
-                insert_gate_in_new_column (newgate, end, circuit);
-            }
+            insert_gate_in_new_column (newgate, para.at(pos),circuit);
         }
+        circuit->getGreedyParallel();
     } else {
         insert_gate_in_new_column (newgate, pos,circuit->subcircuits[name]);
         unsigned int wire = getFirstWire (yy);
@@ -768,7 +728,7 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
 {
     vector<int> s;
     int select = pickRect(rects,x,y,s);
-    if (c->numGates()!=0 && select >= c->numGates()) {
+    if (c->numGates()!=0 && select >= (int)c->numGates()) {
         select = select % c->numGates();
     }
     Gate* g = NULL;
@@ -791,14 +751,17 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
             cols.push_back(bounds);
             start_gate = para.at(column) + 1;
         }
-
-        for (unsigned int i = 0; i < cols.size (); i++) {
-            cout << c->getName() << ":" <<  x << ":" << cols.at(i).x0 << ":" << i << endl;
-            if (x < cols.at(i).x0) {
-                r_pos = i-1;
-                break;
+        if (x < 0) {
+            r_pos = -1;
+        } else {
+            for (unsigned int i = 0; i < cols.size (); i++) {
+                cout << c->getName() << ":" <<  x << ":" << cols.at(i).x0 << ":" << i << endl;
+                if (x < cols.at(i).x0) {
+                    r_pos = i;
+                    break;
+                }
+                if (i == cols.size()-1) r_pos = i+1;
             }
-            r_pos = i;
         }
         r_name = c->getName();
     }
