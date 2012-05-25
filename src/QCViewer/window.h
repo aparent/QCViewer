@@ -56,6 +56,7 @@ protected:
     void setup_gate_button (Gtk::Button*, GateIcon*, std::vector<Gtk::TargetEntry> &);
 
     // Signal handlers:
+    virtual bool on_key_release_event(GdkEventKey* event);
     void delete_loop();
     void set_loop_label ();
     void set_loop_iter ();

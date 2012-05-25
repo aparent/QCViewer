@@ -147,7 +147,6 @@ void Subcircuit::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> 
 
 gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
 {
-    gateRect r;
     double maxX = 0.0;
     vector <gateRect>*subRects = new vector<gateRect>;
     vector<unsigned int> para = getGreedyParallel();
@@ -186,13 +185,16 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     }
     xcurr -= maxX;
     xcurr -= gatePad;
-    r = (*subRects)[0];
-    for (unsigned int i = 1; i < subRects->size(); i++) {
-        //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
-        r = combine_gateRect(r,(*subRects)[i]);
+    gateRect r;
+    if (subRects->size() > 0) {
+        r = subRects->at(0);
+        for (unsigned int i = 1; i < subRects->size(); i++) {
+            //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
+            r = combine_gateRect(r,(*subRects)[i]);
+        }
+        drawSubCircBox(cr, r);
+        r.subRects = subRects;
     }
-    drawSubCircBox(cr, r);
-    r.subRects = subRects;
     return r;
 }
 

@@ -54,6 +54,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 
 QCViewer::QCViewer()
 {
+    add_events (Gdk::KEY_PRESS_MASK|Gdk::KEY_RELEASE_MASK );
     std::cerr << "In QCViewer::QCViewer.\n";
     drawparallel = drawarch = false;
     set_title(QCV_NAME);
@@ -96,6 +97,15 @@ QCViewer::QCViewer()
 }
 
 QCViewer::~QCViewer() {}
+
+bool QCViewer::on_key_release_event(GdkEventKey* event)
+{
+    cout << event->keyval << ":" << GDK_KEY_Delete << endl;
+    if (event->keyval == GDK_KEY_Delete) {
+        on_menu_delete ();
+    }
+    return true;
+}
 
 void QCViewer::unimplemented ()
 {
@@ -420,7 +430,6 @@ void QCViewer::set_selection (vector<Selection> s)
         m_PropFrame.hide ();
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
-
         Gate * gate = c.getSelectedGate();
         if (gate != NULL && gate->type == Gate::RGATE) {
             m_RGateEditFrame.show ();
