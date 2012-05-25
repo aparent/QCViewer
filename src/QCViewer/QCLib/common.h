@@ -57,8 +57,6 @@ class gateRect
 {
 public:
     gateRect();
-    //! Frees all subRects.
-    void remove();
     //! The x position of the rectangle
     double x0;
     //! The y position of the rectangle
@@ -68,7 +66,7 @@ public:
     //! The height of the rectangle
     double height;
     //! Contains subrectangles in the case of an expanded subcircuit
-    std::vector<gateRect> * subRects;
+    std::vector<gateRect> subRects;
 };
 
 class LayoutColumn

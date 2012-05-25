@@ -376,7 +376,6 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit != NULL) {
-            delete_recs(rects);
             rects = circuit->draw (cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
             //cout << "rects: " << rects.size() << " Gates:" << circuit->numGates() << endl;
             generate_layout_rects ();
@@ -567,7 +566,6 @@ unsigned int CircuitWidget::get_NumLines()
 void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 {
 
-    cout << "In Col: " << column_id <<  endl;
     circuit->addGate(g, column_id);
     circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
@@ -579,7 +577,6 @@ void CircuitWidget::insert_gate_in_column (Gate *g, unsigned int column_id)
 
 void CircuitWidget::insert_gate_at_front (Gate *g)
 {
-    cout << "Front: " << endl;
     circuit->addGate(g, 0);
     circuit->getGreedyParallel();
     ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
@@ -591,7 +588,6 @@ void CircuitWidget::insert_gate_at_front (Gate *g)
 
 void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x, Circuit* circ)
 {
-    cout << "New Col: " << x <<  endl;
     if (!circuit) return;
     circ->addGate (g, x);
     circ->getGreedyParallel();
@@ -603,7 +599,6 @@ void CircuitWidget::insert_gate_in_new_column (Gate *g, unsigned int x, Circuit*
 
 void CircuitWidget::generate_layout_rects ()
 {
-    delete_recs(columns);
     columns.clear ();
     if (!circuit || circuit->numGates () == 0) return;
 
@@ -714,8 +709,8 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
     if (select!=-1) {
         g = c->getGate(select);
     }
-    if (g != NULL && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && rects.at(select).subRects!=NULL) {
-        getCircuitAndColPosition (x, y, ((Subcircuit*)g)->getCircuit(), *(rects.at(select).subRects), r_name, r_pos );
+    if (g != NULL && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !rects.at(select).subRects.empty()) {
+        getCircuitAndColPosition (x, y, ((Subcircuit*)g)->getCircuit(), rects.at(select).subRects, r_name, r_pos );
     } else {
         vector<unsigned int> para = c->getGreedyParallel();
         vector<gateRect> cols;
@@ -746,9 +741,3 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
     }
 }
 
-void CircuitWidget::delete_recs(std::vector<gateRect>& recs)
-{
-    for (unsigned int i = 0; i < recs.size(); i++) {
-        recs.at(i).remove();
-    }
-}
