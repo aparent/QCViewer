@@ -42,11 +42,10 @@ class Selection
 {
 public:
     Selection();
-    ~Selection();
     Selection(uint32_t n);
-    Selection(uint32_t n, std::vector<Selection>* s);
+    Selection(uint32_t n, std::vector<Selection> s);
     uint32_t gate;
-    std::vector<Selection> * sub;
+    std::vector<Selection> sub;
 };
 
 /*! \brief Rectangle that defines the area taken up by a gate

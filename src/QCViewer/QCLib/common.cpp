@@ -30,26 +30,17 @@ Authors: Alex Parent, Jacob Parker
 using namespace std;
 
 
-Selection::~Selection()
-{
-    if (sub != NULL) {
-        //delete sub;
-    }
-}
-
 Selection::Selection()
 {
     gate = 0;
-    sub = NULL;
 }
 
 Selection::Selection(uint32_t n)
 {
     gate = n;
-    sub = NULL;
 }
 
-Selection::Selection(uint32_t n, vector<Selection>* s)
+Selection::Selection(uint32_t n, vector<Selection> s)
 {
     gate = n;
     sub = s;

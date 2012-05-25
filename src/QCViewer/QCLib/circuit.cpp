@@ -468,8 +468,8 @@ void Circuit::drawSelections (cairo_t* cr, const vector<gateRect> &rects, const 
     for (unsigned int i = 0; i < selections.size (); i++) {
         if (selections[i].gate < rects.size()) { //XXX Why is this needed?
             drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
-            if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
-                drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
+            if (!selections[i].sub.empty() && rects[selections[i].gate].subRects != NULL) {
+                drawSelections (cr, *rects[selections[i].gate].subRects, selections[i].sub);
             }
         }
     }

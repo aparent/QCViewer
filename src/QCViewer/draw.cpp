@@ -254,8 +254,8 @@ vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)
         if (rects[i].y0 <= s.y0 && rects[i].y0+rects[i].height <= s.y0) continue;
         if (s.y0 <= rects[i].y0 && s.y0+s.height <= rects[i].y0) continue;
         if (rects[i].subRects != NULL) {
-            vector<Selection> *sub = new vector<Selection>();
-            *sub = pickRects (*rects[i].subRects, s);
+            vector<Selection> sub;
+            sub = pickRects (*rects[i].subRects, s);
             ans.push_back (Selection(i,sub));
         } else {
             ans.push_back (Selection(i));

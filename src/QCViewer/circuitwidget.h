@@ -111,8 +111,8 @@ private:
     gateRect select_rect;
 
     void toggle_selection (int);
-    Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> *sub);
-    void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> *selections);
+    Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> sub);
+    void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> selections);
 
     State *state;
     bool drawarch, drawparallel;

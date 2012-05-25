@@ -625,34 +625,16 @@ void CircuitWidget::set_mode (Mode m)
     mode = m;
 }
 
-Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> *selections)
-{
-    if (!circuit || selections->size () != 1) {
-        if (selections->size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
-        return NULL;
-    }
-    Gate* g = circuit->getGate(selections->at(0).gate);
-    if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
-        if (((Subcircuit*)g)->unroll) {
-            selections->at(0).sub->at(0).gate = selections->at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
-            g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
-        } else {
-            g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
-        }
-    }
-    return g;
-}
-
-Gate *CircuitWidget::getSelectedGate ()
+Gate* CircuitWidget::getSelectedSubGate (Circuit* circuit, vector<Selection> selections)
 {
     if (!circuit || selections.size () != 1) {
         if (selections.size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
         return NULL;
     }
     Gate* g = circuit->getGate(selections.at(0).gate);
-    if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand) {
+    if (!selections.at(0).sub.empty() && selections.at(0).sub.size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g)->expand ) {
         if (((Subcircuit*)g)->unroll) {
-            selections.at(0).sub->at(0).gate = selections.at(0).sub->at(0).gate % ((Subcircuit*)g)->numGates();
+            selections.at(0).sub.at(0).gate = selections.at(0).sub.at(0).gate % ((Subcircuit*)g)->numGates();
             g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
         } else {
             g = getSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
@@ -661,27 +643,26 @@ Gate *CircuitWidget::getSelectedGate ()
     return g;
 }
 
-void CircuitWidget::deleteSelectedSubGate (Circuit* circuit, vector<Selection> *selections)
+Gate* CircuitWidget::getSelectedGate ()
 {
-    if (circuit && selections->size () > 0 && selections->at(0).gate < circuit->numGates()) {
-        Gate* g = circuit->getGate(selections->at(0).gate);
-        if (selections->at(0).sub!=NULL && selections->at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll) {
-            deleteSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections->at(0).sub);
-        } else {
-            circuit->removeGate(selections->at(0).gate);
-        }
-    }
+    Gate* g = getSelectedSubGate(circuit,selections);
+    return g;
 }
-void CircuitWidget::deleteSelectedGate ()
+
+void CircuitWidget::deleteSelectedSubGate (Circuit* circuit, vector<Selection> selections)
 {
     if (circuit && selections.size () > 0 && selections.at(0).gate < circuit->numGates()) {
         Gate* g = circuit->getGate(selections.at(0).gate);
-        if (selections.at(0).sub!=NULL && selections.at(0).sub->size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll) {
+        if (!selections.at(0).sub.empty() && selections.at(0).sub.size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g)->expand && !((Subcircuit*)g)->unroll) {
             deleteSelectedSubGate(((Subcircuit*)g)->getCircuit(),selections.at(0).sub);
         } else {
             circuit->removeGate(selections.at(0).gate);
         }
     }
+}
+void CircuitWidget::deleteSelectedGate ()
+{
+    deleteSelectedSubGate (circuit, selections);
     force_redraw();
 }
 
