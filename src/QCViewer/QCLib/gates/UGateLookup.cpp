@@ -134,4 +134,5 @@ void UGateSetup()
     }
     gate_node * node = parse_gates(input);
     add_gates(node);
+    delete node;
 }

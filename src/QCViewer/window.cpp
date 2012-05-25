@@ -770,7 +770,7 @@ void QCViewer::setup_gate_icons()
         gate_icons.push_back(new GateIcon(names[i],dnames[i]));
     }
     for (unsigned int i = 0, y = 0, x = 0; i < gate_icons.size(); i++) {
-        gate_buttons.push_back(new Gtk::Button());
+        gate_buttons.push_back(manage(new Gtk::Button()));
         setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);
         m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1);
         x++;

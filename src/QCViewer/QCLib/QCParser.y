@@ -41,7 +41,8 @@ Authors: Alex Parent, Jacob Parker
   Circuit *circuit;
   Circuit *curr_circ;
   std::vector<std::string> error_log;
-  #define CHECK_NAMES(names,id) if(!check_names(curr_circ,names,error_log,id)){circuit=NULL;return -1;}
+  #define CHECK_NAMES(names,id) if(!check_names(curr_circ,names,error_log,id)){circuit=NULL;return -1;} 
+  #define YYMAXDEPTH 100000
 %}
 %code requires{
   #include "QCLib/QCParserUtils.h"
@@ -73,14 +74,14 @@ input:	/*empty*/
      		| OUTPUTS names NEWLINE {CHECK_NAMES($2,"outputs");add_outputs(circuit,$2); } input
      		| CONSTANTS nums NEWLINE {add_constants(circuit,$2); } input
      		| OUTLABELS names NEWLINE {add_outlabels(circuit,$2);} input
-				| NEWLINE input
-				| START WORD LBRAC names RBRAC NEWLINE 
-					{ curr_circ = new Circuit();  
-						curr_circ->setName($2);
-						add_lines(curr_circ,$4); }
-					gates {circuit->subcircuits[$2]= curr_circ;} END WORD input
-				| START NEWLINE {curr_circ = circuit;} gates END input
-				| error {circuit = NULL; return -1;}
+		| NEWLINE input
+		| START WORD LBRAC names RBRAC NEWLINE 
+			{ curr_circ = new Circuit();  
+			curr_circ->setName($2);
+			add_lines(curr_circ,$4); }
+			gates {circuit->subcircuits[$2]= curr_circ;} END WORD input
+		| START NEWLINE {curr_circ = circuit;} gates END input
+		| error {circuit = NULL; return -1;}
 ;
 gates:  /*empty*/	
 				| WORD names NEWLINE {CHECK_NAMES($2,$1);add_gate(curr_circ,$1,$2,1,circuit->subcircuits,error_log);} gates 

@@ -92,7 +92,6 @@ unsigned int CircuitWidget::getFirstWire (double my)
         }
     }
     return ans;
-
 }
 
 void CircuitWidget::clear_selection ()
@@ -351,7 +350,6 @@ bool CircuitWidget::onScrollEvent (GdkEventScroll *event)
     if (event->direction == 1) s = get_scale()/1.15;
     else s = get_scale()*1.15;
     set_scale(s);
-    force_redraw ();
     return true;
 }
 
@@ -377,11 +375,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit != NULL) {
             rects = circuit->draw (cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
-            //cout << "rects: " << rects.size() << " Gates:" << circuit->numGates() << endl;
             generate_layout_rects ();
-            /*for (unsigned int i = 0; i < NextGateToSimulate; i++) {
-                drawRect (cr->cobj(), rects[i], Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
-            }*/
         }
     }
 

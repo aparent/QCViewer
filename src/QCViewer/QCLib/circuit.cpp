@@ -40,11 +40,14 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-Circuit::Circuit() : arch(NULL) {}
+Circuit::Circuit()
+{
+    allExpanded = false;
+    arch=NULL;
+}
 
 Circuit::~Circuit ()
 {
-    allExpanded = false;
     removeArch ();
     removeSubcircuits();
     removeGates();
@@ -68,7 +71,6 @@ void Circuit::removeSubcircuits()
         delete (*it).second;
     }
 }
-
 
 void Circuit::expandAll()
 {
@@ -371,7 +373,6 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     uint32_t mingw, maxgw;
     unsigned int i = 0;
     double maxX = 0;
-    if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
 
     if (numGates()>0) {
         for (uint32_t j = 0; j < columns.size(); j++) {

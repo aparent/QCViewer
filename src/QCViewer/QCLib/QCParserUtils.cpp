@@ -246,12 +246,10 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
         targets = start_targs;
         while(targets) {
             newGate->targets.push_back(findLine(circ,targets->name));
-            cout << "target " << targets->name << " on gate " << gateName << endl;
             targets = targets->next;
         }
         while(controls) {
             newGate->controls.push_back(Control(findLine(circ,controls->name),controls->neg));
-            cout << "control " << controls->name << " on gate " << gateName << endl;
             controls = controls->next;
         }
     } else {
@@ -277,8 +275,6 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
         newGate->controls.pop_back();
     }
     newGate->setLoopCount(exp);
-
-    cout << newGate->getName() << ": t " << newGate->targets.size() << " c " << newGate->controls.size() << endl;
     newGate->ctrls = true;
     circ->addGate(newGate);
     delete targets;
