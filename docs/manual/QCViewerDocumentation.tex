@@ -190,7 +190,7 @@
 
 % Bottom of the page
 {\large \today}
-{\large Version 0.5}
+{\large Version 0.7}
 
 \end{center}
 
@@ -200,7 +200,7 @@
 \newpage
 
     \begin{flushright}
-    QCViewer 0.5 Documentation
+    QCViewer 0.7 Documentation
     \end{flushright}
 
 %% Introduction
@@ -214,7 +214,7 @@ QCViewer is a tool for displaying, editing, and simulating quantum circuits.
 The QCViewer program.
 \end{center}
 
-It allows users to test new circuit designs and make publication quality diagrams with an easy to use graphical interface. Supported features also include simulation of the circuit while graphically displaying the current state. Additional information on QCViewer can be found \href{http://qcirc.iqc.uwaterloo.ca/QCViewer/QCViewer.pdf}{here}, and the most recent version and changelog can be found \href{http://qcirc.iqc.uwaterloo.ca/index.php?n=Projects.QCViewer}{here}~\cite{Parent2011Quantum}. 
+It allows users to test new circuit designs and make publication quality diagrams with an easy to use graphical interface. Supported features also include simulation of the circuit while graphically displaying the current state. The most recent version and changelog can be found \href{http://qcirc.iqc.uwaterloo.ca/index.php?n=Projects.QCViewer}{here}. 
 
 %% Creating a Circuit
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -521,10 +521,6 @@ If no circuits have been previously saved by the user, QCViewer does come with a
 
 Depending on the number of elements in the QCViewer window, clicking this graphic provides a 1:1 perspective on what exists in the window. For instance if you zoom too far in or out (via the mouse scroll wheel), then clicking this will bring you back to viewing the contents in a 1:1 ratio. 
 
-\item \includegraphics{Figures/Navigation/Pan.png}\\ 
-
-Clicking this graphic will enable the pan feature and turn the button to \includegraphics[scale=0.60]{Figures/Navigation/PanEnabled.png}. While this is enabled, clicking and dragging the contents in the QCViewer window will pan whatever way the mouse is navigated. Clicking this icon again disables the functionality. 
-
 \item \includegraphics{Figures/Navigation/LoadState.png} \\ 
 
 This button allows one to load a quantum state into the circuit currently in QCViewer. The quantum state must be of proper dimensionality, that is, equal to the dimensionality of the circuit. Clicking this graphic prompts a dialog box to ask for the user to enter the state. 
@@ -668,7 +664,7 @@ When opening this file in QCViewer, we can see that the wire labels are now a an
 The modified and labeled EPR circuit.
 \end{center}
 
-In the next section, we will consider how sub-circuits behave in QCViewer. For more in-depth information on the structure of .qc files and how they behave in QCViewer, please consult the following reference~\cite{Parent2011Quantum}
+In the next section, we will consider how sub-circuits behave in QCViewer.
 
 %% Sub-Circuits
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -793,11 +789,12 @@ Subcircuits are specified between the tags:
 \item[END <circuitName>] \hfill \\
 \end{description}
 Here "<circuitName>" is the name of the subcircuit and "<lineListing>" is a space separated list of line names
-used in the subcircuit. 
+used in the subcircuit. For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
 
-
-
-For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
+In between circuit tags is the gate listing.  Each line is formatted "<gateName> <lineListing>".
+By default the last line listed is the target.  For subcircuits the targets and controls must be explicitly 
+separated uses a colon (see the subtractor in inside the "iter" subcircuit in euclid.qc for an example).
+Blank lines add breaks in the layout (i.e. gates after a blank line will not stack with gates before one).
 
 \subsection{Gate Library}
 The gate library file allows you to specify additional gates.  An example gate specification follows:
