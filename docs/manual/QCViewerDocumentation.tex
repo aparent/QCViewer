@@ -835,15 +835,9 @@ Subcircuits are specified between the tags:
 Here "<circuitName>" is the name of the subcircuit and "<lineListing>" is a space separated list of line names
 used in the subcircuit. For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
 
-<<<<<<< HEAD
 In between circuit tags is the gate listing.  Each line is formatted "<gateName> <lineListing>".
 By default the last line listed is the target.  For subcircuits the targets and controls must be explicitly 
 separated uses a colon (see the subtractor in inside the "iter" subcircuit in euclid.qc for an example).
-=======
-In between the circuit tags is the gate listing.  Each line is formatted "<gateName> <lineListing>".  By
-default the last line listed is the target.  For subcircuits the targets and controls must be explicitly
-separated using a colon (see the subtractor in the inside of the "iter" subcircuit in euclid.qc for an example).
->>>>>>> f551171971aeea624d627ff5660eb0e5b4ffcebf
 Blank lines add breaks in the layout (i.e. gates after a blank line will not stack with gates before one).
 
 \subsection{Gate Library}
