@@ -60,9 +60,18 @@ unsigned int Gate::getNumGates() const
 
 gateRect Gate::drawControls (cairo_t *cr,uint32_t xc) const
 {
-    uint32_t minw, maxw;
-    minmaxWire (controls, targets, minw, maxw);
-    if (!controls.empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    uint32_t mincw,maxcw,mintw,maxtw,minw,maxw;
+    minmaxWire (controls, vector<unsigned int>() , mincw, maxcw);
+    minmaxWire (vector<Control>(), targets, mintw, maxtw);
+    minmaxWire (controls,targets, minw, maxw);
+    if (!controls.empty()) {
+        if (maxcw > maxtw) {
+            drawWire (cr, xc, wireToY (maxcw), xc, wireToY (maxtw)+radius);
+        }
+        if (mincw < mintw) {
+            drawWire (cr, xc, wireToY (mincw), xc, wireToY (mintw)-radius);
+        }
+    }
     for (uint32_t i = 0; i < controls.size(); i++) {
         drawDot (cr, xc, wireToY(controls.at(i).wire), dotradius, controls.at(i).polarity);
     }
@@ -76,7 +85,13 @@ gateRect Gate::drawControls (cairo_t *cr,uint32_t xc) const
 
 void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned int &minw, unsigned int &maxw)
 {
-    maxw = minw = targ.at(0);
+    if (targ.size() > 0) {
+        maxw = minw = targ.at(0);
+    } else if (ctrl.size() > 0) {
+        maxw = minw = ctrl.at(0).wire;
+    } else {
+        maxw = minw = 0;
+    }
     for (unsigned int i = 0; i < targ.size (); i++) {
         minw = min (minw, targ[i]);
         maxw = max (maxw, targ[i]);

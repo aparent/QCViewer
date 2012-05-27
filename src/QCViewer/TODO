@@ -1,0 +1,26 @@
+
+1. Does not display circuits with 1000 or more lines (crashes).
+	-Seems to run out of memory and display the circuit incorrectly.  Athough it did not crash for me.
+		-fixed another redering things that large is very slow.  May need to look into preformace optimizations.
+2. It crashes.  Please, make sure this does not happen. You can do that via using the tool to display circuits, and do some operations with it.  It was very embarrassing when QCViewer crashed during Martin's presentation to an IARPA guy.
+	-Fixed a crash with loading circuits containing bad line names.  Maybe this was it?
+3. If there is a controlled-box, when you expand the box, the control is getting lost.  This is an incorrect behaviour.
+	fixed this somewhat.  still draws a bit weird
+4. I wonder what happened with the gate drag and drop.  It seems to be dropping the gate to the right of the pointer. This is very counterintiutive.
+	-fixed somewhat
+5. New distribution needs to include more examples in the Demo folder. Martin wants to see a big random circuit that is not sparce. It is easy to generate one such (it needs not make any useful computation), and add to the Demo folder to highlight the tool's ability to display large circuits.  Other demo circuits need to be included, too.  E.g., depth-3 Toffoli from Matt. 
+-added some stuff
+6. Parallel guides feature does not work correctly---see 3qubitECC.qc files, for example.  Last two CNOTs cannot be executed in parallel.
+	-Was not drawing the last line fixed that which fixes the problem for this example at least.
+7. User's guide needs to be made available.  In fact, as per my previous emails, it needed to be available *before* QCS workshop started on May 21.  This is not the first time user's guide is not available by the deadline set ahead of time.  We missed submission to QIP a long time ago.
+8. Gate deletion is not possible within a subroutine.
+-fixed
+ 
+Here are other changes as requested by the workshop participants. They are all important, and need to be done ASAP.
+1. Mac OS X version should be compiled and made available.
+2. LaTeX should be supported, even if a more involved installation is required. Actually, I do not understand why html is still not working and fractions are not displayed as fractions. We discussed it more than once that fractions in the QFT need to be displayed differently, and this is still not done.
+3. Gate moving by dragging would be highly desirable. The tool should not allow the move when gate cannot be commuted to a location the user wants to move the gate to.
+4. Circuit stats---number of gates, number of qubits, depth, etc, need to be displayed.
+5. Adding gate libraries to the circuit file and being able to browse gates much like you browse subroutines is important. There should be a slightly different interface for those, e.g., a gate that can be implemented in terms of smaller gates could have a small "+" sign on top of it, upon clicking which it is expanded.
+6. More user friendly features in the interface, e.g., "Expand all" and "Contract all" buttons, in the main release, as per group web page.
+7. Measurement needs to be added. 

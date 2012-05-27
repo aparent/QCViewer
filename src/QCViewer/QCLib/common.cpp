@@ -30,38 +30,20 @@ Authors: Alex Parent, Jacob Parker
 using namespace std;
 
 
-Selection::~Selection()
-{
-    if (sub != NULL) {
-        //delete sub;
-    }
-}
-
 Selection::Selection()
 {
     gate = 0;
-    sub = NULL;
 }
 
 Selection::Selection(uint32_t n)
 {
     gate = n;
-    sub = NULL;
 }
 
-Selection::Selection(uint32_t n, vector<Selection>* s)
+Selection::Selection(uint32_t n, vector<Selection> s)
 {
     gate = n;
     sub = s;
 }
 
-void gateRect::remove()
-{
-    if (subRects != NULL) {
-        for (int i = 0; i < subRects->size(); i++) {
-            subRects->at(i).remove();
-        }
-    }
-}
-
-gateRect::gateRect() : x0(0),y0(0),width(0),height(0),subRects(NULL) {}
+gateRect::gateRect() : x0(0),y0(0),width(0),height(0) {}

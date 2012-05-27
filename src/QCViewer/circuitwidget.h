@@ -111,8 +111,8 @@ private:
     gateRect select_rect;
 
     void toggle_selection (int);
-    Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> *sub);
-    void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> *selections);
+    Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> sub);
+    void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> selections);
 
     State *state;
     bool drawarch, drawparallel;
@@ -122,7 +122,6 @@ private:
     cairo_rectangle_t ext;
     double wirestart, wireend;
 
-    void delete_recs( std::vector<gateRect>& recs);
     std::vector<gateRect> columns;
     std::vector<gateRect> rects;
     std::vector<Selection> selections;

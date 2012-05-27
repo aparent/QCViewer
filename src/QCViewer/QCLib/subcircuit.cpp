@@ -147,15 +147,14 @@ void Subcircuit::draw(cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> 
 
 gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
 {
-    gateRect r;
     double maxX = 0.0;
-    vector <gateRect>*subRects = new vector<gateRect>;
+    vector <gateRect> subRects;
     vector<unsigned int> para = getGreedyParallel();
     for(unsigned int j = 0; j <= (unroll * (getLoopCount()-1)); j++) {
         unsigned int currentCol = 0;
         for(unsigned int i = 0; i < numGates(); i++) {
             Gate * g = getGate(i);
-            g->draw(cr,xcurr,maxX,*subRects);
+            g->draw(cr,xcurr,maxX,subRects);
             delete g;
             if(para.size() > currentCol && i == para[currentCol]) {
                 xcurr += maxX - gatePad/2;
@@ -178,21 +177,24 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
             }
 
             if (simState->simulating && !unroll && simState->gate == i + 1 ) {
-                drawRect (cr, subRects->back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+                drawRect (cr, subRects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
             } else if (simState->simulating && unroll && simState->gate +(simState->loop-1)*numGates()  == j*numGates() + i + 1)  {
-                drawRect (cr, subRects->back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+                drawRect (cr, subRects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
             }
         }
     }
     xcurr -= maxX;
     xcurr -= gatePad;
-    r = (*subRects)[0];
-    for (unsigned int i = 1; i < subRects->size(); i++) {
-        //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
-        r = combine_gateRect(r,(*subRects)[i]);
+    gateRect r;
+    if (subRects.size() > 0) {
+        r = subRects.at(0);
+        for (unsigned int i = 1; i < subRects.size(); i++) {
+            //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
+            r = combine_gateRect(r,(subRects)[i]);
+        }
+        drawSubCircBox(cr, r);
+        r.subRects = subRects;
     }
-    drawSubCircBox(cr, r);
-    r.subRects = subRects;
     return r;
 }
 
@@ -224,6 +226,8 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
     if (r.width < extents.width+4) {
         r.width = extents.width+4;
     }
+    gateRect rect = drawControls (cr, r.x0-radius+r.width/2.0);
+    r = combine_gateRect(rect,r);
 }
 
 gateRect Subcircuit::drawBoxed (cairo_t *cr, uint32_t xc) const

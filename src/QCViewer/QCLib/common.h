@@ -42,11 +42,10 @@ class Selection
 {
 public:
     Selection();
-    ~Selection();
     Selection(uint32_t n);
-    Selection(uint32_t n, std::vector<Selection>* s);
+    Selection(uint32_t n, std::vector<Selection> s);
     uint32_t gate;
-    std::vector<Selection> * sub;
+    std::vector<Selection> sub;
 };
 
 /*! \brief Rectangle that defines the area taken up by a gate
@@ -58,8 +57,6 @@ class gateRect
 {
 public:
     gateRect();
-    //! Frees all subRects.
-    void remove();
     //! The x position of the rectangle
     double x0;
     //! The y position of the rectangle
@@ -69,7 +66,7 @@ public:
     //! The height of the rectangle
     double height;
     //! Contains subrectangles in the case of an expanded subcircuit
-    std::vector<gateRect> * subRects;
+    std::vector<gateRect> subRects;
 };
 
 class LayoutColumn

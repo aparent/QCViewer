@@ -54,6 +54,7 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
 
 QCViewer::QCViewer()
 {
+    add_events (Gdk::KEY_PRESS_MASK|Gdk::KEY_RELEASE_MASK );
     std::cerr << "In QCViewer::QCViewer.\n";
     drawparallel = drawarch = false;
     set_title(QCV_NAME);
@@ -96,6 +97,15 @@ QCViewer::QCViewer()
 }
 
 QCViewer::~QCViewer() {}
+
+bool QCViewer::on_key_release_event(GdkEventKey* event)
+{
+    cout << event->keyval << ":" << GDK_KEY_Delete << endl;
+    if (event->keyval == GDK_KEY_Delete) {
+        on_menu_delete ();
+    }
+    return true;
+}
 
 void QCViewer::unimplemented ()
 {
@@ -183,7 +193,7 @@ void QCViewer::on_menu_file_open_circuit ()
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
         vector<string> errors = c.load (dialog.get_filename ());
-        if (errors.size()>1) {
+        if (errors.size()>0) {
             string error_message;
             for ( unsigned int i = 0; i < errors.size(); i++) {
                 error_message += errors.at(i) + "\n";
@@ -420,7 +430,6 @@ void QCViewer::set_selection (vector<Selection> s)
         m_PropFrame.hide ();
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
-
         Gate * gate = c.getSelectedGate();
         if (gate != NULL && gate->type == Gate::RGATE) {
             m_RGateEditFrame.show ();
@@ -761,7 +770,7 @@ void QCViewer::setup_gate_icons()
         gate_icons.push_back(new GateIcon(names[i],dnames[i]));
     }
     for (unsigned int i = 0, y = 0, x = 0; i < gate_icons.size(); i++) {
-        gate_buttons.push_back(new Gtk::Button());
+        gate_buttons.push_back(manage(new Gtk::Button()));
         setup_gate_button (gate_buttons[i], gate_icons[i], listTargets);
         m_GatesTable.attach (*gate_buttons[i],x,x+1,y,y+1);
         x++;

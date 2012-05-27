@@ -50,4 +50,6 @@ void add_gate (Circuit * circ, std::string gateName, name_node *controls,name_no
 void add_R_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, double rot);
 void link_subcircs (Circuit * circ);
 void insert_break(Circuit *circ);
+//! Checks to see if lines with these names exist in the circuit
+bool check_names (Circuit * circ, name_node *names,std::vector<std::string>& error_log,std::string id);
 #endif

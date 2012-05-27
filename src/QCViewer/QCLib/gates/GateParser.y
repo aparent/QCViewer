@@ -108,6 +108,7 @@ gate_node *parse_gates(string input){
 	char *in = (char*)malloc(input.length() + 1);
 	strcpy(in,input.c_str());
 	Gate__scan_string(in);
+	free(in);
 	Gate_parse ();
 	return gate_final;
 }

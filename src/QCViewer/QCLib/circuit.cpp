@@ -40,11 +40,14 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-Circuit::Circuit() : arch(NULL) {}
+Circuit::Circuit()
+{
+    allExpanded = false;
+    arch=NULL;
+}
 
 Circuit::~Circuit ()
 {
-    allExpanded = false;
     removeArch ();
     removeSubcircuits();
     removeGates();
@@ -68,7 +71,6 @@ void Circuit::removeSubcircuits()
         delete (*it).second;
     }
 }
-
 
 void Circuit::expandAll()
 {
@@ -371,7 +373,6 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
     uint32_t mingw, maxgw;
     unsigned int i = 0;
     double maxX = 0;
-    if (columns.empty()) cout << "WARNING: invalid layout detected in " << __FILE__ << " at line " << __LINE__ << "!\n";
 
     if (numGates()>0) {
         for (uint32_t j = 0; j < columns.size(); j++) {
@@ -445,7 +446,7 @@ void Circuit::drawArchitectureWarnings (cairo_t* cr, const vector<gateRect> &rec
 
 void Circuit::drawParallelSectionMarkings (cairo_t* cr, const vector<gateRect> &rects, int numLines, const vector<int> &pLines) const
 {
-    for (uint32_t i = 0; i < pLines.size() - 1; i++) {
+    for (uint32_t i = 0; i < pLines.size(); i++) {
         int gateNum = pLines[i];
         double x = (rects[gateNum].x0 + rects[gateNum].width + rects[gateNum+1].x0)/2;
         drawPWire (cr, x, numLines);
@@ -468,8 +469,8 @@ void Circuit::drawSelections (cairo_t* cr, const vector<gateRect> &rects, const 
     for (unsigned int i = 0; i < selections.size (); i++) {
         if (selections[i].gate < rects.size()) { //XXX Why is this needed?
             drawRect(cr, rects[selections[i].gate], Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
-            if (selections[i].sub != NULL && rects[selections[i].gate].subRects != NULL) {
-                drawSelections (cr, *rects[selections[i].gate].subRects, *selections[i].sub);
+            if (!selections[i].sub.empty() && !rects[selections[i].gate].subRects.empty()) {
+                drawSelections (cr, rects[selections[i].gate].subRects, selections[i].sub);
             }
         }
     }

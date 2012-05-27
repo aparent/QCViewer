@@ -62,7 +62,20 @@ int findLine(Circuit *circ, string name)
         }
     }
     std::cout << "WARNING: line " << name << " not found" << std::endl;
-    return 0;
+    return -1;
+}
+
+bool check_names (Circuit * circ, name_node *names,vector<string>& error_log,string id)
+{
+    name_node *pos = names;
+    while(pos) {
+        if (findLine(circ,pos->name) == -1) {
+            error_log.push_back("Error: line " + pos->name + " in " + id +" not found.");
+            return false;
+        }
+        pos = pos->next;
+    }
+    return true;
 }
 
 void add_lines (Circuit * circ, name_node *names)
@@ -94,8 +107,8 @@ void add_outputs (Circuit * circ, name_node *names)
 
 void add_outlabels (Circuit * circ, name_node *names)
 {
-    int i = 0;
-    while(names&& i < circ->numLines()) {
+    unsigned int i = 0;
+    while(names && i < circ->numLines()) {
         circ->getLineModify(i).outLabel=names->name;
         names = names->next;
         i++;
@@ -233,12 +246,10 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
         targets = start_targs;
         while(targets) {
             newGate->targets.push_back(findLine(circ,targets->name));
-            cout << "target " << targets->name << " on gate " << gateName << endl;
             targets = targets->next;
         }
         while(controls) {
             newGate->controls.push_back(Control(findLine(circ,controls->name),controls->neg));
-            cout << "control " << controls->name << " on gate " << gateName << endl;
             controls = controls->next;
         }
     } else {
@@ -264,8 +275,6 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
         newGate->controls.pop_back();
     }
     newGate->setLoopCount(exp);
-
-    cout << newGate->getName() << ": t " << newGate->targets.size() << " c " << newGate->controls.size() << endl;
     newGate->ctrls = true;
     circ->addGate(newGate);
     delete targets;

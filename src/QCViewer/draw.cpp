@@ -235,8 +235,8 @@ int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &se
 {
     for (int i = 0; i < (int)rects.size (); i++) {
         if (rects[i].x0 <= x && rects[i].x0+rects[i].width >= x && rects[i].y0 <= y && rects[i].y0 + rects[i].height >= y) selections.push_back(i);
-        if (rects[i].subRects!=NULL) {
-            pickRect (*(rects[i].subRects),x,y,selections);
+        if (!rects[i].subRects.empty()) {
+            pickRect (rects[i].subRects,x,y,selections);
         }
     }
     if (selections.size() > 0) {
@@ -253,9 +253,9 @@ vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)
         if (s.x0 <= rects[i].x0 && s.x0+s.width <= rects[i].x0) continue;
         if (rects[i].y0 <= s.y0 && rects[i].y0+rects[i].height <= s.y0) continue;
         if (s.y0 <= rects[i].y0 && s.y0+s.height <= rects[i].y0) continue;
-        if (rects[i].subRects != NULL) {
-            vector<Selection> *sub = new vector<Selection>();
-            *sub = pickRects (*rects[i].subRects, s);
+        if (!rects[i].subRects.empty()) {
+            vector<Selection> sub;
+            sub = pickRects (rects[i].subRects, s);
             ans.push_back (Selection(i,sub));
         } else {
             ans.push_back (Selection(i));
