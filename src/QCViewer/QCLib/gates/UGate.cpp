@@ -187,7 +187,11 @@ gateRect UGate::drawFred (cairo_t *cr, uint32_t xc) const
         minw = min (minw, targets.at(i));
         maxw = max (maxw, targets.at(i));
     }
-    if (controls.empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    if (!controls.empty()) {
+        drawWire (cr, xc, wireToY (minw)-radius, xc, wireToY (maxw));
+    } else {
+        drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
+    }
     return rect;
 }
 

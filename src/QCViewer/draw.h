@@ -40,6 +40,7 @@ Authors: Alex Parent, Jacob Parker
 
 
 void init_fonts();
+gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius);
 cairo_rectangle_t get_circuit_size (Circuit *c, std::vector<LayoutColumn>&, double* wirestart, double* wireend, double scale);
 cairo_surface_t* make_png_surface (cairo_rectangle_t ext);
 cairo_surface_t* make_svg_surface (std::string, cairo_rectangle_t);

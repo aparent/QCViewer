@@ -122,18 +122,11 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     g_object_unref(layout);
 }
 
-gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=true)
+gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius)
 {
     cairo_set_line_width (cr, thickness);
-    // Draw white background
-    if (opaque) {
-        cairo_set_source_rgb (cr, 1, 1, 1);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-    }
     // Draw black border
     cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_stroke (cr);
 
     // Draw cross
@@ -202,21 +195,6 @@ void drawShowFred (cairo_t *cr, double width, double height)
     drawWire (cr, width/2, Xrad, width/2, height-Xrad);
     drawX (cr, width/2, Xrad, Xrad);
     drawX (cr, width/2, height-Xrad, Xrad);
-}
-
-gateRect drawFred (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
-{
-    gateRect rect = drawControls (cr, xc, ctrl, targ);
-    uint32_t minw = targ[0];
-    uint32_t maxw = targ[0];
-    for (uint32_t i = 0; i < targ.size(); i++) {
-        gateRect recttmp = drawX (cr, xc, wireToY(targ[i]), radius);
-        rect = combine_gateRect(rect, recttmp);
-        minw = min (minw, targ[i]);
-        maxw = max (maxw, targ[i]);
-    }
-    if (ctrl.empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
-    return rect;
 }
 
 void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, double wireend)
