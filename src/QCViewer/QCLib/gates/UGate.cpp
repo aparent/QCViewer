@@ -44,14 +44,14 @@ UGate::UGate(string n_name) : Gate(), name(n_name)
     dname_checked = false;
 }
 
-Gate* UGate::clone() const
+shared_ptr<Gate> UGate::clone() const
 {
-    UGate *g = new UGate(name);
+    UGate* g = new UGate(name);
     g->controls = controls;
     g->targets = targets;
     g->drawType = drawType;
     g->breakpoint = breakpoint;
-    return g;
+    return shared_ptr<Gate>(g);
 }
 
 string UGate::getName() const
@@ -66,12 +66,12 @@ string UGate::getName() const
 string UGate::getDrawName()
 {
     if (!dname_checked) {
-        gateMatrix *matrix = UGateLookup(name);
-        if (matrix == NULL) {
+        gateMatrix matrix = UGateLookup(name);
+        if (matrix.dim == 0) {
             cerr << "Game matrix not found for " << name  << "!" << endl;
             dname  = "";
         } else {
-            dname = matrix->drawName;
+            dname = matrix.drawName;
         }
     }
     return dname;
@@ -112,14 +112,14 @@ State UGate::ApplyU (index_t bits) const
     unsigned int input = ExtractInput (bits);
     // now, go through all rows of the output from the correct column of U
     State answer;
-    gateMatrix *matrix = UGateLookup(name);
-    if (matrix == NULL) {
+    gateMatrix matrix = UGateLookup(name);
+    if (matrix.dim == 0) {
         cerr << "Matrix not found!" << endl;
         return State();
     }
-    for (unsigned int i = 0; i < matrix->dim; i++) {
-        if (matrix->data[input*matrix->dim+i] != complex<float_type>(0)) {
-            answer += State(matrix->data[input*matrix->dim+i], BuildBitString (bits, i));
+    for (unsigned int i = 0; i < matrix.dim; i++) {
+        if (matrix.data[input*matrix.dim+i] != complex<float_type>(0)) {
+            answer += State(matrix.data[input*matrix.dim+i], BuildBitString (bits, i));
         }
     }
     return answer;

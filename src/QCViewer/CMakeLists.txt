@@ -1,6 +1,6 @@
-set(CMAKE_CXX_FLAGS "-Wall -pedantic ")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic ")
+set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++0x")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -std=c++0x")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=c++0x")
 
 IF(WIN32)
 	set(CMAKE_CXX_FLAGS "-Wall -pedantic")

@@ -44,13 +44,13 @@ RGate::RGate(float_type n_rot, Axis a) : Gate(), rot(n_rot)
     loop_count = 1;
 }
 
-Gate* RGate::clone() const
+shared_ptr<Gate> RGate::clone() const
 {
     RGate* g = new RGate(rot,axis);
     g->controls = controls;
     g->targets = targets;
     g->breakpoint = breakpoint;
-    return g;
+    return shared_ptr<Gate>(g);
 }
 
 string RGate::getName() const

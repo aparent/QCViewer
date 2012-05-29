@@ -36,6 +36,7 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/gate.h"
 #include "draw.h"
 #include "QCLib/common.h"
+#include <memory>
 
 class CircuitWidget : public Gtk::DrawingArea
 {
@@ -70,12 +71,12 @@ public:
     bool step ();
     bool run (bool);
     void reset ();
-    void insert_gate_in_new_column (Gate *, uint32_t, Circuit *);
-    void insert_gate_in_column (Gate *, uint32_t);
-    void insert_gate_at_front (Gate*);
+    void insert_gate_in_new_column (std::shared_ptr<Gate>, uint32_t, std::shared_ptr<Circuit>);
+    void insert_gate_in_column (std::shared_ptr<Gate>, uint32_t);
+    void insert_gate_at_front (std::shared_ptr<Gate>);
     void generate_layout_rects ();
 
-    Gate* getSelectedGate ();
+    std::shared_ptr<Gate> getSelectedGate ();
     void deleteSelectedGate ();
     enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
     void set_mode (Mode);
@@ -84,7 +85,7 @@ public:
     void expand_all ();
 
     bool is_subcirc (unsigned int);
-    Gate* getGate(unsigned int);
+    std::shared_ptr<Gate> getGate(unsigned int);
 
 protected:
     //Override default signal handler:
@@ -101,7 +102,7 @@ private:
     //std::vector<LayoutColumn> layout;
     std::vector<uint32_t> breakpoints;
 
-    void getCircuitAndColPosition (double x, double y, Circuit* c, std::vector<gateRect> &rects, std::string &r_name, int &r_pos);
+    void getCircuitAndColPosition (double x, double y, std::shared_ptr<Circuit> c, std::vector<gateRect> &rects, std::string &r_name, int &r_pos);
 
     bool simulation_enabled;
     uint32_t NextGateToSimulate;
@@ -111,14 +112,14 @@ private:
     gateRect select_rect;
 
     void toggle_selection (int);
-    Gate* getSelectedSubGate (Circuit* circuit, std::vector<Selection> sub);
-    void deleteSelectedSubGate (Circuit* circuit, std::vector<Selection> selections);
+    std::shared_ptr<Gate> getSelectedSubGate (std::shared_ptr<Circuit> circuit, std::vector<Selection> sub);
+    void deleteSelectedSubGate (std::shared_ptr<Circuit> circuit, std::vector<Selection> selections);
 
     State *state;
     bool drawarch, drawparallel;
     Gtk::Window *win;
     int yoffset;
-    Circuit *circuit;
+    std::shared_ptr<Circuit> circuit;
     cairo_rectangle_t ext;
     double wirestart, wireend;
 

@@ -57,21 +57,21 @@ comment #.*
 "-"                 return TOKEN(MINUS);
 "*"                 return TOKEN(TIMES);
 "/"                 return TOKEN(DIV);
-"i"									return TOKEN(IMAG);
-"("									return TOKEN(LPAREN);
-")"									return TOKEN(RPAREN);
-","									return TOKEN(COMMA);
-"\n"								return TOKEN(NEWLINE);
-"NAME"							BEGIN(TEXT); return TOKEN(NAME); 
-"DRAWNAME"					BEGIN(TEXT); return TOKEN(DRAWNAME); 
-"SYMBOL"						BEGIN(TEXT); return TOKEN(SYMBOL); 
-"COST"							return TOKEN(COST); 
-<TEXT>{word}				BEGIN(INITIAL); SAVE_TOKEN; return WORD;
-<TEXT>\"      			BEGIN(QUOTE);
-<QUOTE>{quote}			SAVE_TOKEN; return WORD;
-<QUOTE>\"      			BEGIN(INITIAL);
-"sqrt"							return TOKEN(SQRT);
-{num}								SAVE_TOKEN; return NUM;
+"i"                 return TOKEN(IMAG);
+"("                 return TOKEN(LPAREN);
+")"                 return TOKEN(RPAREN);
+","                 return TOKEN(COMMA);
+"\n"                return TOKEN(NEWLINE);
+"NAME"              BEGIN(TEXT); return TOKEN(NAME); 
+"DRAWNAME"          BEGIN(TEXT); return TOKEN(DRAWNAME); 
+"SYMBOL"            BEGIN(TEXT); return TOKEN(SYMBOL); 
+"COST"              return TOKEN(COST); 
+<TEXT>{word}        BEGIN(INITIAL); SAVE_TOKEN; return WORD;
+<TEXT>\"            BEGIN(QUOTE);
+<QUOTE>{quote}      SAVE_TOKEN; return WORD;
+<QUOTE>\"           BEGIN(INITIAL);
+"sqrt"              return TOKEN(SQRT);
+{num}               SAVE_TOKEN; return NUM;
 
 
 <*>{whitespace}

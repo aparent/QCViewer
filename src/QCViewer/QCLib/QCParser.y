@@ -31,6 +31,7 @@ Authors: Alex Parent, Jacob Parker
 	#include <cstdlib>
 	#include <fstream>
   #include <string>
+  #include <memory>
   #include <vector>
   #include <iostream>
   #include "QCLib/circuit.h"
@@ -38,8 +39,8 @@ Authors: Alex Parent, Jacob Parker
   void QC_error(const char *s);
   int QC_lex();
   int QC__scan_string(const char*);
-  Circuit *circuit;
-  Circuit *curr_circ;
+  std::shared_ptr<Circuit> circuit;
+  std::shared_ptr<Circuit> curr_circ;
   std::vector<std::string> error_log;
   #define CHECK_NAMES(names,id) if(!check_names(curr_circ,names,error_log,id)){circuit=NULL;return -1;} 
   #define YYMAXDEPTH 100000
@@ -76,7 +77,7 @@ input:	/*empty*/
      		| OUTLABELS names NEWLINE {add_outlabels(circuit,$2);} input
 		| NEWLINE input
 		| START WORD LBRAC names RBRAC NEWLINE 
-			{ curr_circ = new Circuit();  
+			{ curr_circ = std::shared_ptr<Circuit>(new Circuit());  
 			curr_circ->setName($2);
 			add_lines(curr_circ,$4); }
 			gates {circuit->subcircuits[$2]= curr_circ;} END WORD input
@@ -106,10 +107,10 @@ float: NUM {$$=atof($1);}
 %%
 
 #include "QCLib/QCParserUtils.h"
-Circuit *parseCircuit(std::string filename,std::vector<std::string>& error_log_r )
+std::shared_ptr<Circuit> parseCircuit(std::string filename,std::vector<std::string>& error_log_r )
 {
 	error_log.clear();
-	circuit = new Circuit();
+	circuit = std::shared_ptr<Circuit>(new Circuit());
 	curr_circ = circuit;
 	std::string input,line;
 	std::ifstream myfile(filename.c_str());
@@ -132,8 +133,6 @@ Circuit *parseCircuit(std::string filename,std::vector<std::string>& error_log_r
   }
 	else{ 
 		std::cout << "File does not exist." << std::endl;	
-		delete circuit;
-		circuit = NULL;
 	}
 	error_log_r = error_log;
   return circuit;

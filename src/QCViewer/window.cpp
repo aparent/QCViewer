@@ -117,7 +117,7 @@ void QCViewer::unimplemented ()
 
 void QCViewer::set_raxis ()
 {
-    Gate* g = c.getSelectedGate ();
+    shared_ptr<Gate> g = c.getSelectedGate ();
     if (g->type != Gate::RGATE) {
         cout << "UNEXPECTED THING HAPPENED!!!! " << __FILE__ << __LINE__ << endl;
         return;
@@ -126,15 +126,15 @@ void QCViewer::set_raxis ()
     if (btn_RX.get_active ()) na = RGate::X;
     else if (btn_RY.get_active ()) na = RGate::Y;
     else                           na = RGate::Z;
-    if (na != ((RGate*)g)->get_axis ()) {
-        ((RGate*)g)->set_axis (na);
+    if (na != ((RGate*)g.get())->get_axis ()) {
+        ((RGate*)g.get())->set_axis (na);
         c.force_redraw ();
     }
 }
 
 void QCViewer::set_rval ()
 {
-    Gate* g = c.getSelectedGate ();
+    shared_ptr<Gate> g = c.getSelectedGate ();
     if (g->type != Gate::RGATE) {
         cout << "UNEXPECTED THING HAPPENED!!!! " << __FILE__ << __LINE__ << endl;
         return;
@@ -144,14 +144,14 @@ void QCViewer::set_rval ()
     ss >> nr;
     if (ss.fail ()) {
         stringstream ss;
-        ss << ((RGate*)g)->get_rotVal ();
+        ss << ((RGate*)g.get())->get_rotVal ();
         m_RValEntry.set_text (ss.str ());
         Gtk::MessageDialog dialog(*this, "Error");
         dialog.set_secondary_text("Rotation factor must be a floating point number.");
         dialog.run();
         return;
     }
-    ((RGate*)g)->set_rotVal (nr);
+    ((RGate*)g.get())->set_rotVal (nr);
     c.force_redraw ();
 }
 
@@ -430,11 +430,10 @@ void QCViewer::set_selection (vector<Selection> s)
         m_PropFrame.hide ();
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
-        Gate * gate = c.getSelectedGate();
+        shared_ptr<Gate> gate = c.getSelectedGate();
         if (gate != NULL && gate->type == Gate::RGATE) {
             m_RGateEditFrame.show ();
-            RGate* g = (RGate*)gate;
-            switch (g->get_axis ()) {
+            switch (((RGate*)gate.get())->get_axis ()) {
             case RGate::X:
                 btn_RX.set_active ();
                 break;
@@ -446,7 +445,7 @@ void QCViewer::set_selection (vector<Selection> s)
                 break;
             }
             stringstream ss;
-            ss << g->get_rotVal ();
+            ss << ((RGate*)gate.get())->get_rotVal ();
             m_RValEntry.set_text (ss.str ());
         } else {
             m_RGateEditFrame.hide ();
@@ -488,15 +487,15 @@ void QCViewer::add_loop ()
 */
 void QCViewer::set_loop_iter ()
 {
-    Gate* g = c.getSelectedGate();
+    shared_ptr<Gate> g = c.getSelectedGate();
     g->setLoopCount(atoi(m_IterEntry.get_text().c_str()));
 }
 
 void QCViewer::set_subcircuit_name()
 {
-    Gate* g = c.getSelectedGate();
+    shared_ptr<Gate> g = c.getSelectedGate();
     if (g != NULL && g->type==Gate::SUBCIRC) {
-        ((Subcircuit*)g)->setName(m_SubcircNameEntry.get_text());
+        ((Subcircuit*)g.get())->setName(m_SubcircNameEntry.get_text());
         c.force_redraw();
     }
 }
@@ -504,9 +503,9 @@ void QCViewer::set_subcircuit_name()
 
 void QCViewer::expand_subcirc()
 {
-    Gate* g = c.getSelectedGate();
+    shared_ptr<Gate> g = c.getSelectedGate();
     if (g != NULL && g->type==Gate::SUBCIRC) {
-        ((Subcircuit*)g)->expand = !((Subcircuit*)g)->expand;
+        ((Subcircuit*)g.get())->expand = !((Subcircuit*)g.get())->expand;
         c.force_redraw();
     }
 }
@@ -518,9 +517,9 @@ void QCViewer::expand_all_subcirc()
 
 void QCViewer::unroll_subcirc()
 {
-    Gate* g = c.getSelectedGate();
+    shared_ptr<Gate> g = c.getSelectedGate();
     if (g != NULL && g->type==Gate::SUBCIRC) {
-        ((Subcircuit*)g)->unroll = !((Subcircuit*)g)->unroll;
+        ((Subcircuit*)g.get())->unroll = !((Subcircuit*)g.get())->unroll;
         c.force_redraw();
     }
 }

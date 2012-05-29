@@ -32,7 +32,7 @@ Authors: Alex Parent
 
 using namespace std;
 
-Subcircuit::Subcircuit(Circuit* n_circ, const map <unsigned int,unsigned int>& n_linemap, unsigned int loops) : Gate()
+Subcircuit::Subcircuit(shared_ptr<Circuit> n_circ, const map <unsigned int,unsigned int>& n_linemap, unsigned int loops) : Gate()
 {
     drawType = D_SUBCIRC;
     type = SUBCIRC;
@@ -42,18 +42,18 @@ Subcircuit::Subcircuit(Circuit* n_circ, const map <unsigned int,unsigned int>& n
     expand = false;
     unroll = false;
     ctrls = false;
-    simState = new SimState();
+    simState = shared_ptr<SimState>(new SimState());
 }
 
-Gate* Subcircuit::clone() const
+shared_ptr<Gate> Subcircuit::clone() const
 {
-    Subcircuit* g = new Subcircuit(circ,lineMap,loop_count);
+    Subcircuit *g  = new Subcircuit(circ,lineMap,loop_count);
     g->controls = controls;
     g->targets = targets;
     g->expand = expand;
     g->simState = simState;
     g->breakpoint = breakpoint;
-    return g;
+    return shared_ptr<Gate>(g);
 }
 
 string Subcircuit::getName() const
@@ -88,9 +88,9 @@ State Subcircuit::applySubcirc(const State& in) const
     return s;
 }
 
-Gate* Subcircuit::getGate(int pos) const
+shared_ptr<Gate> Subcircuit::getGate(int pos) const
 {
-    Gate *g = circ->getGate(pos)->clone();
+    shared_ptr<Gate> g = circ->getGate(pos)->clone();
     for (unsigned int i = 0; i < g->targets.size(); i++) {
         map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->targets[i]);
         if (it!= lineMap.end()) {
@@ -104,7 +104,7 @@ Gate* Subcircuit::getGate(int pos) const
         }
     }
     if (g->type == SUBCIRC) { //Combine the maps if it is a subcircuit so we have the correct global map
-        Subcircuit* s = (Subcircuit*)g;
+        Subcircuit* s = (Subcircuit*)g.get();
         map<unsigned int,unsigned int>::iterator it = s->lineMap.begin();
         for (; it!=s->lineMap.end(); it++) {
             map<unsigned int,unsigned int>::const_iterator currIt = lineMap.find(it->second);
@@ -127,7 +127,7 @@ vector<unsigned int> Subcircuit::getGreedyParallel() const  //Returns a vector o
 }
 
 
-Circuit* Subcircuit::getCircuit()
+shared_ptr<Circuit> Subcircuit::getCircuit()
 {
     return circ;
 }
@@ -153,9 +153,8 @@ gateRect Subcircuit::drawExp(cairo_t *cr,double xcurr) const
     for(unsigned int j = 0; j <= (unroll * (getLoopCount()-1)); j++) {
         unsigned int currentCol = 0;
         for(unsigned int i = 0; i < numGates(); i++) {
-            Gate * g = getGate(i);
+            shared_ptr<Gate> g = getGate(i);
             g->draw(cr,xcurr,maxX,subRects);
-            delete g;
             if(para.size() > currentCol && i == para[currentCol]) {
                 xcurr += maxX - gatePad/2;
                 if (circ->getGate(i)->breakpoint) {
@@ -280,13 +279,13 @@ bool Subcircuit::step (State& state)
     simState->simulating = true;
     bool bp = false;
     if (simState->gate < numGates () ) {
-        Gate* g = getGate(simState->gate);
+        shared_ptr<Gate> g = getGate(simState->gate);
         if (g->breakpoint) bp = true;
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
+        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g.get())->expand ) {
             state = ApplyGate(state,g);
             simState->gate++;
         } else {
-            if ( ! ((Subcircuit*)g)->step(state)) {
+            if ( ! ((Subcircuit*)g.get())->step(state)) {
                 simState->gate++;
                 step(state);
             }
@@ -295,7 +294,7 @@ bool Subcircuit::step (State& state)
             cout << "SBREAK" << endl;
             return false;
         }
-        if (g->type == Gate::SUBCIRC && ((Subcircuit*)g)->simState->simulating) {
+        if (g->type == Gate::SUBCIRC && ((Subcircuit*)g.get())->simState->simulating) {
             return false;
         }
         return true;
@@ -318,9 +317,9 @@ void Subcircuit::reset ()
     simState->nextGate = true;
     simState->simulating = false;
     for ( unsigned int i = 0; i < numGates(); i++ ) {
-        Gate* g = getGate(i);
+        shared_ptr<Gate> g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g)->reset();
+            ((Subcircuit*)g.get())->reset();
         }
     }
 }

@@ -53,7 +53,7 @@ name_node::~name_node()
     if (next != NULL) delete next;
 }
 
-int findLine(Circuit *circ, string name)
+int findLine(std::shared_ptr<Circuit>circ, string name)
 {
     for(unsigned int j = 0; j < circ->numLines(); j++) {
         if (name.compare(circ->getLine(j).lineName)==0) {
@@ -64,7 +64,7 @@ int findLine(Circuit *circ, string name)
     return -1;
 }
 
-bool check_names (Circuit * circ, name_node *names,vector<string>& error_log,string id)
+bool check_names (std::shared_ptr<Circuit> circ, name_node *names,vector<string>& error_log,string id)
 {
     name_node *pos = names;
     while(pos) {
@@ -77,7 +77,7 @@ bool check_names (Circuit * circ, name_node *names,vector<string>& error_log,str
     return true;
 }
 
-void add_lines (Circuit * circ, name_node *names)
+void add_lines (std::shared_ptr<Circuit> circ, name_node *names)
 {
     while(names) {
         circ->addLine(names->name);
@@ -86,7 +86,7 @@ void add_lines (Circuit * circ, name_node *names)
     delete names;
 }
 
-void add_inputs (Circuit * circ, name_node *names)
+void add_inputs (std::shared_ptr<Circuit> circ, name_node *names)
 {
     while(names) {
         circ->getLineModify(findLine(circ,names->name)).constant=false;
@@ -95,7 +95,7 @@ void add_inputs (Circuit * circ, name_node *names)
     delete names;
 }
 
-void add_outputs (Circuit * circ, name_node *names)
+void add_outputs (std::shared_ptr<Circuit> circ, name_node *names)
 {
     while(names) {
         circ->getLineModify(findLine(circ,names->name)).garbage=false;
@@ -104,7 +104,7 @@ void add_outputs (Circuit * circ, name_node *names)
     delete names;
 }
 
-void add_outlabels (Circuit * circ, name_node *names)
+void add_outlabels (std::shared_ptr<Circuit> circ, name_node *names)
 {
     unsigned int i = 0;
     while(names && i < circ->numLines()) {
@@ -115,7 +115,7 @@ void add_outlabels (Circuit * circ, name_node *names)
     delete names;
 }
 
-void add_constants (Circuit * circ, name_node *names)
+void add_constants (std::shared_ptr<Circuit> circ, name_node *names)
 {
     //while(names) {
     //circ->getLineModify(findLine(circ,names->name)).initValue = atoi((names->name).c_str()); //TODO:FIXME
@@ -124,7 +124,7 @@ void add_constants (Circuit * circ, name_node *names)
     delete names;
 }
 
-void insert_break(Circuit *circ)
+void insert_break(std::shared_ptr<Circuit>circ)
 {
     if (circ->numGates() > 0)
         circ->getGate(circ->numGates()-1)->colbreak = true;
@@ -146,26 +146,26 @@ bool check_dup(name_node *names)
     return check_dup(names->next);
 }
 
-void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp,map<string,Circuit*> &subcircuits, vector<string>& error_log)
+void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names, unsigned int exp,map<string,shared_ptr<Circuit>> &subcircuits, vector<string>& error_log)
 {
     if (names == NULL) {
         cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
         return;
     }
-    Gate *newGate = NULL;
+    shared_ptr<Gate> newGate;
     if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) ||
             (sToUpper(gateName).compare("TOF") == 0)||
             (sToUpper(gateName).compare("NOT") == 0)||
             (sToUpper(gateName).compare("CNOT") == 0)) {
-        newGate = new UGate("X");
+        newGate = shared_ptr<Gate>(new UGate("X"));
         newGate->drawType = Gate::NOT;
     } else if (gateName[0] == 'F'||gateName[0] == 'f'||
                (sToUpper(gateName).compare("FRE") == 0)||
                (sToUpper(gateName).compare("SWAP") == 0)) {
-        newGate = new UGate("F");
+        newGate = shared_ptr<Gate>(new UGate("F"));
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
-        Circuit* c = subcircuits[gateName];
+        shared_ptr<Circuit> c = subcircuits[gateName];
         if (circ->numGates()>0) {
             //circ->getGate(circ->numGates()-1)->colbreak = true;
         }
@@ -177,7 +177,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
             line++;
             names = names->next;
         }
-        newGate = new Subcircuit(c, lineMap,exp);
+        newGate = shared_ptr<Gate>(new Subcircuit(c, lineMap,exp));
         names = start_names;
         while(names) {
             newGate->targets.push_back(findLine(circ,names->name));
@@ -185,7 +185,7 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         }
     } else {
         gateName = sToUpper(gateName);
-        newGate = new UGate(gateName);
+        newGate = shared_ptr<Gate>(new UGate(gateName));
     }
     if(!check_dup(names)) {
         while(names) {
@@ -198,7 +198,6 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
         }
     } else {
         cout << "Duplicate targets or controls on: " << gateName << endl;
-        delete newGate;
         return;
     }
     if (newGate->getName().compare("F")==0) {
@@ -211,26 +210,26 @@ void add_gate (Circuit * circ, string gateName, name_node *names, unsigned int e
     delete names;
 }
 
-void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *targets, unsigned int exp,map<string,Circuit*> &subcircuits, vector<string>& error_log)
+void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *controls,name_node *targets, unsigned int exp,map<string,shared_ptr<Circuit>> &subcircuits, vector<string>& error_log)
 {
     if (targets == NULL) {
         cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
         return;
     }
-    Gate *newGate = NULL;
+    shared_ptr<Gate> newGate;
     if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 && isdigit(gateName[1])) ||
             (sToUpper(gateName).compare("TOF") == 0)||
             (sToUpper(gateName).compare("NOT") == 0)||
             (sToUpper(gateName).compare("CNOT") == 0)) {
-        newGate = new UGate("X");
+        newGate = shared_ptr<Gate>(new UGate("X"));
         newGate->drawType = Gate::NOT;
     } else if (gateName[0] == 'F'||gateName[0] == 'f'||
                (sToUpper(gateName).compare("FRE") == 0)||
                (sToUpper(gateName).compare("SWAP") == 0)) {
-        newGate = new UGate("F");
+        newGate = shared_ptr<Gate>(new UGate("F"));
         newGate->drawType = Gate::FRED;
     } else if (subcircuits.find(gateName) != subcircuits.end() ) {
-        Circuit* c = subcircuits[gateName];
+        shared_ptr<Circuit> c = subcircuits[gateName];
         if (circ->numGates()>0) {
             //circ->getGate(circ->numGates()-1)->colbreak = true;
         }
@@ -242,7 +241,7 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
             line++;
             targets = targets->next;
         }
-        newGate = new Subcircuit(c, lineMap,exp);
+        newGate = shared_ptr<Gate>(new Subcircuit(c, lineMap,exp));
         targets = start_targs;
         while(targets) {
             newGate->targets.push_back(findLine(circ,targets->name));
@@ -254,7 +253,7 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
         }
     } else {
         gateName = sToUpper(gateName);
-        newGate = new UGate(gateName);
+        newGate = shared_ptr<Gate>(new UGate(gateName));
     }
     if(!check_dup(targets)&&!check_dup(controls)) {
         while(targets) {
@@ -267,7 +266,6 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
         }
     } else {
         cout << "Duplicate targets or controls on: " << gateName << endl;
-        delete newGate;
         return;
     }
     if (newGate->getName().compare("F")==0) {
@@ -281,7 +279,7 @@ void add_gate (Circuit * circ, string gateName, name_node *controls,name_node *t
     delete controls;
 }
 
-void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int exp, double rot)
+void add_R_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names, unsigned int exp, double rot)
 {
     RGate::Axis rot_type;
     if (gateName=="RX") {
@@ -293,7 +291,7 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
     } else {
         rot_type = RGate::Z;
     }
-    Gate *newGate = new RGate(rot, rot_type);
+    shared_ptr<Gate> newGate = shared_ptr<Gate>(new RGate(rot, rot_type));
     while(names) {
         if (names->next == NULL) {
             newGate->targets.push_back(findLine(circ,names->name));
@@ -308,13 +306,13 @@ void add_R_gate (Circuit * circ, string gateName, name_node *names, unsigned int
     delete names;
 }
 
-void link_subcircs(Circuit * circ)
+void link_subcircs(std::shared_ptr<Circuit> circ)
 {
-    map<string,Circuit*> subcircs = circ->subcircuits;
-    for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
-        Circuit *c = it->second;
+    map<string,shared_ptr<Circuit>> subcircs = circ->subcircuits;
+    for ( map<string,shared_ptr<Circuit>>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+        shared_ptr<Circuit> c = it->second;
         for (unsigned int i = 0; i < c->numGates(); i++) {
-            Gate *g = c->getGate(i);
+            shared_ptr<Gate> g = c->getGate(i);
             if (subcircs.find(g->getName()) != subcircs.end() ) {
                 map<unsigned int,unsigned int> lineMap;
                 unsigned int line = 0;
@@ -328,7 +326,7 @@ void link_subcircs(Circuit * circ)
                     lineMap.insert (pair<unsigned int,unsigned int>(line,g->targets.at(j)));
                     line++;
                 }
-                Gate *n_g = new Subcircuit(subcircs[g->getName()],lineMap,g->getLoopCount());
+                shared_ptr<Gate> n_g = shared_ptr<Gate>(new Subcircuit(subcircs[g->getName()],lineMap,g->getLoopCount()));
                 if (g->ctrls) {
                     for(unsigned int j = 0; j < g->controls.size(); j++) {
                         n_g->controls.push_back(g->controls.at(j));
@@ -342,17 +340,16 @@ void link_subcircs(Circuit * circ)
                     n_g->targets.push_back(g->targets.at(j));
                 }
                 c->setGate(n_g,i);
-                delete g;
             }
         }
     }
 }
 
-void remove_bad_gates(Circuit * c, vector<string>& error_log )
+void remove_bad_gates(std::shared_ptr<Circuit> c, vector<string>& error_log )
 {
     for (unsigned int i = 0; i < c->numGates(); i++) {
         string name = c->getGate(i)->getName();
-        if (c->getGate(i)->type!=Gate::RGATE && c->getGate(i)->type!=Gate::SUBCIRC && name.compare("tof")!=0 && UGateLookup(name) == NULL ) {
+        if (c->getGate(i)->type!=Gate::RGATE && c->getGate(i)->type!=Gate::SUBCIRC && name.compare("tof")!=0 && UGateLookup(name).dim == 0 ) {
             error_log.push_back("Gate: " + name + " is unrecognized. Excluding.");
             c->removeGate (i);
             i--;
@@ -360,11 +357,11 @@ void remove_bad_gates(Circuit * c, vector<string>& error_log )
     }
 }
 
-void cleanup_bad_gates(Circuit * circ, vector<string>& error_log)
+void cleanup_bad_gates(std::shared_ptr<Circuit> circ, vector<string>& error_log)
 {
     remove_bad_gates (circ,error_log);
-    map<string,Circuit*> subcircs = circ->subcircuits;
-    for ( map<string,Circuit*>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+    map<string,shared_ptr<Circuit>> subcircs = circ->subcircuits;
+    for ( map<string,shared_ptr<Circuit>>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
         remove_bad_gates(it->second, error_log);
     }
 }

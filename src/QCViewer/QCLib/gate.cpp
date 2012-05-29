@@ -102,4 +102,17 @@ void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, 
     }
 }
 
+gateMatrix::~gateMatrix()
+{
+}
 
+gateMatrix::gateMatrix(int n_dim)
+{
+    dim = n_dim;
+}
+
+gateMatrix::gateMatrix()
+{
+    data = NULL;
+    dim = 0;
+}
