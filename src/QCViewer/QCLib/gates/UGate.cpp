@@ -205,16 +205,12 @@ gateRect UGate::drawCNOT (cairo_t *cr, uint32_t xc) const
     return rect;
 }
 
-gateRect UGate::drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque) const
+gateRect UGate::drawNOT (cairo_t *cr, double xc, double yc, double radius) const
 {
     cairo_set_line_width (cr, thickness);
     // Draw white background
-    if (opaque) {
-        cairo_set_source_rgb (cr, 1, 1, 1);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-    }
     // Draw black border
+    cairo_move_to (cr, xc, yc);
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_stroke (cr);

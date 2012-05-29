@@ -103,7 +103,7 @@ private:
     gateRect drawCNOT (cairo_t *cr, uint32_t xc) const;
     gateRect drawCU (cairo_t *cr, uint32_t xc) ;
     gateRect drawX (cairo_t *cr, double xc, double yc, double radius) const;
-    gateRect drawNOT(cairo_t *cr, double xc, double yc, double radius, bool opaque=true) const;
+    gateRect drawNOT(cairo_t *cr, double xc, double yc, double radius) const;
     unsigned int ExtractInput (index_t) const;
     index_t BuildBitString (index_t, unsigned int) const;
     State ApplyU(index_t) const;

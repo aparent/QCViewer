@@ -65,7 +65,7 @@ bool GateIcon::on_expose_event(GdkEventExpose* event)
         cr->scale (scale, scale);
         switch (type) {
         case NOT:
-            drawNOT (cr->cobj(), xc, yc, min(width/2.0, height/2.0));
+            drawShowNOT (cr->cobj(), xc, yc, min(width/2.0, height/2.0));
             break;
         case R:
             drawShowRotation (cr->cobj(), xc, yc, min(width/2.0, height/2.0));

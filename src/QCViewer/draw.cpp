@@ -77,33 +77,6 @@ int pickWire (double y)
     return wire;
 }
 
-//for parallism wires
-void drawPWire (cairo_t *cr, double x, int numLines)
-{
-    cairo_set_line_width (cr, thickness);
-    cairo_set_source_rgba (cr, 0.4, 0.4, 0.4,0.4);
-    cairo_move_to (cr, x, wireToY(0));
-    cairo_line_to (cr, x, wireToY(numLines-1));
-    cairo_stroke (cr);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-}
-
-gateRect drawControls (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
-{
-    uint32_t minw, maxw;
-    minmaxWire (ctrl, targ, minw, maxw);
-    if (!ctrl.empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
-    for (uint32_t i = 0; i < ctrl.size(); i++) {
-        drawDot (cr, xc, wireToY(ctrl[i].wire), dotradius, ctrl[i].polarity);
-    }
-    gateRect rect;
-    rect.x0 = xc-dotradius;
-    rect.y0 = wireToY(minw)-dotradius;
-    rect.width = 2*dotradius;
-    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
-    return rect;
-}
-
 void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
 {
     cairo_set_font_face (cr,ft_default);
@@ -122,10 +95,11 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     g_object_unref(layout);
 }
 
-gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius)
+void drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
 {
     cairo_set_line_width (cr, thickness);
     // Draw black border
+    cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_stroke (cr);
 
@@ -136,13 +110,6 @@ gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius)
     cairo_move_to (cr, xc, yc-radius);
     cairo_line_to (cr, xc, yc+radius);
     cairo_stroke (cr);
-
-    gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
-    r.height = r.width;
-    return r;
 }
 
 void drawShowRotation (cairo_t *cr, double xc, double yc, double radius)
@@ -195,18 +162,6 @@ void drawShowFred (cairo_t *cr, double width, double height)
     drawWire (cr, width/2, Xrad, width/2, height-Xrad);
     drawX (cr, width/2, Xrad, Xrad);
     drawX (cr, width/2, height-Xrad, Xrad);
-}
-
-void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, double wireend)
-{
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_rectangle (cr, 0, 0, w, h); // TODO: document why the scale factors are here
-    cairo_fill (cr);
-
-    for (uint32_t i = 0; i < c->numLines(); i++) {
-        double y = wireToY (i);
-        drawWire (cr, wirestart+xoffset, y, wireend, y);
-    }
 }
 
 int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)

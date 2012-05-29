@@ -61,8 +61,8 @@ public:
     double get_scale ();
     int get_QCost ();
     int get_Depth ();
-    int get_NumGates ();
-    unsigned int get_NumLines ();
+    int get_num_gates ();
+    unsigned int get_num_lines ();
 
     void newcircuit (uint32_t);
 

@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------------
 QCViewer
 Copyright (C) 2011  Alex Parent and The University of Waterloo,
@@ -127,7 +126,8 @@ void add_constants (Circuit * circ, name_node *names)
 
 void insert_break(Circuit *circ)
 {
-    circ->getGate(circ->numGates()-1)->colbreak = true;
+    if (circ->numGates() > 0)
+        circ->getGate(circ->numGates()-1)->colbreak = true;
 }
 
 bool check_dup(name_node *names)
@@ -315,7 +315,6 @@ void link_subcircs(Circuit * circ)
         Circuit *c = it->second;
         for (unsigned int i = 0; i < c->numGates(); i++) {
             Gate *g = c->getGate(i);
-            cout << g->getName() << ": t " << g->targets.size() << " c " << g->controls.size() << endl;
             if (subcircs.find(g->getName()) != subcircs.end() ) {
                 map<unsigned int,unsigned int> lineMap;
                 unsigned int line = 0;

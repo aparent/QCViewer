@@ -23,4 +23,5 @@ Here are other changes as requested by the workshop participants. They are all i
 4. Circuit stats---number of gates, number of qubits, depth, etc, need to be displayed.
 5. Adding gate libraries to the circuit file and being able to browse gates much like you browse subroutines is important. There should be a slightly different interface for those, e.g., a gate that can be implemented in terms of smaller gates could have a small "+" sign on top of it, upon clicking which it is expanded.
 6. More user friendly features in the interface, e.g., "Expand all" and "Contract all" buttons, in the main release, as per group web page.
+-done
 7. Measurement needs to be added. 

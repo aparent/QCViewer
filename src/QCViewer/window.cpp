@@ -209,7 +209,7 @@ void QCViewer::on_menu_file_open_circuit ()
         btn_editcontrols.set_active (false);
         btn_editcontrols.set_active (false);
         std::stringstream ss;
-        ss << "Gates: " << c.get_NumGates();
+        ss << "Gates: " << c.get_num_gates() << " | Qbits: " << c.get_num_lines();
         m_statusbar.push(ss.str());
         c.reset ();
     }
@@ -375,7 +375,7 @@ void QCViewer::on_menu_load_state ()
         if (state!=NULL) delete state;
         state = getStateVec (stateEntry.get_text(), true);
         if (state!=NULL && state->numBits()!=0) {
-            if (state->numBits() == c.get_NumLines()) {
+            if (state->numBits() == c.get_num_lines()) {
                 for (unsigned int i = 0; i < viz.size(); i++) viz[i]->set_state(state);
                 c.set_state(state);
             } else {

@@ -546,12 +546,12 @@ int CircuitWidget::get_Depth ()
     if (circuit == NULL) return 0;
     return circuit->getParallel().size();
 }
-int CircuitWidget::get_NumGates ()
+int CircuitWidget::get_num_gates ()
 {
     if (circuit == NULL) return 0;
     return circuit->totalGates();
 }
-unsigned int CircuitWidget::get_NumLines()
+unsigned int CircuitWidget::get_num_lines()
 {
     if (circuit == NULL) return 0;
     return circuit->numLines();
@@ -723,7 +723,6 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, Circuit* c, ve
             r_pos = -1;
         } else {
             for (unsigned int i = 0; i < cols.size (); i++) {
-                cout << c->getName() << ":" <<  x << ":" << cols.at(i).x0 << ":" << i << endl;
                 if (x < cols.at(i).x0) {
                     r_pos = i;
                     break;

@@ -226,7 +226,7 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
     if (r.width < extents.width+4) {
         r.width = extents.width+4;
     }
-    gateRect rect = drawControls (cr, r.x0-radius+r.width/2.0);
+    gateRect rect = drawControls (cr, r.x0+r.width/2.0);
     r = combine_gateRect(rect,r);
 }
 
