@@ -1,6 +1,6 @@
-.v a b c d e Workspace
-.i a b c d e Workspace
-.o a b c d e
+.v a b c d e Workspace test
+.i a b c d e Workspace test
+.o a b c d e 
 .c
 
 BEGIN S1 (1 2 3 4)
@@ -49,7 +49,7 @@ H5 a b c d e
 tof a b c d
 not b c d e
 S1 a b d c 
-GroverIterate^1 a b c d e Workspace 
+GroverIterate test : a b c d e Workspace 
 tof a b c d
 S1 b c d e 
 TOF a b c d

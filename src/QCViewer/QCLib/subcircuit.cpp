@@ -205,6 +205,7 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
     cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
     cairo_stroke (cr);
     cairo_set_dash (cr, dashes, 0, 0.0);
+    gateRect rect = drawControls (cr, r);
     stringstream ss;
     ss << getName();
     if (getLoopCount() > 1) {
@@ -213,7 +214,6 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
             ss << " " << simState->loop << "/" << getLoopCount();
         }
     }
-    //cairo_set_font_size(cr, 22);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, ss.str().c_str(), &extents);
     double x = r.x0;
@@ -225,7 +225,6 @@ void Subcircuit::drawSubCircBox(cairo_t* cr, gateRect &r) const
     if (r.width < extents.width+4) {
         r.width = extents.width+4;
     }
-    gateRect rect = drawControls (cr, r.x0+r.width/2.0);
     r = combine_gateRect(rect,r);
 }
 

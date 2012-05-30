@@ -78,6 +78,7 @@ public:
 protected:
     unsigned int loop_count;
     gateRect drawControls (cairo_t *cr,uint32_t xc) const;
+    gateRect drawControls (cairo_t *cr, const gateRect &r) const;
 
 };
 
