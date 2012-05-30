@@ -24,6 +24,9 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent
 ---------------------------------------------------------------------*/
 
+#ifndef M_PI
+#define M_PI 3.141592
+#endif
 
 #ifndef DRAW_CONSTANTS_H
 #define DRAW_CONSTANTS_H

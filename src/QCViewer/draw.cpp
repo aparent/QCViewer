@@ -34,6 +34,7 @@ Authors: Alex Parent, Jacob Parker
 
 #include "QCLib/circuit.h"
 #include "QCLib/subcircuit.h"
+#include "QCLib/draw_constants.h"
 #include "draw.h"
 
 
@@ -49,17 +50,6 @@ using namespace std;
 FT_Library library;
 FT_Face ft_face;
 cairo_font_face_t * ft_default;
-
-// XXX organize this!!
-const double radius = 15.0;
-const double dotradius = 10.0;
-const double thickness = 2.0;
-const double xoffset = 10.0;
-const double yoffset = 10.0;
-const double wireDist = 40.0;
-const double gatePad = 18.0;
-const double textPad = 5.0;
-const double Upad = 0.9;
 
 void init_fonts()
 {

@@ -32,10 +32,6 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-#ifndef M_PI
-#define M_PI 3.14159265
-#endif
-
 RGate::RGate(float_type n_rot, Axis a) : Gate(), rot(n_rot)
 {
     drawType = DEFAULT;

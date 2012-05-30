@@ -5,7 +5,7 @@
 2. It crashes.  Please, make sure this does not happen. You can do that via using the tool to display circuits, and do some operations with it.  It was very embarrassing when QCViewer crashed during Martin's presentation to an IARPA guy.
 	-Fixed a crash with loading circuits containing bad line names.  Maybe this was it?
 3. If there is a controlled-box, when you expand the box, the control is getting lost.  This is an incorrect behaviour.
-	fixed this somewhat.  still draws a bit weird
+	-fixed
 4. I wonder what happened with the gate drag and drop.  It seems to be dropping the gate to the right of the pointer. This is very counterintiutive.
 	-fixed somewhat
 5. New distribution needs to include more examples in the Demo folder. Martin wants to see a big random circuit that is not sparce. It is easy to generate one such (it needs not make any useful computation), and add to the Demo folder to highlight the tool's ability to display large circuits.  Other demo circuits need to be included, too.  E.g., depth-3 Toffoli from Matt. 

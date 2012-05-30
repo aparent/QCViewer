@@ -28,9 +28,6 @@ Authors: Alex Parent, Jacob Parker
 #include "draw_common.h"
 #include "draw_constants.h"
 #include <cmath>
-#ifndef M_PI
-#define M_PI 3.141592
-#endif
 
 using namespace std;
 
