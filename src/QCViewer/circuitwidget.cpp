@@ -47,7 +47,7 @@ CircuitWidget::CircuitWidget()
     circuit = NULL;
     win = NULL;
     cx = cy = 0;
-    panning = drawarch = drawparallel = false;
+    size_changed = panning = drawarch = drawparallel = false;
     mode = NORMAL;
     ext.width=0;
     ext.height=0;
@@ -199,6 +199,14 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event)
         force_redraw ();
     }
     return true;
+}
+
+void CircuitWidget::check_circuit_size()
+{
+    if (circuit&&size_changed) {
+        ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+        size_changed = false;
+    }
 }
 
 bool CircuitWidget::on_button_release_event(GdkEventButton* event)
@@ -374,7 +382,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit != NULL) {
-            rects = circuit->draw (cr->cobj(), drawarch, drawparallel,  ext, wirestart, wireend, scale, selections, ft_default);
+            rects = circuit->draw (cr->cobj(), drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default);
             generate_layout_rects ();
         }
     }
@@ -420,6 +428,7 @@ void CircuitWidget::loadArch (string file)
 
 void CircuitWidget::force_redraw ()
 {
+    check_circuit_size();
     Glib::RefPtr<Gdk::Window> win = get_window();
     if (win) {
         Gdk::Rectangle r(0, 0, get_allocation().get_width(),
@@ -488,7 +497,7 @@ void CircuitWidget::set_scale (double x)
 {
     if (!circuit) return;
     scale = x;
-    ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    size_changed = true;
     force_redraw ();
 }
 
@@ -560,7 +569,7 @@ void CircuitWidget::insert_gate_in_column (shared_ptr<Gate> g, unsigned int colu
 
     circuit->addGate(g, column_id);
     circuit->getGreedyParallel();
-    ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    size_changed = true;
     selections.clear ();
     selections.push_back(column_id);
     ((QCViewer*)win)->set_selection (selections);
@@ -571,7 +580,7 @@ void CircuitWidget::insert_gate_at_front (shared_ptr<Gate> g)
 {
     circuit->addGate(g, 0);
     circuit->getGreedyParallel();
-    ext = circuit->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    size_changed = true;
     selections.clear ();
     selections.push_back(0);
     ((QCViewer*)win)->set_selection (selections);
@@ -583,7 +592,7 @@ void CircuitWidget::insert_gate_in_new_column (shared_ptr<Gate> g, unsigned int 
     if (!circuit) return;
     circ->addGate (g, x);
     circ->getGreedyParallel();
-    ext = circ->get_circuit_size (&wirestart, &wireend, scale, ft_default);
+    size_changed = true;
     selections.clear ();
     force_redraw ();
     selections.push_back(x);
@@ -593,7 +602,6 @@ void CircuitWidget::generate_layout_rects ()
 {
     columns.clear ();
     if (!circuit || circuit->numGates () == 0) return;
-
     unsigned int start_gate = 0;
     for (unsigned int column = 0; column < circuit->columns.size() && start_gate < circuit->numGates (); column++) {
         gateRect bounds = rects.at(start_gate);

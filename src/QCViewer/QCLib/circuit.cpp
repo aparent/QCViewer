@@ -205,7 +205,6 @@ start:
 vector<unsigned int> Circuit::getGreedyParallel()
 {
     vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
-    sort (parallel.begin (), parallel.end ());
     map<int,int> linesUsed;
     unsigned int maxw, minw;
     int k = 0;
@@ -213,7 +212,6 @@ vector<unsigned int> Circuit::getGreedyParallel()
     for(unsigned int i = 0; i < numGates(); i++) {
 start:
         shared_ptr<Gate> g = getGate(i);
-
         minmaxWire (g->controls, g->targets, minw, maxw);
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {

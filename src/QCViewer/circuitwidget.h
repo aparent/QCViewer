@@ -103,10 +103,11 @@ private:
     std::vector<uint32_t> breakpoints;
 
     void getCircuitAndColPosition (double x, double y, std::shared_ptr<Circuit> c, std::vector<gateRect> &rects, std::string &r_name, int &r_pos);
+    void check_circuit_size();
 
     bool simulation_enabled;
     uint32_t NextGateToSimulate;
-    bool panning;
+    bool panning,size_changed;
     double oldmousex, oldmousey;
 
     gateRect select_rect;
