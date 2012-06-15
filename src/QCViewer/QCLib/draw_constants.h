@@ -24,12 +24,15 @@ Institute for Quantum Computing, Quantum Circuits Group
 Authors: Alex Parent
 ---------------------------------------------------------------------*/
 
+#ifndef M_PI
+#define M_PI 3.141592
+#endif
 
 #ifndef DRAW_CONSTANTS_H
 #define DRAW_CONSTANTS_H
 
 const double radius = 15.0;
-const double dotradius = 7.0;
+const double dotradius = 10.0;
 const double thickness = 2.0;
 const double xoffset = 10.0;
 const double yoffset = 10.0;

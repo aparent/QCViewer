@@ -49,8 +49,6 @@ Circuit::Circuit()
 Circuit::~Circuit ()
 {
     removeArch ();
-    removeSubcircuits();
-    removeGates();
 }
 
 void Circuit::newArch ()
@@ -65,64 +63,48 @@ void Circuit::removeArch ()
         arch = NULL;
     }
 }
-void Circuit::removeSubcircuits()
-{
-    for ( map<string,Circuit*>::iterator it = subcircuits.begin() ; it != subcircuits.end(); it++ ) {
-        delete (*it).second;
-    }
-}
 
 void Circuit::expandAll()
 {
     allExpanded = !(allExpanded);
     for(unsigned int i = 0; i<numGates(); i++) {
-        Gate *g = getGate(i);
+        shared_ptr<Gate> g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g)->expand = allExpanded;
+            ((Subcircuit*)g.get())->expand = allExpanded;
         }
     }
-    for ( map<string,Circuit*>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {
+    for ( map<string,std::shared_ptr<Circuit>>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {
         it->second->expandAll();
-    }
-}
-
-void Circuit::removeGates()
-{
-    for(unsigned int i = 0; i < gates.size(); i++) {
-        delete gates[i];
     }
 }
 
 void Circuit::swapGate (unsigned int i, unsigned int j)
 {
-    Gate *tmp = gates[i];
-    gates[i] = gates[j];
-    gates[j] = tmp;
+    swap(gates[i],gates[j]);
 }
 
-void Circuit::addGate(Gate *newGate)
+void Circuit::addGate(shared_ptr<Gate> newGate)
 {
     gates.push_back(newGate);
 }
 
-void Circuit::addGate(Gate *newGate, unsigned int pos)
+void Circuit::addGate(std::shared_ptr<Gate> newGate, unsigned int pos)
 {
     gates.insert(gates.begin()+pos, newGate);
 }
 
-void Circuit::setGate(Gate *newGate, unsigned int pos)
+void Circuit::setGate(std::shared_ptr<Gate> newGate, unsigned int pos)
 {
     gates.at(pos) = newGate;
 }
 
 void Circuit::removeGate (unsigned int pos)
 {
-    delete gates[pos];
     gates.erase (gates.begin () + pos);
     getGreedyParallel();
 }
 
-Gate* Circuit::getGate(int pos) const
+std::shared_ptr<Gate> Circuit::getGate(int pos) const
 {
     return gates.at(pos);
 }
@@ -198,7 +180,7 @@ vector<int> Circuit::getParallel() const
     vector<int>  returnValue;
     map<int,int> linesUsed;
     for(unsigned int i = 0; i<numGates(); i++) {
-        Gate *g = getGate(i);
+        shared_ptr<Gate> g = getGate(i);
 start:
         for(unsigned int j = 0; j < g->controls.size(); j++) {
             if (linesUsed.find(g->controls[j].wire) != linesUsed.end()) {
@@ -223,15 +205,13 @@ start:
 vector<unsigned int> Circuit::getGreedyParallel()
 {
     vector<int> parallel = getParallel (); // doing greedy sometimes "tries too hard"; we need to do greedy within the regions defined here (XXX: explain this better)
-    sort (parallel.begin (), parallel.end ());
     map<int,int> linesUsed;
     unsigned int maxw, minw;
     int k = 0;
     columns.clear ();
     for(unsigned int i = 0; i < numGates(); i++) {
 start:
-        Gate *g = getGate(i);
-
+        shared_ptr<Gate> g = getGate(i);
         minmaxWire (g->controls, g->targets, minw, maxw);
         for (unsigned int j = minw; j <= maxw; j++) {
             if (linesUsed.find(j) != linesUsed.end()) {
@@ -264,7 +244,7 @@ vector<int> Circuit::getArchWarnings () const
     if (arch == 0) return warnings; // Assume "no" architecture by default.
     for (unsigned int g = 0; g < gates.size(); g++) {
         wires = getGate(g)->targets;
-        Gate* gg = getGate (g);
+        shared_ptr<Gate> gg = getGate (g);
         for (unsigned int i = 0; i < gg->controls.size(); i++) {
             wires.push_back (gg->controls[i].wire);
         }
@@ -378,7 +358,7 @@ vector<gateRect> Circuit::draw_circ (cairo_t *cr, double *wirestart, double *wir
         for (uint32_t j = 0; j < columns.size(); j++) {
             maxX = 0.0;
             for (; i <= columns.at(j); i++) {
-                Gate* g = getGate (i);
+                shared_ptr<Gate> g = getGate (i);
                 minmaxWire (g->controls, g->targets, mingw, maxgw);
                 g->draw(cr,xcurr,maxX,rects);
                 if (simState.simulating && simState.gate == i+1) {
@@ -560,17 +540,17 @@ bool Circuit::run (State& state)
     while (simState.gate < numGates ()) {
         bool bp = false;
         // check if we have reached a breakpoint
-        Gate* g = getGate (simState.gate);
+        shared_ptr<Gate> g = getGate (simState.gate);
         if (g->breakpoint) bp = true;
 
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
+        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g.get())->expand ) {
             state = ApplyGate (state, getGate (simState.gate));
             simState.gate++;
         }	else {
-            while (((Subcircuit*)g)->step(state)) {
+            while (((Subcircuit*)g.get())->step(state)) {
                 cout << "sStep" << endl;
             }
-            if( ((Subcircuit*)g)->simState->simulating == false) {
+            if( ((Subcircuit*)g.get())->simState->simulating == false) {
                 simState.gate++;
             } else {
                 return true;
@@ -590,9 +570,9 @@ void Circuit::reset ()
     simState.nextGate = true;
     simState.simulating = false;
     for ( unsigned int i = 0; i < numGates(); i++ ) {
-        Gate* g = getGate(i);
+        shared_ptr<Gate> g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g)->reset();
+            ((Subcircuit*)g.get())->reset();
         }
     }
 }
@@ -601,12 +581,12 @@ bool Circuit::step (State& state)
 {
     simState.simulating = true;
     if (simState.gate < numGates () ) {
-        Gate* g = getGate(simState.gate);
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g)->expand ) {
+        shared_ptr<Gate> g = getGate(simState.gate);
+        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g.get())->expand ) {
             state = ApplyGate(state,g);
             simState.gate++;
         } else {
-            if (! ((Subcircuit*)g)->step(state) && !((Subcircuit*)g)->simState->simulating) {
+            if (! ((Subcircuit*)g.get())->step(state) && !((Subcircuit*)g.get())->simState->simulating) {
                 simState.gate++;
                 step(state);
             }

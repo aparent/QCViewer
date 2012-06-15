@@ -39,17 +39,18 @@ public:
     bool neg;
     name_node *next;
 };
-void cleanup_bad_gates(Circuit * c,std::vector<std::string>& error_log);
-void add_lines (Circuit * circ, name_node *names);
-void add_inputs (Circuit * circ, name_node *names);
-void add_outputs (Circuit * circ, name_node *names);
-void add_constants (Circuit * circ, name_node *names);
-void add_outlabels (Circuit * circ, name_node *names);
-void add_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, std::map<std::string,Circuit*> &subcircuits,std::vector<std::string>& error_log);
-void add_gate (Circuit * circ, std::string gateName, name_node *controls,name_node *targets, unsigned int exp,std::map<std::string,Circuit*> &subcircuits, std::vector<std::string>& error_log);
-void add_R_gate (Circuit * circ, std::string gateName, name_node *names, unsigned int exp, double rot);
-void link_subcircs (Circuit * circ);
-void insert_break(Circuit *circ);
+
+void cleanup_bad_gates(std::shared_ptr<Circuit> c,std::vector<std::string>& error_log);
+void add_lines (std::shared_ptr<Circuit> circ, name_node *names);
+void add_inputs (std::shared_ptr<Circuit> circ, name_node *names);
+void add_outputs (std::shared_ptr<Circuit> circ, name_node *names);
+void add_constants (std::shared_ptr<Circuit> circ, name_node *names);
+void add_outlabels (std::shared_ptr<Circuit> circ, name_node *names);
+void add_gate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *names, unsigned int exp, std::map<std::string,std::shared_ptr<Circuit>> &subcircuits,std::vector<std::string>& error_log);
+void add_gate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *controls,name_node *targets, unsigned int exp,std::map<std::string,std::shared_ptr<Circuit>> &subcircuits, std::vector<std::string>& error_log);
+void add_R_gate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *names, unsigned int exp, double rot);
+void link_subcircs (std::shared_ptr<Circuit> circ);
+void insert_break(std::shared_ptr<Circuit>circ);
 //! Checks to see if lines with these names exist in the circuit
-bool check_names (Circuit * circ, name_node *names,std::vector<std::string>& error_log,std::string id);
+bool check_names (std::shared_ptr<Circuit> circ, name_node *names,std::vector<std::string>& error_log,std::string id);
 #endif

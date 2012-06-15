@@ -33,7 +33,7 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLexer.h"
 
 
-Circuit *parseCircuit (std::string file,std::vector<std::string>& error_log_r);
-void saveCircuit(Circuit *circ, std::string filename);
+std::shared_ptr<Circuit> parseCircuit (std::string file,std::vector<std::string>& error_log_r);
+void saveCircuit(std::shared_ptr<Circuit> circ, std::string filename);
 
 #endif

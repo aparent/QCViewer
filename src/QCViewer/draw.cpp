@@ -34,6 +34,7 @@ Authors: Alex Parent, Jacob Parker
 
 #include "QCLib/circuit.h"
 #include "QCLib/subcircuit.h"
+#include "QCLib/draw_constants.h"
 #include "draw.h"
 
 
@@ -50,17 +51,6 @@ FT_Library library;
 FT_Face ft_face;
 cairo_font_face_t * ft_default;
 
-// XXX organize this!!
-const double radius = 15.0;
-const double dotradius = 10.0;
-const double thickness = 2.0;
-const double xoffset = 10.0;
-const double yoffset = 10.0;
-const double wireDist = 40.0;
-const double gatePad = 18.0;
-const double textPad = 5.0;
-const double Upad = 0.9;
-
 void init_fonts()
 {
     FT_Init_FreeType( &library );
@@ -75,33 +65,6 @@ int pickWire (double y)
     int wire = floor((y-yoffset)/wireDist - 1);
     if ((double)(y - wireToY (wire)) > wireDist/2) return wire + 1;
     return wire;
-}
-
-//for parallism wires
-void drawPWire (cairo_t *cr, double x, int numLines)
-{
-    cairo_set_line_width (cr, thickness);
-    cairo_set_source_rgba (cr, 0.4, 0.4, 0.4,0.4);
-    cairo_move_to (cr, x, wireToY(0));
-    cairo_line_to (cr, x, wireToY(numLines-1));
-    cairo_stroke (cr);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-}
-
-gateRect drawControls (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
-{
-    uint32_t minw, maxw;
-    minmaxWire (ctrl, targ, minw, maxw);
-    if (!ctrl.empty())drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
-    for (uint32_t i = 0; i < ctrl.size(); i++) {
-        drawDot (cr, xc, wireToY(ctrl[i].wire), dotradius, ctrl[i].polarity);
-    }
-    gateRect rect;
-    rect.x0 = xc-dotradius;
-    rect.y0 = wireToY(minw)-dotradius;
-    rect.width = 2*dotradius;
-    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
-    return rect;
 }
 
 void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
@@ -122,18 +85,12 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     g_object_unref(layout);
 }
 
-gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=true)
+void drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
 {
     cairo_set_line_width (cr, thickness);
-    // Draw white background
-    if (opaque) {
-        cairo_set_source_rgb (cr, 1, 1, 1);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-    }
     // Draw black border
-    cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
+    cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_stroke (cr);
 
     // Draw cross
@@ -143,13 +100,6 @@ gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius, bool opaque=
     cairo_move_to (cr, xc, yc-radius);
     cairo_line_to (cr, xc, yc+radius);
     cairo_stroke (cr);
-
-    gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
-    r.height = r.width;
-    return r;
 }
 
 void drawShowRotation (cairo_t *cr, double xc, double yc, double radius)
@@ -202,33 +152,6 @@ void drawShowFred (cairo_t *cr, double width, double height)
     drawWire (cr, width/2, Xrad, width/2, height-Xrad);
     drawX (cr, width/2, Xrad, Xrad);
     drawX (cr, width/2, height-Xrad, Xrad);
-}
-
-gateRect drawFred (cairo_t *cr, uint32_t xc, const vector<Control> &ctrl, const vector<uint32_t> &targ)
-{
-    gateRect rect = drawControls (cr, xc, ctrl, targ);
-    uint32_t minw = targ[0];
-    uint32_t maxw = targ[0];
-    for (uint32_t i = 0; i < targ.size(); i++) {
-        gateRect recttmp = drawX (cr, xc, wireToY(targ[i]), radius);
-        rect = combine_gateRect(rect, recttmp);
-        minw = min (minw, targ[i]);
-        maxw = max (maxw, targ[i]);
-    }
-    if (ctrl.empty()) drawWire (cr, xc, wireToY (minw), xc, wireToY (maxw));
-    return rect;
-}
-
-void drawbase (cairo_t *cr, Circuit *c, double w, double h, double wirestart, double wireend)
-{
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_rectangle (cr, 0, 0, w, h); // TODO: document why the scale factors are here
-    cairo_fill (cr);
-
-    for (uint32_t i = 0; i < c->numLines(); i++) {
-        double y = wireToY (i);
-        drawWire (cr, wirestart+xoffset, y, wireend, y);
-    }
 }
 
 int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)

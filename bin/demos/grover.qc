@@ -1,3 +1,6 @@
+#Use the input state "|0>^5|1>".  After each iteration you should see the state corresponding 
+#the toffoli oracle increase in amplitude maximizing at the 4th iteration.
+
 .v a b c d e Workspace
 .i a b c d e Workspace
 .o a b c d e

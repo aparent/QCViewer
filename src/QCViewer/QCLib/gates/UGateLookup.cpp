@@ -33,12 +33,12 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-map<string,gateMatrix*> gateLib;
+map<string,gateMatrix> gateLib;
 
 std::vector<std::string> UGateNames()
 {
     vector<string> result;
-    map<string,gateMatrix*>::iterator it;
+    map<string,gateMatrix>::iterator it;
     for ( it=gateLib.begin() ; it != gateLib.end(); it++ ) {
         if (((*it).first).compare("F") != 0) { //TODO: this is very special case
             result.push_back((*it).first);
@@ -50,25 +50,25 @@ std::vector<std::string> UGateNames()
 std::vector<std::string> UGateDNames()
 {
     vector<string> result;
-    map<string,gateMatrix*>::iterator it;
+    map<string,gateMatrix>::iterator it;
     for ( it=gateLib.begin() ; it != gateLib.end(); it++ ) {
         if (((*it).first).compare("F") != 0) { //TODO: this is very special case
-            result.push_back(((*it).second)->drawName);
+            result.push_back(((*it).second).drawName);
         }
     }
     return result;
 }
 
-gateMatrix *UGateLookup(string name)
+gateMatrix UGateLookup(string name)
 {
     if ( gateLib.find(name) == gateLib.end() ) {
         cerr << "GATE: " << name << " does not exist" << endl;
-        return NULL;
+        return gateMatrix(0);
     }
     return gateLib[name];
 }
 
-void UGateLoad(string name, gateMatrix *mat)
+void UGateLoad(string name, gateMatrix mat)
 {
     if ( gateLib.find(name) == gateLib.end() ) {
         gateLib[name]=mat;
@@ -78,7 +78,7 @@ void UGateLoad(string name, gateMatrix *mat)
     }
 }
 
-gateMatrix *get_matrix(matrix_row *n)
+gateMatrix get_matrix(matrix_row *n)
 {
     matrix_row* temp = n;
     unsigned int numRow=0;
@@ -96,29 +96,29 @@ gateMatrix *get_matrix(matrix_row *n)
         }
         if (numCol != numRow) {
             cerr << "Invalid Gate Matrix" << endl;
-            return NULL;
+            return gateMatrix(0);
         }
         temp = temp->next;
     }
-    gateMatrix *ret = new gateMatrix;
-    ret->data = new complex<float_type>[numRow*numRow];
+    gateMatrix ret;
+    ret.data = new complex<float_type>[numRow*numRow];
     for(unsigned int i = 0; i < numRow; i++) {
         row_terms *terms = n->terms;
         for(unsigned int j = 0; j < numRow; j++) {
-            ret->data[i*numRow + j] = *terms->val;
+            ret.data[i*numRow + j] = *terms->val;
             terms = terms->next;
         }
         n = n->next;
     }
-    ret->dim = numRow;
+    ret.dim = numRow;
     return ret;
 }
 
 void add_gates(gate_node *n)
 {
-    gateMatrix *g =get_matrix(n->row);
-    g->drawName = n->drawName;
-    if (g != NULL) UGateLoad(n->symbol,g);
+    gateMatrix g = get_matrix(n->row);
+    g.drawName = n->drawName;
+    if (g.dim != 0) UGateLoad(n->symbol,g);
     if (n->next != NULL) add_gates(n->next);
 }
 

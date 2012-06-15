@@ -31,7 +31,7 @@ Authors: Alex Parent, Jacob Parker
 #include "circuit.h"
 #include "state.h"
 
-State ApplyGate (const State &in, const Gate *g);
+State ApplyGate (const State &in, const std::shared_ptr<Gate> g);
 State ApplyCircuit (const State &in, const Circuit &circ);
 
 #endif

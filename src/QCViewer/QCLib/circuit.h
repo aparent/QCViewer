@@ -35,6 +35,7 @@ Authors: Alex Parent, Jacob Parker
 #include "types.h"
 #include <vector>
 #include <string>
+#include <memory>
 #include <map>
 #include "common.h"
 
@@ -131,9 +132,9 @@ public:
     */
     ///@{
     //! Appends gate to the end of the circuit
-    void addGate(Gate *newGate);
+    void addGate(std::shared_ptr<Gate> newGate);
     //! Inserts gate at pos
-    void addGate(Gate *newGate, unsigned int pos);
+    void addGate(std::shared_ptr<Gate> newGate, unsigned int pos);
     /*!
     	\brief Sets gate at pos
     	\param newGate gate to set
@@ -142,13 +143,13 @@ public:
     	Use this to replace a gate in the the circuit.
     	Note: You may want to delete the old gate if it is no longer in use
     */
-    void setGate(Gate *newGate, unsigned int pos);
+    void setGate(std::shared_ptr<Gate> newGate, unsigned int pos);
     //! removes gate at pos
     void removeGate (unsigned int pos);
     //! Swaps gates at a and b
     void swapGate (unsigned int a, unsigned int b);
     //! returns gate at pos
-    Gate* getGate(int pos) const;
+    std::shared_ptr<Gate> getGate(int pos) const;
 
     //! Returns the number of gates counting subcircuits as 1 gate
     unsigned int numGates() const;
@@ -187,7 +188,7 @@ public:
 
 
     //! Mapping of names to circuits storing subcircuits that might appear in this circuit
-    std::map<std::string,Circuit*> subcircuits;
+    std::map<std::string,std::shared_ptr<Circuit>> subcircuits;
 
     /*! @name Drawing
     	These functions have to do with produceing images of the circuit
@@ -205,7 +206,7 @@ public:
 private:
     QArch *arch;
     std::string name;
-    std::vector <Gate*>           gates;
+    std::vector <std::shared_ptr<Gate>>           gates;
     std::vector <Line>            lines;
     std::vector <unsigned int> breakpoints;
 
@@ -225,9 +226,7 @@ private:
 
     unsigned int findcolumn (unsigned int gate) const;
     //for deconstructor
-    void removeSubcircuits();
     void removeArch ();
-    void removeGates();
 };
 
 

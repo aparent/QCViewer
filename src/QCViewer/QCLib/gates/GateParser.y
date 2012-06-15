@@ -83,20 +83,20 @@ matrix:		  row NEWLINE matrix {$$ = new matrix_row($1,$3);}
 					| NEWLINE {$$ = NULL;}
 ;
 
-row: 			  exp 			{$$ = new row_terms($1);}
-					| exp COMMA row {$$ = new row_terms($1,$3);} 
+row:  exp {$$ = new row_terms($1);}
+    | exp COMMA row {$$ = new row_terms($1,$3);} 
 ;
-exp:					  NUM								{ $$ = new complex<float>(atof($1),0);}
-							| IMAG              { $$ = new complex<float>(0,1);}
-							| exp MINUS 		exp { $$ = new complex<float>(*$1 - *$3); delete $1; delete $3;}
-							| exp PLUS 			exp { $$ = new complex<float>(*$1 + *$3); delete $1; delete $3;}
-							| exp TIMES 		exp { $$ = new complex<float>(*$1 * *$3); delete $1; delete $3;}
-							| exp DIV		 		exp { $$ = new complex<float>(*$1 / *$3); delete $1; delete $3;}
-							| exp EXPONENT  exp { $$ = new complex<float>(pow(*$1,*$3)); delete $1; delete $3;}
-							| SQRT  exp 				{ *$2 = sqrt(*$2); $$ = $2; }
-							| exp IMAG					{ $$ = new complex<float>(-imag(*$1),real(*$1)); delete $1;}
-							| MINUS exp 				{ *$2 = -*$2; $$ = $2;}
-							| LPAREN exp RPAREN	{ $$ = $2;}
+exp: NUM { $$ = new complex<float>(atof($1),0);}
+    | IMAG { $$ = new complex<float>(0,1);}
+    | exp MINUS exp { $$ = new complex<float>(*$1 - *$3); delete $1; delete $3;}
+    | exp PLUS exp { $$ = new complex<float>(*$1 + *$3); delete $1; delete $3;}
+    | exp TIMES exp { $$ = new complex<float>(*$1 * *$3); delete $1; delete $3;}
+    | exp DIV exp { $$ = new complex<float>(*$1 / *$3); delete $1; delete $3;}
+    | exp EXPONENT  exp { $$ = new complex<float>(pow(*$1,*$3)); delete $1; delete $3;}
+    | SQRT  exp { *$2 = sqrt(*$2); $$ = $2; }
+    | exp IMAG { $$ = new complex<float>(-imag(*$1),real(*$1)); delete $1;}
+    | MINUS exp { *$2 = -*$2; $$ = $2;}
+    | LPAREN exp RPAREN	{ $$ = $2;}
 ;
 %%
 

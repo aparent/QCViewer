@@ -31,6 +31,7 @@ Authors: Alex Parent, Jacob Parker
 #include <fstream>
 #include <vector>
 #include <map>
+#include <memory>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
@@ -50,11 +51,11 @@ string getGates(const Circuit &circ)
 {
     string ret;
     for (unsigned int i = 0; i < circ.numGates(); i++) {
-        Gate *gate = circ.getGate(i);
+        shared_ptr<Gate> gate = circ.getGate(i);
         cout << gate->getName() << endl;
         ret += gate->getName();
         if (gate->type==Gate::SUBCIRC) {
-            ret+="^"+intToString(((Subcircuit*)gate)->getLoopCount());
+            ret+="^"+intToString(((Subcircuit*)gate.get())->getLoopCount());
         }
         for (unsigned int j = 0; j < gate->controls.size() ; j++) {
             ret += " " + circ.getLine(gate->controls[j].wire).lineName;
@@ -70,10 +71,10 @@ string getGates(const Circuit &circ)
     return ret;
 }
 
-string getSubcircuits(const map<string,Circuit*> &subcircs)
+string getSubcircuits(const map<string,shared_ptr<Circuit>> &subcircs)
 {
     string ret;
-    for ( map<string,Circuit*>::const_iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+    for ( map<string,shared_ptr<Circuit>>::const_iterator it = subcircs.begin(); it != subcircs.end(); it++) {
         ret += "BEGIN " + (*it).first + " (";
         for (unsigned int i = 0; i < (*it).second->numLines(); i++) {
             ret += (*it).second->getLine(i).lineName + " ";
@@ -129,7 +130,7 @@ string getCircuitInfo(const Circuit &circ)
 }
 
 
-void saveCircuit(Circuit *circ, string filename)
+void saveCircuit(shared_ptr<Circuit> circ, string filename)
 {
     ofstream f;
     f.open (filename.c_str());

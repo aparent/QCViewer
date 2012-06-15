@@ -32,7 +32,7 @@ Authors: Alex Parent
 using namespace std;
 int main (int argc, char *argv[])
 {
-    Circuit* c;
+    std::shared_ptr<Circuit> c;
     UGateSetup();
     FT_Library library;
     FT_Face ft_face;

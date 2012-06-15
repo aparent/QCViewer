@@ -35,8 +35,8 @@ Authors: Alex Parent
 class Subcircuit : public Gate
 {
 public:
-    Subcircuit(Circuit*, const std::map<unsigned int,unsigned int>&,unsigned int);
-    Gate* clone() const;
+    Subcircuit(std::shared_ptr<Circuit>, const std::map<unsigned int,unsigned int>&,unsigned int);
+    std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     void setName(std::string name);
     State applyToBasis(index_t) const;
@@ -51,15 +51,15 @@ public:
     void reset ();
 
 
-    Gate* getGate(int pos) const;
-    Circuit* getCircuit();
+    std::shared_ptr<Gate> getGate(int pos) const;
+    std::shared_ptr<Circuit> getCircuit();
     std::vector<unsigned int> getGreedyParallel() const;  //Returns a vector of ints specifying the last gate in each parallel block.
 
     //! Set true is circuit should be draw in expanded mode
     bool expand;
     //! Set true is circuit should be draw in unrolled mode
     bool unroll;
-    SimState* simState;
+    std::shared_ptr<SimState> simState;
 
 
 protected:
@@ -69,7 +69,7 @@ private:
     void drawSubCircBox(cairo_t* cr, gateRect &r) const;
     gateRect drawExp(cairo_t *cr,double xcurr) const;
     index_t BuildBitString (index_t, unsigned int);
-    Circuit* circ;
+    std::shared_ptr<Circuit> circ;
 };
 
 

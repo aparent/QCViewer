@@ -29,6 +29,7 @@ Authors: Alex Parent, Jacob Parker
 #define GATE
 
 #include <string>
+#include <memory>
 #include <vector>
 #include "state.h"
 #include "common.h"
@@ -58,7 +59,7 @@ public:
     enum dType {NOT, FRED, D_SUBCIRC, DEFAULT};
     virtual ~Gate();
     Gate();
-    virtual Gate* clone() const=0;
+    virtual std::shared_ptr<Gate> clone() const=0;
     virtual void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) =0;
     virtual std::string getName() const=0;
     virtual State applyToBasis(index_t) const=0;
@@ -77,11 +78,15 @@ public:
 protected:
     unsigned int loop_count;
     gateRect drawControls (cairo_t *cr,uint32_t xc) const;
+    gateRect drawControls (cairo_t *cr, const gateRect &r) const;
 
 };
 
 //A gate matrix struct for UGate
 struct gateMatrix {
+    ~gateMatrix();
+    gateMatrix(int);
+    gateMatrix();
     std::string drawName;
     unsigned int dim;
     std::complex<float_type> * data;
@@ -92,7 +97,7 @@ class UGate : public Gate
 {
 public:
     UGate(std::string);
-    Gate* clone() const;
+    std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     State applyToBasis(index_t) const;
     void setName(std::string);
@@ -103,7 +108,7 @@ private:
     gateRect drawCNOT (cairo_t *cr, uint32_t xc) const;
     gateRect drawCU (cairo_t *cr, uint32_t xc) ;
     gateRect drawX (cairo_t *cr, double xc, double yc, double radius) const;
-    gateRect drawNOT(cairo_t *cr, double xc, double yc, double radius, bool opaque=true) const;
+    gateRect drawNOT(cairo_t *cr, double xc, double yc, double radius) const;
     unsigned int ExtractInput (index_t) const;
     index_t BuildBitString (index_t, unsigned int) const;
     State ApplyU(index_t) const;
@@ -119,7 +124,7 @@ class RGate : public Gate
 public:
     enum Axis { X, Y, Z };
     RGate(float_type, Axis);
-    Gate* clone() const;
+    std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
