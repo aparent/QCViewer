@@ -32,7 +32,7 @@ Authors: Alex Parent
 #define DRAW_CONSTANTS_H
 
 const double radius = 15.0;
-const double dotradius = 7.0;
+const double dotradius = 10.0;
 const double thickness = 2.0;
 const double xoffset = 10.0;
 const double yoffset = 10.0;
