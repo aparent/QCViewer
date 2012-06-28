@@ -190,19 +190,8 @@ public:
     //! Mapping of names to circuits storing subcircuits that might appear in this circuit
     std::map<std::string,std::shared_ptr<Circuit>> subcircuits;
 
-    /*! @name Drawing
-    	These functions have to do with produceing images of the circuit
-    */
-    ///@{
-    std::vector<gateRect> draw (cairo_t* cr, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const std::vector<Selection> &selections,cairo_font_face_t * ft_default) const;
-    cairo_rectangle_t get_circuit_size (double* wirestart, double* wireend, double scale, cairo_font_face_t * ft_default) const;
-    //!Saves a png of the circuit
-    void savepng (std::string filename, cairo_font_face_t * ft_default);
-    //!Saves an svg of the circuit
-    void savesvg (std::string filename, cairo_font_face_t * ft_default);
-    //!Saves an eps of the circuit
-    void saveps (std::string filename, cairo_font_face_t * ft_default);
-    ///@}
+    SimState simState; //XXX: made public until a better solution is had (separating simulation from circuit)
+
 private:
     QArch *arch;
     std::string name;
@@ -210,19 +199,8 @@ private:
     std::vector <Line>            lines;
     std::vector <unsigned int> breakpoints;
 
-    SimState simState;
 
     bool allExpanded;
-
-    std::vector<gateRect> draw_circ (cairo_t *cr, double *wirestart, double *wireend, bool forreal) const;
-    void drawbase (cairo_t *cr, double w, double h, double wirestart, double wireend) const;
-    void drawParallelSectionMarkings (cairo_t* cr, const std::vector<gateRect> &rects, int numLines, const std::vector<int> &pLines) const;
-    void drawArchitectureWarnings (cairo_t* cr, const std::vector<gateRect> &rects, const std::vector<int> &badGates) const;
-    void drawSelections (cairo_t* cr, const std::vector<gateRect> &rects, const std::vector<Selection> &selections) const;
-    void drawPWire (cairo_t *cr, double x, int numLines) const;
-    void write_to_png (cairo_surface_t* surf, std::string filename) const;
-    cairo_surface_t* make_svg_surface (std::string filename, cairo_rectangle_t ext) const;
-    cairo_surface_t* make_ps_surface (std::string filename, cairo_rectangle_t ext) const;
 
     unsigned int findcolumn (unsigned int gate) const;
     //for deconstructor

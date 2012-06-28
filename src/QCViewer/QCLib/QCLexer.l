@@ -28,7 +28,6 @@ Authors: Alex Parent, Jacob Parker
 %option noyywrap
 %option nounput
 %option never-interactive
-%option unistd
 %option outfile="QCLexer.cpp"
 %option prefix="QC_"
 %{

@@ -26,6 +26,7 @@ Authors: Alex Parent
 #include <iostream>
 #include <fstream>
 #include <QCLib/circuitParser.h>
+#include <QCLib/circuitDrawer.h>
 #include <cairo-ft.h>
 #include <QCLib/gates/UGateLookup.h>
 
@@ -39,6 +40,7 @@ int main (int argc, char *argv[])
     FT_Init_FreeType( &library );
     FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
     cairo_font_face_t * ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+    CircuitDrawer drawer;
 
     if (argc > 0) {
         vector<string> error_log;
@@ -61,14 +63,14 @@ int main (int argc, char *argv[])
     }
     if (argc>3) {
         if (string(argv[2]).compare("-svg") == 0) {
-            c->savesvg(argv[3],ft_default);
+            drawer.savesvg (*c, argv[3],ft_default);
         } else if (string(argv[2]).compare("-ps") == 0) {
-            c->saveps(argv[3],ft_default);
+            drawer.saveps (*c, argv[3],ft_default);
         } else if (string(argv[2]).compare("-png") == 0) {
-            c->savepng(argv[3],ft_default);
+            drawer.savepng (*c, argv[3],ft_default);
         }
     } else if (argc > 2) {
-        c->savepng(argv[2],ft_default);
+        drawer.savepng (*c, argv[2],ft_default);
     } else {
     }
     return 0;
