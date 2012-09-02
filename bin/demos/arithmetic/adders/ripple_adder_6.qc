@@ -24,7 +24,7 @@ tof a3 b4 a4
 tof a5 z 
 tof a4 b5 z 
 tof b2 
-tof b3 
+tof b3; 
 tof b4 
 tof b1 
 tof a1 b2 

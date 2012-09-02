@@ -69,39 +69,112 @@ Authors: Alex Parent, Jacob Parker
 
 %%
 input:	/*empty*/
-     		| input VARS names NEWLINE {add_lines(circuit,$3);}
-     		| input INPUTS names NEWLINE {CHECK_NAMES($3,"inputs");add_inputs(circuit,$3);}
-     		| input OUTPUTS names NEWLINE {CHECK_NAMES($3,"outputs");add_outputs(circuit,$3); } 
-     		| input CONSTANTS nums NEWLINE {add_constants(circuit,$3); }
-     		| input OUTLABELS names NEWLINE {add_outlabels(circuit,$3);} 
-		| input NEWLINE 
-		| input START WORD LBRAC names RBRAC NEWLINE 
-			{ curr_circ = std::shared_ptr<Circuit>(new Circuit());  
-			curr_circ->setName($3);
-			add_lines(curr_circ,$5); }
-			gates {circuit->subcircuits[$3]= curr_circ;} END WORD 
-		| input START NEWLINE {curr_circ = circuit;} gates END 
-		| error {circuit = NULL; return -1;}
+     		| input VARS names NEWLINE 
+          {
+            add_lines(circuit,$3);
+          }
+     		| input INPUTS names NEWLINE 
+          {
+           CHECK_NAMES($3,"inputs");
+           add_inputs(circuit,$3);   
+          }
+     		| input OUTPUTS names NEWLINE 
+          {
+            CHECK_NAMES($3,"outputs");
+            add_outputs(circuit,$3); 
+          } 
+     		| input CONSTANTS nums NEWLINE 
+          {
+            add_constants(circuit,$3); 
+          }
+     		| input OUTLABELS names NEWLINE 
+          { 
+            add_outlabels(circuit,$3);
+          } 
+		    | input NEWLINE 
+		    | input START WORD LBRAC names RBRAC NEWLINE 
+			    { 
+            curr_circ = std::shared_ptr<Circuit>(new Circuit());  
+			      curr_circ->setName($3);
+			      add_lines(curr_circ,$5); 
+          }
+			    gates 
+          {
+            circuit->subcircuits[$3]= curr_circ;
+          } 
+          END WORD 
+		    | input START NEWLINE 
+          {
+            curr_circ = circuit;
+          } 
+          gates END 
+		    | error 
+          {
+            circuit = NULL; 
+            return -1;
+          }
 ;
 gates:  /*empty*/	
-				| gates WORD names NEWLINE {CHECK_NAMES($3,$2);add_gate(curr_circ,$2,$3,1,circuit->subcircuits,error_log);}  
-				| gates WORD names COLON names NEWLINE {CHECK_NAMES($3,$2);CHECK_NAMES($5,$2);add_gate(curr_circ,$2,$3,$5,1,circuit->subcircuits,error_log);} 
-				| gates WORD LBRAC float RBRAC names NEWLINE {CHECK_NAMES($6,$2);add_R_gate(curr_circ,$2,$6,1,$4);}
-				| gates WORD EXPON NUM names NEWLINE {CHECK_NAMES($5,$2);add_gate(curr_circ,$2,$5,atoi($4),circuit->subcircuits,error_log);} 
-				| gates WORD LBRAC float RBRAC EXPON NUM names NEWLINE {CHECK_NAMES($8,$2);add_R_gate(curr_circ,$2,$8,atoi($7),$4);}
-				| gates NEWLINE {insert_break(curr_circ);}
+        | gates WORD names NEWLINE 
+          {
+            CHECK_NAMES($3,$2);
+            add_gate(curr_circ,$2,$3,1,circuit->subcircuits,error_log);
+          }  
+        | gates WORD names COLON names NEWLINE 
+          {
+            CHECK_NAMES($3,$2);
+            CHECK_NAMES($5,$2);
+            add_gate(curr_circ,$2,$3,$5,1,circuit->subcircuits,error_log);
+          } 
+        | gates WORD LBRAC float RBRAC names NEWLINE 
+          {
+            CHECK_NAMES($6,$2);
+            add_R_gate(curr_circ,$2,$6,1,$4);
+          }
+        | gates WORD EXPON NUM names NEWLINE 
+          {
+            CHECK_NAMES($5,$2);
+            add_gate(curr_circ,$2,$5,atoi($4),circuit->subcircuits,error_log);
+          } 
+        | gates WORD LBRAC float RBRAC EXPON NUM names NEWLINE 
+          {
+            CHECK_NAMES($8,$2);
+            add_R_gate(curr_circ,$2,$8,atoi($7),$4);
+          }
+        | gates NEWLINE 
+          {
+            insert_break(curr_circ);
+          }
 ;
 names:/*empty*/ {$$ = NULL;}
-			|  WORD names {$$ = new name_node($1,$2);} 
-			|  NUM names {$$ = new name_node($1,$2);}
-			|  WORD APOS names {$$ = new name_node($1,$3,true);}
+			|  WORD names 
+        {
+          $$ = new name_node($1,$2);
+        } 
+			|  NUM names 
+        {
+          $$ = new name_node($1,$2);
+        }
+			|  WORD APOS names 
+        {
+          $$ = new name_node($1,$3,true);
+        }
 			|  NUM APOS names {$$ = new name_node($1,$3,true); }
 
 nums:/*empty*/ {$$ = NULL;}
-			|  NUM nums {$$ = new name_node($1,$2);}
+			|  NUM nums 
+        {
+          $$ = new name_node($1,$2);
+        }
 
-float: NUM {$$=atof($1);}
-			| NEG NUM {$$=-atof($2);}
+float: NUM 
+        {
+          $$=atof($1);
+        }
+			| NEG NUM 
+        {
+          $$=-atof($2);
+        }
 ;
 %%
 
