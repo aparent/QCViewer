@@ -60,10 +60,10 @@ Authors: Alex Parent, Jacob Parker
 %defines "QCParser.h"
 %output "QCParser.cpp"
 %start input
-%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON
+%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS
 
 %type <string> WORD NUM
-%type <names> names nums
+%type <names> names nums oneBitGates
 %type <fnum> float
 
 
@@ -141,11 +141,28 @@ gates:  /*empty*/
             CHECK_NAMES($8,$2);
             add_R_gate(curr_circ,$2,$8,atoi($7),$4);
           }
+        | gates WORD PLUS oneBitGates NEWLINE
+          {
+            add_one_bit_gates(curr_circ,$2,$4);
+          }
+        | gates NUM PLUS oneBitGates NEWLINE
+          {
+            add_one_bit_gates(curr_circ,$2,$4);
+          }
         | gates NEWLINE 
           {
             insert_break(curr_circ);
           }
 ;
+
+oneBitGates:   WORD
+               {
+                 $$ = new name_node($1,NULL);
+               }
+             | oneBitGates WORD
+               {
+                 $$ = new name_node($2, $1);
+               }
 names:/*empty*/ {$$ = NULL;}
 			|  WORD names 
         {

@@ -265,7 +265,7 @@ void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *contro
             controls = controls->next;
         }
     } else {
-        cout << "Duplicate targets or controls on: " << gateName << endl;
+        error_log.push_back("Duplicate targets or controls on: " + gateName);
         return;
     }
     if (newGate->getName().compare("F")==0) {
@@ -304,6 +304,21 @@ void add_R_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *name
     newGate->ctrls = false;
     circ->addGate(newGate);
     delete names;
+}
+
+void add_one_bit_gates (shared_ptr<Circuit> circ, string qubit, name_node *gates)
+{
+  unsigned int line = findLine(circ,qubit);
+    while(gates) {
+        shared_ptr<Gate> newGate;
+        string gateName = sToUpper(gates->name);
+        newGate = shared_ptr<Gate>(new UGate(gateName));
+        newGate->targets.push_back(line);
+        newGate->ctrls = false;
+        circ->addGate(newGate);
+        gates = gates->next;
+    }
+  delete gates;
 }
 
 void link_subcircs(std::shared_ptr<Circuit> circ)

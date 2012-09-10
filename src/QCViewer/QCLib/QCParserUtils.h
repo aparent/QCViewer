@@ -40,6 +40,7 @@ public:
     name_node *next;
 };
 
+void add_one_bit_gates (std::shared_ptr<Circuit> circ, std::string qubit, name_node *gates);
 void cleanup_bad_gates(std::shared_ptr<Circuit> c,std::vector<std::string>& error_log);
 void add_lines (std::shared_ptr<Circuit> circ, name_node *names);
 void add_inputs (std::shared_ptr<Circuit> circ, name_node *names);

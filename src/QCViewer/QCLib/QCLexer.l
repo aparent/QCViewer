@@ -33,9 +33,10 @@ Authors: Alex Parent, Jacob Parker
 %{
 	#include "QCParser.h"
 	#include "QCLib/utility.h"
-	#define SAVE_TOKEN QC_lval.string = strdup(yytext);
+	#include <iostream>
+	#define SAVE_TOKEN {/*std::cout << yytext << std::endl;*/ QC_lval.string = strdup(yytext);}
 	#define TOKEN(t) (QC_lval.token = t)
-	#define printok(t) std::cout<<t<<" ";
+	#define printok(t) std::cout<<t<<" "<<std::endl
 %}
 
 word [[:alnum:]\*]+
@@ -62,6 +63,7 @@ comment #.*
 "^"									return TOKEN(EXPON);
 "'"									return TOKEN(APOS);
 "-"									return TOKEN(NEG);
+"+"									return TOKEN(PLUS);
 {num}								SAVE_TOKEN; return NUM;
 {word}							SAVE_TOKEN; return WORD;
 
