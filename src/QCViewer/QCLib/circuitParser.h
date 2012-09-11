@@ -30,7 +30,6 @@ Authors: Alex Parent, Jacob Parker
 #include <string>
 #include "circuit.h"
 #include "utility.h"
-#include "QCLexer.h"
 
 
 std::shared_ptr<Circuit> parseCircuit (std::string file,std::vector<std::string>& error_log_r);
