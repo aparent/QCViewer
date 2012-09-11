@@ -69,29 +69,8 @@ Authors: Alex Parent, Jacob Parker
 
 %%
 input:	/*empty*/
-     		| input VARS names NEWLINE 
-          {
-            add_lines(circuit,$3);
-          }
-     		| input INPUTS names NEWLINE 
-          {
-           CHECK_NAMES($3,"inputs");
-           add_inputs(circuit,$3);   
-          }
-     		| input OUTPUTS names NEWLINE 
-          {
-            CHECK_NAMES($3,"outputs");
-            add_outputs(circuit,$3); 
-          } 
-     		| input CONSTANTS nums NEWLINE 
-          {
-            add_constants(circuit,$3); 
-          }
-     		| input OUTLABELS names NEWLINE 
-          { 
-            add_outlabels(circuit,$3);
-          } 
 		    | input NEWLINE 
+     		| input header
 		    | input START WORD LBRAC names RBRAC NEWLINE 
 			    { 
             curr_circ = std::shared_ptr<Circuit>(new Circuit());  
@@ -114,6 +93,30 @@ input:	/*empty*/
             return -1;
           }
 ;
+
+header: VARS names NEWLINE 
+          {
+            add_lines(circuit,$2);
+          }
+     		| INPUTS names NEWLINE 
+          {
+           CHECK_NAMES($2,"inputs");
+           add_inputs(circuit,$2);   
+          }
+     		| OUTPUTS names NEWLINE 
+          {
+            CHECK_NAMES($2,"outputs");
+            add_outputs(circuit,$2); 
+          } 
+     		| CONSTANTS nums NEWLINE 
+          {
+            add_constants(circuit,$2); 
+          }
+     		| OUTLABELS names NEWLINE 
+          { 
+            add_outlabels(circuit,$2);
+          }
+
 gates:  /*empty*/	
         | gates WORD names NEWLINE 
           {

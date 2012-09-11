@@ -308,7 +308,7 @@ void add_R_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *name
 
 void add_one_bit_gates (shared_ptr<Circuit> circ, string qubit, name_node *gates)
 {
-  unsigned int line = findLine(circ,qubit);
+    unsigned int line = findLine(circ,qubit);
     while(gates) {
         shared_ptr<Gate> newGate;
         string gateName = sToUpper(gates->name);
@@ -318,7 +318,7 @@ void add_one_bit_gates (shared_ptr<Circuit> circ, string qubit, name_node *gates
         circ->addGate(newGate);
         gates = gates->next;
     }
-  delete gates;
+    delete gates;
 }
 
 void link_subcircs(std::shared_ptr<Circuit> circ)
