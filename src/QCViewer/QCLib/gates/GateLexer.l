@@ -63,6 +63,7 @@ comment #.*
 "\n"                return TOKEN(NEWLINE);
 "NAME"              BEGIN(TEXT); return TOKEN(NAME); 
 "DRAWNAME"          BEGIN(TEXT); return TOKEN(DRAWNAME); 
+"LATEXNAME"         BEGIN(TEXT); return TOKEN(LATEXNAME); 
 "SYMBOL"            BEGIN(TEXT); return TOKEN(SYMBOL); 
 "COST"              return TOKEN(COST); 
 <TEXT>{word}        BEGIN(INITIAL); SAVE_TOKEN; return WORD;

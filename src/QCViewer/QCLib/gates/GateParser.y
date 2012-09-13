@@ -55,7 +55,7 @@ Authors: Alex Parent, Jacob Parker
 %defines "GateParser.h"
 %output "GateParser.cpp"
 
-%token NAME DRAWNAME WORD NUM COMMA NEWLINE LPAREN RPAREN
+%token NAME DRAWNAME LATEXNAME WORD NUM COMMA NEWLINE LPAREN RPAREN
 %token SYMBOL COST
 
 %left MINUS PLUS
@@ -75,8 +75,8 @@ input: 		 /* empty */  {$$ = NULL;}
         	| input gate {$2->next = $1; $$ = $2; gate_final = $2;}
 ;
 
-gate:     NAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $7);}
-gate:     NAME WORD NEWLINE DRAWNAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $8, $10);}
+gate:      NAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $7);}
+         | NAME WORD NEWLINE DRAWNAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $8, $10);}
 ;
 
 matrix:		  row NEWLINE matrix {$$ = new matrix_row($1,$3);}
