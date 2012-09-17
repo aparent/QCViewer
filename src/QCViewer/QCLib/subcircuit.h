@@ -35,7 +35,7 @@ Authors: Alex Parent
 class Subcircuit : public Gate
 {
 public:
-    Subcircuit(std::shared_ptr<Circuit>, const std::map<unsigned int,unsigned int>&,unsigned int);
+    Subcircuit(std::shared_ptr<Circuit>, const std::vector<unsigned int>&,unsigned int);
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     void setName(std::string name);
@@ -63,7 +63,7 @@ public:
 
 
 protected:
-    std::map<unsigned int,unsigned int> lineMap;
+    std::vector<unsigned int> lineMap;
 private:
     gateRect drawBoxed (cairo_t *cr, uint32_t xc) const;
     void drawSubCircBox(cairo_t* cr, gateRect &r) const;

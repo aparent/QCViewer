@@ -32,7 +32,7 @@ Authors: Alex Parent
 
 using namespace std;
 
-Subcircuit::Subcircuit(shared_ptr<Circuit> n_circ, const map <unsigned int,unsigned int>& n_linemap, unsigned int loops) : Gate()
+Subcircuit::Subcircuit(shared_ptr<Circuit> n_circ, const vector <unsigned int>& n_linemap, unsigned int loops) : Gate()
 {
     drawType = D_SUBCIRC;
     type = SUBCIRC;
@@ -92,25 +92,15 @@ shared_ptr<Gate> Subcircuit::getGate(int pos) const
 {
     shared_ptr<Gate> g = circ->getGate(pos)->clone();
     for (unsigned int i = 0; i < g->targets.size(); i++) {
-        map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->targets[i]);
-        if (it!= lineMap.end()) {
-            g->targets[i] = it->second;
-        }
+        g->targets[i] = lineMap.at(g->targets[i]);
     }
     for (unsigned int i = 0; i < g->controls.size(); i++) {
-        map<unsigned int,unsigned int>::const_iterator it = lineMap.find(g->controls[i].wire);
-        if (it!= lineMap.end()) {
-            g->controls[i].wire = it->second;
-        }
+        g->controls[i].wire = lineMap.at(g->controls[i].wire);
     }
     if (g->type == SUBCIRC) { //Combine the maps if it is a subcircuit so we have the correct global map
         Subcircuit* s = (Subcircuit*)g.get();
-        map<unsigned int,unsigned int>::iterator it = s->lineMap.begin();
-        for (; it!=s->lineMap.end(); it++) {
-            map<unsigned int,unsigned int>::const_iterator currIt = lineMap.find(it->second);
-            if (currIt != lineMap.end()) {
-                it->second = currIt->second;
-            }
+        for (unsigned int i = 0; i < s->lineMap.size(); i++) {
+            s->lineMap.at(i) = lineMap.at(s->lineMap.at(i));
         }
     }
     return g;

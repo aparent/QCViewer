@@ -169,12 +169,10 @@ void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names,
         if (circ->numGates()>0) {
             //circ->getGate(circ->numGates()-1)->colbreak = true;
         }
-        map<unsigned int,unsigned int> lineMap;
-        int line = 0;
+        vector<unsigned int> lineMap;
         name_node* start_names = names;
         while(names) {
-            lineMap.insert (pair<unsigned int,unsigned int>(line,findLine(circ,names->name)));
-            line++;
+            lineMap.push_back (findLine(circ,names->name));
             names = names->next;
         }
         newGate = shared_ptr<Gate>(new Subcircuit(c, lineMap,exp));
@@ -233,12 +231,10 @@ void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *contro
         if (circ->numGates()>0) {
             //circ->getGate(circ->numGates()-1)->colbreak = true;
         }
-        map<unsigned int,unsigned int> lineMap;
-        int line = 0;
+        vector<unsigned int> lineMap;
         name_node* start_targs = targets;
         while(targets) {
-            lineMap.insert (pair<unsigned int,unsigned int>(line,findLine(circ,targets->name)));
-            line++;
+            lineMap.push_back (findLine(circ,targets->name));
             targets = targets->next;
         }
         newGate = shared_ptr<Gate>(new Subcircuit(c, lineMap,exp));
@@ -329,17 +325,14 @@ void link_subcircs(std::shared_ptr<Circuit> circ)
         for (unsigned int i = 0; i < c->numGates(); i++) {
             shared_ptr<Gate> g = c->getGate(i);
             if (subcircs.find(g->getName()) != subcircs.end() ) {
-                map<unsigned int,unsigned int> lineMap;
-                unsigned int line = 0;
+                vector<unsigned int> lineMap;
                 if (!g->ctrls) {
                     for(unsigned int j = 0; j < g->controls.size(); j++) {
-                        lineMap.insert (pair<unsigned int,unsigned int>(line,g->controls.at(j).wire));
-                        line++;
+                        lineMap.push_back (g->controls.at(j).wire);
                     }
                 }
                 for(unsigned int j = 0; j < g->targets.size(); j++) {
-                    lineMap.insert (pair<unsigned int,unsigned int>(line,g->targets.at(j)));
-                    line++;
+                    lineMap.push_back (g->targets.at(j));
                 }
                 shared_ptr<Gate> n_g = shared_ptr<Gate>(new Subcircuit(subcircs[g->getName()],lineMap,g->getLoopCount()));
                 if (g->ctrls) {
