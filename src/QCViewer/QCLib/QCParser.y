@@ -34,6 +34,7 @@ Authors: Alex Parent, Jacob Parker
   #include <memory>
   #include <vector>
   #include <iostream>
+  #include "QCLib/utility.h"
   #include "QCLib/circuit.h"
   #include "QCLib/QCParserUtils.h"
   void QC_error(const char *s);
@@ -79,7 +80,7 @@ input:	/*empty*/
           }
 			    gates 
           {
-            circuit->subcircuits[$3]= curr_circ;
+            circuit->subcircuits[sToUpper($3)]= curr_circ;
           } 
           END WORD 
 		    | input START NEWLINE 
@@ -121,13 +122,13 @@ gates:  /*empty*/
         | gates WORD names NEWLINE 
           {
             CHECK_NAMES($3,$2);
-            add_gate(curr_circ,$2,$3,1,circuit->subcircuits,error_log);
+            add_gate(curr_circ,$2,$3,1,error_log);
           }  
         | gates WORD names COLON names NEWLINE 
           {
             CHECK_NAMES($3,$2);
             CHECK_NAMES($5,$2);
-            add_gate(curr_circ,$2,$3,$5,1,circuit->subcircuits,error_log);
+            add_gate(curr_circ,$2,$3,$5,1,error_log);
           } 
         | gates WORD LBRAC float RBRAC names NEWLINE 
           {
@@ -137,7 +138,7 @@ gates:  /*empty*/
         | gates WORD EXPON NUM names NEWLINE 
           {
             CHECK_NAMES($5,$2);
-            add_gate(curr_circ,$2,$5,atoi($4),circuit->subcircuits,error_log);
+            add_gate(curr_circ,$2,$5,atoi($4),error_log);
           } 
         | gates WORD LBRAC float RBRAC EXPON NUM names NEWLINE 
           {
