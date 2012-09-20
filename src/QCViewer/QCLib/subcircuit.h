@@ -38,12 +38,12 @@ public:
     Subcircuit(std::shared_ptr<Circuit>, const std::vector<unsigned int>&,unsigned int);
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
+    std::string getDrawName();
     void setName(std::string name);
     State applyToBasis(index_t) const;
     unsigned int getNumGates() const;
     State applySubcirc(const State&) const;
     unsigned int numGates() const;
-    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) ;
 
     //! Steps the subcircuit through the next gate.
     bool step (State &s);
@@ -60,16 +60,13 @@ public:
     //! Set true is circuit should be draw in unrolled mode
     bool unroll;
     std::shared_ptr<SimState> simState;
+    std::shared_ptr<Circuit> circ;
 
 
 protected:
     std::vector<unsigned int> lineMap;
 private:
-    gateRect drawBoxed (cairo_t *cr, uint32_t xc) const;
-    void drawSubCircBox(cairo_t* cr, gateRect &r) const;
-    gateRect drawExp(cairo_t *cr,double xcurr) const;
     index_t BuildBitString (index_t, unsigned int);
-    std::shared_ptr<Circuit> circ;
 };
 
 

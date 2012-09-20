@@ -33,9 +33,12 @@ Authors: Alex Parent, Jacob Parker
 #include <cairo.h>
 #include <vector>
 #include <string>
+#include <memory>
 #include "common.h"
 #include "circuit.h"
+#include "subcircuit.h"
 #include "draw_constants.h"
+#include "draw_common.h"
 
 class CircuitDrawer
 {
@@ -52,6 +55,21 @@ private:
     void drawParallelSectionMarkings (cairo_t*, const std::vector<gateRect>&, int, const std::vector<int>&) const;
     void drawPWire (cairo_t*, double, int) const;
     void drawSelections (cairo_t* , const std::vector<gateRect>& , const std::vector<Selection>&) const;
+
+
+    void drawGate(std::shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
+    void drawUGate(std::shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
+    gateRect drawControls (std::shared_ptr<Gate> g,cairo_t *cr, const gateRect &r) const;
+    gateRect drawControls (std::shared_ptr<Gate> g,cairo_t *cr,uint32_t xc) const;
+    gateRect drawFred (std::shared_ptr<Gate> g, cairo_t *cr, uint32_t xc) const;
+    gateRect drawCNOT (std::shared_ptr<Gate> g, cairo_t *cr, uint32_t xc) const;
+    gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius) const;
+    gateRect drawX (cairo_t *cr, double xc, double yc, double radius) const;
+    gateRect drawCU (std::shared_ptr<Gate> g,cairo_t *cr, uint32_t xc) const;
+    void drawSubcirc(std::shared_ptr<Subcircuit> s, cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
+    gateRect drawExp(std::shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr) const;
+    void drawSubCircBox(std::shared_ptr<Subcircuit> s, cairo_t* cr, gateRect &r) const;
+    gateRect drawBoxed (std::shared_ptr<Subcircuit> s, cairo_t *cr, uint32_t xc) const;
 
     void write_to_png (cairo_surface_t*, std::string) const;
     cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t) const;

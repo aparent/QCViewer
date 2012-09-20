@@ -56,12 +56,12 @@ class Gate
 {
 public:
     enum gateType {RGATE, UGATE, SUBCIRC};
-    enum dType {NOT, FRED, D_SUBCIRC, DEFAULT};
+    enum dType {NOT, FRED, DEFAULT};
     virtual ~Gate();
     Gate();
     virtual std::shared_ptr<Gate> clone() const=0;
-    virtual void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) =0;
     virtual std::string getName() const=0;
+    virtual std::string getDrawName() =0;
     virtual State applyToBasis(index_t) const=0;
 
     unsigned int getLoopCount() const;
@@ -77,8 +77,6 @@ public:
     bool ctrls;
 protected:
     unsigned int loop_count;
-    gateRect drawControls (cairo_t *cr,uint32_t xc) const;
-    gateRect drawControls (cairo_t *cr, const gateRect &r) const;
 
 };
 
@@ -101,14 +99,8 @@ public:
     std::string getName() const;
     State applyToBasis(index_t) const;
     void setName(std::string);
-    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     std::string getDrawName();
 private:
-    gateRect drawFred (cairo_t *cr, uint32_t xc) const;
-    gateRect drawCNOT (cairo_t *cr, uint32_t xc) const;
-    gateRect drawCU (cairo_t *cr, uint32_t xc) ;
-    gateRect drawX (cairo_t *cr, double xc, double yc, double radius) const;
-    gateRect drawNOT(cairo_t *cr, double xc, double yc, double radius) const;
     unsigned int ExtractInput (index_t) const;
     index_t BuildBitString (index_t, unsigned int) const;
     State ApplyU(index_t) const;
@@ -126,12 +118,12 @@ public:
     RGate(float_type, Axis);
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
+    std::string getDrawName();
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
     void set_rotVal (float_type);
     Axis get_axis () const;
     void set_axis (Axis);
-    void draw(cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
 private:
     float_type rot;
     index_t BuildBitString (index_t, unsigned int) const;

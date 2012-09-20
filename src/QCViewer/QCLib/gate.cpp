@@ -58,59 +58,6 @@ unsigned int Gate::getNumGates() const
     return 1;
 }
 
-gateRect Gate::drawControls (cairo_t *cr,uint32_t xc) const
-{
-    uint32_t mincw,maxcw,mintw,maxtw,minw,maxw;
-    minmaxWire (controls, vector<unsigned int>() , mincw, maxcw);
-    minmaxWire (vector<Control>(), targets, mintw, maxtw);
-    minmaxWire (controls,targets, minw, maxw);
-    if (!controls.empty()) {
-        if (maxcw > maxtw) {
-            drawWire (cr, xc, wireToY (maxcw), xc, wireToY (maxtw)+radius);
-        }
-        if (mincw < mintw) {
-            drawWire (cr, xc, wireToY (mincw), xc, wireToY (mintw)-radius);
-        }
-    }
-    for (uint32_t i = 0; i < controls.size(); i++) {
-        drawDot (cr, xc, wireToY(controls.at(i).wire), dotradius, controls.at(i).polarity);
-    }
-    gateRect rect;
-    rect.x0 = xc-dotradius;
-    rect.y0 = wireToY(minw)-dotradius;
-    rect.width = 2*dotradius;
-    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
-    return rect;
-}
-
-gateRect Gate::drawControls (cairo_t *cr, const gateRect &r) const
-{
-    uint32_t center = r.x0+r.width/2.0;
-    uint32_t top = r.y0;
-    uint32_t bottem = r.y0+r.height;
-    uint32_t mincw,maxcw,mintw,maxtw,minw,maxw;
-    minmaxWire (controls, vector<unsigned int>() , mincw, maxcw);
-    minmaxWire (vector<Control>(), targets, mintw, maxtw);
-    minmaxWire (controls,targets, minw, maxw);
-    if (!controls.empty()) {
-        if (maxcw > maxtw) {
-            drawWire (cr, center, wireToY (maxcw), center, bottem);
-        }
-        if (mincw < mintw) {
-            drawWire (cr, center, wireToY (mincw), center, top);
-        }
-    }
-    for (uint32_t i = 0; i < controls.size(); i++) {
-        drawDot (cr, center, wireToY(controls.at(i).wire), dotradius, controls.at(i).polarity);
-    }
-    gateRect rect;
-    rect.x0 = center-dotradius;
-    rect.y0 = wireToY(minw)-dotradius;
-    rect.width = 2*dotradius;
-    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
-    return rect;
-}
-
 void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned int &minw, unsigned int &maxw)
 {
     if (targ.size() > 0) {
