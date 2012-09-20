@@ -69,7 +69,6 @@ private:
     void drawSubcirc(std::shared_ptr<Subcircuit> s, cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects) const;
     gateRect drawExp(std::shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr) const;
     void drawSubCircBox(std::shared_ptr<Subcircuit> s, cairo_t* cr, gateRect &r) const;
-    gateRect drawBoxed (std::shared_ptr<Subcircuit> s, cairo_t *cr, uint32_t xc) const;
 
     void write_to_png (cairo_surface_t*, std::string) const;
     cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t) const;

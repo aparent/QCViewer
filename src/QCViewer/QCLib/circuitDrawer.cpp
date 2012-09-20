@@ -394,19 +394,24 @@ gateRect CircuitDrawer::drawX (cairo_t *cr, double xc, double yc, double radius)
 gateRect CircuitDrawer::drawCU (shared_ptr<Gate> g,cairo_t *cr, uint32_t xc) const
 {
     uint32_t minw, maxw;
-    string name = g->getDrawName();
+    stringstream ss;
+    ss << g->getName();
+    if (g->getLoopCount() > 1) {
+        ss << " x" << g->getLoopCount();
+    }
     vector<Control> dummy;
     minmaxWire (dummy, g->targets, minw, maxw); // only the targets
     // (XXX) need to do a  check in here re: target wires intermixed with not targets.
 
     double dw = wireToY(1)-wireToY(0);
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
-
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    double w,h;
-    PangoLayout *layout = create_text_layout(cr, name, w, h);
     double height = dw*(maxw-minw+Upad);
-    double width = w+2*textPad;
+
+    // get width of this box
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, ss.str().c_str(), &extents);
+    double width = extents.width+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
     }
@@ -419,19 +424,17 @@ gateRect CircuitDrawer::drawCU (shared_ptr<Gate> g,cairo_t *cr, uint32_t xc) con
     cairo_set_line_width (cr, thickness);
     cairo_stroke(cr);
 
-    double x = (xc - radius + width/2) - w/2;// - extents.x_bearing;
-    double y = yc - height/2; //- extents.y_bearing;
+    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
+    double y = yc - extents.height/2 - extents.y_bearing;
     cairo_move_to(cr, x, y);
-
-    pango_cairo_show_layout (cr, layout);
-    g_object_unref(layout);
-
+    cairo_show_text (cr, ss.str().c_str());
     gateRect r;
     r.x0 = xc - thickness-radius;
     r.y0 = yc -height/2 - thickness;
     r.width = width + 2*thickness;
     r.height = height + 2*thickness;
     return combine_gateRect(rect, r);
+
 }
 
 void CircuitDrawer::drawSubcirc(shared_ptr<Subcircuit> s, cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects) const
@@ -440,7 +443,7 @@ void CircuitDrawer::drawSubcirc(shared_ptr<Subcircuit> s, cairo_t *cr,double &xc
     if (s->expand) {
         r = drawExp(s,cr,xcurr);
     } else {
-        r = drawBoxed(s,cr,xcurr);
+        r = drawCU(static_pointer_cast<Gate>(s),cr,xcurr);
     }
     rects.push_back(r);
     maxX = max (maxX, r.width);
@@ -528,49 +531,3 @@ void CircuitDrawer::drawSubCircBox(shared_ptr<Subcircuit> s, cairo_t* cr, gateRe
     }
     r = combine_gateRect(rect,r);
 }
-
-gateRect CircuitDrawer::drawBoxed (shared_ptr<Subcircuit> s, cairo_t *cr, uint32_t xc) const
-{
-    uint32_t minw, maxw;
-    stringstream ss;
-    ss << s->getName();
-    if (s->getLoopCount() > 1) {
-        ss << " x" << s->getLoopCount();
-    }
-    vector<Control> dummy;
-    minmaxWire (dummy, s->targets, minw, maxw); // only the targets
-    // (XXX) need to do a  check in here re: target wires intermixed with not targets.
-
-    double dw = wireToY(1)-wireToY(0);
-    double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
-    double height = dw*(maxw-minw+Upad);
-
-    // get width of this box
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, ss.str().c_str(), &extents);
-    double width = extents.width+2*textPad;
-    if (width < dw*Upad) {
-        width = dw*Upad;
-    }
-    gateRect rect = drawControls (static_pointer_cast<Gate>(s), cr, xc-radius+width/2.0);
-    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_fill(cr);
-    cairo_rectangle (cr, xc-radius, yc-height/2, width, height);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_set_line_width (cr, thickness);
-    cairo_stroke(cr);
-
-    double x = (xc - radius + width/2) - extents.width/2 - extents.x_bearing;
-    double y = yc - extents.height/2 - extents.y_bearing;
-    cairo_move_to(cr, x, y);
-    cairo_show_text (cr, ss.str().c_str());
-    gateRect r;
-    r.x0 = xc - thickness-radius;
-    r.y0 = yc -height/2 - thickness;
-    r.width = width + 2*thickness;
-    r.height = height + 2*thickness;
-    return combine_gateRect(rect, r);
-}
-
