@@ -374,6 +374,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         double yc = height/2.0;
 
         Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+        circuitDrawer.renderCairo(cr->cobj());
         cr->rectangle(event->area.x, event->area.y,
                       event->area.width, event->area.height);
         cr->clip();
@@ -382,7 +383,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit != NULL) {
-            rects = circuitDrawer.draw(cr->cobj(),*circuit, drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default);
+            rects = circuitDrawer.draw(*circuit, drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default);
             generate_layout_rects ();
         }
     }
@@ -456,41 +457,19 @@ void CircuitWidget::save_circuit (string filename)
 void CircuitWidget::savepng (string filename)
 {
     if (!circuit) return;
-    double wirestart, wireend;
-    cairo_rectangle_t ext = circuitDrawer.getCircuitSize (*circuit,wirestart, wireend, 1.0,ft_default);
-    cairo_surface_t* surface = make_png_surface (ext);
-    cairo_t* cr = cairo_create (surface);
-    cairo_set_source_surface (cr, surface, 0, 0);
-    circuitDrawer.draw(cr,*circuit, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
-    write_to_png (surface, filename);
-    cairo_destroy (cr);
-    cairo_surface_destroy (surface);
+    circuitDrawer.savepng (*circuit, filename,ft_default);
 }
 
 void CircuitWidget::savesvg (string filename)
 {
     if (!circuit) return;
-    double wirestart, wireend;
-    cairo_rectangle_t ext = circuitDrawer.getCircuitSize (*circuit, wirestart, wireend, 1.0, ft_default);
-    cairo_surface_t* surface = make_svg_surface (filename, ext);
-    cairo_t* cr = cairo_create (surface);
-    cairo_set_source_surface (cr, surface, 0, 0);
-    circuitDrawer.draw(cr,*circuit, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
-    cairo_destroy (cr);
-    cairo_surface_destroy (surface);
+    circuitDrawer.savesvg (*circuit, filename,ft_default);
 }
 
 void CircuitWidget::saveps (string filename)
 {
     if (!circuit) return;
-    double wirestart, wireend;
-    cairo_rectangle_t ext = circuitDrawer.getCircuitSize (*circuit, wirestart, wireend, 1.0, ft_default);
-    cairo_surface_t* surface = make_ps_surface (filename, ext);
-    cairo_t* cr = cairo_create(surface);
-    cairo_set_source_surface (cr, surface, 0,0);
-    circuitDrawer.draw(cr,*circuit, drawarch, drawparallel, ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
-    cairo_destroy (cr);
-    cairo_surface_destroy (surface);
+    circuitDrawer.saveps (*circuit, filename,ft_default);
 }
 
 void CircuitWidget::set_scale (double x)

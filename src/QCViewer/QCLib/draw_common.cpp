@@ -46,24 +46,6 @@ PangoLayout* create_text_layout(cairo_t *cr, string label, double &width, double
     return layout;
 }
 
-
-void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative)
-{
-    if (negative) {
-        cairo_set_source_rgb (cr, 1, 1, 1);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-        cairo_set_source_rgb (cr, 0, 0, 0);
-        cairo_set_line_width(cr, thickness);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_stroke (cr);
-    } else {
-        cairo_set_source_rgb (cr, 0, 0, 0);
-        cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-        cairo_fill (cr);
-    }
-}
-
 double wireToY (uint32_t x)
 {
     return yoffset+(x+1)*wireDist;

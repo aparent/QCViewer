@@ -32,7 +32,7 @@ Authors: Alex Parent, Jacob Parker
 #include <string>
 
 #include "QCLib/circuit.h"
-#include "QCLib/circuitDrawer.h"
+#include "QCLib/circuitImage.h"
 #include "QCLib/state.h"
 #include "QCLib/gate.h"
 #include "draw.h"
@@ -136,7 +136,7 @@ private:
 
     cairo_font_face_t * init_fonts();
     cairo_font_face_t * ft_default;
-    CircuitDrawer circuitDrawer;
+    CircuitImage circuitDrawer;
 };
 
 #endif
