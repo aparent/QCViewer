@@ -45,7 +45,6 @@ void CircuitImage::drawbase (cairo_t *cr, Circuit &c, double w, double h, double
     cairo_set_source_rgb (cr, 1, 1, 1);
     cairo_rectangle (cr, 0, 0, w, h); //XXX
     cairo_fill (cr);
-
     for (uint32_t i = 0; i < c.numLines(); i++) {
         double y = wireToY (i);
         drawPrims.push_front(makeLine(wirestart+xoffset, y, wireend, y, Colour(0,0,0,1)));
@@ -56,13 +55,11 @@ vector<gateRect> CircuitImage::drawCirc (cairo_t *cr, Circuit &c, double &wirest
 {
     vector <gateRect> rects;
     cairo_set_source_rgb (cr, 0, 0, 0);
-
     // input labels
     double xinit = 0.0;
     for (uint32_t i = 0; i < c.numLines(); i++) {
         string label = c.getLine(i).getInputLabel();
         TextExt extents = getExtents(label);
-
         double x = 0, y = 0;
         if (forreal) {
             x = wirestart - extents.w;
@@ -71,15 +68,12 @@ vector<gateRect> CircuitImage::drawCirc (cairo_t *cr, Circuit &c, double &wirest
         addText(label,x,y);
         xinit = max (xinit, extents.w);
     }
-
     if (!forreal) wirestart = xinit;
-
     // gates
     double xcurr = xinit+2.0*gatePad;
     uint32_t mingw, maxgw;
     unsigned int i = 0;
     double maxX = 0;
-
     if (c.numGates()>0) {
         for (uint32_t j = 0; j < c.columns.size(); j++) {
             maxX = 0.0;
@@ -455,11 +449,9 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr
                             maxTarget = s->targets.at(i);
                         }
                     }
-                    cairo_set_source_rgba (cr,0.8,0,0,0.8);
-                    cairo_move_to (cr,xcurr, wireToY(maxTarget+1));
-                    cairo_line_to (cr,xcurr, wireToY(maxTarget - s->circ->numLines()));
-                    cairo_stroke (cr);
-                    cairo_set_source_rgb (cr, 0, 0, 0);
+                    double bottem = wireToY(maxTarget+1);
+                    double top = wireToY(maxTarget - s->circ->numLines());
+                    addLine(xcurr, bottem, xcurr, top, Colour(0.8,0,0,0.8));
                 }
                 xcurr += gatePad*1.5;
                 maxX = 0.0;
@@ -491,7 +483,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr
 void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, cairo_t* cr, gateRect &r)
 {
     double dashes[] = { 4.0, 4.0 };
-    cairo_set_dash (cr, dashes, 2, 0.0);
+    cairo_set_dash (cr, dashes, 2, 0.0); //XXX remove cairo
     cairo_set_line_width (cr, 2);
     cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
     cairo_stroke (cr);
@@ -505,16 +497,14 @@ void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, cairo_t* cr, gateRec
             ss << " " << s->simState->loop << "/" << s->getLoopCount();
         }
     }
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, ss.str().c_str(), &extents);
+    TextExt extents = getExtents(ss.str());
     double x = r.x0;
-    double y = r.y0 - (extents.height + extents.y_bearing) - 5.0;
-    cairo_move_to(cr, x, y);
-    cairo_show_text (cr, ss.str().c_str());
-    r.height+=extents.height+10;
-    r.y0-=extents.height+10;
-    if (r.width < extents.width+4) {
-        r.width = extents.width+4;
+    double y = r.y0 - (extents.h + extents.y) - 5.0;
+    addText(ss.str(),x,y);
+    r.height+=extents.h+10;
+    r.y0-=extents.h+10;
+    if (r.width < extents.w+4) {
+        r.width = extents.w+4;
     }
     r = combine_gateRect(rect,r);
 }
