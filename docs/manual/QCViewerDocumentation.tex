@@ -163,7 +163,10 @@
 \usepackage{float}
 \floatstyle{ruled}
 \newfloat{program}{h}{lop}
-\floatname{program}{Listing }
+\floatname{program}{Listing}
+
+%Some macros for this manual
+\newcommand{\qcversion}{1.0} %Version of QCV that this manual is updated for
 
 \begin{document}
 
@@ -190,7 +193,7 @@
 
 % Bottom of the page
 {\large \today}
-{\large Version 0.8}
+{\large Version \qcversion{}}
 
 \end{center}
 
@@ -200,7 +203,7 @@
 \newpage
 
     \begin{flushright}
-    QCViewer 0.8 Documentation
+    QCViewer \qcversion{} Documentation
     \end{flushright}
 
 %% Introduction
@@ -690,9 +693,9 @@ One may wish to provide labels to the circuit wires and to the collection of gat
 .o a b
 .ol a b
 .c
-BEGIN EPR(a b)
-H a
-tof a b
+BEGIN EPR(1 2)
+H 1
+tof 1 2
 END EPR
 
 BEGIN
