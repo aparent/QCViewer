@@ -1,0 +1,213 @@
+\documentclass[10pt]{article}
+
+%-----------------------------------------------------------------------------%
+% Margins:
+%-----------------------------------------------------------------------------%
+
+\special{papersize=8.5in,11in} \setlength{\topmargin}{0in}
+\setlength{\headheight}{0in} \setlength{\headsep}{0in}
+\setlength{\textheight}{8.75in} \setlength{\oddsidemargin}{0in}
+\setlength{\textwidth}{6.5in}
+
+%-----------------------------------------------------------------------------%
+% Font:
+%-----------------------------------------------------------------------------%
+
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{stmaryrd}
+%\usepackage{dsfont}
+
+%-----------------------------------------------------------------------------%
+% PDF:
+%-----------------------------------------------------------------------------%
+
+\usepackage{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+
+%-----------------------------------------------------------------------------%
+% Various packages:
+%-----------------------------------------------------------------------------%
+
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{amsthm}
+\usepackage{eepic}
+\usepackage{sectsty}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{appendix}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata,chains,fit,shapes,er,petri,calc,patterns}
+\usepackage[latin1]{inputenc}
+
+%-----------------------------------------------------------------------------%
+% Theorem-like environments:
+%-----------------------------------------------------------------------------%
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{prop}[theorem]{Proposition}
+\newtheorem{cor}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem*{fact}{Fact}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{corollary}{Corollary}
+
+%-----------------------------------------------------------------------------%
+% Macros:
+%-----------------------------------------------------------------------------%
+
+\newcommand{\comment}[1]{\begin{quote}\sf [*** #1 ***]\end{quote}}
+\newcommand{\tinyspace}{\mspace{1mu}}
+\newcommand{\microspace}{\mspace{0.5mu}}
+\newcommand{\op}[1]{\operatorname{#1}}
+
+\newcommand{\suchthat}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+\newcommand{\norm}[1]{\left\lVert\tinyspace#1\tinyspace\right\rVert}
+\newcommand{\snorm}[1]{\lVert\tinyspace#1\tinyspace\rVert}
+\newcommand{\abs}[1]{\left\lvert\tinyspace #1 \tinyspace\right\rvert}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\def\iso{\cong}
+\newcommand{\defeq}{\stackrel{\smash{\text{\tiny def}}}{=}}
+\newcommand{\tr}{\operatorname{Tr}}
+\newcommand{\rank}{\operatorname{rank}}
+\renewcommand{\det}{\operatorname{Det}}
+\renewcommand{\vec}{\operatorname{vec}}
+\newcommand{\im}{\operatorname{Im}}
+\renewcommand{\t}{{\scriptscriptstyle\mathsf{T}}}
+\newcommand{\ip}[2]{\left\langle #1 , #2\right\rangle}
+\newcommand{\sip}[2]{\langle #1 , #2\rangle}
+\def\({\left(}
+\def\){\right)}
+\def\I{\mathbb{1}}
+
+\newcommand{\triplenorm}[1]{%
+  \left|\!\microspace\left|\!\microspace\left| #1
+  \right|\!\microspace\right|\!\microspace\right|}
+
+\newcommand{\fid}{\operatorname{F}}
+\newcommand{\setft}[1]{\mathrm{#1}}
+\newcommand{\lin}[1]{\setft{L}\left(#1\right)}
+\newcommand{\density}[1]{\setft{D}\left(#1\right)}
+\newcommand{\unitary}[1]{\setft{U}\left(#1\right)}
+\newcommand{\trans}[1]{\setft{T}\left(#1\right)}
+\newcommand{\herm}[1]{\setft{Herm}\left(#1\right)}
+\newcommand{\pos}[1]{\setft{Pos}\left(#1\right)}
+\newcommand{\pd}[1]{\setft{Pd}\left(#1\right)}
+\newcommand{\sphere}[1]{\mathcal{S}\!\left(#1\right)}
+\newcommand{\opset}[3]{\setft{#1}_{#2}\!\left(#3\right)}
+
+\newcommand{\cent}{\textnormal{\textcent}}
+
+\def\complex{\mathbb{C}}
+\def\real{\mathbb{R}}
+\def\natural{\mathbb{N}}
+\def\integer{\mathbb{Z}}
+
+\def \lket {\left|}
+\def \rket {\right\rangle}
+\def \lbra {\left\langle}
+\def \rbra {\right|}
+\newcommand{\ket}[1]{\lket\microspace #1 \microspace\rket}
+\newcommand{\bra}[1]{\lbra\microspace #1 \microspace\rbra}
+
+\newenvironment{mylist}[1]{\begin{list}{}{
+    \setlength{\leftmargin}{#1}
+    \setlength{\rightmargin}{0mm}
+    \setlength{\labelsep}{2mm}
+    \setlength{\labelwidth}{8mm}
+    \setlength{\itemsep}{0mm}}}
+    {\end{list}}
+
+%\newcommand{\class}[1]{\textup{#1}}
+%\newcommand{\reg}[1]{\mathsf{#1}}
+\newcommand{\prob}[1]{\textit{#1}}
+\newcommand{\reg}[1]{\bf{#1}}
+\newcommand{\class}[1]{\mathsf{#1}}
+
+
+\newenvironment{namedtheorem}[1]
+           {\begin{trivlist}\item {\bf #1.}\em}{\end{trivlist}}
+
+\def\X{\mathcal{X}}
+\def\Y{\mathcal{Y}}
+\def\Z{\mathcal{Z}}
+\def\W{\mathcal{W}}
+\def\A{\mathcal{A}}
+\def\B{\mathcal{B}}
+\def\V{\mathcal{V}}
+\def\U{\mathcal{U}}
+\def\C{\mathcal{C}}
+\def\D{\mathcal{D}}
+\def\E{\mathcal{E}}
+\def\F{\mathcal{F}}
+\def\M{\mathcal{M}}
+\def\N{\mathcal{N}}
+\def\R{\mathcal{R}}
+\def\P{\mathcal{P}}
+\def\Q{\mathcal{Q}}
+\def\S{\mathcal{S}}
+\def\T{\mathcal{T}}
+\def\K{\mathcal{K}}
+\def\H{\mathcal{H}}
+\def\yes{\text{yes}}
+\def\no{\text{no}}
+
+% \usepackage[american,cuteinductors,smartlabels]{circuitikz}
+\usepackage[american,cuteinductors]{circuitikz}
+\usepackage{siunitx}
+
+\ctikzset{bipoles/thickness=1}
+\ctikzset{bipoles/length=0.8cm}
+\ctikzset{bipoles/diode/height=.375}
+\ctikzset{bipoles/diode/width=.3}
+\ctikzset{tripoles/thyristor/height=.8}
+\ctikzset{tripoles/thyristor/width=1}
+\ctikzset{bipoles/vsourceam/height/.initial=.7}
+\ctikzset{bipoles/vsourceam/width/.initial=.7}
+%\tikzstyle{every node}=[font=\small]
+\tikzstyle{every path}=[line width=0.8pt,line cap=round,line join=round]
+
+\definecolor{AleeRed}{rgb}{0.5,0,0}
+
+\begin{document}
+
+%-----------------------------------------------------------------------------%
+\title{\bf QCViewer: A tool for displaying, editing, \\ and simulating quantum circuits}
+%-----------------------------------------------------------------------------%
+
+\author{%
+Author List  \\
+  \it \small Institute for Quantum Computing and School of Computer Science \\  \it \small University of Waterloo
+}
+
+\date{}
+
+\maketitle
+
+\begin{abstract}
+Quantum Circuit Viewer (QCViewer) is a software tool for the design and simulation of quantum circuits. It allows users to test new circuit designs and make publication quality diagrams with an easy to use graphical interface. Supported features also include simulation of the circuit while graphically displaying the current state. The goal in creating QCViewer was to develop a convenient tool that would be useful to the quantum computing community for both research and educational purposes. QCViewer provides a drag and drop interface for circuit design. This makes it easy to quickly test out new algorithm and circuit design ideas. In order to make the diagrams useful for presentation (e.g., Adobe Illustrator, PowerPoint) and publication (e.g., \LaTeX) we provide the ability to export images in scalable vector graphics (.svg) and portable network graphics (.png). 
+
+The quantum circuits are specified in QCViewer using a unique format in plain text files with the ".qc" extension. They are designed to be very human readable and writeable. Users have the choice of specifying circuits by either writing ASCII files directly or drawing them graphically using the drag-and-drop interface. Gates can be placed by dragging them directly onto qubit wires. Controls are then edited by entering control editing mode and clicking on qubit wires. Circuits may also be "rolled" and "unrolled" to make the graphical representations of the circuits more concise and modular for exceptionally large or complex circuits. 
+
+Subcircuits may be specified within a larger circuit. Organizing a circuit in this manner may be useful from an organizational perspective, and the ability to hide the inner workings of a circuit with a subcircuit label allows for neatness and modular circuit design. This feature is also useful when creating publication quality circuit images for indicating the functionality or purpose of certain portions of the circuit. 
+
+Our circuit simulator is state-vector based. Breakpoints can be inserted into the circuit to pause the simulation at specific points. The results of the simulation can be displayed as graphs of either the probability distribution, real amplitudes, or imaginary amplitudes of the state in the computational basis. An input state may be specified using Dirac notation with states being automatically normalized if needed. From the user's perspective, to specify a qubit, they simply need to encase the qubit string between the $"|"$ and $">"$ characters. One may loop certain portions of the circuit multiple times. Loops can be specified in the file format by using the "\^{}" exponent symbol, followed by a numerical value indicating the number of times the circuit should be looped for. 
+
+The executable for QCViewer can be obtained from the website \href{http://qcirc.iqc.uwaterloo.ca/}{http://qcirc.iqc.uwaterloo.ca/}.
+\end{abstract}
+
+\end{document}
