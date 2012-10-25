@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 #include <cairo-svg.h>
 #include <cairo-ps.h>
 
@@ -17,6 +18,7 @@ void CircuitImage::renderCairo(cairo_t* c)
 
 vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default)
 {
+    assert(cr != NULL);
     cairo_scale (cr, scale, scale);
     cairo_set_font_face (cr,ft_default);
     cairo_set_font_size(cr, 18);
@@ -24,17 +26,23 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
 
     vector<gateRect> rects;
     //Push the gate drawing into a group so that wireend can be determined and wires can be drawn first
-    cairo_push_group (cr);
+    //cairo_push_group (cr); ???
     rects = drawCirc (cr, c, wirestart, wireend, true);
-    cairo_pattern_t *group = cairo_pop_group (cr);
+    //cairo_pattern_t *group = cairo_pop_group (cr);  ??
     drawbase (cr, c, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
-    cairo_set_source (cr, group);
+    //cairo_set_source (cr, group);
     //Draw the gates
-    cairo_paint(cr);
-    cairo_pattern_destroy (group);
-    if (drawParallel) drawParallelSectionMarkings (cr, rects, c.numLines(), c.getParallel());
-    if (drawArch) drawArchitectureWarnings (cr, rects, c.getArchWarnings());
-    if (!selections.empty()) drawSelections (cr, rects, selections);
+    //cairo_paint(cr); ???
+    //cairo_pattern_destroy (group); ???
+    if (drawParallel) { 
+      drawParallelSectionMarkings (cr, rects, c.numLines(), c.getParallel());
+    }
+    if (drawArch){ 
+      drawArchitectureWarnings (cr, rects, c.getArchWarnings());
+    }
+    if (!selections.empty()){
+      drawSelections (cr, rects, selections);
+    }
     cairoRender (cr);
 
     return rects;
@@ -157,16 +165,18 @@ void CircuitImage::drawSelections (cairo_t* cr, const vector<gateRect> &rects, c
 
 cairo_rectangle_t CircuitImage::getCircuitSize (Circuit &c, double &wirestart, double &wireend, double scale, cairo_font_face_t * ft_default)
 {
+    drawPrims.clear();
     cairo_surface_t *unbounded_rec_surface = cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
-    cairo_t *cr = cairo_create(unbounded_rec_surface);
-    cairo_set_source_surface (cr, unbounded_rec_surface, 0.0, 0.0);
-    cairo_scale (cr, scale, scale);
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-    drawCirc (cr, c, wirestart, wireend, false); // XXX fix up these inefficienies!!
+    cairo_t *context = cairo_create(unbounded_rec_surface);
+    cairo_set_source_surface (context, unbounded_rec_surface, 0.0, 0.0);
+    cairo_scale (context, scale, scale);
+    cairo_set_font_face (context,ft_default);
+    cairo_set_font_size(context, 18);
+    drawCirc (context, c, wirestart, wireend, false); // XXX fix up these inefficienies!!
+    cairoRender (context);
     cairo_rectangle_t ext;
     cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
-    cairo_destroy (cr);
+    cairo_destroy (context);
     cairo_surface_destroy (unbounded_rec_surface);
     return ext;
 }
@@ -198,12 +208,13 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
 {
     double wirestart, wireend;
     cairo_rectangle_t ext = getCircuitSize (c,wirestart, wireend, 1.0, ft_default);
+    cout << ext.width+ext.x << " : " << thickness+ext.height+ext.y << endl;
     cairo_surface_t* surface = cairo_svg_surface_create (filename.c_str(), ext.width+ext.x, thickness+ext.height+ext.y);
-    cairo_t* cr = cairo_create (surface);
-    renderCairo(cr);
-    cairo_set_source_surface (cr, surface, 0, 0);
-    draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
-    cairo_destroy (cr);
+    cairo_t* context = cairo_create (surface);
+    renderCairo(context);
+    cairo_set_source_surface (context, surface, 0, 0);
+    draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default); 
+    cairo_destroy (context);
     cairo_surface_destroy (surface);
 }
 
@@ -564,22 +575,22 @@ CircuitImage::TextExt CircuitImage::getExtents(std::string str) const
     }
 }
 
-void CircuitImage::cairoRender (cairo_t *cr) const
+void CircuitImage::cairoRender (cairo_t *context) const
 {
     list<std::shared_ptr<DrawPrim>>::const_iterator prim;
     for (prim=drawPrims.begin() ; prim != drawPrims.end(); prim++ ) {
         switch ((*prim)->type) {
         case DrawPrim::LINE:
-            cairoLine(cr,static_pointer_cast<Line>(*prim));
+            cairoLine(context,static_pointer_cast<Line>(*prim));
             break;
         case DrawPrim::RECTANGLE:
-            cairoRectangle(cr,static_pointer_cast<Rectangle>(*prim));
+            cairoRectangle(context,static_pointer_cast<Rectangle>(*prim));
             break;
         case DrawPrim::TEXT:
-            cairoText(cr,static_pointer_cast<Text>(*prim));
+            cairoText(context,static_pointer_cast<Text>(*prim));
             break;
         case DrawPrim::CIRCLE:
-            cairoCircle(cr,static_pointer_cast<Circle>(*prim));
+            cairoCircle(context,static_pointer_cast<Circle>(*prim));
             break;
         default:
             break;
@@ -587,39 +598,39 @@ void CircuitImage::cairoRender (cairo_t *cr) const
     }
 }
 
-void CircuitImage::cairoLine(cairo_t *cr,std::shared_ptr<Line> line) const
+void CircuitImage::cairoLine(cairo_t *context,std::shared_ptr<Line> line) const
 {
     Colour c = line->colour;
-    cairo_set_source_rgba (cr,c.r,c.g,c.b,c.a);
-    cairo_set_line_width (cr, thickness);
-    cairo_move_to (cr, line->x1, line->y1);
-    cairo_line_to (cr, line->x2, line->y2);
-    cairo_stroke (cr);
+    cairo_set_source_rgba (context,c.r,c.g,c.b,c.a);
+    cairo_set_line_width (context, thickness);
+    cairo_move_to (context, line->x1, line->y1);
+    cairo_line_to (context, line->x2, line->y2);
+    cairo_stroke (context);
 }
 
-void CircuitImage::cairoRectangle(cairo_t *cr,std::shared_ptr<Rectangle> r) const
+void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r) const
 {
-    cairo_set_source_rgba (cr, r->fill.r, r->fill.g, r->fill.b, r->fill.a);
-    cairo_rectangle (cr, r->x0, r->y0, r->width, r->height);
-    cairo_fill (cr);
-    cairo_set_source_rgba (cr, r->outline.r, r->outline.g, r->outline.b, r->outline.a);
-    cairo_rectangle (cr, r->x0, r->y0, r->width, r->height);
-    cairo_stroke (cr);
+    cairo_set_source_rgba (context, r->fill.r, r->fill.g, r->fill.b, r->fill.a);
+    cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
+    cairo_fill (context);
+    cairo_set_source_rgba (context, r->outline.r, r->outline.g, r->outline.b, r->outline.a);
+    cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
+    cairo_stroke (context);
 }
 
-void CircuitImage::cairoText(cairo_t *cr,std::shared_ptr<Text> t) const
+void CircuitImage::cairoText(cairo_t *context,std::shared_ptr<Text> t) const
 {
-    cairo_move_to (cr, t->x, t->y);
-    cairo_show_text (cr, t->text.c_str());
+    cairo_move_to (context, t->x, t->y);
+    cairo_show_text (context, t->text.c_str());
 }
 
-void CircuitImage::cairoCircle(cairo_t *cr,std::shared_ptr<Circle> c) const
+void CircuitImage::cairoCircle(cairo_t *context,std::shared_ptr<Circle> c) const
 {
-    cairo_set_source_rgba (cr, c->fill.r, c->fill.g, c->fill.b, c->fill.a);
-    cairo_arc (cr, c->x, c->y, c->r, 0, 2*M_PI);
-    cairo_fill (cr);
-    cairo_set_source_rgba (cr, c->outline.r, c->outline.g, c->outline.b, c->outline.a);
-    cairo_set_line_width(cr, thickness);
-    cairo_arc (cr, c->x, c->y, c->r, 0, 2*M_PI);
-    cairo_stroke (cr);
+    cairo_set_source_rgba (context, c->fill.r, c->fill.g, c->fill.b, c->fill.a);
+    cairo_arc (context, c->x, c->y, c->r, 0, 2*M_PI);
+    cairo_fill (context);
+    cairo_set_source_rgba (context, c->outline.r, c->outline.g, c->outline.b, c->outline.a);
+    cairo_set_line_width(context, thickness);
+    cairo_arc (context, c->x, c->y, c->r, 0, 2*M_PI);
+    cairo_stroke (context);
 }
