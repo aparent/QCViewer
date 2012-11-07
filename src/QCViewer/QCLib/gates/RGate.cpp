@@ -34,12 +34,26 @@ using namespace std;
 
 RGate::RGate(float_type n_rot, Axis a) : Gate(), rot(n_rot)
 {
+    frac = false;
+    numer = 0;
+    denom = 0;
     drawType = DEFAULT;
     type = RGATE;
     axis = a;
     loop_count = 1;
 }
 
+RGate::RGate(Axis a, int n_numer, int n_denom) : Gate()
+{
+    frac = true;
+    numer = n_numer;
+    denom = n_denom;
+    rot = (double)numer/(double)denom;
+    drawType = DEFAULT;
+    type = RGATE;
+    axis = a;
+    loop_count = 1;
+}
 shared_ptr<Gate> RGate::clone() const
 {
     RGate* g = new RGate(rot,axis);
@@ -51,22 +65,23 @@ shared_ptr<Gate> RGate::clone() const
 
 string RGate::getName() const
 {
-    //const string pi_str = "<span font=\"SYMBOL bold 14\">π</span>";
-    const string pi_str = "<span font_desc=\"LMMathItalic10 bold 18\">π</span>";
-    //const string pi_str = "π";
     string rot_str;
-    if (rot == 1.0) {
-        rot_str = "";
+    if (frac) {
+        rot_str = intToString(numer) + "π/" + intToString(denom);
     } else {
-        rot_str = floatToString(rot);
+        if (rot == 1.0) {
+            rot_str = "π";
+        } else {
+            rot_str = floatToString(rot) + "π";
+        }
     }
     switch (axis) {
     case RGate::X:
-        return "RX(" + rot_str + pi_str + ")";
+        return "RX(" + rot_str + ")";
     case RGate::Y:
-        return "RY(" + rot_str + pi_str +")";
+        return "RY(" + rot_str + ")";
     case RGate::Z:
-        return "RZ(" + rot_str + pi_str +")";
+        return "RZ(" + rot_str + ")";
     default:
         return "R";
     }

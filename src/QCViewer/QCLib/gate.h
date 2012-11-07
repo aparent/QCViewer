@@ -116,6 +116,7 @@ class RGate : public Gate
 public:
     enum Axis { X, Y, Z };
     RGate(float_type, Axis);
+    RGate(Axis,int,int);
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     std::string getDrawName();
@@ -124,6 +125,8 @@ public:
     void set_rotVal (float_type);
     Axis get_axis () const;
     void set_axis (Axis);
+    bool frac;
+    int numer,denom;
 private:
     float_type rot;
     index_t BuildBitString (index_t, unsigned int) const;

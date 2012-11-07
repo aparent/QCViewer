@@ -184,7 +184,7 @@ void fix_F_gate(shared_ptr<Gate> g)
 void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names, unsigned int exp, vector<string>& error_log)
 {
     if (names == NULL) {
-        cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
+        error_log.push_back("Gate " + gateName + " has no targets or controls. Skipping.");
         return;
     }
     shared_ptr<Gate> newGate = setup_gate_type(gateName);
@@ -198,7 +198,7 @@ void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names,
             names = names->next;
         }
     } else {
-        cout << "Duplicate targets or controls on: " << gateName << endl;
+        error_log.push_back("Duplicate targets or controls on: " + gateName);
         return;
     }
     fix_F_gate(newGate);
@@ -212,7 +212,7 @@ void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names,
 void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *controls,name_node *targets, unsigned int exp, vector<string>& error_log)
 {
     if (targets == NULL) {
-        cout << "Gate " << gateName << " has no targets or controls. Skipping." << endl;
+        error_log.push_back("Gate " + gateName + " has no targets or controls. Skipping.");
         return;
     }
     shared_ptr<Gate> newGate = setup_gate_type(gateName);
@@ -237,7 +237,7 @@ void add_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *contro
     delete controls;
 }
 
-void add_R_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *names, unsigned int exp, double rot)
+void addRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *names, unsigned int exp, double rot)
 {
     RGate::Axis rot_type;
     if (gateName=="RX") {
@@ -249,18 +249,47 @@ void add_R_gate (std::shared_ptr<Circuit> circ, string gateName, name_node *name
     } else {
         rot_type = RGate::Z;
     }
-    shared_ptr<Gate> newGate = shared_ptr<Gate>(new RGate(rot, rot_type));
+    shared_ptr<Gate> g = shared_ptr<Gate>(new RGate(rot, rot_type));
     while(names) {
         if (names->next == NULL) {
-            newGate->targets.push_back(findLine(circ,names->name));
+            g->targets.push_back(findLine(circ,names->name));
         } else {
-            newGate->controls.push_back(Control(findLine(circ,names->name),names->neg));
+            g->controls.push_back(Control(findLine(circ,names->name),names->neg));
         }
         names = names->next;
     }
-    newGate->setLoopCount(exp);
-    newGate->ctrls = false;
-    circ->addGate(newGate);
+
+    g->setLoopCount(exp);
+    g->ctrls = false;
+    circ->addGate(g);
+    delete names;
+}
+
+
+void addFracRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *names, unsigned int exp, int numer, int denom)
+{
+    RGate::Axis rot_type;
+    if (gateName=="RX") {
+        rot_type = RGate::X;
+    } else if (gateName=="RY") {
+        rot_type = RGate::Y;
+    } else if (gateName=="RZ") {
+        rot_type = RGate::Z;
+    } else {
+        rot_type = RGate::Z;
+    }
+    shared_ptr<Gate> g = shared_ptr<Gate>(new RGate(rot_type,numer,denom));
+    while(names) {
+        if (names->next == NULL) {
+            g->targets.push_back(findLine(circ,names->name));
+        } else {
+            g->controls.push_back(Control(findLine(circ,names->name),names->neg));
+        }
+        names = names->next;
+    }
+    g->setLoopCount(exp);
+    g->ctrls = false;
+    circ->addGate(g);
     delete names;
 }
 

@@ -61,7 +61,7 @@ Authors: Alex Parent, Jacob Parker
 %defines "QCParser.h"
 %output "QCParser.cpp"
 %start input
-%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS
+%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END PI NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS DIV
 
 %type <string> WORD NUM
 %type <names> names nums oneBitGates
@@ -133,7 +133,12 @@ gates:  /*empty*/
         | gates WORD LBRAC float RBRAC names NEWLINE 
           {
             CHECK_NAMES($6,$2);
-            add_R_gate(curr_circ,$2,$6,1,$4);
+            addRGate(curr_circ,$2,$6,1,$4);
+          }
+        | gates WORD LBRAC NUM PI DIV NUM RBRAC names NEWLINE 
+          {
+            CHECK_NAMES($9,$2);
+            addFracRGate(curr_circ,$2,$9,1,atoi($4),atoi($7));
           }
         | gates WORD EXPON NUM names NEWLINE 
           {
@@ -143,7 +148,12 @@ gates:  /*empty*/
         | gates WORD LBRAC float RBRAC EXPON NUM names NEWLINE 
           {
             CHECK_NAMES($8,$2);
-            add_R_gate(curr_circ,$2,$8,atoi($7),$4);
+            addRGate(curr_circ,$2,$8,atoi($7),$4);
+          }
+        | gates WORD LBRAC NUM PI DIV NUM RBRAC EXPON NUM names NEWLINE 
+          {
+            CHECK_NAMES($11,$2);
+            addFracRGate(curr_circ,$2,$11,atoi($10),atoi($4),atoi($7));
           }
         | gates WORD PLUS oneBitGates NEWLINE
           {
@@ -197,6 +207,7 @@ float: NUM
           $$=-atof($2);
         }
 ;
+
 %%
 
 #include "QCLib/QCParserUtils.h"

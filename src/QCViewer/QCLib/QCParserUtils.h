@@ -49,7 +49,8 @@ void add_constants (std::shared_ptr<Circuit> circ, name_node *names);
 void add_outlabels (std::shared_ptr<Circuit> circ, name_node *names);
 void add_gate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *names, unsigned int exp,std::vector<std::string>& error_log);
 void add_gate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *controls,name_node *targets, unsigned int exp, std::vector<std::string>& error_log);
-void add_R_gate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *names, unsigned int exp, double rot);
+void addRGate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *names, unsigned int exp, double rot);
+void addFracRGate (std::shared_ptr<Circuit> circ, std::string gateName, name_node *names, unsigned int exp, int num, int denom);
 void link_subcircs (std::shared_ptr<Circuit> circ);
 void insert_break(std::shared_ptr<Circuit>circ);
 //! Checks to see if lines with these names exist in the circuit

@@ -34,14 +34,14 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
     //Draw the gates
     //cairo_paint(cr); ???
     //cairo_pattern_destroy (group); ???
-    if (drawParallel) { 
-      drawParallelSectionMarkings (cr, rects, c.numLines(), c.getParallel());
+    if (drawParallel) {
+        drawParallelSectionMarkings (cr, rects, c.numLines(), c.getParallel());
     }
-    if (drawArch){ 
-      drawArchitectureWarnings (cr, rects, c.getArchWarnings());
+    if (drawArch) {
+        drawArchitectureWarnings (cr, rects, c.getArchWarnings());
     }
-    if (!selections.empty()){
-      drawSelections (cr, rects, selections);
+    if (!selections.empty()) {
+        drawSelections (cr, rects, selections);
     }
     cairoRender (cr);
 
@@ -213,7 +213,7 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
     cairo_t* context = cairo_create (surface);
     renderCairo(context);
     cairo_set_source_surface (context, surface, 0, 0);
-    draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default); 
+    draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
     cairo_destroy (context);
     cairo_surface_destroy (surface);
 }

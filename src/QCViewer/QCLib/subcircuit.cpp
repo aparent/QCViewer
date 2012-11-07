@@ -97,7 +97,7 @@ shared_ptr<Gate> Subcircuit::getGate(int pos) const
 {
     shared_ptr<Gate> g = circ->getGate(pos)->clone();
     for (unsigned int i = 0; i < g->targets.size(); i++) {
-        g->targets[i] = lineMap.at(g->targets[i]);
+        g->targets.at(i) = lineMap.at(g->targets[i]);
     }
     for (unsigned int i = 0; i < g->controls.size(); i++) {
         g->controls[i].wire = lineMap.at(g->controls[i].wire);

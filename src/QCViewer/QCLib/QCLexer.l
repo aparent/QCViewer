@@ -55,6 +55,7 @@ comment #.*
 \.ol               	return TOKEN(OUTLABELS);
 "BEGIN"							return TOKEN(START);
 "END"								return TOKEN(END);
+"pi"								return TOKEN(PI);
 "\n"								return TOKEN(NEWLINE);
 ";"	   							return TOKEN(NEWLINE);
 ":"	   							return TOKEN(COLON);
@@ -64,6 +65,7 @@ comment #.*
 "'"									return TOKEN(APOS);
 "-"									return TOKEN(NEG);
 "+"									return TOKEN(PLUS);
+"/"									return TOKEN(DIV);
 {num}								SAVE_TOKEN; return NUM;
 {word}							SAVE_TOKEN; return WORD;
 
