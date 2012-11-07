@@ -50,6 +50,7 @@ State *getStateVec (std::string input, bool normalize)
     parseNode *node = parseDirac(input);
     if(node!=NULL) {
         diracTerm term = evalTree(node);
+        delete node;
         if (term.type != KET ) {
             return NULL;
         }

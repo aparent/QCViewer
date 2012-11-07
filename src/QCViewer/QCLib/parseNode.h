@@ -31,6 +31,16 @@ Authors: Alex Parent, Jacob Parker
 #include <string>
 
 struct parseNode {
+    parseNode(int n_type, std::string n_value) {
+        left = NULL;
+        right = NULL;
+        type = n_type;
+        value = n_value;
+    }
+    ~parseNode() {
+        if (left) delete left;
+        if (right) delete right;
+    }
     int type;
     std::string value;
     parseNode * left;

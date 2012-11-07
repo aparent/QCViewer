@@ -63,8 +63,8 @@ exp:	subex            { $$ = $1;    }
       | exp TIMES exp  { $2->left = $1; $2->right=$3; $$ = $2; }
 ;
 subex: term
-       | subex subex  %prec low      { parseNode * val = new parseNode;
-                                       val->value = "*"; val->left = $1; val->right=$2; val->type = TIMES;
+       | subex subex  %prec low      { parseNode * val = new parseNode(TIMES,"*");
+                                       val->left = $1; val->right=$2;
                                        $$ = val; }
        | subex DIV NUM               { $2->left = $1; $2->right=$3; $$ = $2; }
        | subex EXPON NUM               { $2->left = $1; $2->right=$3; $$ = $2; }

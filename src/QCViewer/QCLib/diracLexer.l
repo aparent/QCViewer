@@ -46,18 +46,18 @@ Authors: Alex Parent, Jacob Parker
 %x ketmult
 
 %%
-"sqrt"			yylval = setupNode(SQRT,"SQRT"); 	return SQRT;
-"+"			yylval = setupNode(PLUS,"+"); 		return PLUS;
-"-"			yylval = setupNode(MINUS,"-");		return MINUS;
-"*"			yylval = setupNode(TIMES,"*");  	return TIMES;
-"/"			yylval = setupNode(DIV,"/");		return DIV;
-"^"			yylval = setupNode(EXPON,"^");		return EXPON;
-"i"			yylval = setupNode(CNUM,"1"); 		return CNUM;
-[0-9]+			yylval = setupNode(NUM,string(yytext)); return NUM;
-[0-9]+\.[0-9]		yylval = setupNode(NUM,string(yytext));	return NUM;
+"sqrt"			yylval = new parseNode(SQRT,"SQRT"); 	return SQRT;
+"+"			yylval = new parseNode(PLUS,"+"); 		return PLUS;
+"-"			yylval = new parseNode(MINUS,"-");		return MINUS;
+"*"			yylval = new parseNode(TIMES,"*");  	return TIMES;
+"/"			yylval = new parseNode(DIV,"/");		return DIV;
+"^"			yylval = new parseNode(EXPON,"^");		return EXPON;
+"i"			yylval = new parseNode(CNUM,"1"); 		return CNUM;
+[0-9]+			yylval = new parseNode(NUM,string(yytext)); return NUM;
+[0-9]+\.[0-9]		yylval = new parseNode(NUM,string(yytext));	return NUM;
 "|"			BEGIN(ket);
 
-<ket>[0-1]+		yylval = setupNode(KET,string(yytext));	return KET;
+<ket>[0-1]+		yylval = new parseNode(KET,string(yytext));	return KET;
 <ket>\>			BEGIN(INITIAL);
 
 <*>[ \t\n]+		/* eat whitespace */
@@ -65,11 +65,4 @@ Authors: Alex Parent, Jacob Parker
 
 
 %%
-
-parseNode *setupNode(int type, string value){
-	parseNode * val = new parseNode;
-	val->value = value; val->left = NULL; val->right=NULL;
-	val->type=type;
-	return val;
-}
 
