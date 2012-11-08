@@ -47,7 +47,6 @@ PangoLayout* create_text_layout(cairo_t *cr,std::string label, double &w, double
 gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 double wireToY (uint32_t x);
 void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2);
-void drawRect (cairo_t *cr, gateRect r, Colour outline, Colour fill);
 #endif
 
 

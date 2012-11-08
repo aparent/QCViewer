@@ -34,7 +34,7 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
         drawArchitectureWarnings (rects, c.getArchWarnings());
     }
     if (!selections.empty()) {
-        drawSelections (cr, rects, selections);
+        drawSelections (rects, selections);
     }
     cairoRender (cr);
 
@@ -143,14 +143,14 @@ void CircuitImage::drawPWire (double x, int numLines)
     addLine(x, wireToY(0),x, wireToY(numLines-1), Colour(0.4, 0.4, 0.4,0.4));
 }
 
-void CircuitImage::drawSelections (cairo_t* cr, const vector<gateRect> &rects, const vector<Selection> &selections)
+void CircuitImage::drawSelections (const vector<gateRect> &rects, const vector<Selection> &selections)
 {
     for (unsigned int i = 0; i < selections.size (); i++) {
         if (selections[i].gate < rects.size()) { //XXX Why is this needed?
             gateRect r = rects[selections[i].gate];
             addRect(r.x0, r.y0, r.width, r.height, Colour (0.1, 0.2, 0.7, 0.7), Colour (0.1,0.2,0.7,0.3));
             if (!selections[i].sub.empty() && !rects[selections[i].gate].subRects.empty()) {
-                drawSelections (cr, rects[selections[i].gate].subRects, selections[i].sub);
+                drawSelections (rects[selections[i].gate].subRects, selections[i].sub);
             }
         }
     }
@@ -459,11 +459,13 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr
                 maxX = 0.0;
                 currentCol++;
             }
-
-            if (s->simState->simulating && !s->unroll && s->simState->gate == i + 1 ) {
-                drawRect (cr, subRects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
-            } else if (s->simState->simulating && s->unroll && s->simState->gate +(s->simState->loop-1)*s->numGates()  == j*s->numGates() + i + 1)  {
-                drawRect (cr, subRects.back(), Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+            if (s->simState->simulating) {
+                const gateRect r = subRects.back();
+                if (!s->unroll && s->simState->gate == i + 1 ) {
+                    addRect(r.x0, r.y0, r.width, r.height , Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+                } else if (s->unroll && s->simState->gate + (s->simState->loop-1)*s->numGates()  == j*s->numGates() + i + 1)  {
+                    addRect(r.x0, r.y0, r.width, r.height , Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
+                }
             }
         }
     }

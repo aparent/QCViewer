@@ -138,7 +138,7 @@ private:
     void drawArchitectureWarnings (const std::vector<gateRect>&, const std::vector<int>&);
     void drawParallelSectionMarkings (const std::vector<gateRect>&, int, const std::vector<int>&);
     void drawPWire (double, int);
-    void drawSelections (cairo_t* , const std::vector<gateRect>& , const std::vector<Selection>&);
+    void drawSelections (const std::vector<gateRect>& , const std::vector<Selection>&);
 
 
     void drawGate(std::shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
