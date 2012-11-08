@@ -67,7 +67,15 @@ string RGate::getName() const
 {
     string rot_str;
     if (frac) {
-        rot_str = intToString(numer) + "π/" + intToString(denom);
+       if ((numer == 1) && (denom ==1)){
+          rot_str = "π";
+       } else if (numer == 1) {
+         rot_str = "π/" + intToString(denom);
+       } else if (denom == 1) {
+         rot_str = intToString(numer) + "π";
+       } else {
+         rot_str = intToString(numer) + "π/" + intToString(denom);
+       }
     } else {
         if (rot == 1.0) {
             rot_str = "π";
