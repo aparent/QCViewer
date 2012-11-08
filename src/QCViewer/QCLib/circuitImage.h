@@ -135,25 +135,25 @@ private:
     TextExt getExtents(std::string) const;
 
     void drawbase (cairo_t*, Circuit&, double, double, double, double);
-    void drawArchitectureWarnings (cairo_t*, const std::vector<gateRect>&, const std::vector<int>&);
-    void drawParallelSectionMarkings (cairo_t*, const std::vector<gateRect>&, int, const std::vector<int>&);
-    void drawPWire (cairo_t*, double, int);
+    void drawArchitectureWarnings (const std::vector<gateRect>&, const std::vector<int>&);
+    void drawParallelSectionMarkings (const std::vector<gateRect>&, int, const std::vector<int>&);
+    void drawPWire (double, int);
     void drawSelections (cairo_t* , const std::vector<gateRect>& , const std::vector<Selection>&);
 
 
     void drawGate(std::shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
-    void drawUGate(std::shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
-    gateRect drawControls (std::shared_ptr<Gate> g,cairo_t *cr, const gateRect &r);
-    gateRect drawControls (std::shared_ptr<Gate> g,cairo_t *cr,uint32_t xc);
-    gateRect drawFred (std::shared_ptr<Gate> g, cairo_t *cr, uint32_t xc);
-    gateRect drawCNOT (std::shared_ptr<Gate> g, cairo_t *cr, uint32_t xc);
-    gateRect drawNOT (cairo_t *cr, double xc, double yc, double radius);
-    gateRect drawX (cairo_t *cr, double xc, double yc, double radius);
-    gateRect drawCU (std::shared_ptr<Gate> g,cairo_t *cr, uint32_t xc);
+    void drawUGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
+    gateRect drawControls (std::shared_ptr<Gate> g, const gateRect &r);
+    gateRect drawControls (std::shared_ptr<Gate> g, uint32_t xc);
+    gateRect drawFred (std::shared_ptr<Gate> g, uint32_t xc);
+    gateRect drawCNOT (std::shared_ptr<Gate> g, uint32_t xc);
+    gateRect drawNOT (double xc, double yc, double radius);
+    gateRect drawX (double xc, double yc, double radius);
+    gateRect drawCU (std::shared_ptr<Gate> g,uint32_t xc);
     void drawSubcirc(std::shared_ptr<Subcircuit> s, cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     gateRect drawExp(std::shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr);
     void drawSubCircBox(std::shared_ptr<Subcircuit> s, cairo_t* cr, gateRect &r);
-    void drawDot (cairo_t *cr, double xc, double yc, double radius, bool negative);
+    void drawDot (double xc, double yc, double radius, bool negative);
 
     void write_to_png (cairo_surface_t*, std::string) const;
     cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t) const;
