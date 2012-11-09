@@ -46,7 +46,6 @@ class CircuitImage
 public:
     enum Renderer {CAIRO};
     Renderer renderer;
-    std::vector<gateRect> drawCirc (cairo_t*, Circuit&, double& , double& , bool );
     std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *);
     cairo_rectangle_t getCircuitSize (Circuit& c, double&, double&, double, cairo_font_face_t*);
     void savepng (Circuit&, std::string, cairo_font_face_t*);
@@ -77,10 +76,12 @@ private:
     class Rectangle : public DrawPrim
     {
     public:
-        Rectangle(double nx0,double ny0,double nwidth, double nheight, Colour f, Colour o)
+        Rectangle(double nx0,double ny0,double nwidth, double nheight, Colour f, Colour o, bool ndashed = false)
             : x0(nx0), y0(ny0), height(nheight), width(nwidth), fill(f), outline(o) {
             type = RECTANGLE;
+            dashed = ndashed;
         }
+        bool dashed;
         double x0,y0,height,width;
         Colour fill;
         Colour outline;
@@ -122,7 +123,7 @@ private:
 
     std::shared_ptr<DrawPrim> makeLine (double x1,double y1,double x2, double y2, Colour c);
     void addLine (double x1,double y1,double x2, double y2, Colour c);
-    void addRect (double x1,double y1,double x2, double y2, Colour f, Colour o);
+    void addRect (double x1,double y1,double x2, double y2, Colour f, Colour o, bool dashed = false);
     void addText (std::string t, double x,double y);
     void addCircle (double r0, double x0, double y0, Colour f, Colour l);
     //RENDERS
@@ -134,14 +135,14 @@ private:
 
     TextExt getExtents(std::string) const;
 
-    void drawbase (cairo_t*, Circuit&, double, double, double, double);
+    void drawbase (Circuit&, double, double, double, double);
     void drawArchitectureWarnings (const std::vector<gateRect>&, const std::vector<int>&);
     void drawParallelSectionMarkings (const std::vector<gateRect>&, int, const std::vector<int>&);
     void drawPWire (double, int);
     void drawSelections (const std::vector<gateRect>& , const std::vector<Selection>&);
 
-
-    void drawGate(std::shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
+    std::vector<gateRect> drawCirc (Circuit&, double& , double& , bool );
+    void drawGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     void drawUGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     gateRect drawControls (std::shared_ptr<Gate> g, const gateRect &r);
     gateRect drawControls (std::shared_ptr<Gate> g, uint32_t xc);
@@ -150,9 +151,9 @@ private:
     gateRect drawNOT (double xc, double yc, double radius);
     gateRect drawX (double xc, double yc, double radius);
     gateRect drawCU (std::shared_ptr<Gate> g,uint32_t xc);
-    void drawSubcirc(std::shared_ptr<Subcircuit> s, cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects);
-    gateRect drawExp(std::shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr);
-    void drawSubCircBox(std::shared_ptr<Subcircuit> s, cairo_t* cr, gateRect &r);
+    void drawSubcirc(std::shared_ptr<Subcircuit> s,double &xcurr,double &maxX, std::vector <gateRect> &rects);
+    gateRect drawExp(std::shared_ptr<Subcircuit> s,double xcurr);
+    void drawSubCircBox(std::shared_ptr<Subcircuit> s, gateRect &r);
     void drawDot (double xc, double yc, double radius, bool negative);
 
     void write_to_png (cairo_surface_t*, std::string) const;

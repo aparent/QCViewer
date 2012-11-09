@@ -25,8 +25,8 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
     drawPrims.clear();
 
     vector<gateRect> rects;
-    rects = drawCirc (cr, c, wirestart, wireend, true);
-    drawbase (cr, c, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
+    rects = drawCirc (c, wirestart, wireend, true);
+    drawbase (c, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
     if (drawParallel) {
         drawParallelSectionMarkings (rects, c.numLines(), c.getParallel());
     }
@@ -41,21 +41,19 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
     return rects;
 }
 
-void CircuitImage::drawbase (cairo_t *cr, Circuit &c, double w, double h, double wirestart, double wireend)
+void CircuitImage::drawbase (Circuit &c, double w, double h, double wirestart, double wireend)
 {
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_rectangle (cr, 0, 0, w, h); //XXX
-    cairo_fill (cr);
     for (uint32_t i = 0; i < c.numLines(); i++) {
         double y = wireToY (i);
         drawPrims.push_front(makeLine(wirestart+xoffset, y, wireend, y, Colour(0,0,0,1)));
     }
+    shared_ptr<DrawPrim> r = shared_ptr<DrawPrim>(new Rectangle(0,0,w,h,Colour(1,1,1,1) ,Colour(1,1,1,1)));
+    drawPrims.push_front(r);
 }
 
-vector<gateRect> CircuitImage::drawCirc (cairo_t *cr, Circuit &c, double &wirestart, double &wireend, bool forreal)
+vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &wireend, bool forreal)
 {
     vector <gateRect> rects;
-    cairo_set_source_rgb (cr, 0, 0, 0);
     // input labels
     double xinit = 0.0;
     for (uint32_t i = 0; i < c.numLines(); i++) {
@@ -81,7 +79,7 @@ vector<gateRect> CircuitImage::drawCirc (cairo_t *cr, Circuit &c, double &wirest
             for (; i <= c.columns.at(j); i++) {
                 shared_ptr<Gate> g = c.getGate (i);
                 minmaxWire (g->controls, g->targets, mingw, maxgw);
-                drawGate(g,cr,xcurr,maxX,rects);
+                drawGate(g,xcurr,maxX,rects);
                 if (c.simState.simulating && c.simState.gate == i+1) {
                     gateRect r = rects.back();
                     addRect(r.x0, r.y0, r.width, r.height, Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
@@ -108,7 +106,6 @@ vector<gateRect> CircuitImage::drawCirc (cairo_t *cr, Circuit &c, double &wirest
     wireend = wirestart + fullCirc.width + gatePad*2;
 
     // output labels
-    cairo_set_source_rgb (cr, 0, 0, 0);
     for (uint32_t i = 0; i < c.numLines (); i++) {
         string label = c.getLine(i).getOutputLabel();
         TextExt extents = getExtents(label);
@@ -165,7 +162,7 @@ cairo_rectangle_t CircuitImage::getCircuitSize (Circuit &c, double &wirestart, d
     cairo_scale (context, scale, scale);
     cairo_set_font_face (context,ft_default);
     cairo_set_font_size(context, 18);
-    drawCirc (context, c, wirestart, wireend, false); // XXX fix up these inefficienies!!
+    drawCirc (c, wirestart, wireend, false); // XXX fix up these inefficienies!!
     cairoRender (context);
     cairo_rectangle_t ext;
     cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
@@ -232,7 +229,7 @@ cairo_surface_t* CircuitImage::make_ps_surface (string file, cairo_rectangle_t e
     return img_surface;
 }
 
-void CircuitImage::drawGate(shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double &maxX, std::vector <gateRect> &rects)
+void CircuitImage::drawGate(shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects)
 {
     switch (g->type) {
     case Gate::UGATE:
@@ -241,7 +238,7 @@ void CircuitImage::drawGate(shared_ptr<Gate> g,cairo_t *cr,double &xcurr,double 
         break;
     case Gate::SUBCIRC:
     default:
-        drawSubcirc (static_pointer_cast<Subcircuit>(g),cr, xcurr,maxX,rects);
+        drawSubcirc (static_pointer_cast<Subcircuit>(g),xcurr,maxX,rects);
         break;
     }
 }
@@ -420,11 +417,11 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
     return combine_gateRect(rect, r);
 }
 
-void CircuitImage::drawSubcirc(shared_ptr<Subcircuit> s, cairo_t *cr,double &xcurr,double &maxX, vector <gateRect> &rects)
+void CircuitImage::drawSubcirc(shared_ptr<Subcircuit> s, double &xcurr,double &maxX, vector <gateRect> &rects)
 {
     gateRect r;
     if (s->expand) {
-        r = drawExp(s,cr,xcurr);
+        r = drawExp(s,xcurr);
     } else {
         r = drawCU(static_pointer_cast<Gate>(s),xcurr);
     }
@@ -432,7 +429,7 @@ void CircuitImage::drawSubcirc(shared_ptr<Subcircuit> s, cairo_t *cr,double &xcu
     maxX = max (maxX, r.width);
 }
 
-gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr)
+gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,double xcurr)
 {
     double maxX = 0.0;
     vector <gateRect> subRects;
@@ -441,7 +438,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr
         unsigned int currentCol = 0;
         for(unsigned int i = 0; i < s->numGates(); i++) {
             shared_ptr<Gate> g = s->getGate(i);
-            drawGate(g,cr,xcurr,maxX,subRects);
+            drawGate(g,xcurr,maxX,subRects);
             if(para.size() > currentCol && i == para[currentCol]) {
                 xcurr += maxX - gatePad/2;
                 if (s->circ->getGate(i)->breakpoint) {
@@ -478,20 +475,15 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,cairo_t *cr,double xcurr
             //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
             r = combine_gateRect(r,(subRects)[i]);
         }
-        drawSubCircBox(s,cr, r);
+        drawSubCircBox(s,r);
         r.subRects = subRects;
     }
     return r;
 }
 
-void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, cairo_t* cr, gateRect &r)
+void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, gateRect &r)
 {
-    double dashes[] = { 4.0, 4.0 };
-    cairo_set_dash (cr, dashes, 2, 0.0); //XXX remove cairo
-    cairo_set_line_width (cr, 2);
-    cairo_rectangle (cr, r.x0, r.y0, r.width, r.height);
-    cairo_stroke (cr);
-    cairo_set_dash (cr, dashes, 0, 0.0);
+    addRect(r.x0, r.y0, r.width, r.height , Colour (1,1,1,0), Colour (0,0,0,1),true);
     gateRect rect = drawControls (static_pointer_cast<Gate>(s), r);
     stringstream ss;
     ss << s->getName();
@@ -534,9 +526,9 @@ void CircuitImage::addLine (double x1,double y1,double x2, double y2, Colour c)
     drawPrims.push_back(makeLine(x1, y1, x2, y2, c));
 }
 
-void CircuitImage::addRect (double x,double y,double w, double h, Colour f, Colour o)
+void CircuitImage::addRect (double x,double y,double w, double h, Colour f, Colour o, bool dashed)
 {
-    shared_ptr<DrawPrim> r = shared_ptr<DrawPrim>(new Rectangle(x,y,w,h,f,o));
+    shared_ptr<DrawPrim> r = shared_ptr<DrawPrim>(new Rectangle(x,y,w,h,f,o,dashed));
     drawPrims.push_back(r);
 }
 
@@ -603,12 +595,20 @@ void CircuitImage::cairoLine(cairo_t *context,std::shared_ptr<Line> line) const
 
 void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r) const
 {
+    if (r->dashed) { //turn dashes on
+        double dashes[] = { 4.0, 4.0 };
+        cairo_set_dash (cr, dashes, 2, 0.0);
+    }
     cairo_set_source_rgba (context, r->fill.r, r->fill.g, r->fill.b, r->fill.a);
     cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
     cairo_fill (context);
     cairo_set_source_rgba (context, r->outline.r, r->outline.g, r->outline.b, r->outline.a);
     cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
     cairo_stroke (context);
+    if (r->dashed) { //turn dashes back off
+        double dashes[] = { 4.0, 4.0 };
+        cairo_set_dash (cr, dashes, 0, 0.0);
+    }
 }
 
 void CircuitImage::cairoText(cairo_t *context,std::shared_ptr<Text> t) const
