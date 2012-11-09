@@ -19,9 +19,11 @@ void CircuitImage::renderCairo(cairo_t* c)
 vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default)
 {
     assert(cr != NULL);
+    //These are needed to get proper text extents
     cairo_scale (cr, scale, scale);
     cairo_set_font_face (cr,ft_default);
     cairo_set_font_size(cr, 18);
+    // ---------------------------------
     drawPrims.clear();
 
     vector<gateRect> rects;
