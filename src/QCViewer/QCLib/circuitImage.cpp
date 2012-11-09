@@ -112,9 +112,8 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
         string label = c.getLine(i).getOutputLabel();
         TextExt extents = getExtents(label);
 
-        double x, y;
-        x = wireend + xoffset;
-        y = wireToY(i) - (extents.h/2+extents.y);
+        double x = wireend + xoffset;
+        double y = wireToY(i) - (extents.h/2+extents.y);
         addText(label,x,y);
     }
     return rects;
@@ -597,8 +596,8 @@ void CircuitImage::cairoLine(cairo_t *context,std::shared_ptr<Line> line) const
 
 void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r) const
 {
+    const double dashes[] = { 4.0, 4.0 };
     if (r->dashed) { //turn dashes on
-        double dashes[] = { 4.0, 4.0 };
         cairo_set_dash (cr, dashes, 2, 0.0);
     }
     cairo_set_source_rgba (context, r->fill.r, r->fill.g, r->fill.b, r->fill.a);
@@ -608,7 +607,6 @@ void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r)
     cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
     cairo_stroke (context);
     if (r->dashed) { //turn dashes back off
-        double dashes[] = { 4.0, 4.0 };
         cairo_set_dash (cr, dashes, 0, 0.0);
     }
 }

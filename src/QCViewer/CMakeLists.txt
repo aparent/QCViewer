@@ -1,11 +1,11 @@
-set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++0x")
-set(CMAKE_CXX_FLAGS_DEBUG "-pg -g -pedantic -Wall -Wextra -std=c++0x")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -pedantic -std=c++0x")
+set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++0x -static-libgcc -static-libstdc++")
+set(CMAKE_CXX_FLAGS_DEBUG "-pg -g -pedantic -Wall -Wextra -std=c++0x -static-libgcc -static-libstdc++")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=c++0x -static-libgcc -static-libstdc++")
 
 IF(WIN32)
-	set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
+	set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x -static-libgcc -static-libstdc++ ")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x -static-libgcc -static-libstdc++")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -pedantic -std=gnu++0x")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=gnu++0x -static-libgcc -static-libstdc++")
 ENDIF(WIN32)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -66,13 +66,13 @@ include_directories( ${QCViewer_SOURCE_DIR}/QCLib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 #add_executable (viewer WIN32  ${QCVIEWER_SRC_FILES})
-add_library(qclib ${QCLIB_SRC_FILES})
+add_library(qc ${QCLIB_SRC_FILES})
 add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp ${QCVIEWER_SRC_FILES} )
 add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp)
 
-target_link_libraries(qcviewer qclib)
+target_link_libraries(qcviewer qc)
 target_link_libraries(qcviewer ${GTKMM_LIBRARIES})
-target_link_libraries(qcimage qclib)
+target_link_libraries(qcimage qc)
 target_link_libraries(qcimage ${GTKMM_LIBRARIES})
 
 install(TARGETS qcviewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)

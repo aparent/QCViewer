@@ -60,12 +60,3 @@ gateRect combine_gateRect (const gateRect &a, const gateRect &b)
     c.height = max (a.y0-c.y0 + a.height, b.y0 - c.y0 + b.height);
     return c;
 }
-
-void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
-{
-    cairo_set_line_width (cr, thickness);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_move_to (cr, x1, y1);
-    cairo_line_to (cr, x2, y2);
-    cairo_stroke (cr);
-}

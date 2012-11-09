@@ -30,23 +30,13 @@ Authors: Alex Parent
 
 #include <cairo.h>
 #include <pango/pangocairo.h>
-#include <vector>
 #include "types.h"
-#include "gate.h"
+#include <string>
 #include "common.h"
-
-class Colour
-{
-public:
-    Colour () : r(0.0),g(0.0),b(0.0),a(0.0) {}
-    Colour (double rr, double gg, double bb, double aa) : r(rr), g(gg), b(bb), a(aa) {}
-    double r, g, b, a;
-};
 
 PangoLayout* create_text_layout(cairo_t *cr,std::string label, double &w, double &h);
 gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 double wireToY (uint32_t x);
-void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2);
 #endif
 
 

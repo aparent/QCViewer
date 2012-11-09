@@ -58,6 +58,15 @@ void init_fonts()
     ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 
+void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
+{
+    cairo_set_line_width (cr, thickness);
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_move_to (cr, x1, y1);
+    cairo_line_to (cr, x2, y2);
+    cairo_stroke (cr);
+}
+
 int pickWire (double y)
 {
     if (y < yoffset+wireDist/2) return -1;

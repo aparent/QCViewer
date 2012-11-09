@@ -55,6 +55,13 @@ public:
     void renderCairo(cairo_t*);
 
 private:
+    class Colour
+    {
+    public:
+        Colour () : r(0.0),g(0.0),b(0.0),a(0.0) {}
+        Colour (double rr, double gg, double bb, double aa) : r(rr), g(gg), b(bb), a(aa) {}
+        double r, g, b, a;
+    };
     class DrawPrim
     {
     public:
