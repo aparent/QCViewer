@@ -4,7 +4,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -pedantic -std=c++0x")
 
 IF(WIN32)
 	set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x -static-libgcc -static-libstdc++")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -pedantic -std=gnu++0x")
 ENDIF(WIN32)
 
