@@ -265,7 +265,12 @@ To load a particular quantum state, click the \includegraphics[scale=0.60]{Figur
 \includegraphics{Figures/CreateCircuit/LoadState.png}
 \end{center}
 
-To specify a particular state to enter, the ket formalism is represented by prefixing the state with ``|"  and terminating the state with the less than symbol``>". For instance, if we chose our input state to be $\ket{00}$, this is equivalent to inputting ``|00>". Once we input our state, it is loaded as input into our circuit. By selecting \includegraphics[scale=0.60]{Figures/Navigation/DisplayState.png} the state of the qubits are displayed below.
+To specify a particular state to enter, the ket formalism is represented by prefixing the 
+state with \verb+|+  and terminating the state with the less than symbol \verb+>+. 
+For instance, if we chose our input state to be $\ket{00}$, this is equivalent to 
+inputting \verb+|00>+. Once we input our state, it is loaded as input into our circuit. 
+By selecting \includegraphics[scale=0.60]{Figures/Navigation/DisplayState.png} 
+the state of the qubits are displayed below.
 
 \begin{center}
 \includegraphics{Figures/CreateCircuit/DisplayState.png}
@@ -364,7 +369,8 @@ Selecting which axis to rotate on and modifying the $\theta$ value for these gat
 Rotation dialog box.
 \end{center}
 
-Putting in a value, $v$ into the dialog box corresponds to $(v)\pi$ along which ever axis is specified by the radio buttons above. 
+Putting in a value, $v$ into the dialog box corresponds to a rotation of $v\pi$ along 
+which ever axis is specified by the radio buttons above. 
 
 \item \includegraphics{Figures/Gates/Mod2.png}  Addition Modulo Two
 
@@ -384,8 +390,6 @@ SWAP = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 
   \end{minipage}\hspace{-2.5cm}
   \begin{minipage}{.2\linewidth}
   \vspace*{3pt}
-    \begin{align}
-    \end{align}
   \end{minipage}
 \end{center}
 
@@ -395,89 +399,64 @@ The Hadamard gate acts on a single qubit and maps the basis state $\ket{0}$ to $
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/HadamardViewer} \\
+  \vspace*{3pt}
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:Hadamard}
     \renewcommand{\arraystretch}{1.25}
 H =  \frac{1}{\sqrt 2}\begin{pmatrix} 1 & 1 \\ 1 & \textnormal{-}1 \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 \item \includegraphics{Figures/Gates/PGate.png} 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/PGateViewer} \\
-
+\vspace*{3pt}
 \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:PGate}
     \renewcommand{\arraystretch}{1.25}
 P = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 \item \includegraphics{Figures/Gates/PAdjointGate.png} 
-
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/PAdjointGateViewer} \\
+\vspace*{3pt}
 \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:PGateAdjoint}
     \renewcommand{\arraystretch}{1.25}
 P^\dagger = \begin{pmatrix} 1 & 0 \\ 0 & -i \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 \item \includegraphics{Figures/Gates/TGate.png}  $\frac{\pi}{8}$ Gate
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/TGateViewer} \\
-
+  \vspace*{3pt}
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:TGate}
     \renewcommand{\arraystretch}{1.25}
 T = e^{i \pi/8}\begin{pmatrix} e^{-i\pi/8} & 0 \\ 0 & e^{i\pi/8} \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 \item \includegraphics{Figures/Gates/TAdjointGate.png} 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/TAdjointGateViewer} \\
-
+\vspace*{3pt}
 \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:TGateAjoint}
     \renewcommand{\arraystretch}{1.25}
 T^\dagger = e^{i \pi/8}\begin{pmatrix} e^{i\pi/8} & 0 \\ 0 & e^{-i\pi/8} \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
-
 \end{center}
 
 \item \includegraphics{Figures/Gates/XGate.png}  Pauli-X Gate
@@ -486,17 +465,13 @@ The Pauli-X Gate acts on a single qubits and corresponds to a rotation around th
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/XGateViewer} \\
+  \vspace*{3pt}
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:XGate}
     \renewcommand{\arraystretch}{1.25}
 X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 The Pauli-X Gate is essentially the quantum NOT as it maps the qubit states $\ket{0}$ to $\ket{1}$ and $\ket{1}$ to $\ket{0}$. 
@@ -507,17 +482,13 @@ The Pauli-Y Gate acts on a single qubit and corresponds to a rotation about the 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/YGateViewer} \\
+  \vspace*{3pt}
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:YGate}
     \renewcommand{\arraystretch}{1.25}
 Y = \begin{pmatrix} 0 & \textnormal{-}i \\ i & 0 \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 It maps the basis states $\ket{0}$ to $i\ket{1}$ and $\ket{1}$ to $-i\ket{0}$. 
@@ -528,17 +499,13 @@ The Pauli-Z Gate acts on a single qubit and corresponds to a rotation about the 
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/Gates/ZGateViewer} \\
+  \vspace*{3pt}
   \begin{minipage}{.9\linewidth}
     \begin{equation*} \label{mat:ZGate}
     \renewcommand{\arraystretch}{1.25}
 Z = \begin{pmatrix} 1 & 0 \\ 0 & \textnormal{-}1 \end{pmatrix}
     \end{equation*}
   \end{minipage}\hspace{-2.5cm}
-  \begin{minipage}{.2\linewidth}
-  \vspace*{3pt}
-    \begin{align}
-    \end{align}
-  \end{minipage}
 \end{center}
 
 It maps the basis states $\ket{0}$ to an unchanged $\ket{0}$ and maps $\ket{1}$ to $-\ket{1}$. 
@@ -556,7 +523,8 @@ It maps the basis states $\ket{0}$ to an unchanged $\ket{0}$ and maps $\ket{1}$ 
 \begin{itemize}
 \item \includegraphics{Figures/Navigation/Open.png} \\ 
 
-Clicking the \em Open \em icon prompts a dialog box to appear that allows the user to select previously saved circuits as .qc files to open.
+Clicking the \em Open \em icon prompts a dialog box to appear that allows the user to select 
+previously saved circuits as \verb+.qc+ files to open.
 
 \begin{center}
 \includegraphics[scale=0.75]{Figures/Navigation/OpenDialog.png}
@@ -621,7 +589,7 @@ For a specific example use of the \em Display State \em functionality, refer to 
 The {\bf File} menu allows one to quit the QCViewer program.
 
 \item \includegraphics{Figures/Menu/Circuit.png} \\ \\
-The {\bf Circuit} menu provides us with the option to create a \em New \em circuit (more information on how to create a circuit refer to  Section~\ref{sec:CreatingaCircuit}. From here, we may also \em Open \em previously saved circuits and \em Save \em the current workspace circuit as a .qc file. The \em Open \em dialog is provided in more detail in Section~\ref{sub:NavigationBar}.
+The {\bf Circuit} menu provides us with the option to create a \em New \em circuit (more information on how to create a circuit refer to  Section~\ref{sec:CreatingaCircuit}. From here, we may also \em Open \em previously saved circuits and \em Save \em the current workspace circuit as a \verb+.qc+ file. The \em Open \em dialog is provided in more detail in Section~\ref{sub:NavigationBar}.
 
 \item \includegraphics{Figures/Menu/Diagram.png} \\ \\ 
 The {\bf Diagram} menu option allows one to save the current circuit in the workspace for publication quality circuit diagrams as either png, SVG, or Postscript format. From this menu there are options to \em Show parallel guides \em and \em Show warnings \em, both of which are covered in more detail in Section~\ref{sec:CreatingaCircuit}.
@@ -639,7 +607,7 @@ The {\bf Help} menu provides additional information about the creators of QCView
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Working with .qc Files}\label{sec:QCFiles}
 
-When you create a circuit in QCViewer, a corresponding .qc file is generated when the circuit is saved. This file serves as a textual representation of what the circuit consists of. 
+When you create a circuit in QCViewer, a corresponding \verb+.qc+ file is generated when the circuit is saved. This file serves as a textual representation of what the circuit consists of. 
 
 \subsection{The Basics of .qc Files}\label{sec:BasicsOfQCFiles}
 
@@ -650,7 +618,7 @@ As an example, given our EPR circuit used in the previous sections:
 EPR circuit generated from QCViewer.
 \end{center}
 
-The output of the .qc file associated with this circuit is shown in listing \ref{qc:epr}.
+The output of the \verb+.qc+ file associated with this circuit is shown in listing \ref{qc:epr}.
 
 \begin{program}
 \caption{.qc file generated for epr circuit}
@@ -671,18 +639,26 @@ END
 The header information consists of the following content:
 
 \begin{itemize}
-\item .v: Defines names of the circuit qubits.
-\item .i: Specifies which qubits accept primary inputs.
-\item .o: Reports primary outputs.
-\item .ol: Allows one to alternate names to be specified for the output labels. (Optional parameter).
-\item .c: Specifies the values of input constants. (Optional parameter).
+\item \verb+.v+: Defines names of the circuit qubits.
+\item \verb+.i+: Specifies which qubits accept primary inputs.
+\item \verb+.o+: Reports primary outputs.
+\item \verb+.ol+: Allows one to alternate names to be specified for the output labels. (Optional parameter).
+\item \verb+.c+: Specifies the values of input constants. (Optional parameter).
 \end{itemize}
 
-The primary circuit is represented between BEGIN and END tags. The circuit name is represented as the leftmost string in each line. In the case above, H refers the Hadamard gate and tof refers to the Toffoli gate. The numbers following the names refer to the line of the circuit that the gate resides on. For instance there is a 1 next to the H indicating that the Hadamard gate is on the first line. In the case where there is more than one number as with the Toffoli gate, the rightmost number refers to the line of the circuit that the gate is on, and the rest of the numbers refer to the lines of the circuit that any controls are on.
+The primary circuit is represented between \verb+BEGIN+ and \verb+END+ tags. The circuit name is represented 
+as the leftmost string in each line. In the case above, \verb+H+ refers the Hadamard gate and \verb+tof+ refers to the 
+Toffoli gate. The numbers following the names refer to the line of the circuit that the gate resides on. 
+For instance there is a \verb+1+ next to the \verb+H+ indicating that the Hadamard gate is on the first line. In the 
+case where there is more than one number as with the Toffoli gate, the rightmost number refers to the line of 
+the circuit that the gate is on, and the rest of the numbers refer to the lines of the circuit that any 
+controls are on.
 
 \subsection{Labeling Circuits}\label{sec:LabelingCircuits}
 
-One may wish to provide labels to the circuit wires and to the collection of gates for succinctness. For example, we may modify the names of the circuit wires and circuit name of the EPR circuit by modifying the respective .qc file as shown in listing \ref{qc:eprl}.
+One may wish to provide labels to the circuit wires and to the collection of gates for succinctness. 
+For example, we may modify the names of the circuit wires and circuit name of the EPR circuit by 
+modifying the respective \verb+.qc+ file as shown in listing \ref{qc:eprl}.
 
 \begin{program}
 \caption{ .qc file generated for labeled epr circuit}
@@ -704,7 +680,10 @@ END
 \end{verbatim}
 \end{program}
 
-When opening this file in QCViewer, we can see that the wire labels are now a and b opposed to the previous 1 and 2 respectively. We've also provided a name for the circuit (EPR) and refer to this circuit between the main BEGIN and END tags. The respective output from QCViewer is displayed as:
+When opening this file in QCViewer, we can see that the wire labels are now \verb+a+ and \verb+b+ 
+opposed to the previous \verb+1+ and \verb+2+ respectively. We've also provided a name for 
+the circuit (\verb+EPR+) and refer to this circuit between the main \verb+BEGIN+ and \verb+END+ tags. 
+The respective output from QCViewer is displayed as:
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/QCFiles/EPRCircuitLabel} \\
@@ -717,7 +696,7 @@ In the next section, we will consider how sub-circuits behave in QCViewer.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Sub-Circuits}\label{sec:SubCircuits}
 
-It is often convenient to group gates with a specific functionality together as a sub-circuit for the main circuit. In the \em demos \em folder provided with your distribution of QCViewer there exists a number of demo circuits to try and view. The attention of this section will be focused on the \em grover.qc \em file provided in this distribution (See listing \ref{qc:grover}).
+It is often convenient to group gates with a specific functionality together as a sub-circuit for the main circuit. In the \em demos \em folder provided with your distribution of QCViewer there exists a number of demo circuits to try and view. The attention of this section will be focused on the \verb+grover.qc+ file provided in this distribution (See listing \ref{qc:grover}).
 
 \begin{program}
 \caption{ .qc file for the grover circuit}
@@ -726,7 +705,7 @@ It is often convenient to group gates with a specific functionality together as 
 .v a b c d e Workspace
 .i a b c d e Workspace
 .o a b c d e
-.c
+
 BEGIN H5(a b c d e)
 H a
 H b
@@ -738,27 +717,24 @@ END H5
 BEGIN GroverIterate (a b c d e Workspace)
 H Workspace
 T5 a' b' c d e' Workspace
-H Workspace
-
+H Workspace;
 H5 a b c d e
-
 X e
 Z a' b' c' d' e
 X e
-
-H5 a b c d e
+H5 a b c d e;
 END GroverIterate
 
 BEGIN
 H5 a b c d e
-
 GroverIterate^4 a b c d e Workspace 
 END
-
 \end{verbatim}
 \end{program}
 
-This circuit consists of two sub-circuits labeled H5 and GroverIterate. They are called between the primary BEGIN and END tags to display the following output in figure \ref{f:grover}.
+This circuit consists of two sub-circuits labeled \verb+H5+ and \verb+GroverIterate+. 
+They are called between the primary \verb+BEGIN+ and \verb+END+ tags to display the 
+following output in figure \ref{f:grover}.
 
 \begin{figure}
 \capstart
@@ -768,7 +744,7 @@ This circuit consists of two sub-circuits labeled H5 and GroverIterate. They are
 \label{f:grover}
 \end{figure}
 
-You can see that these sub-circuits consist of the labels provided in the .qc file. If we wished to expand one of the subcircuits to view the inner content, we may click on the sub-circuit of choice which brings up the subcircuit menu.
+You can see that these subcircuits consist of the labels provided in the \verb+.qc+ file. If we wished to expand one of the subcircuits to view the inner content, we may click on the sub-circuit of choice which brings up the subcircuit menu.
 
 \begin{center}
 \includegraphics{Figures/SubCircuits/SubCircuitMenu.png} \\
@@ -809,9 +785,9 @@ Similarly, by pressing the \em Unroll \em button afterward, the circuit is colla
 \section{File Specifications}
 
 \subsection{Circuit File}
-Circuit files are used to specify a .qc circuit. They are designed to be very human readable and
+Circuit files are used to specify a \verb+.qc+ circuit. They are designed to be very human readable and
 writeable.  To see a larger example circuit which uses most of the file features discussed in this example
-look at the euclid.qc file in the demos folder.
+look at the \verb+euclid.qc+ file in the demos folder.
 
 Circuit files begin with a specification of qubits. A description of the labels used follows:
 \begin{description}
@@ -830,17 +806,14 @@ This is a list of initial values for lines which are not inputs.
 \end{description}
 
 This is followed by the specification of any subcircuits that will be needed by the primary circuit.
-Subcircuits are specified between the tags:
-\begin{description}
-\item[BEGIN <circuitName> (<lineListing>)] \hfill \\
-\item[END <circuitName>] \hfill \\
-\end{description}
-Here "<circuitName>" is the name of the subcircuit and "<lineListing>" is a space separated list of line names
+Subcircuits are specified between the tags \verb+BEGIN <circuitName> (<lineListing>)+ and
+\verb+END <circuitName>+. Here \verb+<circuitName>+ is the name of the subcircuit 
+and \verb+<lineListing>+ is a space separated list of line names
 used in the subcircuit. For a simple example of this see the EPR subcircuit in listing \ref{qc:eprl}.
 
-In between circuit tags is the gate listing.  Each line is formatted "<gateName> <lineListing>".
+In between circuit tags is the gate listing.  Each line is formatted \verb+<gateName> <lineListing>+.
 By default the last line listed is the target.  For subcircuits the targets and controls must be explicitly 
-separated uses a colon (see the subtractor in inside the "iter" subcircuit in euclid.qc for an example).
+separated uses a colon (see the subtractor in inside the \verb+iter+ subcircuit in \verb+euclid.qc+ for an example).
 Blank lines add breaks in the layout (i.e. gates after a blank line will not stack with gates before one).
 
 \subsection{Gate Library}
@@ -868,7 +841,7 @@ The full name of the gate.  Currently this tag does not do anything.
 The name to be used while drawing.  This can be any unicode character 
 and can include sub/super-script tags (<sub>/<super>).
 \item[SYMBOL] \hfill \\
-This gives the name that the gate is referenced by in the .qc file.  It is also used as the drawname if one is not
+This gives the name that the gate is referenced by in the \verb+.qc+ file.  It is also used as the drawname if one is not
 specified.
 \end{description}
 Below the tags the gate matrix is specified.  This matrix is used to simulate the gate.  Columns are separated by commas
