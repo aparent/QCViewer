@@ -382,7 +382,7 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
 {
     uint32_t minw, maxw;
     stringstream ss;
-    ss << g->getName();
+    ss << g->getDrawName();
     if (g->getLoopCount() > 1) {
         ss << " x" << g->getLoopCount();
     }
@@ -551,12 +551,11 @@ CircuitImage::TextExt CircuitImage::getExtents(std::string str) const
     switch (renderer) {
     case CAIRO:
     default:
-        cairo_text_extents_t extents;
-        cairo_text_extents(cr, str.c_str(), &extents);
-        ext.h = extents.height;
-        ext.w = extents.width;
-        ext.y = extents.y_bearing;
-        ext.x = extents.x_bearing;
+        ext.h = 0;
+        ext.w = 0;
+        ext.y = 0;
+        ext.x = 0;
+        create_text_layout(cr, str, ext.w, ext.h);
         return ext;
     }
 }
@@ -614,7 +613,10 @@ void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r)
 void CircuitImage::cairoText(cairo_t *context,std::shared_ptr<Text> t) const
 {
     cairo_move_to (context, t->x, t->y);
-    cairo_show_text (context, t->text.c_str());
+    double w,h;
+    PangoLayout *layout = create_text_layout(context, t->text, w, h);
+    pango_cairo_show_layout (cr, layout);
+    g_object_unref(layout);
 }
 
 void CircuitImage::cairoCircle(cairo_t *context,std::shared_ptr<Circle> c) const

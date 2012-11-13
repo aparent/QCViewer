@@ -66,6 +66,8 @@ shared_ptr<Gate> RGate::clone() const
 string RGate::getName() const
 {
     string rot_str;
+    const string startTag = "<span font_desc=\"LMMathItalic10 bold 18\">";
+    const string endTag =  "</span>";
     if (frac) {
         if ((numer == 1) && (denom ==1)) {
             rot_str = "π";
@@ -83,6 +85,7 @@ string RGate::getName() const
             rot_str = floatToString(rot) + "π";
         }
     }
+    rot_str = startTag + rot_str + endTag;
     switch (axis) {
     case RGate::X:
         return "RX(" + rot_str + ")";
