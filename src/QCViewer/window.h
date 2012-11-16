@@ -53,7 +53,7 @@ public:
     void load_state (State* s);
 protected:
     void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
-    void setup_gate_button (Gtk::Button*, GateIcon*, std::vector<Gtk::TargetEntry> &);
+    void setup_gate_button (Gtk::Button*, GateIcon*);
 
     // Signal handlers:
     virtual bool on_key_release_event(GdkEventKey* event);

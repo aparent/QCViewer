@@ -3,7 +3,7 @@ import random
 def randCirc(qubits,gates):
   s = ""
   r = ""
-  gateset = ["T","H","X","Y","Z","RZ(0.25)","RZ(0.5)"]
+  gateset = ["T","T*","H","X","Y","Z","RX(1 pi/8)","RY(1 pi/4)","RZ(1 pi/2)"]
   for i in range(qubits):
     s += " "+str(i)
   r += ".v"+s+"\n"
