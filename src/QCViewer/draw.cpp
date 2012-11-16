@@ -25,20 +25,10 @@ Authors: Alex Parent, Jacob Parker
 ---------------------------------------------------------------------*/
 
 
-#include <cairo.h>
-#include <cairo-svg.h>
 #include <cairo-ft.h>
-#include <cairo-ps.h>
 #include <cmath>
-#include <iostream>
-
-#include "QCLib/circuit.h"
-#include "QCLib/subcircuit.h"
 #include "QCLib/draw_constants.h"
 #include "draw.h"
-
-
-#include <ft2build.h>
 
 #ifndef M_PI
 #define M_PI 3.141592
@@ -58,14 +48,7 @@ void init_fonts()
     ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
 }
 
-void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
-{
-    cairo_set_line_width (cr, thickness);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_move_to (cr, x1, y1);
-    cairo_line_to (cr, x2, y2);
-    cairo_stroke (cr);
-}
+
 
 int pickWire (double y)
 {
@@ -76,92 +59,6 @@ int pickWire (double y)
     return wire;
 }
 
-void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
-{
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-    double w,h;
-    PangoLayout *layout = create_text_layout(cr, name, w, h);
-    cairo_rectangle (cr, xc - width/2.0, yc- width/2.0, width, width);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_stroke (cr);
-    double scale = width/(max(w,h)+textPad);
-    cairo_scale(cr,scale,scale);
-    double x = (1.0/scale)*(xc) - (1.0/2.0)*w;
-    double y = (1.0/scale)*(yc)- (1.0/2.0)*h ;
-    cairo_move_to (cr, x, y);
-    pango_cairo_show_layout (cr, layout);
-    g_object_unref(layout);
-}
-
-void drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
-{
-    cairo_set_line_width (cr, thickness);
-    // Draw black border
-    cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_stroke (cr);
-
-    // Draw cross
-    cairo_move_to (cr, xc-radius, yc);
-    cairo_line_to (cr, xc+radius, yc);
-    cairo_stroke (cr);
-    cairo_move_to (cr, xc, yc-radius);
-    cairo_line_to (cr, xc, yc+radius);
-    cairo_stroke (cr);
-}
-
-void drawShowRotation (cairo_t *cr, double xc, double yc, double radius)
-{
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-    cairo_set_line_width (cr, thickness);
-
-    string text = "R";
-    cairo_text_extents_t extents;
-    cairo_text_extents (cr, text.c_str (), &extents);
-    double tw = extents.width + 2.0*textPad;
-    double th = extents.height + 2.0*textPad;
-
-    double textradius = sqrt(tw*tw + th*th)/2.0;
-    double scale = radius/textradius;
-    double x = xc/scale - (extents.width/2.0 + extents.x_bearing);
-    double y = yc/scale - (extents.height/2.0 + extents.y_bearing);
-    cairo_scale (cr, scale, scale);
-
-    cairo_set_source_rgb (cr, 0, 0, 0);
-    cairo_arc (cr, xc/scale, yc/scale, textradius, 0, 2.0*M_PI);
-    cairo_stroke (cr);
-    cairo_move_to (cr, x, y);
-    cairo_show_text (cr, text.c_str ());
-}
-
-gateRect drawX (cairo_t *cr, double xc, double yc, double radius)
-{
-    // Draw cross
-    radius = radius*sqrt(2)/2;
-    cairo_move_to (cr, xc-radius, yc-radius);
-    cairo_line_to (cr, xc+radius, yc+radius);
-    cairo_stroke (cr);
-    cairo_move_to (cr, xc+radius, yc-radius);
-    cairo_line_to (cr, xc-radius, yc+radius);
-    cairo_stroke (cr);
-
-    gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
-    r.height = r.width;
-    return r;
-}
-
-void drawShowFred (cairo_t *cr, double width, double height)
-{
-    double Xrad = min(height/4.3, width/2.0);
-    drawWire (cr, width/2, Xrad, width/2, height-Xrad);
-    drawX (cr, width/2, Xrad, Xrad);
-    drawX (cr, width/2, height-Xrad, Xrad);
-}
 
 int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)
 {
@@ -195,32 +92,3 @@ vector<Selection> pickRects (const vector<gateRect> &rects, const gateRect &s)
     }
     return ans;
 }
-
-cairo_surface_t* make_png_surface (cairo_rectangle_t ext)
-{
-    cairo_surface_t *img_surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
-    return img_surface;
-}
-
-cairo_surface_t* make_svg_surface (string file, cairo_rectangle_t ext)
-{
-    cairo_surface_t *img_surface = cairo_svg_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y); // these measurements should be in points, w/e.
-    return img_surface;
-}
-
-cairo_surface_t* make_ps_surface (string file, cairo_rectangle_t ext)
-{
-    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y);
-    cairo_ps_surface_set_eps (img_surface, true);
-    return img_surface;
-}
-
-void write_to_png (cairo_surface_t* surf, string filename)
-{
-    cairo_status_t status = cairo_surface_write_to_png (surf, filename.c_str());
-    if (status != CAIRO_STATUS_SUCCESS) {
-        cout << "Error saving to png." << endl;
-        return;
-    }
-}
-

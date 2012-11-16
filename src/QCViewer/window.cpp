@@ -492,6 +492,7 @@ void QCViewer::add_loop ()
     c.force_redraw();
 }
 */
+
 void QCViewer::set_loop_iter ()
 {
     shared_ptr<Gate> g = c.getSelectedGate();
@@ -742,6 +743,7 @@ void QCViewer::setup_menu_layout()
     m_PropTable.attach (m_IterLbl,0,1,2,3);
     m_PropTable.attach (m_IterEntry,1,2,2,4);
 
+    //Setup Rotation buttons 
     m_RGateEditFrame.set_label ("Rotation");
     m_RGateEditFrame.add (m_RGateEditTable);
     m_RGateEditTable.resize (3,2);
