@@ -39,7 +39,7 @@ using namespace std;
 Circuit::Circuit()
 {
     allExpanded = false;
-    arch=NULL;
+    arch = NULL;
 }
 
 Circuit::~Circuit ()
@@ -66,7 +66,8 @@ void Circuit::expandAll()
     for(unsigned int i = 0; i<numGates(); i++) {
         shared_ptr<Gate> g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g.get())->expand = allExpanded;
+            shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
+            sub->expand = allExpanded;
         }
     }
     for ( map<string,std::shared_ptr<Circuit>>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {
@@ -288,12 +289,12 @@ void Circuit::arch_set_LNN()
 
 void Circuit::setName(string n_name)
 {
-    this->name = n_name;
+    name = n_name;
 }
 
 string Circuit::getName()
 {
-    return this->name;
+    return name;
 }
 
 bool Circuit::run (State& state)
@@ -307,14 +308,15 @@ bool Circuit::run (State& state)
         shared_ptr<Gate> g = getGate (simState.gate);
         if (g->breakpoint) bp = true;
 
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g.get())->expand ) {
+        if (g->type != Gate::SUBCIRC || !dynamic_pointer_cast<Subcircuit>(g)->expand ) {
             state = ApplyGate (state, getGate (simState.gate));
             simState.gate++;
         }	else {
-            while (((Subcircuit*)g.get())->step(state)) {
+            shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
+            while (sub->step(state)) {
                 cout << "sStep" << endl;
             }
-            if( ((Subcircuit*)g.get())->simState->simulating == false) {
+            if( sub->simState->simulating == false) {
                 simState.gate++;
             } else {
                 return true;
@@ -336,7 +338,8 @@ void Circuit::reset ()
     for ( unsigned int i = 0; i < numGates(); i++ ) {
         shared_ptr<Gate> g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g.get())->reset();
+            shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
+            sub->reset();
         }
     }
 }
@@ -346,11 +349,12 @@ bool Circuit::step (State& state)
     simState.simulating = true;
     if (simState.gate < numGates () ) {
         shared_ptr<Gate> g = getGate(simState.gate);
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g.get())->expand ) {
+        if (g->type != Gate::SUBCIRC || !dynamic_pointer_cast<Subcircuit>(g)->expand ) {
             state = ApplyGate(state,g);
             simState.gate++;
         } else {
-            if (! ((Subcircuit*)g.get())->step(state) && !((Subcircuit*)g.get())->simState->simulating) {
+            shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
+            if (!sub->step(state) && !sub->simState->simulating) {
                 simState.gate++;
                 step(state);
             }
@@ -362,7 +366,7 @@ bool Circuit::step (State& state)
 
 unsigned int Circuit::findcolumn (unsigned int gate) const
 {
-    unsigned int i;
-    for (i = 0; i < columns.size () && gate > columns.at(i); i++);
+    unsigned int i = 0;
+    for (; i < columns.size () && gate > columns.at(i); i++);
     return i - 1;
 }

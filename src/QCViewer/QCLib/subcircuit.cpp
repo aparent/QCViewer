@@ -134,11 +134,11 @@ bool Subcircuit::step (State& state)
     if (simState->gate < numGates () ) {
         shared_ptr<Gate> g = getGate(simState->gate);
         if (g->breakpoint) bp = true;
-        if (g->type != Gate::SUBCIRC || !((Subcircuit*)g.get())->expand ) {
+        if (g->type != Gate::SUBCIRC || !dynamic_pointer_cast<Subcircuit>(g)->expand ) {
             state = ApplyGate(state,g);
             simState->gate++;
         } else {
-            if ( ! ((Subcircuit*)g.get())->step(state)) {
+            if ( !dynamic_pointer_cast<Subcircuit>(g)->step(state)) {
                 simState->gate++;
                 step(state);
             }
@@ -147,7 +147,7 @@ bool Subcircuit::step (State& state)
             cout << "SBREAK" << endl;
             return false;
         }
-        if (g->type == Gate::SUBCIRC && ((Subcircuit*)g.get())->simState->simulating) {
+        if (g->type == Gate::SUBCIRC && dynamic_pointer_cast<Subcircuit>(g)->simState->simulating) {
             return false;
         }
         return true;
@@ -172,7 +172,7 @@ void Subcircuit::reset ()
     for ( unsigned int i = 0; i < numGates(); i++ ) {
         shared_ptr<Gate> g = getGate(i);
         if (g->type == Gate::SUBCIRC) {
-            ((Subcircuit*)g.get())->reset();
+            dynamic_pointer_cast<Subcircuit>(g)->reset();
         }
     }
 }
