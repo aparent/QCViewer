@@ -149,6 +149,7 @@ bool check_dup(name_node *names)
 //! Assigns the gate as a UGATE unless it is one of the special types
 shared_ptr<Gate> setup_gate_type(string gateName)
 {
+    cout << gateName << endl;
     if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 &&
             isdigit(gateName[1])) ||
             (sToUpper(gateName).compare("TOF") == 0)||
@@ -164,6 +165,11 @@ shared_ptr<Gate> setup_gate_type(string gateName)
         shared_ptr<Gate> newGate;
         newGate = shared_ptr<Gate>(new UGate("F"));
         newGate->drawType = Gate::FRED;
+        return newGate;
+    } else if (sToUpper(gateName).compare("MEASURE")==0) {
+        shared_ptr<Gate> newGate;
+        newGate = shared_ptr<Gate>(new UGate("MEASURE"));
+        newGate->drawType = Gate::MEASURE;
         return newGate;
     } else {
         gateName = sToUpper(gateName);

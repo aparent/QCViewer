@@ -254,6 +254,9 @@ void CircuitImage::drawUGate(shared_ptr<Gate> g ,double &xcurr,double &maxX, vec
     case Gate::FRED:
         r = drawFred (g,xcurr);
         break;
+    case Gate::MEASURE:
+        r = drawMeasure (g,xcurr);
+        break;
     case Gate::DEFAULT:
     default:
         r = drawCU (g,xcurr);
@@ -314,6 +317,21 @@ gateRect CircuitImage::drawControls (shared_ptr<Gate> g, uint32_t xc)
     rect.width = 2*dotradius;
     rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
     return rect;
+}
+
+gateRect CircuitImage::drawMeasure (shared_ptr<Gate> g,uint32_t xc)
+{
+    double yc = wireToY(g->targets.at(0));
+    addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
+    addLine (xc-radius, yc, xc+radius, yc+radius, L_COLOUR);
+    addLine (xc-radius, yc, xc+radius, yc-radius, L_COLOUR);
+    addLine (xc+radius, yc-radius, xc+radius, yc+radius, L_COLOUR);
+    gateRect r;
+    r.x0 = xc-radius-thickness;
+    r.y0 = yc-radius-thickness;
+    r.width = 2*(radius+thickness);
+    r.height = r.width;
+    return r;
 }
 
 gateRect CircuitImage::drawFred (shared_ptr<Gate> g, uint32_t xc)

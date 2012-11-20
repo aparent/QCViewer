@@ -47,3 +47,10 @@ DRAWNAME "S<sup>†</sup>"
 SYMBOL P*
 1 , 0
 0 , -i
+
+NAME Measure
+SYMBOL MEASURE
+1 , 0
+0 , 1
+
+

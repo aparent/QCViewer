@@ -146,8 +146,8 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     const int width = allocation.get_width();
     const int height = allocation.get_height();
     // translate mouse click coords into circuit diagram coords
-    double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
-    double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
+    double xx = (x - width/2.0 + ext.width/2.0)/scale + cx;
+    double yy = (y - height/2.0 + ext.height/2.0)/scale + cy;
     vector<int> select_ids;
     string name;
     int pos = -1;
@@ -155,8 +155,12 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
     if (name.compare("Main")==0||pos==-1||name.compare("")==0) {  //If the click is not in a subcircuit
         vector<unsigned int> para =  circuit->getGreedyParallel();
         unsigned int wire = getFirstWire (yy);
-        if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) wire = circuit->numLines () - newgate->targets.size ();
-        for (unsigned int i = 0; i < newgate->targets.size(); i++) newgate->targets[i] += wire;
+        if (wire + newgate->targets.size () - 1 >= circuit->numLines ()) {
+            wire = circuit->numLines () - newgate->targets.size ();
+        }
+        for (unsigned int i = 0; i < newgate->targets.size(); i++) {
+            newgate->targets[i] += wire;
+        }
         if (columns.empty()||pos==-1) {
             insert_gate_at_front (newgate);
         } else if (pos >= (int)para.size()) {
@@ -175,8 +179,9 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 
 bool CircuitWidget::on_button_press_event (GdkEventButton* event)
 {
-    if (!circuit) return true;
-    if (event->button == 1) {
+    if (!circuit) {
+        return true;
+    } else if (event->button == 1) {
         panning = true;
         oldmousex = event->x;
         oldmousey = event->y;
@@ -184,21 +189,26 @@ bool CircuitWidget::on_button_press_event (GdkEventButton* event)
         select_rect.y0 = event->y;
         select_rect.width = 0;
         select_rect.height = 0;
+        return true;
+    } else {
+        return true;
     }
-    return true;
 }
 
 bool CircuitWidget::onMotionEvent (GdkEventMotion* event)
 {
-    if (!circuit) return true;
-    if (panning) {
+    if (!circuit) {
+        return true;
+    } else if (panning) {
         cx -= (event->x - oldmousex)/scale;
         cy -= (event->y - oldmousey)/scale;
         oldmousex = event->x;
         oldmousey = event->y;
         force_redraw ();
+        return true;
+    } else {
+        return true;
     }
-    return true;
 }
 
 void CircuitWidget::check_circuit_size()
@@ -266,7 +276,9 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
             // if null, add it as a positive control
             // if ctrl is positive, add as negative
             // if ctrl is negative. remove.
-            if (rects[selections[0].gate].x0 > x || rects[selections[0].gate].x0+rects[selections[0].gate].width < x) return true;
+            if (rects[selections[0].gate].x0 > x || rects[selections[0].gate].x0+rects[selections[0].gate].width < x) {
+                return true;
+            }
             wireid = pickWire (y);
             if ((unsigned int)wireid >= circuit->numLines()) wireid = -1;
             if (wireid == -1) return true;
