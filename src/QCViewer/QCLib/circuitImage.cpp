@@ -301,12 +301,7 @@ gateRect CircuitImage::drawControls (shared_ptr<Gate> g, uint32_t xc)
     minmaxWire (vector<Control>(), g->targets, mintw, maxtw);
     minmaxWire (g->controls,g->targets, minw, maxw);
     if (!g->controls.empty()) {
-        if (maxcw > maxtw) {
-            addLine (xc, wireToY (maxcw), xc, wireToY (maxtw)+radius, L_COLOUR);
-        }
-        if (mincw < mintw) {
-            addLine (xc, wireToY (mincw), xc, wireToY (mintw)-radius, L_COLOUR);
-        }
+        addLine (xc, wireToY (maxw), xc, wireToY (minw), L_COLOUR);
     }
     for (uint32_t i = 0; i < g->controls.size(); i++) {
         drawDot (xc, wireToY(g->controls.at(i).wire), dotradius, g->controls.at(i).polarity);
@@ -345,9 +340,7 @@ gateRect CircuitImage::drawFred (shared_ptr<Gate> g, uint32_t xc)
         minw = min (minw, g->targets.at(i));
         maxw = max (maxw, g->targets.at(i));
     }
-    if (!g->controls.empty()) {
-        addLine(xc, wireToY (minw)-radius, xc, wireToY (maxw), L_COLOUR);
-    } else {
+    if (g->controls.empty()) {
         addLine (xc, wireToY (minw), xc, wireToY (maxw), L_COLOUR);
     }
     return rect;

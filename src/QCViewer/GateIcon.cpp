@@ -90,6 +90,16 @@ void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
     g_object_unref(layout);
 }
 
+void drawShowMeasure (cairo_t *cr, double xc, double yc, double width, string name)
+{
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_move_to (cr, xc-width/2, yc);
+    cairo_line_to (cr, xc+width/2, yc+width/2);
+    cairo_line_to (cr, xc+width/2, yc-width/2);
+    cairo_line_to (cr, xc-width/2, yc);
+    cairo_stroke (cr);
+}
+
 void drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
 {
     cairo_set_line_width (cr, thickness);
@@ -166,6 +176,9 @@ bool GateIcon::on_expose_event(GdkEventExpose* event)
             break;
         case SWAP:
             drawShowFred (cr->cobj(), width/scale, height/scale);
+            break;
+        case MEASURE:
+            drawShowMeasure (cr->cobj (), xc, yc, min(width, height), dname);
             break;
         case DEFAULT:
             drawShowU (cr->cobj (), xc, yc, min(width, height), dname);

@@ -149,7 +149,6 @@ bool check_dup(name_node *names)
 //! Assigns the gate as a UGATE unless it is one of the special types
 shared_ptr<Gate> setup_gate_type(string gateName)
 {
-    cout << gateName << endl;
     if ((sToUpper(gateName)[0] == 'T' && gateName.size()>1 &&
             isdigit(gateName[1])) ||
             (sToUpper(gateName).compare("TOF") == 0)||
@@ -168,7 +167,7 @@ shared_ptr<Gate> setup_gate_type(string gateName)
         return newGate;
     } else if (sToUpper(gateName).compare("MEASURE")==0) {
         shared_ptr<Gate> newGate;
-        newGate = shared_ptr<Gate>(new UGate("MEASURE"));
+        newGate = shared_ptr<Gate>(new UGate("MEASURE",""));
         newGate->drawType = Gate::MEASURE;
         return newGate;
     } else {
@@ -363,7 +362,11 @@ void remove_bad_gates(std::shared_ptr<Circuit> c, vector<string>& error_log )
     for (unsigned int i = 0; i < c->numGates(); i++) {
         shared_ptr<Gate> g = c->getGate(i);
         string name = g->getName();
-        if (g->type!=Gate::RGATE && g->type!=Gate::SUBCIRC && name.compare("tof")!=0 && UGateLookup(name).dim == 0 ) {
+        if (g->type!=Gate::RGATE &&
+                g->type!=Gate::SUBCIRC &&
+                g->drawType!=Gate::MEASURE &&
+                name.compare("tof")!=0 &&
+                UGateLookup(name).dim == 0 ) {
             error_log.push_back("Gate: " + name + " is unrecognized. Excluding.");
             c->removeGate (i);
             i--;

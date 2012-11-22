@@ -774,6 +774,7 @@ void QCViewer::setup_gate_icons()
     gate_icons.push_back(new GateIcon(GateIcon::R));
     gate_icons.push_back(new GateIcon(GateIcon::NOT));
     gate_icons.push_back(new GateIcon(GateIcon::SWAP));
+    gate_icons.push_back(new GateIcon(GateIcon::MEASURE));
 
     vector<string> names = UGateNames();
     vector<string> dnames = UGateDNames();

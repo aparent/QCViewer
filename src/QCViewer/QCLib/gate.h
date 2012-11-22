@@ -95,6 +95,7 @@ class UGate : public Gate
 {
 public:
     UGate(std::string);
+    UGate(std::string,std::string);
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     State applyToBasis(index_t) const;

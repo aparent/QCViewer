@@ -32,7 +32,7 @@ Authors: Alex Parent, Jacob Parker
 class GateIcon : public Gtk::DrawingArea
 {
 public:
-    enum GateType { NOT, R, SWAP, DEFAULT };
+    enum GateType { NOT, R, SWAP, MEASURE, DEFAULT };
     GateIcon ();
     GateIcon (std::string,std::string);
     GateIcon (GateType);
