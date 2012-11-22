@@ -29,8 +29,10 @@ Authors: Alex Parent
 #include <QCLib/circuitImage.h>
 #include <cairo-ft.h>
 #include <QCLib/gates/UGateLookup.h>
+#include <string>
 
 using namespace std;
+
 int main (int argc, char *argv[])
 {
     std::shared_ptr<Circuit> c;

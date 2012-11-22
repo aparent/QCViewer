@@ -2,12 +2,14 @@
 #include <assert.h>
 #include <cairo-svg.h>
 #include <cairo-ps.h>
-
+#include "text.h"
 #include "circuitImage.h"
 
 #define L_COLOUR Colour(0,0,0,1) //XXX put somewhere better
 
 using namespace std;
+
+TextEngine textEngine;
 
 
 void CircuitImage::renderCairo(cairo_t* c)
@@ -60,14 +62,14 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     double xinit = 0.0;
     for (uint32_t i = 0; i < c.numLines(); i++) {
         string label = c.getLine(i).getInputLabel();
-        TextExt extents = getExtents(label);
+        TextObject* text = textEngine.renderText(label);
         double x = 0, y = 0;
         if (forreal) {
-            x = wirestart - extents.w;
-            y = wireToY(i) - (extents.h/2 + extents.y);
+            x = wirestart - text->getWidth();
+            y = wireToY(i) - (text->getHeight()/2.0 + text->getY());
         }
         addText(label,x,y);
-        xinit = max (xinit, extents.w);
+        xinit = max (xinit, text->getWidth());
     }
     if (!forreal) wirestart = xinit;
     // gates
@@ -110,10 +112,10 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     // output labels
     for (uint32_t i = 0; i < c.numLines (); i++) {
         string label = c.getLine(i).getOutputLabel();
-        TextExt extents = getExtents(label);
+        TextObject* text = textEngine.renderText(label);
 
         double x = wireend + xoffset;
-        double y = wireToY(i) - (extents.h/2+extents.y);
+        double y = wireToY(i) - (text->getHeight()/2.0+text->getY());
         addText(label,x,y);
     }
     return rects;
@@ -406,8 +408,8 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
     double height = dw*(maxw-minw+Upad);
 
     // get width of this box
-    TextExt extents = getExtents(ss.str());
-    double width = extents.w+2*textPad;
+    TextObject* text = textEngine.renderText(ss.str());
+    double width = text->getWidth()+2*textPad;
     if (width < dw*Upad) {
         width = dw*Upad;
     }
@@ -418,8 +420,8 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
     Colour outline = Colour (0,0,0,1); //black outline
     addRect(xc-radius, yc-height/2, width, height,fill,outline);
 
-    double x = (xc - radius + width/2) - extents.w/2 - extents.x;
-    double y = yc - extents.h/2 - extents.y;
+    double x = (xc - radius + width/2.0) - text->getWidth()/2.0 - text->getX();
+    double y = yc - text->getHeight()/2 - text->getY();
     addText(ss.str(),x,y);
     gateRect r;
     r.x0 = xc - thickness-radius;
@@ -505,14 +507,14 @@ void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, gateRect &r)
             ss << " " << s->simState->loop << "/" << s->getLoopCount();
         }
     }
-    TextExt extents = getExtents(ss.str());
+    TextObject* text = textEngine.renderText(ss.str());
     double x = r.x0;
-    double y = r.y0 - (extents.h + extents.y) - 5.0;
+    double y = r.y0 - (text->getHeight() + text->getY()) - 5.0;
     addText(ss.str(),x,y);
-    r.height+=extents.h+10;
-    r.y0-=extents.h+10;
-    if (r.width < extents.w+4) {
-        r.width = extents.w+4;
+    r.height += text->getHeight() + 10.0;
+    r.y0 -= text->getHeight() + 10.0;
+    if (r.width < text->getWidth() + 4.0) {
+        r.width = text->getWidth() + 4.0;
     }
     r = combine_gateRect(rect,r);
 }
@@ -554,21 +556,6 @@ void CircuitImage::addCircle (double r, double x, double y, Colour f, Colour l)
 {
     shared_ptr<DrawPrim> p = shared_ptr<DrawPrim>(new Circle(r,x,y,f,l));
     drawPrims.push_back(p);
-}
-
-CircuitImage::TextExt CircuitImage::getExtents(std::string str) const
-{
-    TextExt ext;
-    switch (renderer) {
-    case CAIRO:
-    default:
-        ext.h = 0;
-        ext.w = 0;
-        ext.y = 0;
-        ext.x = 0;
-        create_text_layout(cr, str, ext.w, ext.h);
-        return ext;
-    }
 }
 
 void CircuitImage::cairoRender (cairo_t *context) const
@@ -621,13 +608,9 @@ void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r)
     }
 }
 
-void CircuitImage::cairoText(cairo_t *context,std::shared_ptr<Text> t) const
+void CircuitImage::cairoText(cairo_t* context, std::shared_ptr<Text> t) const
 {
-    cairo_move_to (context, t->x, t->y);
-    double w,h;
-    PangoLayout *layout = create_text_layout(context, t->text, w, h);
-    pango_cairo_show_layout (cr, layout);
-    g_object_unref(layout);
+    textEngine.renderText(t->text)->draw(context, t->x, t->y);
 }
 
 void CircuitImage::cairoCircle(cairo_t *context,std::shared_ptr<Circle> c) const

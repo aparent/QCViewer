@@ -30,17 +30,20 @@ Authors: Alex Parent, Jacob Parker
 #include <iostream>
 #include <cstdlib> 
 
+QCViewer* window;
+
 int main (int argc, char *argv[])
 {
     srand((unsigned)time(NULL));
+    g_type_init();
     Gtk::Main kit(argc, argv);
     init_fonts();
     UGateSetup();
-    QCViewer window;
-    window.set_default_size (800,600);
+    window = new QCViewer;
+    window->set_default_size (800,600);
     std::cerr << "Running window\n";
 
-    Gtk::Main::run(window);
+    Gtk::Main::run(*window);
 
 
     return EXIT_SUCCESS;

@@ -8,3 +8,5 @@ cmake_install.cmake
 .nfs*
 *.orig
 *.pyc
+cscope.out
+tags
