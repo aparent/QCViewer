@@ -61,6 +61,8 @@ protected:
     void set_loop_label ();
     void set_loop_iter ();
 
+    void on_menu_textmode_regular();
+    void on_menu_textmode_latex();
     void on_menu_file_open_circuit ();
     void on_menu_file_open_arch ();
     void on_menu_mode_edit ();

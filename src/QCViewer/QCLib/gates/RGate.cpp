@@ -29,6 +29,7 @@ Authors: Alex Parent, Jacob Parker
 #include <cmath>
 #include <complex>
 #include "QCLib/draw_constants.h"
+#include "QCLib/text.h"
 
 using namespace std;
 
@@ -63,9 +64,55 @@ shared_ptr<Gate> RGate::clone() const
     return shared_ptr<Gate>(g);
 }
 
+extern TextEngine textEngine;
 string RGate::getName() const
 {
     string rot_str;
+    std::string pi_str;
+    if(textEngine.getMode() == TEXT_LATEX) {
+      pi_str = "\\pi";
+    } else {
+      pi_str = "π";
+    }
+
+    if(frac) {
+        if((numer == 1) && (denom ==1)) {
+            rot_str = pi_str;
+        } else if (numer == 1) {
+            if(textEngine.getMode() == TEXT_LATEX) {
+                rot_str = "\\frac{" + pi_str + "}{" + intToString(denom) + "}";
+            } else {
+                rot_str = pi_str + "/" + intToString(denom);
+            }
+        } else if (denom == 1) {
+            rot_str = intToString(numer) + pi_str;
+        } else {
+            if(textEngine.getMode() == TEXT_LATEX) {
+                rot_str = "\\frac{" + intToString(numer) + pi_str + "}{" + intToString(denom) + "}";
+            } else {
+                rot_str = intToString(numer) + pi_str + "/" + intToString(denom);
+            }
+        }
+    } else {
+        if (rot == 1.0) {
+            rot_str = pi_str;
+        } else {
+            rot_str = floatToString(rot) + pi_str;
+        }
+    }
+
+
+    if(textEngine.getMode() == TEXT_LATEX) {
+        std::string str = "R_";
+        switch(axis) {
+            case RGate::X: str += "x"; break;
+            case RGate::Y: str += "y"; break;
+            case RGate::Z: str += "z"; break;
+        }
+        str += "\\left(" + rot_str + "\\right)";
+        return str;
+    }
+
     const string startTag = "<span font_desc=\"LMMathItalic10 bold 18\">";
     const string endTag =  "</span>";
     if (frac) {
@@ -87,14 +134,10 @@ string RGate::getName() const
     }
     rot_str = startTag + rot_str + endTag;
     switch (axis) {
-    case RGate::X:
-        return "RX(" + rot_str + ")";
-    case RGate::Y:
-        return "RY(" + rot_str + ")";
-    case RGate::Z:
-        return "RZ(" + rot_str + ")";
-    default:
-        return "R";
+        case RGate::X: return "RX(" + rot_str + ")";
+        case RGate::Y: return "RY(" + rot_str + ")";
+        case RGate::Z: return "RZ(" + rot_str + ")";
+        default: return "R";
     }
 }
 

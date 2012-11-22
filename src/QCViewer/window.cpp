@@ -36,6 +36,7 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/dirac.h"
 #include "QCLib/utility.h"
 #include "QCLib/subcircuit.h"
+#include "QCLib/text.h"
 
 using namespace std;
 void QCViewer::setup_gate_button (Gtk::Button* btn, GateIcon *g)
@@ -159,6 +160,16 @@ void QCViewer::set_rval ()
         rg->set_rotVal (nr);
         c.force_redraw ();
     }
+}
+
+extern TextEngine textEngine;
+void QCViewer::on_menu_textmode_regular() {
+  textEngine.setMode(TEXT_PANGO);
+  c.force_redraw();
+}
+void QCViewer::on_menu_textmode_latex() {
+  textEngine.setMode(TEXT_LATEX);
+  c.force_redraw();
 }
 
 void QCViewer::on_menu_about ()
@@ -622,6 +633,13 @@ void QCViewer::setup_menu_actions()
     m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
 
+    m_refActionGroup->add(Gtk::Action::create("TextMode", "Text Mode"));
+    m_refActionGroup->add(Gtk::Action::create("TextModeRegular", "Regular"),
+                          sigc::mem_fun(*this, &QCViewer::on_menu_textmode_regular));
+    m_refActionGroup->add(Gtk::Action::create("TextModeLaTeX", "LaTeX"),
+                          sigc::mem_fun(*this, &QCViewer::on_menu_textmode_latex));
+
+
     m_refActionGroup->add(Gtk::Action::create("Help", "Help"));
     m_refActionGroup->add(Gtk::Action::create ("About", "About"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_about));
@@ -651,6 +669,10 @@ void QCViewer::setup_menu_layout()
         "        <menuitem action='DiagramSaveSvg'/>"
         "        <menuitem action='DiagramSavePs'/>"
         "        <separator/>"
+        "      </menu>"
+        "      <menu action='TextMode'>"
+        "        <menuitem action='TextModeRegular'/>"
+        "        <menuitem action='TextModeLaTeX'/>"
         "      </menu>"
         "      <menuitem action='DiagramParallel'/>"
         "      <menuitem action='DiagramArch'/>"

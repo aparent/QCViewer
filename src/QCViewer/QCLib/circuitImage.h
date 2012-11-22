@@ -118,12 +118,6 @@ private:
         Colour outline;
     };
 
-    class TextExt
-    {
-    public:
-        double x,y,h,w;
-    };
-
     cairo_t* cr;
 
     std::list<std::shared_ptr<DrawPrim>> drawPrims;
@@ -139,8 +133,6 @@ private:
     void cairoRectangle(cairo_t*,std::shared_ptr<Rectangle>) const;
     void cairoText(cairo_t*,std::shared_ptr<Text>) const;
     void cairoCircle(cairo_t*,std::shared_ptr<Circle>) const;
-
-    TextExt getExtents(std::string) const;
 
     void drawbase (Circuit&, double, double, double, double);
     void drawArchitectureWarnings (const std::vector<gateRect>&, const std::vector<int>&);
