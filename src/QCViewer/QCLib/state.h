@@ -49,6 +49,8 @@ public:
     const State& operator-= (const State &r);
     const State& operator*= (const std::complex<float_type>);
     void normalize();
+    //! Simulates a measurment of a specified bit in the computational basis
+    void measure(int bit);
     unsigned int numBits() const;
 
     index_t dim;

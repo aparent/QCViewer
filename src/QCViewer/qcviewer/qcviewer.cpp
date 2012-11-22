@@ -28,10 +28,11 @@ Authors: Alex Parent, Jacob Parker
 #include "window.h"
 #include "QCLib/gates/UGateLookup.h"
 #include <iostream>
+#include <cstdlib> 
 
 int main (int argc, char *argv[])
 {
-
+    srand((unsigned)time(NULL));
     Gtk::Main kit(argc, argv);
     init_fonts();
     UGateSetup();

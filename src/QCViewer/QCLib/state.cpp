@@ -27,6 +27,8 @@ Authors: Alex Parent, Jacob Parker
 #include "state.h"
 #include "utility.h" // ipow floorLog2
 #include <iostream>
+#include <ctime> //for seed values
+#include <cstdlib>
 #include <limits>
 using namespace std;
 
@@ -128,6 +130,29 @@ void State::normalize()
     for (it = data.begin(); it != data.end(); ++it) {
         data[it->first] = (it->second) / complex<float_type>(norm,0);
     }
+}
+
+void State::measure(int bit)
+{
+    double prob1 = 0;
+    StateMap::const_iterator it;
+    for (it = data.begin(); it != data.end(); ++it) {
+        if (GetRegister (it->first, bit))
+            prob1 += norm(it->second);
+    }
+    double ran = ((double)rand()/(double)RAND_MAX);
+    if (ran > prob1) {
+        for (it = data.begin(); it != data.end(); ++it) {
+            if (GetRegister(it->first, bit))
+                data.erase(it->first);
+        }
+    } else {
+        for (it = data.begin(); it != data.end(); ++it) {
+            if (!GetRegister(it->first, bit))
+                data.erase(it->first);
+        }
+    }
+    normalize();
 }
 
 void State::print()

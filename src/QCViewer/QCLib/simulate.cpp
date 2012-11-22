@@ -27,6 +27,7 @@ Authors: Alex Parent, Jacob Parker
 #include "circuit.h"
 #include "simulate.h"
 #include <cmath>
+#include <assert.h>
 #include <iostream>
 #include <string>
 #include "utility.h"
@@ -50,6 +51,11 @@ gateMatrix getGateMatrix(Gate*);//defined below
 State ApplyGate (const State &in, const std::shared_ptr<Gate> g)
 {
     State s = in;
+    if (g->drawType == Gate::MEASURE) {
+        assert(g->targets.size() > 0); //Gate has a target
+        s.measure(g->targets.at(0));
+        return s;
+    }
     for (unsigned int i = 0; i <  g->getLoopCount();  i++) {
         State out = State(s.dim);
         for (StateMap::const_iterator it = s.data.begin(); it != s.data.end(); ++it) {
