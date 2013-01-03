@@ -41,6 +41,9 @@ Authors: Alex Parent, Jacob Parker
 #include "draw_constants.h"
 #include "draw_common.h"
 
+
+#include <iostream>
+
 class CircuitImage
 {
 public:
@@ -65,7 +68,7 @@ private:
     class DrawPrim
     {
     public:
-        enum PrimType {LINE, RECTANGLE, TEXT, CIRCLE};
+        enum PrimType {LINE, RECTANGLE, TEXT, CIRCLE, TRIANGLE};
         PrimType type;
     };
 
@@ -77,6 +80,17 @@ private:
             type = LINE;
         }
         double x1,x2,y1,y2;
+        Colour colour;
+    };
+
+    class Triangle : public DrawPrim
+    {
+    public:
+        Triangle(double nx0,double ny0,double nx1,double ny1,double nx2,double ny2, Colour c)
+            : x0(nx0), x1(nx1), x2(nx2),y0(ny0), y1(ny1), y2(ny2), colour(c) {
+            type = TRIANGLE;
+        }
+        double x0,x1,x2,y0,y1,y2;
         Colour colour;
     };
 
@@ -127,12 +141,14 @@ private:
     void addRect (double x1,double y1,double x2, double y2, Colour f, Colour o, bool dashed = false);
     void addText (std::string t, double x,double y);
     void addCircle (double r0, double x0, double y0, Colour f, Colour l);
+    void addTriangle (double x0,double y0,double x1, double y1,double x2, double y2, Colour c);
     //RENDERS
     void cairoRender(cairo_t*) const;
     void cairoLine(cairo_t*,std::shared_ptr<Line>) const;
     void cairoRectangle(cairo_t*,std::shared_ptr<Rectangle>) const;
     void cairoText(cairo_t*,std::shared_ptr<Text>) const;
     void cairoCircle(cairo_t*,std::shared_ptr<Circle>) const;
+    void cairoTriangle(cairo_t *context,std::shared_ptr<Triangle> t) const;
 
     void drawbase (Circuit&, double, double, double, double);
     void drawArchitectureWarnings (const std::vector<gateRect>&, const std::vector<int>&);
@@ -155,6 +171,8 @@ private:
     void drawSubCircBox(std::shared_ptr<Subcircuit> s, gateRect &r);
     void drawDot (double xc, double yc, double radius, bool negative);
     gateRect drawMeasure (std::shared_ptr<Gate> g,uint32_t xc);
+    gateRect drawSelectZero (std::shared_ptr<Gate> g,uint32_t xc);
+    gateRect drawSelectOne (std::shared_ptr<Gate> g,uint32_t xc);
 
     void write_to_png (cairo_surface_t*, std::string) const;
     cairo_surface_t* make_ps_surface (std::string, cairo_rectangle_t) const;

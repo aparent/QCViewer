@@ -170,6 +170,16 @@ shared_ptr<Gate> setup_gate_type(string gateName)
         newGate = shared_ptr<Gate>(new UGate("MEASURE",""));
         newGate->drawType = Gate::MEASURE;
         return newGate;
+    } else if (sToUpper(gateName).compare("SELECTZERO")==0) {
+        shared_ptr<Gate> newGate;
+        newGate = shared_ptr<Gate>(new UGate("SELECTZERO",""));
+        newGate->drawType = Gate::SELECTZERO;
+        return newGate;
+    } else if (sToUpper(gateName).compare("SELECTONE")==0) {
+        shared_ptr<Gate> newGate;
+        newGate = shared_ptr<Gate>(new UGate("SELECTONE",""));
+        newGate->drawType = Gate::SELECTONE;
+        return newGate;
     } else {
         gateName = sToUpper(gateName);
         return shared_ptr<Gate>(new UGate(gateName));
@@ -365,6 +375,8 @@ void remove_bad_gates(std::shared_ptr<Circuit> c, vector<string>& error_log )
         if (g->type!=Gate::RGATE &&
                 g->type!=Gate::SUBCIRC &&
                 g->drawType!=Gate::MEASURE &&
+                g->drawType!=Gate::SELECTZERO &&
+                g->drawType!=Gate::SELECTONE &&
                 name.compare("tof")!=0 &&
                 UGateLookup(name).dim == 0 ) {
             error_log.push_back("Gate: " + name + " is unrecognized. Excluding.");

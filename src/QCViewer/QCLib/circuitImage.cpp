@@ -259,6 +259,12 @@ void CircuitImage::drawUGate(shared_ptr<Gate> g ,double &xcurr,double &maxX, vec
     case Gate::MEASURE:
         r = drawMeasure (g,xcurr);
         break;
+    case Gate::SELECTZERO:
+        r = drawSelectZero (g,xcurr);
+        break;
+    case Gate::SELECTONE:
+        r = drawSelectOne (g,xcurr);
+        break;
     case Gate::DEFAULT:
     default:
         r = drawCU (g,xcurr);
@@ -320,9 +326,39 @@ gateRect CircuitImage::drawMeasure (shared_ptr<Gate> g,uint32_t xc)
 {
     double yc = wireToY(g->targets.at(0));
     addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
-    addLine (xc-radius, yc, xc+radius, yc+radius, L_COLOUR);
-    addLine (xc-radius, yc, xc+radius, yc-radius, L_COLOUR);
-    addLine (xc+radius, yc-radius, xc+radius, yc+radius, L_COLOUR);
+    addTriangle (xc-radius, yc,xc+radius, yc-radius,xc+radius, yc+radius,L_COLOUR);
+    gateRect r;
+    r.x0 = xc-radius-thickness;
+    r.y0 = yc-radius-thickness;
+    r.width = 2*(radius+thickness);
+    r.height = r.width;
+    return r;
+}
+
+gateRect CircuitImage::drawSelectZero (shared_ptr<Gate> g,uint32_t xc)
+{
+    double yc = wireToY(g->targets.at(0));
+    addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
+    addTriangle (xc-radius, yc,xc+radius, yc-radius,xc+radius, yc+radius,L_COLOUR);
+    TextObject* text = textEngine.renderText("0");
+    double height = text->getHeight();
+    addText("0",xc,yc-height/2);
+    gateRect r;
+    r.x0 = xc-radius-thickness;
+    r.y0 = yc-radius-thickness;
+    r.width = 2*(radius+thickness);
+    r.height = r.width;
+    return r;
+}
+
+gateRect CircuitImage::drawSelectOne (shared_ptr<Gate> g,uint32_t xc)
+{
+    double yc = wireToY(g->targets.at(0));
+    addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
+    addTriangle (xc-radius, yc,xc+radius, yc-radius,xc+radius, yc+radius,L_COLOUR);
+    TextObject* text = textEngine.renderText("1");
+    double height = text->getHeight();
+    addText("1",xc,yc-height/2);
     gateRect r;
     r.x0 = xc-radius-thickness;
     r.y0 = yc-radius-thickness;
@@ -546,6 +582,12 @@ void CircuitImage::addRect (double x,double y,double w, double h, Colour f, Colo
     drawPrims.push_back(r);
 }
 
+void CircuitImage::addTriangle (double x0,double y0,double x1, double y1,double x2, double y2, Colour c)
+{
+    shared_ptr<DrawPrim> t = shared_ptr<DrawPrim>(new Triangle(x0,y0,x1,y1,x2,y2,c));
+    drawPrims.push_back(t);
+}
+
 void CircuitImage::addText (string t, double x,double y)
 {
     shared_ptr<DrawPrim> p = shared_ptr<DrawPrim>(new Text(t,x,y));
@@ -568,6 +610,9 @@ void CircuitImage::cairoRender (cairo_t *context) const
             break;
         case DrawPrim::RECTANGLE:
             cairoRectangle(context,static_pointer_cast<Rectangle>(*prim));
+            break;
+        case DrawPrim::TRIANGLE:
+            cairoTriangle(context,static_pointer_cast<Triangle>(*prim));
             break;
         case DrawPrim::TEXT:
             cairoText(context,static_pointer_cast<Text>(*prim));
@@ -606,6 +651,18 @@ void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r)
     if (r->dashed) { //turn dashes back off
         cairo_set_dash (cr, dashes, 0, 0.0);
     }
+}
+
+void CircuitImage::cairoTriangle(cairo_t *context,std::shared_ptr<Triangle> t) const
+{
+    Colour c = t->colour;
+    cairo_set_source_rgba (context,c.r,c.g,c.b,c.a);
+    cairo_set_line_width (context, thickness);
+    cairo_move_to (context, t->x0, t->y0);
+    cairo_line_to (context, t->x1, t->y1);
+    cairo_line_to (context, t->x2, t->y2);
+    cairo_line_to (context, t->x0, t->y0);
+    cairo_stroke (context);
 }
 
 void CircuitImage::cairoText(cairo_t* context, std::shared_ptr<Text> t) const

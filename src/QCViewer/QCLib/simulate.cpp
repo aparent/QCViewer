@@ -55,6 +55,14 @@ State ApplyGate (const State &in, const std::shared_ptr<Gate> g)
         assert(g->targets.size() > 0); //Gate has a target
         s.measure(g->targets.at(0));
         return s;
+    } else if (g->drawType == Gate::SELECTZERO) {
+        assert(g->targets.size() > 0); //Gate has a target
+        s.selectZero(g->targets.at(0));
+        return s;
+    } else if (g->drawType == Gate::SELECTONE) {
+        assert(g->targets.size() > 0); //Gate has a target
+        s.selectOne(g->targets.at(0));
+        return s;
     }
     for (unsigned int i = 0; i <  g->getLoopCount();  i++) {
         State out = State(s.dim);

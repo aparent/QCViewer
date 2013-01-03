@@ -155,6 +155,26 @@ void State::measure(int bit)
     normalize();
 }
 
+void State::selectOne(int bit)
+{
+    StateMap::const_iterator it;
+    for (it = data.begin(); it != data.end(); ++it) {
+        if (!GetRegister(it->first, bit))
+            data.erase(it->first);
+    }
+    normalize();
+}
+
+void State::selectZero(int bit)
+{
+    StateMap::const_iterator it;
+    for (it = data.begin(); it != data.end(); ++it) {
+        if (GetRegister(it->first, bit))
+            data.erase(it->first);
+    }
+    normalize();
+}
+
 void State::print()
 {
     map<index_t, complex<float_type> >::const_iterator it;

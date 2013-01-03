@@ -51,6 +51,8 @@ public:
     void normalize();
     //! Simulates a measurment of a specified bit in the computational basis
     void measure(int bit);
+    void selectOne(int bit);
+    void selectZero(int bit);
     unsigned int numBits() const;
 
     index_t dim;

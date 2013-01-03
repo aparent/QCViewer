@@ -56,7 +56,7 @@ class Gate
 {
 public:
     enum gateType {RGATE, UGATE, SUBCIRC};
-    enum dType {NOT, FRED, MEASURE, DEFAULT};
+    enum dType {NOT, FRED, MEASURE,SELECTZERO,SELECTONE, DEFAULT};
     virtual ~Gate();
     Gate();
     virtual std::shared_ptr<Gate> clone() const=0;
