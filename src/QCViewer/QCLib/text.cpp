@@ -93,22 +93,22 @@ LatexTextObject::LatexTextObject(std::string text)
     /* Get a temporary working directory. */
     char wdbfr[10], *newwd;
     {
-      const char * wdtmpl = "tmpXXXXXX";
-      strcpy(wdbfr, wdtmpl);
-      #ifdef WIN32
-      if(newwd = wdbfr, _mktemp_s(wdbfr, wdtmpl))
-      #else
-      if((newwd = mkdtemp(wdbfr)) == NULL)
-      #endif
-      {
-        throw "Couldn't create temporary directory for TeX.";
-      }
+        const char * wdtmpl = "tmpXXXXXX";
+        strcpy(wdbfr, wdtmpl);
+#ifdef WIN32
+        if(newwd = wdbfr, _mktemp_s(wdbfr, wdtmpl))
+#else
+        if((newwd = mkdtemp(wdbfr)) == NULL)
+#endif
+        {
+            throw "Couldn't create temporary directory for TeX.";
+        }
     }
 
     /* Save the current working directory. */
     char oldwd[PATH_MAX];
     if(getcwd(oldwd, PATH_MAX) == NULL) {
-      throw "Couldn't get current working directory.";
+        throw "Couldn't get current working directory.";
     }
 
     if(chdir(newwd)) {

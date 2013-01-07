@@ -27,7 +27,6 @@ Authors: Alex Parent, Jacob Parker
 
 #include "gate.h"
 #include "utility.h"
-#include "draw_constants.h"
 
 #include <iostream>
 

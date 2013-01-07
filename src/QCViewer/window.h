@@ -40,13 +40,14 @@ Authors: Alex Parent, Jacob Parker
 #include "circuitwidget.h"
 #include "stateWidget.h"
 #include "GateIcon.h"
+#include "options.h"
 #include "QCLib/common.h"
 
 
 class QCViewer : public Gtk::Window
 {
 public:
-    QCViewer ();
+    QCViewer (QCVOptions);
     virtual ~QCViewer();
 
     void set_selection (std::vector<Selection>);
@@ -160,6 +161,7 @@ private:
     void unroll_subcirc();
     void set_subcircuit_name();
 
+    QCVOptions options;
     State *state;
     bool drawparallel;
     bool drawarch;

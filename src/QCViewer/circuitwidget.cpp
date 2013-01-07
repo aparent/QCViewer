@@ -41,7 +41,7 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-CircuitWidget::CircuitWidget()
+CircuitWidget::CircuitWidget(DrawOptions drawOp) : circuitDrawer(drawOp)
 {
     state = NULL;
     circuit = NULL;

@@ -38,7 +38,6 @@ Authors: Alex Parent, Jacob Parker
 #include "common.h"
 #include "circuit.h"
 #include "subcircuit.h"
-//#include "draw_constants.h"
 #include "draw_common.h"
 
 
@@ -46,24 +45,24 @@ Authors: Alex Parent, Jacob Parker
 
 class DrawOptions
 {
-	public:
-		DrawOptions();
-  	double radius;
-		double dotradius;
-		double thickness;
-		double xoffset;
-		double yoffset;
-		double wireDist;
-		double gatePad;
-		double textPad;
-		double Upad;
+public:
+    DrawOptions();
+    double radius;
+    double dotradius;
+    double thickness;
+    double xoffset;
+    double yoffset;
+    double wireDist;
+    double gatePad;
+    double textPad;
+    double Upad;
 };
 
 class CircuitImage
 {
 public:
-		CircuitImage();
-		CircuitImage(DrawOptions);
+    CircuitImage();
+    CircuitImage(DrawOptions);
     enum Renderer {CAIRO};
     Renderer renderer;
     std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *);
@@ -150,7 +149,7 @@ private:
     };
 
     cairo_t* cr;
-		DrawOptions op;
+    DrawOptions op;
 
     std::list<std::shared_ptr<DrawPrim>> drawPrims;
 

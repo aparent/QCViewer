@@ -13,24 +13,25 @@ TextEngine textEngine;
 
 DrawOptions::DrawOptions()
 {
-		//Defaults
+    //Defaults
     radius = 15.0;
-		dotradius = 10.0;
-		thickness = 2.0;
-		xoffset = 10.0;
-		yoffset = 10.0;
-		wireDist = 40.0;
-		gatePad = 18.0;
-		textPad = 5.0;
-		Upad = 0.9;
+    dotradius = 10.0;
+    thickness = 2.0;
+    xoffset = 10.0;
+    yoffset = 10.0;
+    wireDist = 40.0;
+    gatePad = 18.0;
+    textPad = 5.0;
+    Upad = 0.9;
 }
 
 CircuitImage::CircuitImage()
 {
 }
 
-CircuitImage::CircuitImage(DrawOptions d){
-  op = d;
+CircuitImage::CircuitImage(DrawOptions d)
+{
+    op = d;
 }
 
 void CircuitImage::renderCairo(cairo_t* c)

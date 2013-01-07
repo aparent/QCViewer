@@ -53,8 +53,9 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
                        9 /* the length of I'm Data! in bytes */);
 }
 
-QCViewer::QCViewer()
+QCViewer::QCViewer(QCVOptions ops) : c(ops.draw)
 {
+    options = ops;
     add_events (Gdk::KEY_PRESS_MASK|Gdk::KEY_RELEASE_MASK );
     std::cerr << "In QCViewer::QCViewer.\n";
     drawparallel = drawarch = false;

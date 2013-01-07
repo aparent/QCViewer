@@ -42,7 +42,7 @@ Authors: Alex Parent, Jacob Parker
 class CircuitWidget : public Gtk::DrawingArea
 {
 public:
-    CircuitWidget ();
+    CircuitWidget (DrawOptions);
     virtual ~CircuitWidget ();
     std::vector<std::string> load (std::string);
     void loadArch (std::string);

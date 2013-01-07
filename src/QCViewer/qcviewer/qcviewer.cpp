@@ -29,7 +29,7 @@ Authors: Alex Parent, Jacob Parker
 #include "options.h"
 #include "QCLib/gates/UGateLookup.h"
 #include <iostream>
-#include <cstdlib> 
+#include <cstdlib>
 #include <boost/program_options.hpp>
 
 QCViewer* window;
@@ -41,10 +41,10 @@ int main (int ac, char *av[])
     srand((unsigned)time(NULL));
     g_type_init();
     Gtk::Main kit(ac, av);
-		QCVOptions ops = handleOptions(ac, av);
+    QCVOptions ops = handleOptions(ac, av);
     init_fonts();
     UGateSetup();
-    window = new QCViewer;
+    window = new QCViewer(ops);
     window->set_default_size (800,600);
     std::cerr << "Running window\n";
 
@@ -56,25 +56,27 @@ int main (int ac, char *av[])
 
 QCVOptions handleOptions(int ac,char *av[])
 {
-namespace po = boost::program_options;
+    namespace po = boost::program_options;
 
-QCVOptions QCVOp;
+    QCVOptions QCVOp;
 
-//Options parsed from the command line
-po::options_description cmdOp("CmdLine Options");
-cmdOp.add_options()
+    //Options parsed from the command line
+    po::options_description cmd("CmdLine Options");
+    cmd.add_options()
     ("help", "produce help message")
     ("version", "prints out the version")
-;
+    ;
 
-//Options parsed from the config file
-po::options_description config("Config");
-config.add_options()
-    ("test2", po::value<double>()->default_value(0.7), "test2")
-    ("ui.asdf", po::value<double>()->default_value(0.7), "test2")
-;
+    //Options parsed from the config file
+    po::options_description config("Config");
+    config.add_options()
+    ("draw.dotradius", po::value<double>(&QCVOp.draw.dotradius)->default_value(10.0), "The Radius of the control dot.")
+    ;
 
-return QCVOp;
+    po::variables_map vm;
+    po::store(po::parse_command_line(ac, av, cmd), vm);
+    po::store(po::parse_config_file<char>("QCV.cfg", config), vm);
+    po::notify(vm);
 
-
+    return QCVOp;
 }

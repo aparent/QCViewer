@@ -31,7 +31,6 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/utility.h"
 #include <complex>
 #include <iostream>
-#include "QCLib/draw_constants.h"
 
 
 using namespace std;
