@@ -72,12 +72,6 @@ LatexTextObject::LatexTextObject(std::string text)
     contents = text;
     pdf = NULL;
 
-    /*
-        XXX XXX XXX
-
-        This is _not_ good for concurrent qcviewer processes. We should really
-        put things into /tmp correctly. The annoyingness is preview.sty.
-    */
     const char* tmpl =
         "\\documentclass{article}\n"
         "\\usepackage[active, tightpage]{preview}\n"
@@ -94,32 +88,50 @@ LatexTextObject::LatexTextObject(std::string text)
     if(system("pdflatex --version")) {
         throw "Cannot find LaTeX installation.";
     }
-    if(chdir("tex/")) {
-        std::string msg = "Couldn't cd into tex/";
-        throw msg;
+
+    /* Get a temporary working directory. */
+    char wdbfr[10], *newwd;
+    {
+      const char * wdtmpl = "tmpXXXXXX";
+      strcpy(wdbfr, wdtmpl);
+      #ifdef WIN32
+      if(newwd = wdbfr, _mktemp_s(wdbfr, wdtmpl))
+      #else
+      if((newwd = mkdtemp(wdbfr)) == NULL)
+      #endif
+      {
+        throw "Couldn't create temporary directory for TeX.";
+      }
     }
-    char filename[256];
-    int id = rand();
-    snprintf(filename, sizeof(filename), "QCV%d.tex", id);
-    FILE* texf = fopen(filename, "w");
+
+    /* Save the current working directory. */
+    char oldwd[PATH_MAX];
+    if(getcwd(oldwd, PATH_MAX) == NULL) {
+      throw "Couldn't get current working directory.";
+    }
+
+    if(chdir(newwd)) {
+        throw "Couldn't cd into temporary directory.";
+    }
+    FILE* texf = fopen("QCV.tex", "w");
     if(texf == NULL) {
-        throw "Could not open TeX file.";
+        chdir(oldwd);
+        throw "Couldn't open TeX file.";
     }
     fprintf(texf, tmpl, text.c_str());
     fclose(texf);
     char cmd[256];
-    snprintf(cmd, sizeof(cmd), "pdflatex -interaction=nonstopmode %s", filename);
+    snprintf(cmd, sizeof(cmd), "pdflatex -interaction=nonstopmode QCV.tex");
     if(system(cmd)) {
-        chdir("..");
+        chdir(oldwd);
         std::string msg = "Failed to render \"" + text + "\"";
         throw msg;
     }
-    snprintf(filename, sizeof(filename), "QCV%d.pdf", id);
-    pdf = new PopplerContainer(filename, width, height);
+    pdf = new PopplerContainer("QCV.pdf", width, height);
     x = 0; // XXX
     y = 0; // XXX
-    system("rm QCV*.*"); // XXX
-    chdir("..");
+    chdir(oldwd);
+    boost::filesystem::remove_all(newwd);
 }
 
 void LatexTextObject::draw(cairo_t* cr, double x, double y)
@@ -140,7 +152,7 @@ LatexTextObject::~LatexTextObject()
 
 TextEngine::TextEngine()
 {
-    setMode(TEXT_LATEX);
+    setMode(TEXT_PANGO);
 }
 
 TextEngine::~TextEngine()

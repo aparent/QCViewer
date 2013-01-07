@@ -11,6 +11,7 @@ enum TextMode {
 class TextObject
 {
 public:
+    virtual ~TextObject() {};
     virtual void draw(cairo_t* cr, double x, double y) = 0;
     double getWidth() {
         return width;
