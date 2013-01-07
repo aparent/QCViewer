@@ -26,17 +26,22 @@ Authors: Alex Parent, Jacob Parker
 
 
 #include "window.h"
+#include "options.h"
 #include "QCLib/gates/UGateLookup.h"
 #include <iostream>
 #include <cstdlib> 
+#include <boost/program_options.hpp>
 
 QCViewer* window;
 
-int main (int argc, char *argv[])
+QCVOptions handleOptions(int,char*[]);
+
+int main (int ac, char *av[])
 {
     srand((unsigned)time(NULL));
     g_type_init();
-    Gtk::Main kit(argc, argv);
+    Gtk::Main kit(ac, av);
+		QCVOptions ops = handleOptions(ac, av);
     init_fonts();
     UGateSetup();
     window = new QCViewer;
@@ -45,6 +50,31 @@ int main (int argc, char *argv[])
 
     Gtk::Main::run(*window);
 
-
     return EXIT_SUCCESS;
+}
+
+
+QCVOptions handleOptions(int ac,char *av[])
+{
+namespace po = boost::program_options;
+
+QCVOptions QCVOp;
+
+//Options parsed from the command line
+po::options_description cmdOp("CmdLine Options");
+cmdOp.add_options()
+    ("help", "produce help message")
+    ("version", "prints out the version")
+;
+
+//Options parsed from the config file
+po::options_description config("Config");
+config.add_options()
+    ("test2", po::value<double>()->default_value(0.7), "test2")
+    ("ui.asdf", po::value<double>()->default_value(0.7), "test2")
+;
+
+return QCVOp;
+
+
 }

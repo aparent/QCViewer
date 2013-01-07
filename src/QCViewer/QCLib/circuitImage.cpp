@@ -11,6 +11,27 @@ using namespace std;
 
 TextEngine textEngine;
 
+DrawOptions::DrawOptions()
+{
+		//Defaults
+    radius = 15.0;
+		dotradius = 10.0;
+		thickness = 2.0;
+		xoffset = 10.0;
+		yoffset = 10.0;
+		wireDist = 40.0;
+		gatePad = 18.0;
+		textPad = 5.0;
+		Upad = 0.9;
+}
+
+CircuitImage::CircuitImage()
+{
+}
+
+CircuitImage::CircuitImage(DrawOptions d){
+  op = d;
+}
 
 void CircuitImage::renderCairo(cairo_t* c)
 {
@@ -30,7 +51,7 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
 
     vector<gateRect> rects;
     rects = drawCirc (c, wirestart, wireend, true);
-    drawbase (c, ext.width+ext.x, ext.height+ext.y+thickness, wirestart, wireend);
+    drawbase (c, ext.width+ext.x, ext.height+ext.y+op.thickness, wirestart, wireend);
     if (drawParallel) {
         drawParallelSectionMarkings (rects, c.numLines(), c.getParallel());
     }
@@ -49,7 +70,7 @@ void CircuitImage::drawbase (Circuit &c, double w, double h, double wirestart, d
 {
     for (uint32_t i = 0; i < c.numLines(); i++) {
         double y = wireToY (i);
-        drawPrims.push_front(makeLine(wirestart+xoffset, y, wireend, y, Colour(0,0,0,1)));
+        drawPrims.push_front(makeLine(wirestart+op.xoffset, y, wireend, y, Colour(0,0,0,1)));
     }
     shared_ptr<DrawPrim> r = shared_ptr<DrawPrim>(new Rectangle(0,0,w,h,Colour(1,1,1,1) ,Colour(1,1,1,1)));
     drawPrims.push_front(r);
@@ -73,7 +94,7 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     }
     if (!forreal) wirestart = xinit;
     // gates
-    double xcurr = xinit+2.0*gatePad;
+    double xcurr = xinit+2.0*op.gatePad;
     uint32_t mingw, maxgw;
     unsigned int i = 0;
     double maxX = 0;
@@ -89,17 +110,17 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
                     addRect(r.x0, r.y0, r.width, r.height, Colour (0.1,0.7,0.2,0.7), Colour (0.1, 0.7,0.2,0.3));
                 }
             }
-            xcurr += maxX - gatePad/2;
+            xcurr += maxX - op.gatePad/2;
             if (c.getGate(c.columns.at(j))->breakpoint) {
                 addLine(xcurr, wireToY(-1), xcurr, wireToY(c.numLines()), Colour(0.8,0,0,0.8));
             }
-            xcurr += gatePad*1.5;
+            xcurr += op.gatePad*1.5;
         }
     }
 
 
     xcurr -= maxX;
-    xcurr += gatePad;
+    xcurr += op.gatePad;
     gateRect fullCirc;
     if (rects.size() > 0) {
         fullCirc = rects[0];
@@ -107,14 +128,14 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
             fullCirc = combine_gateRect(fullCirc,rects[i]);
         }
     }
-    wireend = wirestart + fullCirc.width + gatePad*2;
+    wireend = wirestart + fullCirc.width + op.gatePad*2;
 
     // output labels
     for (uint32_t i = 0; i < c.numLines (); i++) {
         string label = c.getLine(i).getOutputLabel();
         TextObject* text = textEngine.renderText(label);
 
-        double x = wireend + xoffset;
+        double x = wireend + op.xoffset;
         double y = wireToY(i) - (text->getHeight()/2.0+text->getY());
         addText(label,x,y);
     }
@@ -178,7 +199,7 @@ void CircuitImage::savepng (Circuit &c, string filename, cairo_font_face_t * ft_
 {
     double wirestart, wireend;
     cairo_rectangle_t ext = getCircuitSize (c, wirestart, wireend, 1.0,ft_default);
-    cairo_surface_t* surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, thickness+ext.height+ext.y);
+    cairo_surface_t* surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, op.thickness+ext.height+ext.y);
     cairo_t* cr = cairo_create (surface);
     renderCairo(cr);
     cairo_set_source_surface (cr, surface, 0, 0);
@@ -201,8 +222,8 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
 {
     double wirestart, wireend;
     cairo_rectangle_t ext = getCircuitSize (c,wirestart, wireend, 1.0, ft_default);
-    cout << ext.width+ext.x << " : " << thickness+ext.height+ext.y << endl;
-    cairo_surface_t* surface = cairo_svg_surface_create (filename.c_str(), ext.width+ext.x, thickness+ext.height+ext.y);
+    cout << ext.width+ext.x << " : " << op.thickness+ext.height+ext.y << endl;
+    cairo_surface_t* surface = cairo_svg_surface_create (filename.c_str(), ext.width+ext.x, op.thickness+ext.height+ext.y);
     cairo_t* context = cairo_create (surface);
     renderCairo(context);
     cairo_set_source_surface (context, surface, 0, 0);
@@ -227,7 +248,7 @@ void CircuitImage::saveps (Circuit &c, string filename,cairo_font_face_t * ft_de
 
 cairo_surface_t* CircuitImage::make_ps_surface (string file, cairo_rectangle_t ext) const
 {
-    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width+ext.x, thickness+ext.height+ext.y);
+    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width+ext.x, op.thickness+ext.height+ext.y);
     cairo_ps_surface_set_eps (img_surface, true);
     return img_surface;
 }
@@ -292,13 +313,13 @@ gateRect CircuitImage::drawControls (shared_ptr<Gate> g,const gateRect &r)
         }
     }
     for (uint32_t i = 0; i < g->controls.size(); i++) {
-        drawDot (center, wireToY(g->controls.at(i).wire), dotradius, g->controls.at(i).polarity);
+        drawDot (center, wireToY(g->controls.at(i).wire), op.dotradius, g->controls.at(i).polarity);
     }
     gateRect rect;
-    rect.x0 = center-dotradius;
-    rect.y0 = wireToY(minw)-dotradius;
-    rect.width = 2*dotradius;
-    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
+    rect.x0 = center-op.dotradius;
+    rect.y0 = wireToY(minw)-op.dotradius;
+    rect.width = 2*op.dotradius;
+    rect.height = wireToY(maxw) - wireToY(minw) + 2*(op.dotradius);
     return rect;
 }
 
@@ -312,25 +333,25 @@ gateRect CircuitImage::drawControls (shared_ptr<Gate> g, uint32_t xc)
         addLine (xc, wireToY (maxw), xc, wireToY (minw), L_COLOUR);
     }
     for (uint32_t i = 0; i < g->controls.size(); i++) {
-        drawDot (xc, wireToY(g->controls.at(i).wire), dotradius, g->controls.at(i).polarity);
+        drawDot (xc, wireToY(g->controls.at(i).wire), op.dotradius, g->controls.at(i).polarity);
     }
     gateRect rect;
-    rect.x0 = xc-dotradius;
-    rect.y0 = wireToY(minw)-dotradius;
-    rect.width = 2*dotradius;
-    rect.height = wireToY(maxw) - wireToY(minw) + 2*(dotradius);
+    rect.x0 = xc-op.dotradius;
+    rect.y0 = wireToY(minw)-op.dotradius;
+    rect.width = 2*op.dotradius;
+    rect.height = wireToY(maxw) - wireToY(minw) + 2*(op.dotradius);
     return rect;
 }
 
 gateRect CircuitImage::drawMeasure (shared_ptr<Gate> g,uint32_t xc)
 {
     double yc = wireToY(g->targets.at(0));
-    addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
-    addTriangle (xc-radius, yc,xc+radius, yc-radius,xc+radius, yc+radius,L_COLOUR);
+    addRect(xc-op.radius+op.thickness , yc-op.radius , 2*op.radius - 1.5*op.thickness, 2*op.radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
+    addTriangle (xc-op.radius, yc,xc+op.radius, yc-op.radius,xc+op.radius, yc+op.radius,L_COLOUR);
     gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
+    r.x0 = xc-op.radius-op.thickness;
+    r.y0 = yc-op.radius-op.thickness;
+    r.width = 2*(op.radius+op.thickness);
     r.height = r.width;
     return r;
 }
@@ -338,15 +359,15 @@ gateRect CircuitImage::drawMeasure (shared_ptr<Gate> g,uint32_t xc)
 gateRect CircuitImage::drawSelectZero (shared_ptr<Gate> g,uint32_t xc)
 {
     double yc = wireToY(g->targets.at(0));
-    addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
-    addTriangle (xc-radius, yc,xc+radius, yc-radius,xc+radius, yc+radius,L_COLOUR);
+    addRect(xc-op.radius+op.thickness , yc-op.radius , 2*op.radius - 1.5*op.thickness, 2*op.radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
+    addTriangle (xc-op.radius, yc,xc+op.radius, yc-op.radius,xc+op.radius, yc+op.radius,L_COLOUR);
     TextObject* text = textEngine.renderText("0");
     double height = text->getHeight();
     addText("0",xc,yc-height/2);
     gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
+    r.x0 = xc-op.radius-op.thickness;
+    r.y0 = yc-op.radius-op.thickness;
+    r.width = 2*(op.radius+op.thickness);
     r.height = r.width;
     return r;
 }
@@ -354,15 +375,15 @@ gateRect CircuitImage::drawSelectZero (shared_ptr<Gate> g,uint32_t xc)
 gateRect CircuitImage::drawSelectOne (shared_ptr<Gate> g,uint32_t xc)
 {
     double yc = wireToY(g->targets.at(0));
-    addRect(xc-radius+thickness , yc-radius , 2*radius - 1.5*thickness, 2*radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
-    addTriangle (xc-radius, yc,xc+radius, yc-radius,xc+radius, yc+radius,L_COLOUR);
+    addRect(xc-op.radius+op.thickness , yc-op.radius , 2*op.radius - 1.5*op.thickness, 2*op.radius,Colour(1,1,1,1) ,Colour(1,1,1,1));
+    addTriangle (xc-op.radius, yc,xc+op.radius, yc-op.radius,xc+op.radius, yc+op.radius,L_COLOUR);
     TextObject* text = textEngine.renderText("1");
     double height = text->getHeight();
     addText("1",xc,yc-height/2);
     gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
+    r.x0 = xc-op.radius-op.thickness;
+    r.y0 = yc-op.radius-op.thickness;
+    r.width = 2*(op.radius+op.thickness);
     r.height = r.width;
     return r;
 }
@@ -373,7 +394,7 @@ gateRect CircuitImage::drawFred (shared_ptr<Gate> g, uint32_t xc)
     uint32_t minw = g->targets.at(0);
     uint32_t maxw = g->targets.at(0);
     for (uint32_t i = 0; i < g->targets.size(); i++) {
-        gateRect recttmp = drawX (xc, wireToY(g->targets.at(i)), radius);
+        gateRect recttmp = drawX (xc, wireToY(g->targets.at(i)), op.radius);
         rect = combine_gateRect(rect, recttmp);
         minw = min (minw, g->targets.at(i));
         maxw = max (maxw, g->targets.at(i));
@@ -388,7 +409,7 @@ gateRect CircuitImage::drawCNOT (shared_ptr<Gate> g, uint32_t xc)
 {
     gateRect rect = drawControls (g, xc);
     for (uint32_t i = 0; i < g->targets.size(); i++) {
-        gateRect recttmp = drawNOT (xc, wireToY(g->targets.at(i)), radius);
+        gateRect recttmp = drawNOT (xc, wireToY(g->targets.at(i)), op.radius);
         rect = combine_gateRect(rect, recttmp);
     }
     return rect;
@@ -406,9 +427,9 @@ gateRect CircuitImage::drawNOT (double xc, double yc, double radius)
     addLine(xc, yc-radius, xc, yc+radius, L_COLOUR);
 
     gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
+    r.x0 = xc-radius-op.thickness;
+    r.y0 = yc-radius-op.thickness;
+    r.width = 2*(radius+op.thickness);
     r.height = r.width;
     return r;
 }
@@ -420,9 +441,9 @@ gateRect CircuitImage::drawX (double xc, double yc, double radius)
     addLine(xc-radius, yc-radius, xc+radius, yc+radius, L_COLOUR);
     addLine(xc+radius, yc-radius, xc-radius, yc+radius, L_COLOUR);
     gateRect r;
-    r.x0 = xc-radius-thickness;
-    r.y0 = yc-radius-thickness;
-    r.width = 2*(radius+thickness);
+    r.x0 = xc-radius-op.thickness;
+    r.y0 = yc-radius-op.thickness;
+    r.width = 2*(radius+op.thickness);
     r.height = r.width;
     return r;
 }
@@ -441,29 +462,29 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
 
     double dw = wireToY(1)-wireToY(0);
     double yc = (wireToY (minw)+wireToY(maxw))/2;//-dw/2.0;
-    double height = dw*(maxw-minw+Upad);
+    double height = dw*(maxw-minw+op.Upad);
 
     // get width of this box
     TextObject* text = textEngine.renderText(ss.str());
-    double width = text->getWidth()+2*textPad;
-    if (width < dw*Upad) {
-        width = dw*Upad;
+    double width = text->getWidth()+2*op.textPad;
+    if (width < dw*op.Upad) {
+        width = dw*op.Upad;
     }
-    gateRect rect = drawControls (g, xc-radius+width/2.0);
+    gateRect rect = drawControls (g, xc-op.radius+width/2.0);
 
     //Prepare gate rectangle draw prim
     Colour fill = Colour (1,1,1,1); //White fill
     Colour outline = Colour (0,0,0,1); //black outline
-    addRect(xc-radius, yc-height/2, width, height,fill,outline);
+    addRect(xc-op.radius, yc-height/2, width, height,fill,outline);
 
-    double x = (xc - radius + width/2.0) - text->getWidth()/2.0 - text->getX();
+    double x = (xc - op.radius + width/2.0) - text->getWidth()/2.0 - text->getX();
     double y = yc - text->getHeight()/2 - text->getY();
     addText(ss.str(),x,y);
     gateRect r;
-    r.x0 = xc - thickness-radius;
-    r.y0 = yc -height/2 - thickness;
-    r.width = width + 2*thickness;
-    r.height = height + 2*thickness;
+    r.x0 = xc - op.thickness-op.radius;
+    r.y0 = yc -height/2 - op.thickness;
+    r.width = width + 2*op.thickness;
+    r.height = height + 2*op.thickness;
     return combine_gateRect(rect, r);
 }
 
@@ -490,7 +511,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,double xcurr)
             shared_ptr<Gate> g = s->getGate(i);
             drawGate(g,xcurr,maxX,subRects);
             if(para.size() > currentCol && i == para[currentCol]) {
-                xcurr += maxX - gatePad/2;
+                xcurr += maxX - op.gatePad/2;
                 if (s->circ->getGate(i)->breakpoint) {
                     unsigned int maxTarget = 0;
                     for (unsigned int i = 0; i < s->targets.size(); i++) {
@@ -502,7 +523,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,double xcurr)
                     double top = wireToY(maxTarget - s->circ->numLines());
                     addLine(xcurr, bottem, xcurr, top, Colour(0.8,0,0,0.8));
                 }
-                xcurr += gatePad*1.5;
+                xcurr += op.gatePad*1.5;
                 maxX = 0.0;
                 currentCol++;
             }
@@ -517,7 +538,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,double xcurr)
         }
     }
     xcurr -= maxX;
-    xcurr -= gatePad;
+    xcurr -= op.gatePad;
     gateRect r;
     if (subRects.size() > 0) {
         r = subRects.at(0);
@@ -630,7 +651,7 @@ void CircuitImage::cairoLine(cairo_t *context,std::shared_ptr<Line> line) const
 {
     Colour c = line->colour;
     cairo_set_source_rgba (context,c.r,c.g,c.b,c.a);
-    cairo_set_line_width (context, thickness);
+    cairo_set_line_width (context, op.thickness);
     cairo_move_to (context, line->x1, line->y1);
     cairo_line_to (context, line->x2, line->y2);
     cairo_stroke (context);
@@ -657,7 +678,7 @@ void CircuitImage::cairoTriangle(cairo_t *context,std::shared_ptr<Triangle> t) c
 {
     Colour c = t->colour;
     cairo_set_source_rgba (context,c.r,c.g,c.b,c.a);
-    cairo_set_line_width (context, thickness);
+    cairo_set_line_width (context, op.thickness);
     cairo_move_to (context, t->x0, t->y0);
     cairo_line_to (context, t->x1, t->y1);
     cairo_line_to (context, t->x2, t->y2);
@@ -676,7 +697,7 @@ void CircuitImage::cairoCircle(cairo_t *context,std::shared_ptr<Circle> c) const
     cairo_arc (context, c->x, c->y, c->r, 0, 2*M_PI);
     cairo_fill (context);
     cairo_set_source_rgba (context, c->outline.r, c->outline.g, c->outline.b, c->outline.a);
-    cairo_set_line_width(context, thickness);
+    cairo_set_line_width(context, op.thickness);
     cairo_arc (context, c->x, c->y, c->r, 0, 2*M_PI);
     cairo_stroke (context);
 }

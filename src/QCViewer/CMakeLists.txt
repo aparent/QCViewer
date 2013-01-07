@@ -56,6 +56,10 @@ add_custom_command (
 )
 ENDIF(NOT WIN32)
 
+FIND_PACKAGE(Boost REQUIRED COMPONENTS system program_options filesystem)
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+set(Boost_USE_STATIC_LIBS ON)
+
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 include_directories(${GTKMM_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
@@ -71,9 +75,9 @@ add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp
 add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp)
 
 target_link_libraries(qcviewer qc)
-target_link_libraries(qcviewer ${GTKMM_LIBRARIES})
+target_link_libraries(qcviewer ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES})
 target_link_libraries(qcimage qc)
-target_link_libraries(qcimage ${GTKMM_LIBRARIES})
+target_link_libraries(qcimage ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES})
 
 install(TARGETS qcviewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
 install(TARGETS qcimage DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
