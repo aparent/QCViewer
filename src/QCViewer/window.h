@@ -78,6 +78,7 @@ protected:
     void on_menu_save_circuit ();
     void on_menu_options_parallel ();
     void on_menu_options_arch ();
+    void on_menu_options_toggle_lab();
     void on_menu_zoom_in ();
     void on_menu_zoom_out ();
     void set_rval();

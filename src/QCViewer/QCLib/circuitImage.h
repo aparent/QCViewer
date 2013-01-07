@@ -56,6 +56,7 @@ public:
     double gatePad;
     double textPad;
     double Upad;
+    bool drawLineLabels;
 };
 
 class CircuitImage
@@ -63,6 +64,7 @@ class CircuitImage
 public:
     CircuitImage();
     CircuitImage(DrawOptions);
+    void toggleLineLabels();
     enum Renderer {CAIRO};
     Renderer renderer;
     std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *);

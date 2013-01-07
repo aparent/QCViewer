@@ -331,6 +331,11 @@ void QCViewer::on_menu_options_arch ()
     c.set_drawarch (drawarch);
 }
 
+void QCViewer::on_menu_options_toggle_lab()
+{
+    c.toggle_linelabels();
+}
+
 void QCViewer::on_menu_set_arch_LNN()
 {
     c.arch_set_LNN();
@@ -635,6 +640,8 @@ void QCViewer::setup_menu_actions()
                           sigc::mem_fun(*this, &QCViewer::on_menu_options_parallel));
     m_refActionGroup->add(Gtk::ToggleAction::create ("DiagramArch", Gtk::Stock::DIALOG_WARNING, "Show warnings", "Show architecture alignment warnings"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_options_arch));
+    m_refActionGroup->add(Gtk::Action::create ("DiagramToggleLineLabels", "Toggle Line Labels"),
+                          sigc::mem_fun(*this, &QCViewer::on_menu_options_toggle_lab));
 
     m_refActionGroup->add(Gtk::Action::create("TextMode", "Text Mode"));
     m_refActionGroup->add(Gtk::Action::create("TextModeRegular", "Regular"),
@@ -679,6 +686,7 @@ void QCViewer::setup_menu_layout()
         "      </menu>"
         "      <menuitem action='DiagramParallel'/>"
         "      <menuitem action='DiagramArch'/>"
+        "      <menuitem action='DiagramToggleLineLabels'/>"
         "    </menu>"
         "    <menu action='SimulateMenu'>"
         "      <menuitem action='SimulateDisplay'/>"

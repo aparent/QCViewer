@@ -23,10 +23,16 @@ DrawOptions::DrawOptions()
     gatePad = 18.0;
     textPad = 5.0;
     Upad = 0.9;
+    drawLineLabels = true;
 }
 
 CircuitImage::CircuitImage()
 {
+}
+
+void CircuitImage::toggleLineLabels()
+{
+    op.drawLineLabels = !op.drawLineLabels;
 }
 
 CircuitImage::CircuitImage(DrawOptions d)
@@ -82,16 +88,18 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     vector <gateRect> rects;
     // input labels
     double xinit = 0.0;
-    for (uint32_t i = 0; i < c.numLines(); i++) {
-        string label = c.getLine(i).getInputLabel();
-        TextObject* text = textEngine.renderText(label);
-        double x = 0, y = 0;
-        if (forreal) {
-            x = wirestart - text->getWidth();
-            y = wireToY(i) - (text->getHeight()/2.0 + text->getY());
+    if (op.drawLineLabels) {
+        for (uint32_t i = 0; i < c.numLines(); i++) {
+            string label = c.getLine(i).getInputLabel();
+            TextObject* text = textEngine.renderText(label);
+            double x = 0, y = 0;
+            if (forreal) {
+                x = wirestart - text->getWidth();
+                y = wireToY(i) - (text->getHeight()/2.0 + text->getY());
+            }
+            addText(label,x,y);
+            xinit = max (xinit, text->getWidth());
         }
-        addText(label,x,y);
-        xinit = max (xinit, text->getWidth());
     }
     if (!forreal) wirestart = xinit;
     // gates
@@ -132,13 +140,15 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     wireend = wirestart + fullCirc.width + op.gatePad*2;
 
     // output labels
-    for (uint32_t i = 0; i < c.numLines (); i++) {
-        string label = c.getLine(i).getOutputLabel();
-        TextObject* text = textEngine.renderText(label);
+    if (op.drawLineLabels) {
+        for (uint32_t i = 0; i < c.numLines (); i++) {
+            string label = c.getLine(i).getOutputLabel();
+            TextObject* text = textEngine.renderText(label);
 
-        double x = wireend + op.xoffset;
-        double y = wireToY(i) - (text->getHeight()/2.0+text->getY());
-        addText(label,x,y);
+            double x = wireend + op.xoffset;
+            double y = wireToY(i) - (text->getHeight()/2.0+text->getY());
+            addText(label,x,y);
+        }
     }
     return rects;
 }

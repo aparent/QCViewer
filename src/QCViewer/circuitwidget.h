@@ -53,6 +53,7 @@ public:
     void set_offset (int);
     void set_drawarch (bool);
     void set_drawparallel (bool);
+    void toggle_linelabels();
 
     void savepng (std::string);
     void savesvg (std::string);

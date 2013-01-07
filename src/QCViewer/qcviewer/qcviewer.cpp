@@ -28,6 +28,7 @@ Authors: Alex Parent, Jacob Parker
 #include "window.h"
 #include "options.h"
 #include "QCLib/gates/UGateLookup.h"
+#include "info.h"
 #include <iostream>
 #include <cstdlib>
 #include <boost/program_options.hpp>
@@ -77,6 +78,13 @@ QCVOptions handleOptions(int ac,char *av[])
     po::store(po::parse_command_line(ac, av, cmd), vm);
     po::store(po::parse_config_file<char>("QCV.cfg", config), vm);
     po::notify(vm);
+
+		if (vm.count("help")) {
+      std::cout << cmd << std::endl;
+    }
+		if (vm.count("version")) {
+      std::cout << QCV_NAME << " " << QCV_VERSION << std::endl;
+    }
 
     return QCVOp;
 }

@@ -80,6 +80,12 @@ void CircuitWidget::set_offset (int y)
     yoffset = y;
 }
 
+void CircuitWidget::toggle_linelabels()
+{
+    circuitDrawer.toggleLineLabels();
+    force_redraw ();
+}
+
 CircuitWidget::~CircuitWidget () {}
 unsigned int CircuitWidget::getFirstWire (double my)
 {
