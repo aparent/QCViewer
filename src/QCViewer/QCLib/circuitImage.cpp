@@ -73,6 +73,26 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
     return rects;
 }
 
+double CircuitImage::wireToY (uint32_t x) const
+{
+    return op.yoffset+(x+1)*op.wireDist;
+}
+
+int CircuitImage::pickWire (double y) const
+{
+    if (y < op.yoffset+op.wireDist/2) {
+        return -1;
+    }
+    if (y < op.yoffset+op.wireDist) {
+        return 0;
+    }
+    int wire = floor((y-op.yoffset)/op.wireDist - 1);
+    if ((double)(y - wireToY (wire)) > op.wireDist/2) {
+        return wire + 1;
+    }
+    return wire;
+}
+
 void CircuitImage::drawbase (Circuit &c, double w, double h, double wirestart, double wireend)
 {
     for (uint32_t i = 0; i < c.numLines(); i++) {

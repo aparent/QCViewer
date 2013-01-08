@@ -33,7 +33,6 @@ Authors: Alex Parent, Jacob Parker
 #include <vector>
 #include "state.h"
 #include "common.h"
-#include "draw_common.h"
 
 //used to specify a control number and polarity
 class Control

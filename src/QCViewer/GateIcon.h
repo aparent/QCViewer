@@ -26,6 +26,7 @@ Authors: Alex Parent, Jacob Parker
 #define GATEICON__INCLUDED
 #include <gtkmm.h>
 #include <string>
+#include "QCLib/text.h"
 
 class GateIcon : public Gtk::DrawingArea
 {
@@ -38,6 +39,15 @@ public:
     std::string symbol;
     std::string dname;
     virtual bool on_expose_event(GdkEventExpose* event);
+private:
+    TextEngine textEngine;
+    void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2);
+    void drawShowU (cairo_t *cr, double xc, double yc, double width, std::string name);
+    void drawShowMeasure (cairo_t *cr, double xc, double yc, double width);
+    void drawShowNOT (cairo_t *cr, double xc, double yc, double radius);
+    void drawShowRotation (cairo_t *cr, double xc, double yc, double radius);
+    void drawX (cairo_t *cr, double xc, double yc, double radius);
+    void drawShowFred (cairo_t *cr, double width, double height);
 };
 
 #endif

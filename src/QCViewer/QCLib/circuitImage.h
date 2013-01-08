@@ -38,7 +38,6 @@ Authors: Alex Parent, Jacob Parker
 #include "common.h"
 #include "circuit.h"
 #include "subcircuit.h"
-#include "draw_common.h"
 
 
 #include <iostream>
@@ -69,6 +68,11 @@ public:
     Renderer renderer;
     std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *);
     cairo_rectangle_t getCircuitSize (Circuit& c, double&, double&, double, cairo_font_face_t*);
+
+
+    int pickWire (double y) const;
+    double wireToY (uint32_t x) const;
+
     void savepng (Circuit&, std::string, cairo_font_face_t*);
     void savesvg (Circuit&, std::string, cairo_font_face_t*);
     void saveps  (Circuit&, std::string, cairo_font_face_t*);
@@ -174,6 +178,7 @@ private:
     void drawParallelSectionMarkings (const std::vector<gateRect>&, int, const std::vector<int>&);
     void drawPWire (double, int);
     void drawSelections (const std::vector<gateRect>& , const std::vector<Selection>&);
+
 
     std::vector<gateRect> drawCirc (Circuit&, double& , double& , bool );
     void drawGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);

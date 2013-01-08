@@ -3,6 +3,10 @@
 #include <string>
 #include <vector>
 
+
+#ifndef TEXT_H
+#define TEXT_H
+
 enum TextMode {
     TEXT_PANGO,
     TEXT_LATEX
@@ -50,3 +54,4 @@ private:
     std::vector<TextObject*> cache;
 };
 
+#endif

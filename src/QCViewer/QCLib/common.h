@@ -69,6 +69,10 @@ public:
     std::vector<gateRect> subRects;
 };
 
+gateRect combine_gateRect (const gateRect &a, const gateRect &b);
+int pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
+std::vector<Selection> pickRects (const std::vector<gateRect> &rects, const gateRect &s);
+
 class LayoutColumn
 {
 public:

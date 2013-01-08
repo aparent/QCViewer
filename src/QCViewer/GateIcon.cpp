@@ -28,10 +28,8 @@ Authors: Alex Parent, Jacob Parker
 #include <iostream>
 
 #include "GateIcon.h"
-#include "draw.h"
 #include <cairo-ft.h>
 #include <cmath>
-#include "QCLib/draw_constants.h"
 
 #ifndef M_PI
 #define M_PI 3.141592
@@ -40,11 +38,8 @@ Authors: Alex Parent, Jacob Parker
 
 #define G_BUTTON_SIZE 25
 
-//Font stuff
-extern FT_Library library;
-extern FT_Face ft_face;
-extern cairo_font_face_t * ft_default;
-
+#define LINE_THICKNESS 2.0
+#define TEXT_PAD 5.0
 
 using namespace std;
 
@@ -63,34 +58,32 @@ GateIcon::GateIcon (string s,string d) : type(DEFAULT), symbol(s), dname(d)
     set_size_request (G_BUTTON_SIZE,G_BUTTON_SIZE);
 }
 
-void drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
+void GateIcon::drawWire (cairo_t *cr, double x1, double y1, double x2, double y2)
 {
-    cairo_set_line_width (cr, thickness);
+    cairo_set_line_width (cr, LINE_THICKNESS);
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_move_to (cr, x1, y1);
     cairo_line_to (cr, x2, y2);
     cairo_stroke (cr);
 }
 
-void drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
+void GateIcon::drawShowU (cairo_t *cr, double xc, double yc, double width, string name)
 {
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
     double w,h;
-    PangoLayout *layout = create_text_layout(cr, name, w, h);
+    TextObject* text = textEngine.renderText(name);
+    w = text->getWidth();
+    h = text->getHeight();
     cairo_rectangle (cr, xc - width/2.0, yc- width/2.0, width, width);
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_stroke (cr);
-    double scale = width/(max(w,h)+textPad);
+    double scale = width/(max(w,h)+TEXT_PAD);
     cairo_scale(cr,scale,scale);
     double x = (1.0/scale)*(xc) - (1.0/2.0)*w;
     double y = (1.0/scale)*(yc)- (1.0/2.0)*h ;
-    cairo_move_to (cr, x, y);
-    pango_cairo_show_layout (cr, layout);
-    g_object_unref(layout);
+    text->draw(cr,x,y);
 }
 
-void drawShowMeasure (cairo_t *cr, double xc, double yc, double width)
+void GateIcon::drawShowMeasure (cairo_t *cr, double xc, double yc, double width)
 {
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_move_to (cr, xc-width/2, yc);
@@ -100,9 +93,9 @@ void drawShowMeasure (cairo_t *cr, double xc, double yc, double width)
     cairo_stroke (cr);
 }
 
-void drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
+void GateIcon::drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
 {
-    cairo_set_line_width (cr, thickness);
+    cairo_set_line_width (cr, LINE_THICKNESS);
     // Draw black border
     cairo_arc (cr, xc, yc, radius, 0, 2*M_PI);
     cairo_set_source_rgb (cr, 0, 0, 0);
@@ -113,32 +106,28 @@ void drawShowNOT (cairo_t *cr, double xc, double yc, double radius)
     drawWire (cr,xc, yc-radius, xc, yc+radius);
 }
 
-void drawShowRotation (cairo_t *cr, double xc, double yc, double radius)
+void GateIcon::drawShowRotation (cairo_t *cr, double xc, double yc, double radius)
 {
-    cairo_set_font_face (cr,ft_default);
-    cairo_set_font_size(cr, 18);
-    cairo_set_line_width (cr, thickness);
-
-    string text = "R";
-    cairo_text_extents_t extents;
-    cairo_text_extents (cr, text.c_str (), &extents);
-    double tw = extents.width + 2.0*textPad;
-    double th = extents.height + 2.0*textPad;
+    double w,h;
+    TextObject* text = textEngine.renderText("R");
+    w = text->getWidth();
+    h = text->getHeight();
+    double tw = w + TEXT_PAD;
+    double th = h + TEXT_PAD;
 
     double textradius = sqrt(tw*tw + th*th)/2.0;
     double scale = radius/textradius;
-    double x = xc/scale - (extents.width/2.0 + extents.x_bearing);
-    double y = yc/scale - (extents.height/2.0 + extents.y_bearing);
+    double x = xc/scale - w/2.0;
+    double y = yc/scale - h/2.0;
     cairo_scale (cr, scale, scale);
 
     cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_arc (cr, xc/scale, yc/scale, textradius, 0, 2.0*M_PI);
     cairo_stroke (cr);
-    cairo_move_to (cr, x, y);
-    cairo_show_text (cr, text.c_str ());
+    text->draw(cr,x,y);
 }
 
-void drawX (cairo_t *cr, double xc, double yc, double radius)
+void GateIcon::drawX (cairo_t *cr, double xc, double yc, double radius)
 {
     // Draw cross
     radius = radius*sqrt(2)/2;
@@ -146,7 +135,7 @@ void drawX (cairo_t *cr, double xc, double yc, double radius)
     drawWire (cr,xc+radius, yc-radius, xc-radius, yc+radius);
 }
 
-void drawShowFred (cairo_t *cr, double width, double height)
+void GateIcon::drawShowFred (cairo_t *cr, double width, double height)
 {
     double Xrad = min(height/4.3, width/2.0);
     drawWire (cr, width/2, Xrad, width/2, height-Xrad);

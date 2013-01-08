@@ -43,7 +43,6 @@ int main (int ac, char *av[])
     g_type_init();
     Gtk::Main kit(ac, av);
     QCVOptions ops = handleOptions(ac, av);
-    init_fonts();
     UGateSetup();
     window = new QCViewer(ops);
     window->set_default_size (800,600);

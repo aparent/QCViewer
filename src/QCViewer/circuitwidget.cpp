@@ -34,7 +34,6 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/circuitParser.h"
 #include "QCLib/simulate.h"
 #include <iostream>
-#include "draw.h"
 #include <gtkmm.h>
 #include "QCLib/gate.h"
 #include "window.h" // slows down compiles, would be nice to not need this (see: clicking, effects toolpalette)
@@ -92,7 +91,7 @@ unsigned int CircuitWidget::getFirstWire (double my)
     unsigned int ans=0;
     double mindist=0;
     for (unsigned int i = 0; i < circuit->numLines (); i++) {
-        double y = wireToY (i);
+        double y = circuitDrawer.wireToY (i);
         if (i == 0 || mindist > abs(my-y)) {
             mindist = abs(my-y);
             ans = i;
@@ -289,7 +288,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
             if (rects[selections[0].gate].x0 > x || rects[selections[0].gate].x0+rects[selections[0].gate].width < x) {
                 return true;
             }
-            wireid = pickWire (y);
+            wireid = circuitDrawer.pickWire(y);
             if ((unsigned int)wireid >= circuit->numLines()) wireid = -1;
             if (wireid == -1) return true;
             g = circuit->getGate (selections[0].gate);

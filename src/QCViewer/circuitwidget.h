@@ -35,7 +35,6 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/circuitImage.h"
 #include "QCLib/state.h"
 #include "QCLib/gate.h"
-#include "draw.h"
 #include "QCLib/common.h"
 #include <memory>
 

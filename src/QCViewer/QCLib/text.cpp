@@ -35,9 +35,17 @@ PangoTextObject::PangoTextObject(std::string text)
     contents = text;
     desc = pango_font_description_from_string("LM Roman 12, Roman, Serif bold 18");
 
-    // XXX TODO
-    width = 0;
-    height = 0;
+    cairo_surface_t *surf= cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
+    cairo_t *cr = cairo_create(surf);
+    PangoLayout* layout = pango_cairo_create_layout(cr);
+    pango_layout_set_font_description(layout, desc);
+    pango_layout_set_markup(layout, contents.c_str(), contents.length());
+    int w,h;
+    pango_layout_get_size(layout, &w, &h);
+    width = (double)w/(double)PANGO_SCALE;
+    height = (double)h/(double)PANGO_SCALE;
+    cairo_destroy (cr);
+    cairo_surface_destroy (surf);
     x = 0;
     y = 0;
 
@@ -53,12 +61,6 @@ void PangoTextObject::draw(cairo_t* cr, double x, double y)
     pango_layout_set_markup(layout, contents.c_str(), contents.length());
     cairo_move_to(cr, x, y);
     pango_cairo_show_layout(cr, layout);
-
-    // After we've drawn it once we will have more accurate measurements (these might be the same? XXX)
-    int w, h;
-    pango_layout_get_size(layout, &w, &h);
-    width = (double)w/(double)PANGO_SCALE;
-    height = (double)h/(double)PANGO_SCALE;
 }
 
 PangoTextObject::~PangoTextObject()

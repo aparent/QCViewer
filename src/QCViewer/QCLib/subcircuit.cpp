@@ -28,7 +28,6 @@ Authors: Alex Parent
 #include "subcircuit.h"
 #include "simulate.h"
 #include <iostream> //XXX
-#include "draw_constants.h"
 
 using namespace std;
 
