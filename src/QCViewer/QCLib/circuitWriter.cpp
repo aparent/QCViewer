@@ -38,15 +38,6 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-string allLines(const Circuit &circ)
-{
-    string ret = "";
-    for (unsigned int i = 0 ; i < circ.numLines() ; i++) {
-        ret = ret+ " "+circ.getLine(i).lineName;
-    }
-    return ret;
-}
-
 string getGates(const Circuit &circ)
 {
     string ret;
@@ -54,8 +45,9 @@ string getGates(const Circuit &circ)
         shared_ptr<Gate> gate = circ.getGate(i);
         cout << gate->getName() << endl;
         ret += gate->getName();
-        if (gate->type==Gate::SUBCIRC) {
-            ret+="^"+intToString(((Subcircuit*)gate.get())->getLoopCount());
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gate);
+        if (s) {
+            ret+="^"+intToString(s->getLoopCount());
         }
         for (unsigned int j = 0; j < gate->controls.size() ; j++) {
             ret += " " + circ.getLine(gate->controls[j].wire).lineName;
@@ -74,7 +66,7 @@ string getGates(const Circuit &circ)
 string getSubcircuits(const map<string,shared_ptr<Circuit>> &subcircs)
 {
     string ret;
-    for ( map<string,shared_ptr<Circuit>>::const_iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+    for ( map<string,shared_ptr<Circuit>>::const_iterator it = subcircs.begin(); it != subcircs.end(); ++it) {
         ret += "BEGIN " + (*it).first + " (";
         for (unsigned int i = 0; i < (*it).second->numLines(); i++) {
             ret += (*it).second->getLine(i).lineName + " ";

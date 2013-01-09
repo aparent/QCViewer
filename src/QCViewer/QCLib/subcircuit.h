@@ -31,6 +31,7 @@ Authors: Alex Parent
 #include "circuit.h"
 #include <string>
 #include <map>
+
 //A subcircuit gate contains
 class Subcircuit : public Gate
 {

@@ -32,7 +32,6 @@ Authors: Alex Parent, Jacob Parker
 #include <memory>
 #include <vector>
 #include "state.h"
-#include "common.h"
 
 //used to specify a control number and polarity
 class Control
@@ -72,7 +71,6 @@ public:
     std::vector <unsigned int> targets;
     bool breakpoint;
     bool colbreak;
-
     bool ctrls;
 protected:
     unsigned int loop_count;

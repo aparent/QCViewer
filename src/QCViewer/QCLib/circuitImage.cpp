@@ -28,6 +28,8 @@ DrawOptions::DrawOptions()
 
 CircuitImage::CircuitImage()
 {
+    renderer = CAIRO;
+    cr = NULL;
 }
 
 void CircuitImage::toggleLineLabels()
@@ -35,9 +37,10 @@ void CircuitImage::toggleLineLabels()
     op.drawLineLabels = !op.drawLineLabels;
 }
 
-CircuitImage::CircuitImage(DrawOptions d)
+CircuitImage::CircuitImage(DrawOptions d) : op(d)
 {
-    op = d;
+    renderer = CAIRO;
+    cr = NULL;
 }
 
 void CircuitImage::renderCairo(cairo_t* c)
@@ -125,9 +128,9 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     // gates
     double xcurr = xinit+2.0*op.gatePad;
     uint32_t mingw, maxgw;
-    unsigned int i = 0;
     double maxX = 0;
     if (c.numGates()>0) {
+        uint32_t i = 0;
         for (uint32_t j = 0; j < c.columns.size(); j++) {
             maxX = 0.0;
             for (; i <= c.columns.at(j); i++) {
@@ -151,7 +154,7 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     xcurr -= maxX;
     xcurr += op.gatePad;
     gateRect fullCirc;
-    if (rects.size() > 0) {
+    if (!rects.empty()) {
         fullCirc = rects[0];
         for (unsigned int i = 1; i < rects.size(); i++) {
             fullCirc = combine_gateRect(fullCirc,rects[i]);
@@ -571,7 +574,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,double xcurr)
     xcurr -= maxX;
     xcurr -= op.gatePad;
     gateRect r;
-    if (subRects.size() > 0) {
+    if (!subRects.empty()) {
         r = subRects.at(0);
         for (unsigned int i = 1; i < subRects.size(); i++) {
             //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
@@ -655,7 +658,7 @@ void CircuitImage::addCircle (double r, double x, double y, Colour f, Colour l)
 void CircuitImage::cairoRender (cairo_t *context) const
 {
     list<std::shared_ptr<DrawPrim>>::const_iterator prim;
-    for (prim=drawPrims.begin() ; prim != drawPrims.end(); prim++ ) {
+    for (prim=drawPrims.begin() ; prim != drawPrims.end(); ++prim ) {
         switch ((*prim)->type) {
         case DrawPrim::LINE:
             cairoLine(context,static_pointer_cast<Line>(*prim));

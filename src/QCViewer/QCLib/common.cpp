@@ -66,7 +66,7 @@ int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &se
             pickRect (rects[i].subRects,x,y,selections);
         }
     }
-    if (selections.size() > 0) {
+    if (!selections.empty()) {
         return selections.at(0);
     }
     return -1;

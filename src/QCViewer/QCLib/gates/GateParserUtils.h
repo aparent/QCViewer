@@ -68,19 +68,15 @@ struct gate_node {
     std::string drawName;
     std::string symbol;
     matrix_row *row;
-    gate_node(char* n_name, char* n_symbol, matrix_row *n_row ) {
+    gate_node(char* n_name, char* n_symbol, matrix_row *n_row )
+        : name(n_name), drawName(n_symbol), symbol(n_symbol)  {
         next = NULL;
         row = n_row;
-        name = std::string(n_name);
-        symbol = std::string(n_symbol);
-        drawName = std::string(n_symbol);
     }
-    gate_node(char* n_name, char* n_dname, char* n_symbol, matrix_row *n_row ) {
+    gate_node(char* n_name, char* n_dname, char* n_symbol, matrix_row *n_row )
+        : name(n_name), drawName(n_dname), symbol(n_symbol) {
         next = NULL;
         row = n_row;
-        name = std::string(n_name);
-        drawName = std::string(n_dname);
-        symbol = std::string(n_symbol);
     }
     ~gate_node() {
         if (next!= NULL) delete next;

@@ -49,6 +49,9 @@ Circuit::~Circuit ()
 
 void Circuit::newArch ()
 {
+    if (arch) {
+        delete arch;
+    }
     arch = new QArch (numLines());
 }
 
@@ -70,7 +73,7 @@ void Circuit::expandAll()
             sub->expand = allExpanded;
         }
     }
-    for ( map<string,std::shared_ptr<Circuit>>::iterator it = subcircuits.begin(); it != subcircuits.end(); it++) {
+    for ( map<string,std::shared_ptr<Circuit>>::iterator it = subcircuits.begin(); it != subcircuits.end(); ++it) {
         it->second->expandAll();
     }
 }
@@ -362,11 +365,4 @@ bool Circuit::step (State& state)
         return true;
     }
     return false;
-}
-
-unsigned int Circuit::findcolumn (unsigned int gate) const
-{
-    unsigned int i = 0;
-    for (; i < columns.size () && gate > columns.at(i); i++);
-    return i - 1;
 }

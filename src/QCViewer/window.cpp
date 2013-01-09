@@ -53,9 +53,8 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
                        9 /* the length of I'm Data! in bytes */);
 }
 
-QCViewer::QCViewer(QCVOptions ops) : c(ops.draw)
+QCViewer::QCViewer(QCVOptions ops) : c(ops.draw), options(ops)
 {
-    options = ops;
     add_events (Gdk::KEY_PRESS_MASK|Gdk::KEY_RELEASE_MASK );
     std::cerr << "In QCViewer::QCViewer.\n";
     drawparallel = drawarch = false;
@@ -213,7 +212,7 @@ void QCViewer::on_menu_file_open_circuit ()
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
         vector<string> errors = c.load (dialog.get_filename ());
-        if (errors.size()>0) {
+        if (!errors.empty()) {
             string error_message;
             for ( unsigned int i = 0; i < errors.size(); i++) {
                 error_message += errors.at(i) + "\n";

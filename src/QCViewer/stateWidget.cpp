@@ -131,8 +131,8 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
         cr->rectangle (0, 0, width, height);
         cr->set_source_rgb (1, 1, 1);
         cr->fill ();
-        if (drawmode == EXPECTED || drawmode == EXPECTED_TRACED) {
-            if (state != NULL) {
+        if (state != NULL) {
+            if (drawmode == EXPECTED || drawmode == EXPECTED_TRACED) {
                 if (drawmode == EXPECTED) {
                     if (draw_compressed) cr->move_to (xborder, height-yborder);
                     for (unsigned int i = 0; i < num_draw; i++) {
@@ -181,9 +181,8 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
                 cr->move_to (xborder-tickwidth/2.0, yborder);
                 cr->line_to (xborder+tickwidth/2.0, yborder);
                 cr->stroke ();
-            }
-        } else if (drawmode == REAL || drawmode == IMAG) { // XXX: proper scaling?
-            if (state != NULL) {
+
+            } else if (drawmode == REAL || drawmode == IMAG) { // XXX: proper scaling?
                 double avg = 0.0;
                 double maxX = 0.0;
                 for (unsigned int i = 0; i < num_draw; i++) {
@@ -240,20 +239,21 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
                 cr->move_to (xborder, y);
                 cr->line_to (width - xborder, y);
                 cr->stroke ();
+
+                cr->set_source_rgb (0.5, 0.5, 0.5);
+                cr->move_to (xborder, height/2.0);
+                cr->line_to (width - xborder, height/2.0);
+                cr->stroke ();
+                cr->move_to (xborder, yborder);
+                cr->line_to (xborder, height-yborder);
+                cr->stroke ();
+                cr->move_to (xborder - tickwidth/2.0, yborder);
+                cr->line_to (xborder + tickwidth/2.0, yborder);
+                cr->stroke ();
+                cr->move_to (xborder - tickwidth/2.0, height - yborder);
+                cr->line_to (xborder + tickwidth/2.0, height - yborder);
+                cr->stroke ();
             }
-            cr->set_source_rgb (0.5, 0.5, 0.5);
-            cr->move_to (xborder, height/2.0);
-            cr->line_to (width - xborder, height/2.0);
-            cr->stroke ();
-            cr->move_to (xborder, yborder);
-            cr->line_to (xborder, height-yborder);
-            cr->stroke ();
-            cr->move_to (xborder - tickwidth/2.0, yborder);
-            cr->line_to (xborder + tickwidth/2.0, yborder);
-            cr->stroke ();
-            cr->move_to (xborder - tickwidth/2.0, height - yborder);
-            cr->line_to (xborder + tickwidth/2.0, height - yborder);
-            cr->stroke ();
         }
     }
     return true;

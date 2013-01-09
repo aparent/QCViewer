@@ -93,8 +93,9 @@ LatexTextObject::LatexTextObject(std::string text)
     }
 
     /* Get a temporary working directory. */
-    char wdbfr[10], *newwd;
+    char *newwd;
     {
+        char wdbfr[10];
         const char * wdtmpl = "tmpXXXXXX";
         strcpy(wdbfr, wdtmpl);
 #ifdef WIN32
@@ -188,7 +189,7 @@ whoops_pango:
         case TEXT_LATEX:
             try {
                 obj = new LatexTextObject(text);
-            } catch(std::string msg) {
+            } catch(std::string &msg) {
                 latexFailure(msg);
                 goto whoops_pango;
             } catch(...) {

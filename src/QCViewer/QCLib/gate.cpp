@@ -38,6 +38,10 @@ Gate::Gate()
 {
     breakpoint = false;
     colbreak = false;
+    ctrls = false;
+    loop_count = 0;
+    type = UGATE;
+    drawType = DEFAULT;
 }
 
 Gate::~Gate() {}
@@ -59,9 +63,9 @@ unsigned int Gate::getNumGates() const
 
 void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned int &minw, unsigned int &maxw)
 {
-    if (targ.size() > 0) {
+    if (!targ.empty()) {
         maxw = minw = targ.at(0);
-    } else if (ctrl.size() > 0) {
+    } else if (!ctrl.empty()) {
         maxw = minw = ctrl.at(0).wire;
     } else {
         maxw = minw = 0;
@@ -82,6 +86,7 @@ gateMatrix::~gateMatrix()
 
 gateMatrix::gateMatrix(int n_dim)
 {
+    data = NULL;
     dim = n_dim;
 }
 

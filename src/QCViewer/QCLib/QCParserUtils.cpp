@@ -262,7 +262,7 @@ void addRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *names,
     } else if (gateName=="RZ") {
         rot_type = RGate::Z;
     } else {
-        rot_type = RGate::Z;
+        cout << "Bad R-Gate type. See: " << __FILE__ << __LINE__ << endl;
     }
     shared_ptr<Gate> g = shared_ptr<Gate>(new RGate(rot, rot_type));
     while(names) {
@@ -291,7 +291,7 @@ void addFracRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *na
     } else if (gateName=="RZ") {
         rot_type = RGate::Z;
     } else {
-        rot_type = RGate::Z;
+        cout << "Bad R-Gate type. See: " << __FILE__ << __LINE__ << endl;
     }
     shared_ptr<Gate> g = shared_ptr<Gate>(new RGate(rot_type,numer,denom));
     while(names) {
@@ -358,7 +358,7 @@ void link_circuit(shared_ptr<Circuit> c, const map<string,shared_ptr<Circuit>> &
 void link_subcircs(std::shared_ptr<Circuit> circ)
 {
     map<string,shared_ptr<Circuit>> subcircs = circ->subcircuits;
-    for ( map<string,shared_ptr<Circuit>>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+    for ( map<string,shared_ptr<Circuit>>::iterator it = subcircs.begin(); it != subcircs.end(); ++it) {
         shared_ptr<Circuit> c = it->second;
         link_circuit(c,subcircs);
     }
@@ -390,7 +390,7 @@ void cleanup_bad_gates(std::shared_ptr<Circuit> circ, vector<string>& error_log)
 {
     remove_bad_gates (circ,error_log);
     map<string,shared_ptr<Circuit>> subcircs = circ->subcircuits;
-    for ( map<string,shared_ptr<Circuit>>::iterator it = subcircs.begin(); it != subcircs.end(); it++) {
+    for ( map<string,shared_ptr<Circuit>>::iterator it = subcircs.begin(); it != subcircs.end(); ++it) {
         remove_bad_gates(it->second, error_log);
     }
 }
