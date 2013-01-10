@@ -48,14 +48,16 @@ Selection::Selection(uint32_t n, vector<Selection> s)
 
 gateRect::gateRect() : x0(0),y0(0),width(0),height(0) {}
 
-gateRect combine_gateRect (const gateRect &a, const gateRect &b)
+gateRect& gateRect::operator+= (const gateRect& rhs)
 {
-    gateRect c;
-    c.x0 = min(a.x0, b.x0);
-    c.y0 = min(a.y0, b.y0);
-    c.width =  max (a.x0-c.x0 + a.width,  b.x0 - c.x0 + b.width);
-    c.height = max (a.y0-c.y0 + a.height, b.y0 - c.y0 + b.height);
-    return c;
+    gateRect ans;
+    ans.x0 = min(x0, rhs.x0);
+    ans.y0 = min(y0, rhs.y0);
+    ans.width =  max (x0-ans.x0 + width,  rhs.x0 - ans.x0 + rhs.width);
+    ans.height = max (y0-ans.y0 + height, rhs.y0 - ans.y0 + rhs.height);
+    *this = ans;
+    return *this;
+
 }
 
 int pickRect (const vector<gateRect> &rects, double x, double y, vector<int> &selections)

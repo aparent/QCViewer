@@ -157,7 +157,7 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
     if (!rects.empty()) {
         fullCirc = rects[0];
         for (unsigned int i = 1; i < rects.size(); i++) {
-            fullCirc = combine_gateRect(fullCirc,rects[i]);
+            fullCirc += rects[i];
         }
     }
     wireend = wirestart + fullCirc.width + op.gatePad*2;
@@ -429,7 +429,7 @@ gateRect CircuitImage::drawFred (shared_ptr<Gate> g, uint32_t xc)
     uint32_t maxw = g->targets.at(0);
     for (uint32_t i = 0; i < g->targets.size(); i++) {
         gateRect recttmp = drawX (xc, wireToY(g->targets.at(i)), op.radius);
-        rect = combine_gateRect(rect, recttmp);
+        rect += recttmp;
         minw = min (minw, g->targets.at(i));
         maxw = max (maxw, g->targets.at(i));
     }
@@ -444,7 +444,7 @@ gateRect CircuitImage::drawCNOT (shared_ptr<Gate> g, uint32_t xc)
     gateRect rect = drawControls (g, xc);
     for (uint32_t i = 0; i < g->targets.size(); i++) {
         gateRect recttmp = drawNOT (xc, wireToY(g->targets.at(i)), op.radius);
-        rect = combine_gateRect(rect, recttmp);
+        rect += recttmp;
     }
     return rect;
 }
@@ -523,7 +523,8 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
     r.y0 = yc -height/2 - op.thickness;
     r.width = width + 2*op.thickness;
     r.height = height + 2*op.thickness;
-    return combine_gateRect(rect, r);
+    rect += r;
+    return rect;
 }
 
 void CircuitImage::drawSubcirc(shared_ptr<Subcircuit> s, double &xcurr,double &maxX, vector <gateRect> &rects)
@@ -582,7 +583,7 @@ gateRect CircuitImage::drawExp(shared_ptr<Subcircuit> s,double xcurr)
         r = subRects.at(0);
         for (unsigned int i = 1; i < subRects.size(); i++) {
             //drawRect (cr, subRects->at(i), Colour(0.8,0,0,0.8), Colour (0.1, 0.7,0.2,0.3));
-            r = combine_gateRect(r,(subRects)[i]);
+            r += subRects[i];
         }
         drawSubCircBox(s,r);
         r.subRects = subRects;
@@ -611,7 +612,7 @@ void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, gateRect &r)
     if (r.width < text->getWidth() + 4.0) {
         r.width = text->getWidth() + 4.0;
     }
-    r = combine_gateRect(rect,r);
+    r += rect;
 }
 
 void CircuitImage::drawDot (double xc, double yc, double radius, bool negative)
