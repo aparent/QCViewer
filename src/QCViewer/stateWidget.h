@@ -60,6 +60,7 @@ private:
     double t_barWidth;
 
     void force_redraw ();
+    void drawBar(Cairo::RefPtr <Cairo::Context> cr,int pos, double yPos, double h, int r, int g, int b);
     State *state;
     Gtk::Statusbar* status;
     int mousex, mousey;
