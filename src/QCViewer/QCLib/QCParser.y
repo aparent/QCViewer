@@ -43,7 +43,7 @@ Authors: Alex Parent, Jacob Parker
   std::shared_ptr<Circuit> circuit;
   std::shared_ptr<Circuit> curr_circ;
   std::vector<std::string> error_log;
-  #define CHECK_NAMES(names,id) if(!check_names(curr_circ,names,error_log,id)){circuit=NULL;return -1;} 
+  #define CHECK_NAMES(names,id) if(!check_names(curr_circ,names,error_log,id)){circuit=std::shared_ptr<Circuit>();return -1;} 
 %}
 %code requires{
   #include "QCLib/QCParserUtils.h"
@@ -90,7 +90,7 @@ input:	/*empty*/
           gates END 
 		    | error 
           {
-            circuit = NULL; 
+            circuit = std::shared_ptr<Circuit>();
             return -1;
           }
 ;
@@ -228,7 +228,7 @@ std::shared_ptr<Circuit> parseCircuit(std::string filename,std::vector<std::stri
   		strcpy(in,input.c_str());
   		QC__scan_string(in);
   		QC_parse ();
-			if (circuit == NULL){
+			if (!circuit){
 				error_log_r = error_log;
 				return circuit;
 			}

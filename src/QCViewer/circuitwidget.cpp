@@ -40,7 +40,7 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-CircuitWidget::CircuitWidget(DrawOptions drawOp) : circuit(NULL),circuitDrawer(drawOp)
+CircuitWidget::CircuitWidget(DrawOptions drawOp) : circuit(std::shared_ptr<Circuit>()),circuitDrawer(drawOp)
 {
     state = NULL;
     win = NULL;
@@ -402,7 +402,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->set_source_rgb (1,1,1);
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
-        if (circuit != NULL) {
+        if (circuit) {
             rects = circuitDrawer.draw(*circuit, drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default);
             generate_layout_rects ();
         }
@@ -431,7 +431,7 @@ vector<string> CircuitWidget::load (string file)
     circuit = parseCircuit(file,error_log);
     breakpoints.clear ();
     cx = cy = 0;
-    if (circuit == NULL) {
+    if (!circuit) {
         cout << "Error loading circuit" << endl;
         return error_log;
     }
@@ -518,7 +518,7 @@ bool CircuitWidget::step ()
 
 void CircuitWidget::reset ()
 {
-    if(circuit!=NULL) {
+    if(circuit) {
         circuit->reset();
         NextGateToSimulate = 0;
         force_redraw ();
@@ -536,22 +536,22 @@ double CircuitWidget::get_scale ()
 }
 int CircuitWidget::get_QCost ()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->QCost();
 }
 int CircuitWidget::get_Depth ()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->getParallel().size();
 }
 int CircuitWidget::get_num_gates ()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->totalGates();
 }
 unsigned int CircuitWidget::get_num_lines()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->numLines();
 }
 
@@ -615,7 +615,7 @@ shared_ptr<Gate> CircuitWidget::getSelectedSubGate (shared_ptr<Circuit> circuit,
 {
     if (!circuit || selections.size () != 1) {
         if (selections.size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
-        return NULL;
+        return shared_ptr<Gate>();
     }
     shared_ptr<Gate> g = circuit->getGate(selections.at(0).gate);
     shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);

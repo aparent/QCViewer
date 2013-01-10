@@ -56,7 +56,7 @@ shared_ptr<Gate> Subcircuit::clone() const
 
 string Subcircuit::getName() const
 {
-    if (circ != NULL) return circ->getName();
+    if (circ) return circ->getName();
     return "NULL";
 }
 

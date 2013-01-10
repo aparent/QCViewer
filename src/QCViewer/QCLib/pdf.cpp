@@ -1,6 +1,7 @@
 #include <poppler.h>
 #include <assert.h>
 #include <iostream>
+#include <cstdlib>
 #include "pdf.h"
 
 PopplerContainer::~PopplerContainer()

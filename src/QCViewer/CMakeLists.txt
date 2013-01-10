@@ -23,7 +23,6 @@ LIST(APPEND QCLIB_SRC_FILES
 	GateLexer.cpp
 )
 
-IF(NOT WIN32)
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/QCParser.cpp ${CMAKE_CURRENT_BINARY_DIR}/QCParser.h
 	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCLib/QCParser.y
@@ -54,7 +53,6 @@ add_custom_command (
 	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/QCLib/gates/GateParser.y
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLib/gates/GateParser.y
 )
-ENDIF(NOT WIN32)
 
 FIND_PACKAGE(Boost REQUIRED COMPONENTS system program_options filesystem)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})

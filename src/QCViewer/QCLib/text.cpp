@@ -98,14 +98,22 @@ LatexTextObject::LatexTextObject(std::string text)
         char wdbfr[10];
         const char * wdtmpl = "tmpXXXXXX";
         strcpy(wdbfr, wdtmpl);
-#ifdef WIN32
-        if(newwd = wdbfr, _mktemp_s(wdbfr, wdtmpl))
-#else
+        #ifdef WIN32
+        if((newwd = mktemp(wdbfr)) == NULL)
+        #else
         if((newwd = mkdtemp(wdbfr)) == NULL)
-#endif
+        #endif
         {
-            throw "Couldn't create temporary directory for TeX.";
+            throw "Couldn't create temporary directory for TeX (mk[d]temp).";
         }
+        #ifdef WIN32
+        if(unlink(wdbfr)) {
+            throw "Couldn't create temporary directory for TeX (unlink).";
+        }
+        if(mkdir(wdbfr)) {
+            throw "Couldn't create temporary directory for TeX (mkdir).";
+        }
+        #endif
     }
 
     /* Save the current working directory. */
