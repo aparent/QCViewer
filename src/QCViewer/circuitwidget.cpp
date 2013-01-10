@@ -81,6 +81,7 @@ void CircuitWidget::set_offset (int y)
 void CircuitWidget::toggle_linelabels()
 {
     circuitDrawer.toggleLineLabels();
+    size_changed = true;
     force_redraw ();
 }
 
