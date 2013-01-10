@@ -486,7 +486,11 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
 {
     uint32_t minw, maxw;
     stringstream ss;
-    ss << g->getDrawName();
+    if (textEngine.getMode() == TEXT_LATEX) {
+        ss << g->getLatexName();
+    } else {
+        ss << g->getDrawName();
+    }
     if (g->getLoopCount() > 1) {
         ss << " x" << g->getLoopCount();
     }

@@ -28,7 +28,6 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/utility.h"
 #include <cmath>
 #include <complex>
-#include "QCLib/text.h"
 
 using namespace std;
 
@@ -63,34 +62,21 @@ shared_ptr<Gate> RGate::clone() const
     return shared_ptr<Gate>(g);
 }
 
-extern TextEngine textEngine;
 string RGate::getName() const
 {
     string rot_str;
     std::string pi_str;
-    if(textEngine.getMode() == TEXT_LATEX) {
-        pi_str = "\\pi";
-    } else {
-        pi_str = "π";
-    }
+    pi_str = "π";
 
     if(frac) {
         if((numer == 1) && (denom ==1)) {
             rot_str = pi_str;
         } else if (numer == 1) {
-            if(textEngine.getMode() == TEXT_LATEX) {
-                rot_str = "\\frac{" + pi_str + "}{" + intToString(denom) + "}";
-            } else {
-                rot_str = pi_str + "/" + intToString(denom);
-            }
+            rot_str = pi_str + "/" + intToString(denom);
         } else if (denom == 1) {
             rot_str = intToString(numer) + pi_str;
         } else {
-            if(textEngine.getMode() == TEXT_LATEX) {
-                rot_str = "\\frac{" + intToString(numer) + pi_str + "}{" + intToString(denom) + "}";
-            } else {
-                rot_str = intToString(numer) + pi_str + "/" + intToString(denom);
-            }
+            rot_str = intToString(numer) + pi_str + "/" + intToString(denom);
         }
     } else {
         if (rot == 1.0) {
@@ -98,24 +84,6 @@ string RGate::getName() const
         } else {
             rot_str = floatToString(rot) + pi_str;
         }
-    }
-
-
-    if(textEngine.getMode() == TEXT_LATEX) {
-        std::string str = "R_";
-        switch(axis) {
-        case RGate::X:
-            str += "x";
-            break;
-        case RGate::Y:
-            str += "y";
-            break;
-        case RGate::Z:
-            str += "z";
-            break;
-        }
-        str += "\\left(" + rot_str + "\\right)";
-        return str;
     }
 
     const string startTag = "<span font_desc=\"LMMathItalic10 bold 18\">";
@@ -148,6 +116,44 @@ string RGate::getName() const
     default:
         return "R";
     }
+}
+
+std::string RGate::getLatexName()
+{
+    string rot_str;
+    std::string pi_str;
+    pi_str = "\\pi";
+    if(frac) {
+        if((numer == 1) && (denom ==1)) {
+            rot_str = pi_str;
+        } else if (numer == 1) {
+            rot_str = "\\frac{" + pi_str + "}{" + intToString(denom) + "}";
+        } else if (denom == 1) {
+            rot_str = intToString(numer) + pi_str;
+        } else {
+            rot_str = "\\frac{" + intToString(numer) + pi_str + "}{" + intToString(denom) + "}";
+        }
+    } else {
+        if (rot == 1.0) {
+            rot_str = pi_str;
+        } else {
+            rot_str = floatToString(rot) + pi_str;
+        }
+    }
+    std::string str = "R_";
+    switch(axis) {
+    case RGate::X:
+        str += "x";
+        break;
+    case RGate::Y:
+        str += "y";
+        break;
+    case RGate::Z:
+        str += "z";
+        break;
+    }
+    str += "\\left(" + rot_str + "\\right)";
+    return str;
 }
 
 std::string RGate::getDrawName()

@@ -65,6 +65,11 @@ std::string Subcircuit::getDrawName()
     return getName();
 }
 
+std::string Subcircuit::getLatexName()
+{
+    return getName();
+}
+
 void Subcircuit::setName(string n_name)
 {
     circ->setName(n_name);

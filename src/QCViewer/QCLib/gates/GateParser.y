@@ -77,6 +77,7 @@ input: 		 /* empty */  {$$ = NULL;}
 
 gate:      NAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $7);}
          | NAME WORD NEWLINE DRAWNAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $8, $10);}
+         | NAME WORD NEWLINE DRAWNAME WORD NEWLINE LATEXNAME WORD NEWLINE SYMBOL WORD NEWLINE matrix {$$ = new gate_node($2, $5, $8, $11,$13);}
 ;
 
 matrix:		  row NEWLINE matrix {$$ = new matrix_row($1,$3);}
