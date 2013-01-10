@@ -48,7 +48,7 @@ gateMatrix getGateMatrix(Gate*);//defined below
 	The application of the gate is left up to the gate class.  This allows per gate class
 	optimization if nessicary. (For a good example of how this works see gates/UGate.cpp
 */
-State ApplyGate (const State &in, const std::shared_ptr<Gate> g)
+State ApplyGate (const State &in, const std::shared_ptr<Gate> &g)
 {
     State s = in;
     if (g->drawType == Gate::MEASURE) {

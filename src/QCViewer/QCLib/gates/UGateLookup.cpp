@@ -118,6 +118,7 @@ void add_gates(gate_node *n)
 {
     gateMatrix g = get_matrix(n->row);
     g.drawName = n->drawName;
+    g.latexName = n->latexName;
     if (g.dim != 0) UGateLoad(n->symbol,g);
     if (n->next != NULL) add_gates(n->next);
 }

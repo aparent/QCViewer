@@ -27,7 +27,6 @@ Authors: Alex Parent
 
 #include "subcircuit.h"
 #include "simulate.h"
-#include <iostream> //XXX
 
 using namespace std;
 
@@ -57,11 +56,16 @@ shared_ptr<Gate> Subcircuit::clone() const
 
 string Subcircuit::getName() const
 {
-    if (circ != NULL) return circ->getName();
+    if (circ) return circ->getName();
     return "NULL";
 }
 
 std::string Subcircuit::getDrawName()
+{
+    return getName();
+}
+
+std::string Subcircuit::getLatexName()
 {
     return getName();
 }
@@ -102,7 +106,7 @@ shared_ptr<Gate> Subcircuit::getGate(int pos) const
         g->controls[i].wire = lineMap.at(g->controls[i].wire);
     }
     if (g->type == SUBCIRC) { //Combine the maps if it is a subcircuit so we have the correct global map
-        Subcircuit* s = (Subcircuit*)g.get();
+        shared_ptr<Subcircuit> s = static_pointer_cast<Subcircuit>(g);
         for (unsigned int i = 0; i < s->lineMap.size(); i++) {
             s->lineMap.at(i) = lineMap.at(s->lineMap.at(i));
         }
@@ -129,11 +133,13 @@ shared_ptr<Circuit> Subcircuit::getCircuit()
 bool Subcircuit::step (State& state)
 {
     simState->simulating = true;
-    bool bp = false;
     if (simState->gate < numGates () ) {
         shared_ptr<Gate> g = getGate(simState->gate);
-        if (g->breakpoint) bp = true;
-        if (g->type != Gate::SUBCIRC || !dynamic_pointer_cast<Subcircuit>(g)->expand ) {
+        bool bp = false;
+        if (g->breakpoint) {
+            bp = true;
+        }
+        if (g->type != Gate::SUBCIRC || !static_pointer_cast<Subcircuit>(g)->expand ) {
             state = ApplyGate(state,g);
             simState->gate++;
         } else {
@@ -143,7 +149,6 @@ bool Subcircuit::step (State& state)
             }
         }
         if (bp) {
-            cout << "SBREAK" << endl;
             return false;
         }
         if (g->type == Gate::SUBCIRC && dynamic_pointer_cast<Subcircuit>(g)->simState->simulating) {

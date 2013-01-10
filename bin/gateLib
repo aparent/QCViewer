@@ -32,6 +32,7 @@ SYMBOL T
 
 NAME TGateConj
 DRAWNAME "T<sup>†</sup>"
+LATEXNAME "T^\dagger"
 SYMBOL T*
 1 , 0
 0 , 1/sqrt(2) - i*1/sqrt(2)
@@ -44,6 +45,7 @@ SYMBOL P
 
 NAME PGateConj
 DRAWNAME "S<sup>†</sup>"
+LATEXNAME "S^\dagger"
 SYMBOL P*
 1 , 0
 0 , -i

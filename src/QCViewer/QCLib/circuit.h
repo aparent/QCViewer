@@ -37,7 +37,6 @@ Authors: Alex Parent, Jacob Parker
 #include <string>
 #include <memory>
 #include <map>
-#include "common.h"
 
 class Line
 {
@@ -202,7 +201,6 @@ private:
 
     bool allExpanded;
 
-    unsigned int findcolumn (unsigned int gate) const;
     //for deconstructor
     void removeArch ();
 };

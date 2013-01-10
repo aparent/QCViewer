@@ -67,9 +67,10 @@ public:
     double height;
     //! Contains subrectangles in the case of an expanded subcircuit
     std::vector<gateRect> subRects;
+    //! Combines 2 rectangles into a minimum bounding box which contains both
+    gateRect& operator+= (const gateRect&);
 };
 
-gateRect combine_gateRect (const gateRect &a, const gateRect &b);
 int pickRect (const std::vector<gateRect> &rects, double x, double y, std::vector<int> &selections);
 std::vector<Selection> pickRects (const std::vector<gateRect> &rects, const gateRect &s);
 

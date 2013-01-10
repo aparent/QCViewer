@@ -47,7 +47,7 @@ int main (int argc, char *argv[])
     if (argc > 0) {
         vector<string> error_log;
         c = parseCircuit(argv[1],error_log);
-        if (c == NULL) {
+        if (!c) {
             cout << "Parse Error" << endl;
             return -1;
         }

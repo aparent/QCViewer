@@ -53,9 +53,8 @@ void QCViewer::dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData& 
                        9 /* the length of I'm Data! in bytes */);
 }
 
-QCViewer::QCViewer(QCVOptions ops) : c(ops.draw)
+QCViewer::QCViewer(QCVOptions ops) : c(ops.draw), options(ops)
 {
-    options = ops;
     add_events (Gdk::KEY_PRESS_MASK|Gdk::KEY_RELEASE_MASK );
     std::cerr << "In QCViewer::QCViewer.\n";
     drawparallel = drawarch = false;
@@ -213,7 +212,7 @@ void QCViewer::on_menu_file_open_circuit ()
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
         vector<string> errors = c.load (dialog.get_filename ());
-        if (errors.size()>0) {
+        if (!errors.empty()) {
             string error_message;
             for ( unsigned int i = 0; i < errors.size(); i++) {
                 error_message += errors.at(i) + "\n";
@@ -456,7 +455,7 @@ void QCViewer::set_selection (vector<Selection> s)
         m_FlowFrame.hide();
     } else if (selections.size () == 1) {
         shared_ptr<Gate> gate = c.getSelectedGate();
-        if (gate != NULL && gate->type == Gate::RGATE) {
+        if (gate && gate->type == Gate::RGATE) {
             shared_ptr<RGate> rg = dynamic_pointer_cast<RGate>(gate);
             m_RGateEditFrame.show ();
             switch (rg->get_axis ()) {
@@ -521,7 +520,7 @@ void QCViewer::set_loop_iter ()
 void QCViewer::set_subcircuit_name()
 {
     shared_ptr<Gate> g = c.getSelectedGate();
-    if (g != NULL && g->type==Gate::SUBCIRC) {
+    if (g && g->type==Gate::SUBCIRC) {
         shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
         sub->setName(m_SubcircNameEntry.get_text());
         c.force_redraw();
@@ -532,7 +531,7 @@ void QCViewer::set_subcircuit_name()
 void QCViewer::expand_subcirc()
 {
     shared_ptr<Gate> g = c.getSelectedGate();
-    if (g != NULL && g->type==Gate::SUBCIRC) {
+    if (g && g->type==Gate::SUBCIRC) {
         shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
         sub->expand = !sub->expand;
         c.force_redraw();
@@ -547,7 +546,7 @@ void QCViewer::expand_all_subcirc()
 void QCViewer::unroll_subcirc()
 {
     shared_ptr<Gate> g = c.getSelectedGate();
-    if (g != NULL && g->type==Gate::SUBCIRC) {
+    if (g && g->type==Gate::SUBCIRC) {
         shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(g);
         sub->unroll = !sub->unroll;
         c.force_redraw();

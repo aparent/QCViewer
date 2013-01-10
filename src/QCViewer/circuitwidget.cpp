@@ -40,10 +40,9 @@ Authors: Alex Parent, Jacob Parker
 
 using namespace std;
 
-CircuitWidget::CircuitWidget(DrawOptions drawOp) : circuitDrawer(drawOp)
+CircuitWidget::CircuitWidget(DrawOptions drawOp) : circuit(std::shared_ptr<Circuit>()),circuitDrawer(drawOp)
 {
     state = NULL;
-    circuit = NULL;
     win = NULL;
     cx = cy = 0;
     size_changed = panning = drawarch = drawparallel = false;
@@ -82,6 +81,7 @@ void CircuitWidget::set_offset (int y)
 void CircuitWidget::toggle_linelabels()
 {
     circuitDrawer.toggleLineLabels();
+    size_changed = true;
     force_redraw ();
 }
 
@@ -115,7 +115,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
         return;
     }
     selections.clear();
-    ((QCViewer*)win)->set_selection (selections);
+    static_cast<QCViewer*>(win)->set_selection (selections);
     Gtk::Widget* widget = drag_get_source_widget(context);
     Gtk::Button* button = dynamic_cast<Gtk::Button*>(widget);
     if (button == NULL) {
@@ -125,7 +125,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
 
     shared_ptr<Gate> newgate;
     unsigned int target = 0;
-    switch (((GateIcon*)button->get_image ())->type) {
+    switch (static_cast<GateIcon*>(button->get_image())->type) {
     case GateIcon::NOT:
         newgate = shared_ptr<Gate>(new UGate ("X"));
         newgate->drawType = Gate::NOT;
@@ -143,7 +143,7 @@ void CircuitWidget::on_drag_data_received(const Glib::RefPtr<Gdk::DragContext>& 
         newgate->drawType = Gate::MEASURE;
         break;
     default:
-        newgate = shared_ptr<Gate>(new UGate(((GateIcon*)button->get_image ())->symbol));
+        newgate = shared_ptr<Gate>(new UGate(static_cast<GateIcon*>(button->get_image ())->symbol));
         break;
     }
     if (newgate->targets.size () > circuit->numLines ()) {
@@ -240,7 +240,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
     shared_ptr<Gate> g;
     if (event->button == 3) {
         selections.clear ();
-        ((QCViewer*)win)->set_selection (selections);
+        static_cast<QCViewer*>(win)->set_selection (selections);
         force_redraw ();
     } else if (event->button == 1) {
         panning = false;
@@ -269,7 +269,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
             if (!pickRects(rects, r).empty()) {
                 selections.clear ();
                 selections = pickRects (rects, r);
-                ((QCViewer*)win)->set_selection (selections);
+                static_cast<QCViewer*>(win)->set_selection (selections);
             }
             force_redraw ();
         }
@@ -278,7 +278,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
             if (selections.size () != 1) {
                 cout << "very bad thing happened: " << __LINE__ << __FILE__ << endl;
                 selections.clear ();
-                ((QCViewer*)win)->set_selection (selections);
+                static_cast<QCViewer*>(win)->set_selection (selections);
             }
             // find out which wire was clicked
             // get the control associated with this gate, wire
@@ -324,7 +324,7 @@ bool CircuitWidget::on_button_release_event(GdkEventButton* event)
                     if (i != selections[0].gate && !(minW2 > maxW || maxW2 < minW)) {
                         circuit->swapGate (firstGateID, selections[0].gate); // pop it out to the left
                         selections[0].gate = firstGateID;
-                        ((QCViewer*)win)->set_selection (selections);
+                        static_cast<QCViewer*>(win)->set_selection (selections);
                         circuit->getGreedyParallel();
                         force_redraw ();
                         return true;
@@ -403,7 +403,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->set_source_rgb (1,1,1);
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
-        if (circuit != NULL) {
+        if (circuit) {
             rects = circuitDrawer.draw(*circuit, drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default);
             generate_layout_rects ();
         }
@@ -432,7 +432,7 @@ vector<string> CircuitWidget::load (string file)
     circuit = parseCircuit(file,error_log);
     breakpoints.clear ();
     cx = cy = 0;
-    if (circuit == NULL) {
+    if (!circuit) {
         cout << "Error loading circuit" << endl;
         return error_log;
     }
@@ -501,14 +501,6 @@ void CircuitWidget::set_scale (double x)
     force_redraw ();
 }
 
-// XXX: urg, may be duplicated elsewhere. check.
-unsigned int findcolumn (vector<LayoutColumn>& layout, unsigned int gate)
-{
-    unsigned int i;
-    for (i = 0; i < layout.size () && gate > layout[i].lastGateID; i++);
-    return i - 1;
-}
-
 bool CircuitWidget::run (bool breaks)
 {
     if (!circuit || !state) return false;
@@ -527,7 +519,7 @@ bool CircuitWidget::step ()
 
 void CircuitWidget::reset ()
 {
-    if(circuit!=NULL) {
+    if(circuit) {
         circuit->reset();
         NextGateToSimulate = 0;
         force_redraw ();
@@ -545,22 +537,22 @@ double CircuitWidget::get_scale ()
 }
 int CircuitWidget::get_QCost ()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->QCost();
 }
 int CircuitWidget::get_Depth ()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->getParallel().size();
 }
 int CircuitWidget::get_num_gates ()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->totalGates();
 }
 unsigned int CircuitWidget::get_num_lines()
 {
-    if (circuit == NULL) return 0;
+    if (!circuit) return 0;
     return circuit->numLines();
 }
 
@@ -572,7 +564,7 @@ void CircuitWidget::insert_gate_in_column (shared_ptr<Gate> g, unsigned int colu
     size_changed = true;
     selections.clear ();
     selections.push_back(column_id);
-    ((QCViewer*)win)->set_selection (selections);
+    static_cast<QCViewer*>(win)->set_selection (selections);
     force_redraw ();
 }
 
@@ -583,7 +575,7 @@ void CircuitWidget::insert_gate_at_front (shared_ptr<Gate> g)
     size_changed = true;
     selections.clear ();
     selections.push_back(0);
-    ((QCViewer*)win)->set_selection (selections);
+    static_cast<QCViewer*>(win)->set_selection (selections);
     force_redraw ();
 }
 
@@ -606,7 +598,7 @@ void CircuitWidget::generate_layout_rects ()
     for (unsigned int column = 0; column < circuit->columns.size() && start_gate < circuit->numGates (); column++) {
         gateRect bounds = rects.at(start_gate);
         for (unsigned int gate = start_gate + 1; gate <= circuit->columns.at(column) ; gate++) {
-            bounds = combine_gateRect(bounds, rects[gate]);
+            bounds += rects[gate];
         }
         bounds.y0 = ext.y;
         bounds.height = max (bounds.height, ext.height);
@@ -620,19 +612,22 @@ void CircuitWidget::set_mode (Mode m)
     mode = m;
 }
 
-shared_ptr<Gate> CircuitWidget::getSelectedSubGate (std::shared_ptr<Circuit> circuit, vector<Selection> selections)
+shared_ptr<Gate> CircuitWidget::getSelectedSubGate (shared_ptr<Circuit> circuit, vector<Selection> selections)
 {
     if (!circuit || selections.size () != 1) {
         if (selections.size () > 1) cout << "bad: getSelectedGate when multiple gates selected.\n";
-        return NULL;
+        return shared_ptr<Gate>();
     }
     shared_ptr<Gate> g = circuit->getGate(selections.at(0).gate);
-    if (!selections.at(0).sub.empty() && selections.at(0).sub.size() == 1 && g->type==Gate::SUBCIRC&& ((Subcircuit*)g.get())->expand ) {
-        if (((Subcircuit*)g.get())->unroll) {
-            selections.at(0).sub.at(0).gate = selections.at(0).sub.at(0).gate % ((Subcircuit*)g.get())->numGates();
-            g = getSelectedSubGate(((Subcircuit*)g.get())->getCircuit(),selections.at(0).sub);
-        } else {
-            g = getSelectedSubGate(((Subcircuit*)g.get())->getCircuit(),selections.at(0).sub);
+    shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+    if ( s ) {
+        if (!selections.at(0).sub.empty() && selections.at(0).sub.size() == 1 && s->expand ) {
+            if (s->unroll) {
+                selections.at(0).sub.at(0).gate = selections.at(0).sub.at(0).gate % s->numGates();
+                g = getSelectedSubGate(s->getCircuit(),selections.at(0).sub);
+            } else {
+                g = getSelectedSubGate(s->getCircuit(),selections.at(0).sub);
+            }
         }
     }
     return g;
@@ -648,8 +643,9 @@ void CircuitWidget::deleteSelectedSubGate (std::shared_ptr<Circuit> circuit, vec
 {
     if (circuit && selections.size () > 0 && selections.at(0).gate < circuit->numGates()) {
         shared_ptr<Gate> g = circuit->getGate(selections.at(0).gate);
-        if (!selections.at(0).sub.empty() && selections.at(0).sub.size() == 1 && g->type==Gate::SUBCIRC && ((Subcircuit*)g.get())->expand && !((Subcircuit*)g.get())->unroll) {
-            deleteSelectedSubGate(((Subcircuit*)g.get())->getCircuit(),selections.at(0).sub);
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+        if (s && !selections.at(0).sub.empty() && selections.at(0).sub.size() == 1 && s->expand && !s->unroll) {
+            deleteSelectedSubGate(s->getCircuit(),selections.at(0).sub);
         } else {
             circuit->removeGate(selections.at(0).gate);
         }
@@ -705,12 +701,12 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, std::shared_pt
     if (c->numGates()!=0 && select >= (int)c->numGates()) {
         select = select % c->numGates();
     }
-    shared_ptr<Gate> g;
+    shared_ptr<Subcircuit> sub;
     if (select!=-1) {
-        g = c->getGate(select);
+        shared_ptr<Subcircuit> sub = dynamic_pointer_cast<Subcircuit>(c->getGate(select));
     }
-    if (g != NULL && g->type==Gate::SUBCIRC && ((Subcircuit*)g.get())->expand && !rects.at(select).subRects.empty()) {
-        getCircuitAndColPosition (x, y, ((Subcircuit*)g.get())->getCircuit(), rects.at(select).subRects, r_name, r_pos );
+    if (sub && sub->expand && !rects.at(select).subRects.empty()) {
+        getCircuitAndColPosition (x, y, sub->getCircuit(), rects.at(select).subRects, r_name, r_pos );
     } else {
         vector<unsigned int> para = c->getGreedyParallel();
         vector<gateRect> cols;
@@ -718,7 +714,7 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, std::shared_pt
         for (unsigned int column = 0; column < para.size() && start_gate < c->numGates(); column++) {
             gateRect bounds = rects.at(start_gate);
             for (unsigned int gate = start_gate + 1; gate <= para.at(column); gate++) {
-                bounds = combine_gateRect(bounds, rects.at(gate));
+                bounds += rects.at(gate);
             }
             bounds.y0 = ext.y;
             bounds.height = max (bounds.height, ext.height);

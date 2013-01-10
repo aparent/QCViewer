@@ -31,6 +31,7 @@ Authors: Alex Parent
 #include "circuit.h"
 #include <string>
 #include <map>
+
 //A subcircuit gate contains
 class Subcircuit : public Gate
 {
@@ -39,6 +40,7 @@ public:
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     std::string getDrawName();
+    std::string getLatexName();
     void setName(std::string name);
     State applyToBasis(index_t) const;
     unsigned int getNumGates() const;

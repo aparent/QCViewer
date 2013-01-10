@@ -73,16 +73,24 @@ string UGate::getName() const
 
 string UGate::getDrawName()
 {
-    if (!dname_checked) {
-        gateMatrix matrix = UGateLookup(name);
-        if (matrix.dim == 0) {
-            cerr << "Game matrix not found for " << name  << "!" << endl;
-            dname  = "";
-        } else {
-            dname = matrix.drawName;
-        }
+    gateMatrix matrix = UGateLookup(name);
+    if (matrix.dim == 0) {
+        cerr << "Game matrix not found for " << name  << "!" << endl;
+        return "";
+    } else {
+        return matrix.drawName;
     }
-    return dname;
+}
+
+string UGate::getLatexName()
+{
+    gateMatrix matrix = UGateLookup(name);
+    if (matrix.dim == 0) {
+        cerr << "Game matrix not found for " << name  << "!" << endl;
+        return "";
+    } else {
+        return matrix.latexName;
+    }
 }
 
 void UGate::setName(string n_name)
