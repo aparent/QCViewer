@@ -64,64 +64,26 @@ shared_ptr<Gate> RGate::clone() const
 
 string RGate::getName() const
 {
-    string rot_str;
-    std::string pi_str;
-    pi_str = "π";
-
-    if(frac) {
-        if((numer == 1) && (denom ==1)) {
-            rot_str = pi_str;
-        } else if (numer == 1) {
-            rot_str = pi_str + "/" + intToString(denom);
-        } else if (denom == 1) {
-            rot_str = intToString(numer) + pi_str;
-        } else {
-            rot_str = intToString(numer) + pi_str + "/" + intToString(denom);
-        }
-    } else {
-        if (rot == 1.0) {
-            rot_str = pi_str;
-        } else {
-            rot_str = floatToString(rot) + pi_str;
-        }
-    }
-
-    const string startTag = "<span font_desc=\"LMMathItalic10 bold 18\">";
-    const string endTag =  "</span>";
+    string rotStr;
     if (frac) {
-        if ((numer == 1) && (denom ==1)) {
-            rot_str = "π";
-        } else if (numer == 1) {
-            rot_str = "π/" + intToString(denom);
-        } else if (denom == 1) {
-            rot_str = intToString(numer) + "π";
-        } else {
-            rot_str = intToString(numer) + "π/" + intToString(denom);
-        }
+        rotStr = intToString(numer) + " pi" + "/" + intToString(denom);
     } else {
-        if (rot == 1.0) {
-            rot_str = "π";
-        } else {
-            rot_str = floatToString(rot) + "π";
-        }
+        rotStr = floatToString(rot);
     }
-    rot_str = startTag + rot_str + endTag;
-    switch (axis) {
+    switch(axis) {
     case RGate::X:
-        return "RX(" + rot_str + ")";
+        return "RX(" + rotStr + ")";
     case RGate::Y:
-        return "RY(" + rot_str + ")";
-    case RGate::Z:
-        return "RZ(" + rot_str + ")";
+        return "RY(" + rotStr + ")";
     default:
-        return "R";
+        return "RZ(" + rotStr + ")";
     }
 }
 
 std::string RGate::getLatexName()
 {
     string rot_str;
-    std::string pi_str;
+    string pi_str;
     pi_str = "\\pi";
     if(frac) {
         if((numer == 1) && (denom ==1)) {
@@ -158,8 +120,39 @@ std::string RGate::getLatexName()
 
 std::string RGate::getDrawName()
 {
-    return getName();
+    string rot_str;
+    const string startTag = "<span font_desc=\"LMMathItalic10 bold 18\">";
+    const string endTag =  "</span>";
+    if (frac) {
+        if ((numer == 1) && (denom ==1)) {
+            rot_str = "π";
+        } else if (numer == 1) {
+            rot_str = "π/" + intToString(denom);
+        } else if (denom == 1) {
+            rot_str = intToString(numer) + "π";
+        } else {
+            rot_str = intToString(numer) + "π/" + intToString(denom);
+        }
+    } else {
+        if (rot == 1.0) {
+            rot_str = "π";
+        } else {
+            rot_str = floatToString(rot) + "π";
+        }
+    }
+    rot_str = startTag + rot_str + endTag;
+    switch (axis) {
+    case RGate::X:
+        return "RX(" + rot_str + ")";
+    case RGate::Y:
+        return "RY(" + rot_str + ")";
+    case RGate::Z:
+        return "RZ(" + rot_str + ")";
+    default:
+        return "R";
+    }
 }
+
 
 /* RGate simulation implimentation */
 State RGate::applyToBasis(index_t bitString) const
