@@ -1,4 +1,9 @@
 #!/bin/bash
-
-cmake ../../src
+rm -f CMakeCache.txt
+if [ "$1" == "win32" ]; then
+  . ../cross/setup
+  cmake -DCMAKE_TOOLCHAIN_FILE=../cross/toolchain.cross ../../src
+else
+  cmake ../../src
+fi
 make -j4 install

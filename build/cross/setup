@@ -1,0 +1,15 @@
+# Modify these variables to fit your cross-compiler installation.
+export MINGW=/scratch/m4burns/mxe/usr/i686-pc-mingw32
+export QCDEP=/scratch/m4burns/qcdep
+export TARGET=i686-pc-mingw32
+
+export MINGW=/scratch/m4burns/mxe/usr/i686-pc-mingw32
+export CC=$MINGW/../bin/$TARGET-gcc
+export CXX=$MINGW/../bin/$TARGET-g++
+export AR=$MINGW/../bin/$TARGET-ar
+export LD=$MINGW/../bin/$TARGET-ld
+export WINDRES=$MINGW/../bin/$TARGET-windres
+export DLLTOOL=$MINGW/../bin/$TARGET-dlltool
+export NM=$MINGW/../bin/$TARGET-nm
+export PATH=$MINGW/../bin:$PATH
+export PKG_CONFIG_PATH=$QCDEP/lib/pkgconfig:$MINGW/lib/pkgconfig

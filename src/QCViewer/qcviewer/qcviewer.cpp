@@ -78,11 +78,11 @@ QCVOptions handleOptions(int ac,char *av[])
     po::store(po::parse_config_file<char>("QCV.cfg", config), vm);
     po::notify(vm);
 
-		if (vm.count("help")) {
-      std::cout << cmd << std::endl;
+    if (vm.count("help")) {
+        std::cout << cmd << std::endl;
     }
-		if (vm.count("version")) {
-      std::cout << QCV_NAME << " " << QCV_VERSION << std::endl;
+    if (vm.count("version")) {
+        std::cout << QCV_NAME << " " << QCV_VERSION << std::endl;
     }
 
     return QCVOp;

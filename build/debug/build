@@ -1,3 +1,9 @@
 #!/bin/bash
-cmake -DCMAKE_BUILD_TYPE=debug  ../../src
+rm -f CMakeCache.txt
+if [ "$1" == "win32" ]; then
+  . ../cross/setup
+  cmake -DCMAKE_BUILD_TYPE=debug -DCMAKE_TOOLCHAIN_FILE=../cross/toolchain.cross ../../src
+else
+  cmake -DCMAKE_BUILD_TYPE=debug ../../src
+fi
 make -j4 install

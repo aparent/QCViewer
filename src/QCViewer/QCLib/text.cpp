@@ -74,7 +74,8 @@ PangoTextObject::~PangoTextObject()
 /* Latex Text Object */
 
 #ifdef WIN32
-int systemb(const char * cmd, const char * args) {
+int systemb(const char * cmd, const char * args)
+{
     SHELLEXECUTEINFO se;
     memset(&se, 0, sizeof(se));
     se.cbSize = sizeof(se);
@@ -84,27 +85,26 @@ int systemb(const char * cmd, const char * args) {
 
     int res = ::ShellExecuteEx(&se);
 
-    if (res)
-    {
+    if (res) {
         WaitForSingleObject(se.hProcess, INFINITE);
         CloseHandle(se.hProcess);
-    }
-    else
-    {
+    } else {
         char * err;
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | 
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                       FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(),
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                       (LPTSTR) &err, 0, NULL);
-	std::string errs = "CreateProcess: " + err;
+        std::string errs = "CreateProcess: ";
+        errs += err;
         LocalFree(err);
-	throw errs;
+        throw errs;
     }
 
     return !res;
 }
 #else
-int systemb(const char * cmd, const char * args) {
+int systemb(const char * cmd, const char * args)
+{
     char bfr[strlen(cmd)+strlen(args)+2];
     strcpy(bfr, cmd);
     strcat(bfr, " ");
@@ -182,15 +182,15 @@ LatexTextObject::LatexTextObject(std::string text)
     x = 0; // XXX
     y = 0; // XXX
     chdir(oldwd);
-    #ifdef WIN32
-        const char * swit = "/C del /F/S/Q ";
-        char * bfr = (char*)alloca(strlen(swit)+strlen(newwd)+1);
-        strcpy(bfr, swit);
-        strcat(bfr, newwd);
-        systemb("cmd.exe", bfr);
-    #else
-        boost::filesystem::remove_all(newwd);
-    #endif
+#ifdef WIN32
+    const char * swit = "/C del /F/S/Q ";
+    char * bfr = (char*)alloca(strlen(swit)+strlen(newwd)+1);
+    strcpy(bfr, swit);
+    strcat(bfr, newwd);
+    systemb("cmd.exe", bfr);
+#else
+    boost::filesystem::remove_all(newwd);
+#endif
 }
 
 void LatexTextObject::draw(cairo_t* cr, double x, double y)
@@ -272,8 +272,8 @@ void TextEngine::setMode(TextMode m)
 void TextEngine::latexFailure(std::string msg)
 {
     std::cerr << "in TextEngine::latexFailure. Reason: " << msg << "\n";
-    #ifdef WIN32
+#ifdef WIN32
     MessageBox(NULL, msg.c_str(), "LaTeX Error", 0);
-    #endif
+#endif
     setMode(TEXT_PANGO);
 }

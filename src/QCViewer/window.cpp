@@ -38,6 +38,11 @@ Authors: Alex Parent, Jacob Parker
 #include "QCLib/subcircuit.h"
 #include "QCLib/text.h"
 
+/* Fix bug due to old GDK on Debian <= 6.0.6 */
+#ifndef GDK_KEY_Delete
+  #define GDK_KEY_Delete GDK_Delete
+#endif
+
 using namespace std;
 void QCViewer::setup_gate_button (Gtk::Button* btn, GateIcon *g)
 {

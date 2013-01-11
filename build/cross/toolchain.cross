@@ -8,7 +8,7 @@ SET(CMAKE_C_COMPILER   /scratch/m4burns/mxe/usr/bin/i686-pc-mingw32-gcc)
 SET(CMAKE_CXX_COMPILER /scratch/m4burns/mxe/usr/bin/i686-pc-mingw32-g++)
 
 # where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH  /scratch/m4burns/mxe/usr)
+SET(CMAKE_FIND_ROOT_PATH  /scratch/m4burns/mxe/usr /scratch/m4burns/qcdep)
 
 # search for programs in the build host directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -16,4 +16,4 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-SET(BOOST_ROOT /scratch/m4burns/mxe/usr/i686-pc-mingw32)
+SET(BOOST_ROOT /scratch/m4burns/qcdep/boost_1_52_0)
