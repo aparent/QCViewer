@@ -179,6 +179,7 @@ void QCViewer::on_menu_about ()
     vector<Glib::ustring> authors;
     authors.push_back("Alex Parent <aparent@uwaterloo.ca>");
     authors.push_back("Jacob Parker <j3parker@uwaterloo.ca>");
+    authors.push_back("Marc Burns <m4burns@uwaterloo.ca>");
     Gtk::AboutDialog dialog;
     dialog.set_version(QCV_VERSION);
     dialog.set_program_name(QCV_NAME);
@@ -228,7 +229,7 @@ void QCViewer::on_menu_file_open_circuit ()
         btn_editcontrols.set_active (false);
         btn_editcontrols.set_active (false);
         std::stringstream ss;
-        ss << "Gates: " << c.get_num_gates() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
+        ss << "Gates: " << c.get_num_gates() <<" | Depth: "<< c.get_depth() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
         m_statusbar.push(ss.str());
         c.reset ();
     }

@@ -152,7 +152,6 @@ public:
 
     //! Returns the number of gates counting subcircuits as 1 gate
     unsigned int numGates() const;
-    unsigned int gateCount(std::string gateName);
     ///@}
 
     /*! @name Statistics
@@ -161,6 +160,10 @@ public:
     ///@{
     //! Returns the total number of gates in the circuit counting all gates in subcircuits
     unsigned int totalGates() const;
+    //! Returns the total number of gates with some name
+    unsigned int gateCount(std::string gateName);
+    //! Returns the Circuit Depth
+    unsigned int depth();
     ///@}
 
     /*! @name Simulation

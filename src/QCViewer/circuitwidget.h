@@ -66,6 +66,7 @@ public:
     int get_num_gates ();
     int get_gate_count (std::string);
     unsigned int get_num_lines ();
+    unsigned int get_depth ();
 
     void newcircuit (uint32_t);
 
