@@ -228,7 +228,7 @@ void QCViewer::on_menu_file_open_circuit ()
         btn_editcontrols.set_active (false);
         btn_editcontrols.set_active (false);
         std::stringstream ss;
-        ss << "Gates: " << c.get_num_gates() << " | Qbits: " << c.get_num_lines();
+        ss << "Gates: " << c.get_num_gates() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
         m_statusbar.push(ss.str());
         c.reset ();
     }

@@ -123,6 +123,20 @@ unsigned int Circuit::totalGates() const
     return numGates;
 }
 
+unsigned int Circuit::gateCount(string gateName)
+{
+    unsigned int numGates = 0;
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
+        if (s) {
+            numGates += s->getCircuit()->gateCount(gateName);
+        } else if (gates.at(i)->getName().compare(gateName) == 0) {
+            numGates++;
+        }
+    }
+    return numGates;
+}
+
 int Circuit::QCost()
 {
     return 0;

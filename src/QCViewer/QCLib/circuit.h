@@ -152,6 +152,7 @@ public:
 
     //! Returns the number of gates counting subcircuits as 1 gate
     unsigned int numGates() const;
+    unsigned int gateCount(std::string gateName);
     ///@}
 
     /*! @name Statistics

@@ -64,6 +64,7 @@ public:
     int get_QCost ();
     int get_Depth ();
     int get_num_gates ();
+    int get_gate_count (std::string);
     unsigned int get_num_lines ();
 
     void newcircuit (uint32_t);

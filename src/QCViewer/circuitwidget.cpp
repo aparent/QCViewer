@@ -550,6 +550,12 @@ int CircuitWidget::get_num_gates ()
     if (!circuit) return 0;
     return circuit->totalGates();
 }
+
+int CircuitWidget::get_gate_count (string gname)
+{
+    return circuit->gateCount(gname);
+}
+
 unsigned int CircuitWidget::get_num_lines()
 {
     if (!circuit) return 0;
