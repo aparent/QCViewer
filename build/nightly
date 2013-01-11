@@ -1,0 +1,30 @@
+#!/bin/bash
+function die {
+  u=$?
+  echo "$@" >&2
+  exit $?
+}
+
+nightly="`realpath $0`"
+builddir="${nightly%/*}"
+mkdir -p "$builddir/log" || die "Couldn't create log directory."
+cd "$builddir/release"
+echo "Building release binaries for Linux..."
+./build > "$builddir/log/linux" 2>&1 || die "ERROR during Linux release build!"
+echo "Building release binaries for Windows..."
+./build win32 > "$builddir/log/windows" 2>&1 || die "ERROR during Windows release build!"
+
+for i in qcviewer qcimage qcviewer.exe qcimage.exe; do
+  [ -f ../../bin/$i ] || die "Executable $i was not built."
+done
+
+cd ..
+
+echo "Creating Linux package..."
+./package-linux || die "ERROR creating Linux package!"
+
+echo "Creating Windows package..."
+./package-windows || die "ERROR creating Windows package!"
+
+exit 0
+

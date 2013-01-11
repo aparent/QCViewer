@@ -1,0 +1,44 @@
+#!/bin/bash
+# This script packages the Windows build of QCViewer into a
+# self-contained zip file.
+
+# The directory containing binary dependencies for QCViewer.
+BINDEPS=/scratch/m4burns/qcdist
+
+function die {
+  u=$?
+  echo "$@" >&2
+  exit $?
+}
+
+function assert_exe {
+  which $1 >/dev/null 2>&1
+}
+
+assert_exe zip || die "No zip executable."
+
+# Assume we are in the build directory.
+
+ver=`git describe --tags --abbrev=0`
+workdir=`mktemp -d`
+[ -d "$workdir" ] || die "Couldn't create a temporary directory."
+
+mkdir "$workdir/QCViewer-$ver"
+
+cp -r $BINDEPS/*  "$workdir/QCViewer-$ver"/ || die "Couldn't copy dependencies!"
+cp -r ../bin/* "$workdir/QCViewer-$ver"/ || die "Couldn't copy QCViewer binaries!"
+
+# Remove non-Windows executables, if they exist.
+rm -f "$workdir/QCViewer-$ver"/{qcviewer,qcimage}
+
+mkdir -p packages || die "Couldn't create packages directory!"
+destarc="`realpath packages`/QCViewer-${ver}.zip"
+
+# Replace an existing archive.
+rm -f "$destarc"
+
+( cd "$workdir" && zip -qr "$destarc" "QCViewer-$ver" ) || die "Couldn't create archive!"
+
+# Clean up.
+rm -fr "$workdir"
+exit 0
