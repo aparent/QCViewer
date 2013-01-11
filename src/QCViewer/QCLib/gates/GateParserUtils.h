@@ -66,15 +66,21 @@ struct gate_node {
     gate_node* next;
     std::string name;
     std::string drawName;
+    std::string latexName;
     std::string symbol;
     matrix_row *row;
+    gate_node(char* n_name, char* n_dname, char* n_latex_name, char* n_symbol, matrix_row *n_row )
+        : name(n_name), drawName(n_dname), latexName(n_latex_name), symbol(n_symbol)  {
+        next = NULL;
+        row = n_row;
+    }
     gate_node(char* n_name, char* n_symbol, matrix_row *n_row )
-        : name(n_name), drawName(n_symbol), symbol(n_symbol)  {
+        : name(n_name), drawName(n_symbol), latexName(n_symbol), symbol(n_symbol)  {
         next = NULL;
         row = n_row;
     }
     gate_node(char* n_name, char* n_dname, char* n_symbol, matrix_row *n_row )
-        : name(n_name), drawName(n_dname), symbol(n_symbol) {
+        : name(n_name), drawName(n_dname), latexName(n_symbol), symbol(n_symbol) {
         next = NULL;
         row = n_row;
     }

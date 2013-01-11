@@ -46,7 +46,6 @@ StateViewWidget::StateViewWidget (Gtk::Statusbar* ns, Gtk::HBox* h, vector<State
     buttonbox.pack_start (btn_expected, Gtk::PACK_SHRINK);
     buttonbox.pack_start (btn_real, Gtk::PACK_SHRINK);
     buttonbox.pack_start (btn_imag, Gtk::PACK_SHRINK);
-    // buttonbox.pack_start (btn_trace, Gtk::PACK_SHRINK);
     buttonbox.pack_start (btn_close, Gtk::PACK_SHRINK);
     pack_start (sw);
     pack_start (buttonbox, Gtk::PACK_SHRINK);
@@ -139,11 +138,7 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
                         double eValue = bucket[i].real()*bucket[i].real() + bucket[i].imag()*bucket[i].imag();
                         if (eValue > EPS) {
                             if (draw_compressed == false) {
-                                cr->rectangle (xborder + ((double)i)*barWidth, height - yborder, barWidth, -eValue*barHeight);
-                                cr->set_source_rgb (0, 0, 0);
-                                cr->stroke_preserve ();
-                                cr->set_source_rgb (0, 1, 0);
-                                cr->fill ();
+                                drawBar(cr, i, height-yborder, eValue, 0, 1, 0);
                             } else {
                                 cr->line_to (xborder + ((double)i)*barWidth,height-yborder-eValue*barHeight);
                             }
@@ -163,11 +158,7 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
                 } else {
                     for (unsigned int i = 0; i < num_draw_traced; i++) {
                         if (traced_bucket[i] > EPS) {
-                            cr->rectangle (xborder + ((double)i)*t_barWidth, height - yborder, t_barWidth, -traced_bucket[i]*barHeight);
-                            cr->set_source_rgb (0, 0, 0);
-                            cr->stroke_preserve ();
-                            cr->set_source_rgb (0, 1, 0);
-                            cr->fill ();
+                            drawBar(cr, i, height-yborder, traced_bucket[i], 0, 1, 0);
                         }
                     }
                 }
@@ -197,11 +188,11 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
                     float_type eValue = val/maxX;
                     if (abs(val) > EPS) {
                         if (!draw_compressed) {
-                            cr->rectangle (xborder + (double)i*barWidth, height/2.0, barWidth, -eValue*barHeight/2.0);
-                            cr->set_source_rgb (0, 0, 0);
-                            cr->stroke_preserve ();
-                            cr->set_source_rgb (drawmode == REAL ? 1 : 0, 0, drawmode == IMAG ? 1 : 0);
-                            cr->fill ();
+                            if (drawmode == REAL) {
+                                drawBar(cr, i, height/2.0, eValue/2.0, 1, 0, 0);
+                            } else {
+                                drawBar(cr, i, height/2.0, eValue/2.0, 0, 0, 1);
+                            }
                         } else {
                             if ( (lastVal < 0 && eValue > 0) || (lastVal > 0 && eValue < 0)) {
                                 double NextEValue = eValue;
@@ -258,6 +249,16 @@ bool StateWidget::on_expose_event (GdkEventExpose* event)
     }
     return true;
 }
+
+void StateWidget::drawBar(Cairo::RefPtr <Cairo::Context> cr,  int pos, double yPos, double h,  int r, int g, int b)
+{
+    cr->rectangle (xborder + ((double)pos)*barWidth, yPos, barWidth, -h*barHeight);
+    cr->set_source_rgb (0, 0, 0);
+    cr->stroke_preserve ();
+    cr->set_source_rgb (r, g, b);
+    cr->fill ();
+}
+
 
 string base2enc (unsigned long v, unsigned int len)
 {
@@ -356,13 +357,7 @@ void StateWidget::parse_state ()
         unsigned int maxID = 0; // XXX: should be bit string
         double maxMag = -1;
         for (unsigned int j = 0; j < skip; j++, n++) {
-            //cout << "----------------" << endl  << state->numBits() << endl;
-            //printIntBin(n);
-            //cout << endl;
-            //printIntBin(invertBits (n,state->numBits()));
-            //cout << endl;
-            //StateMap::iterator it = state->data.find (invertBits (n,state->numBits()));  //Not sure if this is correct since it messes up QFT output
-            StateMap::iterator it = state->data.find (n); //Replace with line above for possibly more correct ordering
+            StateMap::iterator it = state->data.find (n);
             if (it == state->data.end ()) continue;
             bucket[i] += it->second;
             double mag = it->second.real()*it->second.real() + it->second.imag()*it->second.imag();

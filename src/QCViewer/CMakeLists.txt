@@ -67,7 +67,6 @@ include_directories( ${QCViewer_SOURCE_DIR}/QCLib)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-#add_executable (viewer WIN32  ${QCVIEWER_SRC_FILES})
 add_library(qc ${QCLIB_SRC_FILES})
 add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp ${QCVIEWER_SRC_FILES} )
 add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp)

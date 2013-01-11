@@ -81,6 +81,7 @@ void CircuitWidget::set_offset (int y)
 void CircuitWidget::toggle_linelabels()
 {
     circuitDrawer.toggleLineLabels();
+    size_changed = true;
     force_redraw ();
 }
 
@@ -597,7 +598,7 @@ void CircuitWidget::generate_layout_rects ()
     for (unsigned int column = 0; column < circuit->columns.size() && start_gate < circuit->numGates (); column++) {
         gateRect bounds = rects.at(start_gate);
         for (unsigned int gate = start_gate + 1; gate <= circuit->columns.at(column) ; gate++) {
-            bounds = combine_gateRect(bounds, rects[gate]);
+            bounds += rects[gate];
         }
         bounds.y0 = ext.y;
         bounds.height = max (bounds.height, ext.height);
@@ -713,7 +714,7 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, std::shared_pt
         for (unsigned int column = 0; column < para.size() && start_gate < c->numGates(); column++) {
             gateRect bounds = rects.at(start_gate);
             for (unsigned int gate = start_gate + 1; gate <= para.at(column); gate++) {
-                bounds = combine_gateRect(bounds, rects.at(gate));
+                bounds += rects.at(gate);
             }
             bounds.y0 = ext.y;
             bounds.height = max (bounds.height, ext.height);

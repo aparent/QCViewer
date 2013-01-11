@@ -60,6 +60,7 @@ public:
     virtual std::shared_ptr<Gate> clone() const=0;
     virtual std::string getName() const=0;
     virtual std::string getDrawName() =0;
+    virtual std::string getLatexName() =0;
     virtual State applyToBasis(index_t) const=0;
 
     unsigned int getLoopCount() const;
@@ -83,6 +84,7 @@ struct gateMatrix {
     gateMatrix(int);
     gateMatrix();
     std::string drawName;
+    std::string latexName;
     unsigned int dim;
     std::complex<float_type> * data;
 };
@@ -98,6 +100,7 @@ public:
     State applyToBasis(index_t) const;
     void setName(std::string);
     std::string getDrawName();
+    std::string getLatexName();
 private:
     unsigned int ExtractInput (index_t) const;
     index_t BuildBitString (index_t, unsigned int) const;
@@ -118,6 +121,7 @@ public:
     std::shared_ptr<Gate> clone() const;
     std::string getName() const;
     std::string getDrawName();
+    std::string getLatexName();
     State applyToBasis(index_t) const;
     float_type get_rotVal () const; // XXX: remove float_type, consildate this stuff!!
     void set_rotVal (float_type);
