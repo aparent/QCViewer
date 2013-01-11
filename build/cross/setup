@@ -3,7 +3,6 @@ export MINGW=/scratch/m4burns/mxe/usr/i686-pc-mingw32
 export QCDEP=/scratch/m4burns/qcdep
 export TARGET=i686-pc-mingw32
 
-export MINGW=/scratch/m4burns/mxe/usr/i686-pc-mingw32
 export CC=$MINGW/../bin/$TARGET-gcc
 export CXX=$MINGW/../bin/$TARGET-g++
 export AR=$MINGW/../bin/$TARGET-ar
