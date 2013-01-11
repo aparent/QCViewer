@@ -550,6 +550,19 @@ int CircuitWidget::get_num_gates ()
     if (!circuit) return 0;
     return circuit->totalGates();
 }
+
+int CircuitWidget::get_gate_count (string gname)
+{
+    if (!circuit) return 0;
+    return circuit->gateCount(gname);
+}
+
+unsigned int CircuitWidget::get_depth()
+{
+    if (!circuit) return 0;
+    return circuit->depth();
+}
+
 unsigned int CircuitWidget::get_num_lines()
 {
     if (!circuit) return 0;
@@ -651,19 +664,18 @@ void CircuitWidget::deleteSelectedSubGate (std::shared_ptr<Circuit> circuit, vec
         }
     }
 }
+
 void CircuitWidget::deleteSelectedGate ()
 {
     deleteSelectedSubGate (circuit, selections);
     force_redraw();
 }
 
-
 void  CircuitWidget::expand_all()
 {
     circuit->expandAll();
     force_redraw();
 }
-
 
 void  CircuitWidget::arch_set_LNN()
 {
@@ -692,7 +704,6 @@ shared_ptr<Gate> CircuitWidget::getGate(unsigned int id)
 {
     return circuit->getGate(id);
 }
-
 
 void CircuitWidget::getCircuitAndColPosition (double x, double y, std::shared_ptr<Circuit> c, vector<gateRect> &rects, string &r_name, int &r_pos)
 {
@@ -735,4 +746,3 @@ void CircuitWidget::getCircuitAndColPosition (double x, double y, std::shared_pt
         r_name = c->getName();
     }
 }
-

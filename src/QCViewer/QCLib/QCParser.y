@@ -61,7 +61,7 @@ Authors: Alex Parent, Jacob Parker
 %defines "QCParser.h"
 %output "QCParser.cpp"
 %start input
-%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END PI NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS DIV
+%token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END PI NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS DIV BAR
 
 %type <string> WORD NUM
 %type <names> names nums oneBitGates
@@ -155,11 +155,11 @@ gates:  /*empty*/
             CHECK_NAMES($11,$2);
             addFracRGate(curr_circ,$2,$11,atoi($10),atoi($4),atoi($7));
           }
-        | gates WORD PLUS oneBitGates NEWLINE
+        | gates WORD BAR oneBitGates NEWLINE
           {
             add_one_bit_gates(curr_circ,$2,$4);
           }
-        | gates NUM PLUS oneBitGates NEWLINE
+        | gates NUM BAR oneBitGates NEWLINE
           {
             add_one_bit_gates(curr_circ,$2,$4);
           }

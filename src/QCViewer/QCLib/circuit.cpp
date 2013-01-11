@@ -123,6 +123,33 @@ unsigned int Circuit::totalGates() const
     return numGates;
 }
 
+unsigned int Circuit::gateCount(string gateName)
+{
+    unsigned int numGates = 0;
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
+        if (s) {
+            numGates += s->getCircuit()->gateCount(gateName);
+        } else if (gates.at(i)->getName().compare(gateName) == 0) {
+            numGates++;
+        }
+    }
+    return numGates;
+}
+
+unsigned int Circuit::depth()
+{
+    unsigned int depth = 0;
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
+        if (s) {
+            depth += s->getCircuit()->depth()-1;
+	      }
+    }
+		depth += getParallel().size() + 1;
+    return depth;
+}
+
 int Circuit::QCost()
 {
     return 0;

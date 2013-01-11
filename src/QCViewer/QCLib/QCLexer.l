@@ -65,6 +65,7 @@ comment #.*
 "'"									return TOKEN(APOS);
 "-"									return TOKEN(NEG);
 "+"									return TOKEN(PLUS);
+"|"									return TOKEN(BAR);
 "/"									return TOKEN(DIV);
 {num}								SAVE_TOKEN; return NUM;
 {word}							SAVE_TOKEN; return WORD;
