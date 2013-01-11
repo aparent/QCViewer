@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <boost/filesystem.hpp>
+#ifdef WIN32
+#include <windows.h>
+#endif
 #include "text.h"
 #include "pdf.h"
 
@@ -70,6 +73,46 @@ PangoTextObject::~PangoTextObject()
 
 /* Latex Text Object */
 
+#ifdef WIN32
+int systemb(const char * cmd, const char * args) {
+    SHELLEXECUTEINFO se;
+    memset(&se, 0, sizeof(se));
+    se.cbSize = sizeof(se);
+    se.fMask = SEE_MASK_NOCLOSEPROCESS|SEE_MASK_FLAG_NO_UI|SEE_MASK_NO_CONSOLE;
+    se.lpFile = cmd;
+    se.lpParameters = args;
+
+    int res = ::ShellExecuteEx(&se);
+
+    if (res)
+    {
+        WaitForSingleObject(se.hProcess, INFINITE);
+        CloseHandle(se.hProcess);
+    }
+    else
+    {
+        char * err;
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | 
+                      FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(),
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPTSTR) &err, 0, NULL);
+	std::string errs = "CreateProcess: " + err;
+        LocalFree(err);
+	throw errs;
+    }
+
+    return !res;
+}
+#else
+int systemb(const char * cmd, const char * args) {
+    char bfr[strlen(cmd)+strlen(args)+2];
+    strcpy(bfr, cmd);
+    strcat(bfr, " ");
+    strcat(bfr, args);
+    system(bfr);
+}
+#endif
+
 LatexTextObject::LatexTextObject(std::string text)
 {
     contents = text;
@@ -88,7 +131,7 @@ LatexTextObject::LatexTextObject(std::string text)
         "  \\end{preview}\n"
         "\\end{document}";
 
-    if(system("pdflatex --version")) {
+    if(systemb("pdflatex", "--version")) {
         throw "Cannot find LaTeX installation.";
     }
 
@@ -107,9 +150,6 @@ LatexTextObject::LatexTextObject(std::string text)
             throw "Couldn't create temporary directory for TeX (mk[d]temp).";
         }
         #ifdef WIN32
-        if(unlink(wdbfr)) {
-            throw "Couldn't create temporary directory for TeX (unlink).";
-        }
         if(mkdir(wdbfr)) {
             throw "Couldn't create temporary directory for TeX (mkdir).";
         }
@@ -132,9 +172,8 @@ LatexTextObject::LatexTextObject(std::string text)
     }
     fprintf(texf, tmpl, text.c_str());
     fclose(texf);
-    char cmd[256];
-    snprintf(cmd, sizeof(cmd), "pdflatex -interaction=nonstopmode QCV.tex");
-    if(system(cmd)) {
+
+    if(systemb("pdflatex", "-interaction=nonstopmode QCV.tex")) {
         chdir(oldwd);
         std::string msg = "Failed to render \"" + text + "\"";
         throw msg;
@@ -143,7 +182,15 @@ LatexTextObject::LatexTextObject(std::string text)
     x = 0; // XXX
     y = 0; // XXX
     chdir(oldwd);
-    boost::filesystem::remove_all(newwd);
+    #ifdef WIN32
+        const char * swit = "/C del /F/S/Q ";
+        char * bfr = (char*)alloca(strlen(swit)+strlen(newwd)+1);
+        strcpy(bfr, swit);
+        strcat(bfr, newwd);
+        systemb("cmd.exe", bfr);
+    #else
+        boost::filesystem::remove_all(newwd);
+    #endif
 }
 
 void LatexTextObject::draw(cairo_t* cr, double x, double y)
@@ -225,5 +272,8 @@ void TextEngine::setMode(TextMode m)
 void TextEngine::latexFailure(std::string msg)
 {
     std::cerr << "in TextEngine::latexFailure. Reason: " << msg << "\n";
+    #ifdef WIN32
+    MessageBox(NULL, msg.c_str(), "LaTeX Error", 0);
+    #endif
     setMode(TEXT_PANGO);
 }
