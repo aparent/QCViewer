@@ -1,11 +1,11 @@
-set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++0x")
-set(CMAKE_CXX_FLAGS_DEBUG "-pg -g -pedantic -Wall -Wextra -std=c++0x")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=c++0x")
-
 IF(WIN32)
 	set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=gnu++0x")
+ELSE()
+  set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++0x")
+  set(CMAKE_CXX_FLAGS_DEBUG "-pg -g -pedantic -Wall -Wextra -std=c++0x")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=c++0x")
 ENDIF(WIN32)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -54,6 +54,7 @@ add_custom_command (
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLib/gates/GateParser.y
 )
 
+set(Boost_USE_STATIC_LIBS ON)
 FIND_PACKAGE(Boost REQUIRED COMPONENTS system program_options filesystem)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 set(Boost_USE_STATIC_LIBS ON)
