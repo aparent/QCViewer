@@ -400,7 +400,6 @@ void TextEngine::endBatch()
 void TextEngine::latexFailure(std::string msg)
 {
     std::cerr << "in TextEngine::latexFailure. Reason: " << msg << "\n";
-    abort();
 #ifdef WIN32
     MessageBox(NULL, msg.c_str(), "LaTeX Error", 0);
 #endif
