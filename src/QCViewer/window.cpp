@@ -40,7 +40,7 @@ Authors: Alex Parent, Jacob Parker
 
 /* Fix bug due to old GDK on Debian <= 6.0.6 */
 #ifndef GDK_KEY_Delete
-  #define GDK_KEY_Delete GDK_Delete
+#define GDK_KEY_Delete GDK_Delete
 #endif
 
 using namespace std;
@@ -176,7 +176,9 @@ void QCViewer::on_menu_textmode_regular()
 void QCViewer::on_menu_textmode_latex()
 {
     textEngine.setMode(TEXT_LATEX);
-    c.force_redraw();
+    /* XXX hack: circuit needs to render once in !forreal mode
+       to batch latex calls. */
+    c.set_scale(c.get_scale());
 }
 
 void QCViewer::on_menu_about ()

@@ -144,9 +144,9 @@ unsigned int Circuit::depth()
         shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
         if (s) {
             depth += s->getCircuit()->depth()-1;
-	      }
+        }
     }
-		depth += getParallel().size() + 1;
+    depth += getParallel().size() + 1;
     return depth;
 }
 

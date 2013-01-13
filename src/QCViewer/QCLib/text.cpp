@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,14 +29,29 @@ public:
     ~LatexTextObject();
     virtual void draw(cairo_t* cr, double x, double y);
 private:
-    PopplerContainer* pdf;
+    std::shared_ptr<PopplerContainer> pdf;
+};
+
+class BatchLatexTextObject : public TextObject
+{
+public:
+    BatchLatexTextObject(std::string text);
+    ~BatchLatexTextObject();
+    virtual void draw(cairo_t* cr, double x, double y);
+private:
+    std::shared_ptr<PopplerContainer> pdf;
+    void assignContainer(std::shared_ptr<PopplerContainer>);
+    friend class TextEngine;
 };
 
 /* PangoTextObject */
 
 PangoTextObject::PangoTextObject(std::string text)
+    : TextObject()
 {
     contents = text;
+    batch = false;
+
     desc = pango_font_description_from_string("LM Roman 12, Roman, Serif bold 18");
 
     cairo_surface_t *surf= cairo_recording_surface_create (CAIRO_CONTENT_COLOR, NULL);
@@ -49,8 +65,6 @@ PangoTextObject::PangoTextObject(std::string text)
     height = (double)h/(double)PANGO_SCALE;
     cairo_destroy (cr);
     cairo_surface_destroy (surf);
-    x = 0;
-    y = 0;
 
     assert(desc != NULL);
 }
@@ -105,18 +119,19 @@ int systemb(const char * cmd, const char * args)
 #else
 int systemb(const char * cmd, const char * args)
 {
-    char bfr[strlen(cmd)+strlen(args)+2];
+    char * bfr = (char*)alloca(strlen(cmd)+strlen(args)+2);
     strcpy(bfr, cmd);
     strcat(bfr, " ");
     strcat(bfr, args);
-    system(bfr);
+    return system(bfr);
 }
 #endif
 
 LatexTextObject::LatexTextObject(std::string text)
+    : TextObject()
 {
     contents = text;
-    pdf = NULL;
+    batch = false;
 
     const char* tmpl =
         "\\documentclass{article}\n"
@@ -136,83 +151,93 @@ LatexTextObject::LatexTextObject(std::string text)
     }
 
     /* Get a temporary working directory. */
-    char *newwd;
-    {
-        char wdbfr[10];
-        const char * wdtmpl = "tmpXXXXXX";
-        strcpy(wdbfr, wdtmpl);
-#ifdef WIN32
-        if((newwd = mktemp(wdbfr)) == NULL)
-#else
-        if((newwd = mkdtemp(wdbfr)) == NULL)
-#endif
-        {
-            throw "Couldn't create temporary directory for TeX (mk[d]temp).";
-        }
-#ifdef WIN32
-        if(mkdir(wdbfr)) {
-            throw "Couldn't create temporary directory for TeX (mkdir).";
-        }
-#endif
+    boost::filesystem::path newwd;
+    try {
+        newwd = boost::filesystem::temp_directory_path();
+        newwd /= boost::filesystem::unique_path();
+        create_directory(newwd);
+    } catch(boost::filesystem::filesystem_error & e) {
+        throw std::string("Couldn't allocate temporary directory.");
     }
 
     /* Save the current working directory. */
-    char oldwd[PATH_MAX];
-    if(getcwd(oldwd, PATH_MAX) == NULL) {
-        throw "Couldn't get current working directory.";
+    boost::filesystem::path oldwd;
+    try {
+        oldwd = boost::filesystem::current_path();
+    } catch(boost::filesystem::filesystem_error & e) {
+        throw std::string("Couldn't get working directory.");
     }
 
-    if(chdir(newwd)) {
-        throw "Couldn't cd into temporary directory.";
+    /* Change to temporary directory. */
+    try {
+        boost::filesystem::current_path(newwd);
+    } catch(boost::filesystem::filesystem_error & e) {
+        throw std::string("Couldn't cd into temporary directory.");
     }
+
     FILE* texf = fopen("QCV.tex", "w");
     if(texf == NULL) {
-        chdir(oldwd);
-        throw "Couldn't open TeX file.";
+        boost::filesystem::current_path(oldwd);
+        throw std::string("Couldn't open TeX file.");
     }
     fprintf(texf, tmpl, text.c_str());
     fclose(texf);
 
     if(systemb("pdflatex", "-interaction=nonstopmode QCV.tex")) {
-        chdir(oldwd);
+        boost::filesystem::current_path(oldwd);
         std::string msg = "Failed to render \"" + text + "\"";
         throw msg;
     }
-    pdf = new PopplerContainer("QCV.pdf", width, height);
-    x = 0; // XXX
-    y = 0; // XXX
-    chdir(oldwd);
-#ifdef WIN32
-    const char * swit = "/C del /F/S/Q ";
-    char * bfr = (char*)alloca(strlen(swit)+strlen(newwd)+1);
-    strcpy(bfr, swit);
-    strcat(bfr, newwd);
-    systemb("cmd.exe", bfr);
-#else
-    boost::filesystem::remove_all(newwd);
-#endif
+    PDFReader rd("QCV.pdf");
+    if(rd.getNumPages() != 1) {
+        boost::filesystem::current_path(oldwd);
+        throw std::string("Latex output had the wrong number of pages!");
+    }
+    pdf = rd.getPage(0);
+    pdf->getPageDimensions(width, height);
+    boost::filesystem::current_path(oldwd);
 }
 
 void LatexTextObject::draw(cairo_t* cr, double x, double y)
 {
-    assert(cr != NULL);
-    assert(pdf != NULL);
+    assert(pdf);
+    assert(cr);
     cairo_translate(cr, x, y);
     pdf->draw(cr);
     cairo_translate(cr, -x, -y);
 }
 
 LatexTextObject::~LatexTextObject()
+{ }
+
+BatchLatexTextObject::BatchLatexTextObject(std::string text)
+    : TextObject()
 {
-    delete pdf;
+    contents = text;
+    batch = true;
 }
+
+void BatchLatexTextObject::assignContainer(std::shared_ptr<PopplerContainer> pg)
+{
+    pdf = pg;
+    pdf->getPageDimensions(width, height);
+}
+
+void BatchLatexTextObject::draw(cairo_t* cr, double x, double y)
+{
+    assert(pdf);
+    assert(cr);
+    cairo_translate(cr, x, y);
+    pdf->draw(cr);
+    cairo_translate(cr, -x, -y);
+}
+
+BatchLatexTextObject::~BatchLatexTextObject()
+{ }
 
 /* TextEngine */
 
-TextEngine::TextEngine()
-{
-    setMode(TEXT_PANGO);
-}
+TextEngine::TextEngine() : mode(TEXT_PANGO), batch(false) { }
 
 TextEngine::~TextEngine()
 {
@@ -243,12 +268,17 @@ whoops_pango:
             break;
         case TEXT_LATEX:
             try {
-                obj = new LatexTextObject(text);
+                if(batch) {
+                    obj = new BatchLatexTextObject(text);
+                    batchlist.push_back(obj);
+                } else {
+                    obj = new LatexTextObject(text);
+                }
             } catch(std::string &msg) {
                 latexFailure(msg);
                 goto whoops_pango;
-            } catch(...) {
-                latexFailure("???");
+            } catch(std::exception &e) {
+                latexFailure(e.what());
                 goto whoops_pango;
             }
             cache.push_back(obj);
@@ -269,9 +299,108 @@ void TextEngine::setMode(TextMode m)
     flushCache();
 }
 
+void TextEngine::beginBatch()
+{
+    assert(!batch);
+    batch = true;
+}
+
+void TextEngine::endBatch()
+{
+    assert(batch);
+    if(batchlist.size() > 0) {
+        try {
+            std::stringstream latexs;
+            latexs <<
+                   "\\documentclass{article}\n"
+                   "\\usepackage[active, tightpage]{preview}\n"
+                   "\\usepackage{amsmath}\n"
+                   "\\usepackage{amssymb}\n"
+                   "\\usepackage[mathscr]{eucal}\n"
+                   "\\pagestyle{empty}\n"
+                   "\\begin{document}\n";
+
+            for(auto it = batchlist.begin(); it != batchlist.end(); it++) {
+                assert((*it)->isBatch());
+                latexs << "  \\begin{preview}\n"
+                       << "    $" << (*it)->contents << "$\n"
+                       << "  \\end{preview}\n"
+                       << "  \\newpage\n";
+            }
+            latexs << "\\end{document}";
+
+            if(systemb("pdflatex", "--version")) {
+                throw "Cannot find LaTeX installation.";
+            }
+
+            /* Get a temporary working directory. */
+            boost::filesystem::path newwd;
+            try {
+                newwd = boost::filesystem::temp_directory_path();
+                newwd /= boost::filesystem::unique_path();
+                create_directory(newwd);
+            } catch(boost::filesystem::filesystem_error & e) {
+                throw std::string("Couldn't allocate temporary directory.");
+            }
+
+            /* Save the current working directory. */
+            boost::filesystem::path oldwd;
+            try {
+                oldwd = boost::filesystem::current_path();
+            } catch(boost::filesystem::filesystem_error & e) {
+                throw std::string("Couldn't get working directory.");
+            }
+
+            /* Change to temporary directory. */
+            try {
+                boost::filesystem::current_path(newwd);
+            } catch(boost::filesystem::filesystem_error & e) {
+                throw std::string("Couldn't cd into temporary directory.");
+            }
+
+            FILE* texf = fopen("QCV.tex", "w");
+            if(texf == NULL) {
+                boost::filesystem::current_path(oldwd);
+                throw std::string("Couldn't open TeX file.");
+            }
+            fputs(latexs.str().c_str(), texf);
+            fclose(texf);
+
+            if(systemb("pdflatex", "-interaction=nonstopmode QCV.tex")) {
+                boost::filesystem::current_path(oldwd);
+                std::string msg = "Failed to render.";
+                throw msg;
+            }
+            PDFReader rd("QCV.pdf");
+            if(rd.getNumPages() != batchlist.size()) {
+                boost::filesystem::current_path(oldwd);
+                throw std::string("Latex output had the wrong number of pages!");
+            }
+
+            boost::filesystem::current_path(oldwd);
+
+            for(uint32_t i = 0; i < batchlist.size(); i++) {
+                BatchLatexTextObject * obj = dynamic_cast<BatchLatexTextObject*>(batchlist.at(i));
+                std::shared_ptr<PopplerContainer> pdf = rd.getPage(i);
+                obj->assignContainer(pdf);
+            }
+        } catch(std::string &msg) {
+            latexFailure(msg);
+            setMode(TEXT_PANGO);
+        } catch(std::exception &e) {
+            latexFailure(e.what());
+            setMode(TEXT_PANGO);
+        }
+
+        batchlist.clear();
+    }
+    batch = false;
+}
+
 void TextEngine::latexFailure(std::string msg)
 {
     std::cerr << "in TextEngine::latexFailure. Reason: " << msg << "\n";
+    abort();
 #ifdef WIN32
     MessageBox(NULL, msg.c_str(), "LaTeX Error", 0);
 #endif

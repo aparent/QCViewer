@@ -109,6 +109,10 @@ void CircuitImage::drawbase (Circuit &c, double w, double h, double wirestart, d
 vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &wireend, bool forreal)
 {
     vector <gateRect> rects;
+
+    // prep text
+    if(!forreal) textEngine.beginBatch();
+
     // input labels
     double xinit = 0.0;
     if (op.drawLineLabels) {
@@ -173,6 +177,8 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
             addText(label,x,y);
         }
     }
+
+    if(!forreal) textEngine.endBatch();
     return rects;
 }
 
