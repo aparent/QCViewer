@@ -54,6 +54,6 @@ tof a b c d
 S1 b c d e 
 TOF a b c d
 NOT b c d e
-a | x t y z
-1 | x t y z h
+a | xt*yz
+1 | xtyzh
 END

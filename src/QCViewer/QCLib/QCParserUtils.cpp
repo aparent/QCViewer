@@ -26,6 +26,7 @@ Authors: Alex Parent
 
 #include "QCParserUtils.h"
 #include <cstdlib>
+#include <cctype>
 #include "utility.h"
 #include <iostream>
 #include <vector>
@@ -308,19 +309,21 @@ void addFracRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *na
     delete names;
 }
 
-void add_one_bit_gates (shared_ptr<Circuit> circ, string qubit, name_node *gates)
+void add_one_bit_gates (shared_ptr<Circuit> circ, string qubit, string gateStr)
 {
     unsigned int line = findLine(circ,qubit);
-    while(gates) {
+    for(unsigned int i = 0; i < gateStr.size(); i++) {
         shared_ptr<Gate> newGate;
-        string gateName = sToUpper(gates->name);
-        newGate = shared_ptr<Gate>(new UGate(gateName));
+        string name = string(1,toupper(gateStr.at(i)));
+        if ( (i+1) < gateStr.size() && gateStr[i+1] == '*') {
+            name += gateStr[i+1];
+            i++;
+        }
+        newGate = shared_ptr<Gate>(new UGate(name));
         newGate->targets.push_back(line);
         newGate->ctrls = false;
         circ->addGate(newGate);
-        gates = gates->next;
     }
-    delete gates;
 }
 
 void link_circuit(shared_ptr<Circuit> c, const map<string,shared_ptr<Circuit>> &subcircs)

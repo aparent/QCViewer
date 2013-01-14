@@ -64,7 +64,7 @@ Authors: Alex Parent, Jacob Parker
 %token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END PI NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS DIV BAR
 
 %type <string> WORD NUM id
-%type <names> names nums oneBitGates
+%type <names> names nums
 %type <fnum> float
 
 
@@ -162,7 +162,7 @@ gates:  /*empty*/
             addFracRGate(curr_circ,$2,$11,atoi($10),atoi($4),atoi($7));
           }
 				/*A set of one bit gates to be applied to a single qubit*/
-        | gates id BAR oneBitGates NEWLINE
+        | gates id BAR WORD NEWLINE
           {
             add_one_bit_gates(curr_circ,$2,$4);
           }
@@ -172,14 +172,6 @@ gates:  /*empty*/
           }
 ;
 
-oneBitGates:   WORD
-               {
-                 $$ = new name_node($1,NULL);
-               }
-             | oneBitGates WORD
-               {
-                 $$ = new name_node($2, $1);
-               }
 names:/*empty*/ {$$ = NULL;}
 			|  id names 
         {
