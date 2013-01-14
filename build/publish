@@ -1,0 +1,3 @@
+#!/bin/sh
+# Your public key must be installed in the build account.
+git push qcbuild@hfcs.uwaterloo.ca:QCViewer
