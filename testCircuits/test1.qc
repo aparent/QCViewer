@@ -1,6 +1,6 @@
-.v a b c d e Workspace test
-.i a b c d e Workspace test
-.o a b c d e 
+.v 1 a b c d e Workspace test
+.i 1 a b c d e Workspace test
+.o 1 a b c d e 
 .c
 
 BEGIN S1 (1 2 3 4)
@@ -54,4 +54,6 @@ tof a b c d
 S1 b c d e 
 TOF a b c d
 NOT b c d e
+a | x t y z
+1 | x t y z h
 END

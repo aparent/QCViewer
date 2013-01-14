@@ -63,7 +63,7 @@ Authors: Alex Parent, Jacob Parker
 %start input
 %token VARS INPUTS OUTPUTS CONSTANTS OUTLABELS START END PI NEWLINE NUM WORD APOS LBRAC RBRAC EXPON NEG COLON PLUS DIV BAR
 
-%type <string> WORD NUM
+%type <string> WORD NUM id
 %type <names> names nums oneBitGates
 %type <fnum> float
 
@@ -124,42 +124,45 @@ gates:  /*empty*/
             CHECK_NAMES($3,$2);
             add_gate(curr_circ,$2,$3,1,error_log);
           }  
+				/*gate with colon seperated controls/targets*/
         | gates WORD names COLON names NEWLINE 
           {
             CHECK_NAMES($3,$2);
             CHECK_NAMES($5,$2);
             add_gate(curr_circ,$2,$3,$5,1,error_log);
           } 
+				/*Rotation gate by float*/
         | gates WORD LBRAC float RBRAC names NEWLINE 
           {
             CHECK_NAMES($6,$2);
             addRGate(curr_circ,$2,$6,1,$4);
           }
+				/*rotation gate by fraction*/
         | gates WORD LBRAC NUM PI DIV NUM RBRAC names NEWLINE 
           {
             CHECK_NAMES($9,$2);
             addFracRGate(curr_circ,$2,$9,1,atoi($4),atoi($7));
           }
+				/* gate which is looped */
         | gates WORD EXPON NUM names NEWLINE 
           {
             CHECK_NAMES($5,$2);
             add_gate(curr_circ,$2,$5,atoi($4),error_log);
           } 
+				/*Rotation gate by float shich is looped*/
         | gates WORD LBRAC float RBRAC EXPON NUM names NEWLINE 
           {
             CHECK_NAMES($8,$2);
             addRGate(curr_circ,$2,$8,atoi($7),$4);
           }
+				/*rotation gate by fraction which is looped*/
         | gates WORD LBRAC NUM PI DIV NUM RBRAC EXPON NUM names NEWLINE 
           {
             CHECK_NAMES($11,$2);
             addFracRGate(curr_circ,$2,$11,atoi($10),atoi($4),atoi($7));
           }
-        | gates WORD BAR oneBitGates NEWLINE
-          {
-            add_one_bit_gates(curr_circ,$2,$4);
-          }
-        | gates NUM BAR oneBitGates NEWLINE
+				/*A set of one bit gates to be applied to a single qubit*/
+        | gates id BAR oneBitGates NEWLINE
           {
             add_one_bit_gates(curr_circ,$2,$4);
           }
@@ -178,19 +181,23 @@ oneBitGates:   WORD
                  $$ = new name_node($2, $1);
                }
 names:/*empty*/ {$$ = NULL;}
-			|  WORD names 
+			|  id names 
         {
           $$ = new name_node($1,$2);
         } 
-			|  NUM names 
-        {
-          $$ = new name_node($1,$2);
-        }
-			|  WORD APOS names 
+			|  id APOS names 
         {
           $$ = new name_node($1,$3,true);
         }
-			|  NUM APOS names {$$ = new name_node($1,$3,true); }
+
+id:   WORD
+				{ 
+					$$ = $1;
+				} 
+		| NUM
+				{
+					$$ = $1;
+				}
 
 nums:/*empty*/ {$$ = NULL;}
 			|  NUM nums 
