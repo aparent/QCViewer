@@ -1,12 +1,6 @@
-IF(WIN32)
-	set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=gnu++0x")
-ELSE()
-  set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=c++0x")
-  set(CMAKE_CXX_FLAGS_DEBUG "-pg -g -pedantic -Wall -Wextra -std=c++0x")
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=c++0x")
-ENDIF(WIN32)
+set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=gnu++0x -s")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
