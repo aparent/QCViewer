@@ -14,6 +14,7 @@ function die {
 # Assume we are in the build directory.
 
 ver=`git describe --tags --abbrev=0`
+destname="QCViewer-${ver}-`date +%Y-%m-%d`"
 workdir=`mktemp -d`
 [ -d "$workdir" ] || die "Couldn't create a temporary directory."
 
@@ -25,7 +26,7 @@ cp -r ../bin/* "$workdir/QCViewer-$ver"/ || die "Couldn't copy QCViewer binaries
 rm -f "$workdir/QCViewer-$ver"/{qcviewer.exe,qcimage.exe}
 
 mkdir -p packages || die "Couldn't create packages directory!"
-destarc="`realpath packages`/QCViewer-${ver}.tar.gz"
+destarc="`realpath packages`/${destname}.tar.gz"
 
 # Replace an existing archive.
 rm -f "$destarc"
