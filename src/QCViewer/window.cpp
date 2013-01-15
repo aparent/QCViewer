@@ -461,6 +461,7 @@ void QCViewer::set_selection (vector<Selection> s)
         btn_editcontrols.set_active (false);
         m_PropFrame.hide ();
         m_FlowFrame.hide();
+        m_RGateEditFrame.hide ();
     } else if (selections.size () == 1) {
         shared_ptr<Gate> gate = c.getSelectedGate();
         if (gate && gate->type == Gate::RGATE) {
