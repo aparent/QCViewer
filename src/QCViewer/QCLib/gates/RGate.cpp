@@ -26,6 +26,7 @@ Authors: Alex Parent, Jacob Parker
 
 #include "QCLib/gate.h"
 #include "QCLib/utility.h"
+#include <assert.h>
 #include <cmath>
 #include <complex>
 
@@ -243,5 +244,9 @@ void RGate::set_rotVal (float_type r)   // XXX: remove float_type, consildate th
 
 float_type RGate::get_rotVal () const
 {
+    assert(denom != 0);
+    if (frac){
+      return numer/denom;  
+    }
     return rot;
 }
