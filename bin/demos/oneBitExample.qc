@@ -1,0 +1,10 @@
+.v 1 2 3
+.i 1 2 3
+.o 1 2 3
+
+BEGIN
+H 3
+1 : HTXHTHYTH
+T 2
+TOF 1 2 3
+END

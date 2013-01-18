@@ -49,11 +49,11 @@ H5 a b c d e
 tof a b c d
 not b c d e
 S1 a b d c 
-GroverIterate test : a b c d e Workspace 
+GroverIterate test | a b c d e Workspace 
 tof a b c d
 S1 b c d e 
 TOF a b c d
 NOT b c d e
-a | xt*yz
-1 | xtyzh
+a : xt*yz
+1 : xtyzh
 END
