@@ -38,7 +38,6 @@ using namespace std;
 UGate::UGate(string n_name) : Gate(), name(n_name)
 {
     drawType = DEFAULT;
-    type = UGATE;
     loop_count = 1;
     dname_checked = false;
 }
@@ -46,7 +45,6 @@ UGate::UGate(string n_name) : Gate(), name(n_name)
 UGate::UGate(string n_name, string n_dname) : Gate(), name(n_name)
 {
     drawType = DEFAULT;
-    type = UGATE;
     loop_count = 1;
     dname = n_dname;
     dname_checked = true;

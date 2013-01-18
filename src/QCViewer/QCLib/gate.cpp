@@ -40,7 +40,6 @@ Gate::Gate()
     colbreak = false;
     ctrls = false;
     loop_count = 0;
-    type = UGATE;
     drawType = DEFAULT;
 }
 

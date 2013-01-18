@@ -295,15 +295,11 @@ cairo_surface_t* CircuitImage::make_ps_surface (string file, cairo_rectangle_t e
 
 void CircuitImage::drawGate(shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects)
 {
-    switch (g->type) {
-    case Gate::UGATE:
-    case Gate::RGATE:
+    shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+    if (s) {
+        drawSubcirc (s,xcurr,maxX,rects);
+    } else {
         drawUGate (g,xcurr,maxX,rects);
-        break;
-    case Gate::SUBCIRC:
-    default:
-        drawSubcirc (static_pointer_cast<Subcircuit>(g),xcurr,maxX,rects);
-        break;
     }
 }
 

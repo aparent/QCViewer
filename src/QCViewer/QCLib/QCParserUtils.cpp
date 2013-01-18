@@ -374,9 +374,11 @@ void remove_bad_gates(std::shared_ptr<Circuit> c, vector<string>& error_log )
 {
     for (unsigned int i = 0; i < c->numGates(); i++) {
         shared_ptr<Gate> g = c->getGate(i);
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+        shared_ptr<RGate>      r = dynamic_pointer_cast<RGate>(g);
         string name = g->getName();
-        if (g->type!=Gate::RGATE &&
-                g->type!=Gate::SUBCIRC &&
+        if ( !r &&
+                !s &&
                 g->drawType!=Gate::MEASURE &&
                 g->drawType!=Gate::SELECTZERO &&
                 g->drawType!=Gate::SELECTONE &&

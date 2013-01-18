@@ -38,7 +38,6 @@ RGate::RGate(float_type n_rot, Axis a) : Gate(), rot(n_rot)
     numer = 0;
     denom = 0;
     drawType = DEFAULT;
-    type = RGATE;
     axis = a;
     loop_count = 1;
 }
@@ -50,7 +49,6 @@ RGate::RGate(Axis a, int n_numer, int n_denom) : Gate()
     denom = n_denom;
     rot = (double)numer/(double)denom;
     drawType = DEFAULT;
-    type = RGATE;
     axis = a;
     loop_count = 1;
 }
@@ -245,8 +243,8 @@ void RGate::set_rotVal (float_type r)   // XXX: remove float_type, consildate th
 float_type RGate::get_rotVal () const
 {
     assert(denom != 0);
-    if (frac){
-      return numer/denom;  
+    if (frac) {
+        return numer/denom;
     }
     return rot;
 }
