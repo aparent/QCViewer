@@ -38,7 +38,6 @@ RGate::RGate(float_type n_rot, Axis a) : Gate(), rot(n_rot)
     numer = 0;
     denom = 0;
     drawType = DEFAULT;
-    type = RGATE;
     axis = a;
     loop_count = 1;
 }
@@ -50,7 +49,6 @@ RGate::RGate(Axis a, int n_numer, int n_denom) : Gate()
     denom = n_denom;
     rot = (double)numer/(double)denom;
     drawType = DEFAULT;
-    type = RGATE;
     axis = a;
     loop_count = 1;
 }

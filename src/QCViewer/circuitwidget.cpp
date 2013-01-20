@@ -697,7 +697,11 @@ void CircuitWidget::add_subcirc ()
 
 bool CircuitWidget::is_subcirc (unsigned int id)
 {
-    return circuit->getGate(id)->type == Gate::SUBCIRC;
+    if (dynamic_pointer_cast<Subcircuit>(circuit->getGate(id))) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 shared_ptr<Gate> CircuitWidget::getGate(unsigned int id)

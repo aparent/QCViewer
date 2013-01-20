@@ -33,7 +33,6 @@ using namespace std;
 Subcircuit::Subcircuit(shared_ptr<Circuit> n_circ, const vector <unsigned int>& n_linemap, unsigned int loops) : Gate()
 {
     drawType = DEFAULT;
-    type = SUBCIRC;
     circ = n_circ;
     lineMap = n_linemap;
     loop_count = loops;
@@ -105,8 +104,8 @@ shared_ptr<Gate> Subcircuit::getGate(int pos) const
     for (unsigned int i = 0; i < g->controls.size(); i++) {
         g->controls[i].wire = lineMap.at(g->controls[i].wire);
     }
-    if (g->type == SUBCIRC) { //Combine the maps if it is a subcircuit so we have the correct global map
-        shared_ptr<Subcircuit> s = static_pointer_cast<Subcircuit>(g);
+    shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+    if (s) { //Combine the maps if it is a subcircuit so we have the correct global map
         for (unsigned int i = 0; i < s->lineMap.size(); i++) {
             s->lineMap.at(i) = lineMap.at(s->lineMap.at(i));
         }
@@ -135,15 +134,16 @@ bool Subcircuit::step (State& state)
     simState->simulating = true;
     if (simState->gate < numGates () ) {
         shared_ptr<Gate> g = getGate(simState->gate);
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
         bool bp = false;
         if (g->breakpoint) {
             bp = true;
         }
-        if (g->type != Gate::SUBCIRC || !static_pointer_cast<Subcircuit>(g)->expand ) {
+        if ( !s || !s->expand ) {
             state = ApplyGate(state,g);
             simState->gate++;
         } else {
-            if ( !dynamic_pointer_cast<Subcircuit>(g)->step(state)) {
+            if ( !s->step(state)) {
                 simState->gate++;
                 step(state);
             }
@@ -151,7 +151,7 @@ bool Subcircuit::step (State& state)
         if (bp) {
             return false;
         }
-        if (g->type == Gate::SUBCIRC && dynamic_pointer_cast<Subcircuit>(g)->simState->simulating) {
+        if (s && s->simState->simulating) {
             return false;
         }
         return true;
@@ -175,8 +175,9 @@ void Subcircuit::reset ()
     simState->simulating = false;
     for ( unsigned int i = 0; i < numGates(); i++ ) {
         shared_ptr<Gate> g = getGate(i);
-        if (g->type == Gate::SUBCIRC) {
-            dynamic_pointer_cast<Subcircuit>(g)->reset();
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+        if (s) {
+            s->reset();
         }
     }
 }

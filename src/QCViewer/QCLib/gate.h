@@ -53,7 +53,6 @@ rotation gate we may want the name to be dependent on the rot amount
 class Gate
 {
 public:
-    enum gateType {RGATE, UGATE, SUBCIRC};
     enum dType {NOT, FRED, MEASURE,SELECTZERO,SELECTONE, DEFAULT};
     virtual ~Gate();
     Gate();
@@ -66,7 +65,6 @@ public:
     unsigned int getLoopCount() const;
     virtual unsigned int getNumGates() const;
     void setLoopCount(unsigned int count);
-    gateType type; //used with enum gateType
     dType drawType;
     std::vector <Control> controls;
     std::vector <unsigned int> targets;

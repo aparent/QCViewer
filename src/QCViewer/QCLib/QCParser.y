@@ -125,7 +125,7 @@ gates:  /*empty*/
             add_gate(curr_circ,$2,$3,1,error_log);
           }  
 				/*gate with colon seperated controls/targets*/
-        | gates WORD names COLON names NEWLINE 
+        | gates WORD names BAR names NEWLINE 
           {
             CHECK_NAMES($3,$2);
             CHECK_NAMES($5,$2);
@@ -162,7 +162,7 @@ gates:  /*empty*/
             addFracRGate(curr_circ,$2,$11,atoi($10),atoi($4),atoi($7));
           }
 				/*A set of one bit gates to be applied to a single qubit*/
-        | gates id BAR WORD NEWLINE
+        | gates id COLON WORD NEWLINE
           {
             add_one_bit_gates(curr_circ,$2,$4);
           }
