@@ -244,9 +244,9 @@ void RGate::set_rotVal (float_type r)   // XXX: remove float_type, consildate th
 
 float_type RGate::get_rotVal () const
 {
-    assert(denom != 0);
-    if (frac){
-      return numer/denom;  
+    if (frac) {
+        assert(denom != 0);
+        return numer/denom;
     }
     return rot;
 }
