@@ -64,6 +64,7 @@ public:
     CircuitImage();
     CircuitImage(DrawOptions);
     void toggleLineLabels();
+    bool usingLineLabels();
     enum Renderer {CAIRO};
     Renderer renderer;
     std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *, std::vector<gateRect>&);
@@ -156,6 +157,7 @@ private:
 
     cairo_t* cr;
     DrawOptions op;
+    bool forreal_;
 
     std::list<std::shared_ptr<DrawPrim>> drawPrims;
 

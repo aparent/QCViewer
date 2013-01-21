@@ -1,5 +1,5 @@
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic -std=gnu++0x")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -pg -Wall -Wextra -pedantic -std=gnu++0x")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=gnu++0x -s")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

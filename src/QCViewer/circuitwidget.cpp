@@ -191,7 +191,23 @@ bool CircuitWidget::on_button_press_event (GdkEventButton* event)
     if (!circuit) {
         return true;
     } else if (event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
-      std::cerr << "double-click\n";
+      // Double-click.
+      panning = false;
+      if(circuitDrawer.usingLineLabels()) {
+        // If a line label is double-clicked, edit it.
+        Gtk::Allocation allocation = get_allocation();
+        const int width = allocation.get_width();
+        const int height = allocation.get_height();
+        // translate mouse click coords into circuit diagram coords
+        double x = (event->x - width/2.0 + ext.width/2.0)/scale + cx;// - cx*scale;
+        double y = (event->y - height/2.0 + ext.height/2.0)/scale + cy;// - cy*scale;
+        vector<int> selections;
+        int res = pickRect(wirelabels, x, y, selections);
+        if(res>=0) {
+          edit_line_label(res);
+        }
+      }
+      return true;
     } else if (event->button == 1) {
         panning = true;
         oldmousex = event->x;
@@ -203,6 +219,34 @@ bool CircuitWidget::on_button_press_event (GdkEventButton* event)
         return true;
     } else {
         return true;
+    }
+}
+
+void CircuitWidget::edit_line_label (uint32_t line)
+{
+    if(!circuit) {
+      return;
+    }
+    Gtk::Dialog enterLabel("Enter Label");
+    enterLabel.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    enterLabel.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::Entry labelEntry;
+    labelEntry.set_max_length(5000);
+    labelEntry.show();
+    enterLabel.get_vbox()->pack_start(labelEntry,Gtk::PACK_SHRINK);
+    int result = enterLabel.run();
+    if (result == Gtk::RESPONSE_OK
+        && std::string(labelEntry.get_text()) != "") {
+        if(line >= circuit->numLines()) {
+          Line & l = circuit->getLineModify(line - circuit->numLines());
+          l.outLabel = labelEntry.get_text();
+        } else {
+          Line & l = circuit->getLineModify(line);
+          l.lineName = labelEntry.get_text();
+          l.constant = false;
+        }
+        size_changed = true;
+        force_redraw();
     }
 }
 
@@ -225,6 +269,7 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event)
 void CircuitWidget::check_circuit_size()
 {
     if (circuit&&size_changed) {
+        circuitDrawer.getCircuitSize (*circuit, wirestart, wireend, scale, ft_default);
         ext = circuitDrawer.getCircuitSize (*circuit, wirestart, wireend, scale, ft_default);
         size_changed = false;
     }

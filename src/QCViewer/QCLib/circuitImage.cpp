@@ -37,6 +37,11 @@ void CircuitImage::toggleLineLabels()
     op.drawLineLabels = !op.drawLineLabels;
 }
 
+bool CircuitImage::usingLineLabels()
+{
+    return op.drawLineLabels;
+}
+
 CircuitImage::CircuitImage(DrawOptions d) : op(d)
 {
     renderer = CAIRO;
@@ -110,10 +115,12 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
 {
     vector <gateRect> rects;
 
+    forreal_ = forreal;
     // prep text
     if(!forreal) textEngine.beginBatch();
 
     // input labels
+    wirelabels.clear();
     double xinit = 0.0;
     if (op.drawLineLabels) {
         for (uint32_t i = 0; i < c.numLines(); i++) {
@@ -676,8 +683,12 @@ void CircuitImage::addTriangle (double x0,double y0,double x1, double y1,double 
 
 void CircuitImage::addText (string t, double x,double y)
 {
-    shared_ptr<DrawPrim> p = shared_ptr<DrawPrim>(new Text(t,x,y));
-    drawPrims.push_back(p);
+    /* Drawing the text in LaTeX mode is horribly slow when zooming.
+       Only draw in the final pass. */
+    if(forreal_) {
+      shared_ptr<DrawPrim> p = shared_ptr<DrawPrim>(new Text(t,x,y));
+      drawPrims.push_back(p);
+    }
 }
 
 void CircuitImage::addCircle (double r, double x, double y, Colour f, Colour l)
