@@ -35,11 +35,13 @@ Authors: Alex Parent, Jacob Parker
 	#include "QCLib/utility.h"
 	#include <iostream>
 	#define SAVE_TOKEN {/*std::cout << yytext << std::endl;*/ QC_lval.string = strdup(yytext);}
+	#define REMOVE_QUOTES_SAVE_TOKEN {std::string s = yytext; s.erase(s.begin()); s.erase(s.end()-1); QC_lval.string = strdup(s.c_str());}
 	#define TOKEN(t) (QC_lval.token = t)
 	#define printok(t) std::cout<<t<<" "<<std::endl
 %}
 
 word [[:alnum:]\*]+
+string \"([^\\\"]|\\.)*\"
 digit [0-9]
 int {digit}+
 float {int}\.{int}
@@ -68,6 +70,7 @@ comment #.*
 "|"									return TOKEN(BAR);
 "/"									return TOKEN(DIV);
 {num}								SAVE_TOKEN; return NUM;
+{string}						REMOVE_QUOTES_SAVE_TOKEN; return WORD;
 {word}							SAVE_TOKEN; return WORD;
 
 {whitespace}
