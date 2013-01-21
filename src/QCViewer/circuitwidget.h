@@ -130,6 +130,7 @@ private:
     std::vector<gateRect> columns;
     std::vector<gateRect> rects;
     std::vector<Selection> selections;
+    std::vector<gateRect> wirelabels;
 
     double scale;
     double cx, cy;

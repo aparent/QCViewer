@@ -190,6 +190,8 @@ bool CircuitWidget::on_button_press_event (GdkEventButton* event)
 {
     if (!circuit) {
         return true;
+    } else if (event->button == 1 && event->type == GDK_2BUTTON_PRESS) {
+      std::cerr << "double-click\n";
     } else if (event->button == 1) {
         panning = true;
         oldmousex = event->x;
@@ -404,7 +406,7 @@ bool CircuitWidget::on_expose_event(GdkEventExpose* event)
         cr->fill ();
         cr->translate (xc-ext.width/2.0-cx*scale, yc-ext.height/2.0-cy*scale);
         if (circuit) {
-            rects = circuitDrawer.draw(*circuit, drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default);
+            rects = circuitDrawer.draw(*circuit, drawarch, drawparallel, ext, wirestart, wireend, scale, selections, ft_default, wirelabels);
             generate_layout_rects ();
         }
     }

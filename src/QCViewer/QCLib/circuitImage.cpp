@@ -49,7 +49,7 @@ void CircuitImage::renderCairo(cairo_t* c)
     cr = c;
 }
 
-vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default)
+vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParallel, cairo_rectangle_t ext, double wirestart, double wireend, double scale, const vector<Selection> &selections, cairo_font_face_t * ft_default, vector<gateRect> & wirelabels)
 {
     assert(cr != NULL);
     //These are needed to get proper text extents
@@ -60,7 +60,7 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
     drawPrims.clear();
 
     vector<gateRect> rects;
-    rects = drawCirc (c, wirestart, wireend, true);
+    rects = drawCirc (c, wirestart, wireend, true, wirelabels);
     drawbase (c, ext.width+ext.x, ext.height+ext.y+op.thickness, wirestart, wireend);
     if (drawParallel) {
         drawParallelSectionMarkings (rects, c.numLines(), c.getParallel());
@@ -106,7 +106,7 @@ void CircuitImage::drawbase (Circuit &c, double w, double h, double wirestart, d
     drawPrims.push_front(r);
 }
 
-vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &wireend, bool forreal)
+vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &wireend, bool forreal, vector<gateRect> & wirelabels)
 {
     vector <gateRect> rects;
 
@@ -125,6 +125,12 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
                 y = wireToY(i) - (text->getHeight()/2.0 + text->getY());
             }
             addText(label,x,y);
+            gateRect g;
+            g.x0 = x;
+            g.y0 = y;
+            g.width = text->getWidth();
+            g.height = text->getHeight();
+            wirelabels.push_back(g);
             xinit = max (xinit, text->getWidth());
         }
     }
@@ -175,6 +181,12 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
             double x = wireend + op.xoffset;
             double y = wireToY(i) - (text->getHeight()/2.0+text->getY());
             addText(label,x,y);
+            gateRect g;
+            g.x0 = x;
+            g.y0 = y;
+            g.width = text->getWidth();
+            g.height = text->getHeight();
+            wirelabels.push_back(g);
         }
     }
 
@@ -226,7 +238,10 @@ cairo_rectangle_t CircuitImage::getCircuitSize (Circuit &c, double &wirestart, d
     cairo_scale (context, scale, scale);
     cairo_set_font_face (context,ft_default);
     cairo_set_font_size(context, 18);
-    drawCirc (c, wirestart, wireend, false); // XXX fix up these inefficienies!!
+    {
+      vector<gateRect> dummy;
+      drawCirc (c, wirestart, wireend, false, dummy); // XXX fix up these inefficienies!!
+    }
     cairoRender (context);
     cairo_rectangle_t ext;
     cairo_recording_surface_ink_extents (unbounded_rec_surface, &ext.x, &ext.y, &ext.width, &ext.height);
@@ -243,7 +258,10 @@ void CircuitImage::savepng (Circuit &c, string filename, cairo_font_face_t * ft_
     cairo_t* cr = cairo_create (surface);
     renderCairo(cr);
     cairo_set_source_surface (cr, surface, 0, 0);
-    draw(c, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default);
+    {
+      vector<gateRect> dummy;
+      draw(c, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default, dummy);
+    }
     write_to_png (surface, filename);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
@@ -267,7 +285,10 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
     cairo_t* context = cairo_create (surface);
     renderCairo(context);
     cairo_set_source_surface (context, surface, 0, 0);
-    draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
+    {
+      vector<gateRect> dummy;
+      draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default,dummy);
+    }
     cairo_destroy (context);
     cairo_surface_destroy (surface);
 }
@@ -281,7 +302,10 @@ void CircuitImage::saveps (Circuit &c, string filename,cairo_font_face_t * ft_de
     cairo_t* cr = cairo_create(surface);
     renderCairo(cr);
     cairo_set_source_surface (cr, surface, 0,0);
-    draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default);
+    {
+      vector<gateRect> dummy;
+      draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default,dummy);
+    }
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
 }
