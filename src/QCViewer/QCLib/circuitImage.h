@@ -64,9 +64,10 @@ public:
     CircuitImage();
     CircuitImage(DrawOptions);
     void toggleLineLabels();
+    bool usingLineLabels();
     enum Renderer {CAIRO};
     Renderer renderer;
-    std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *);
+    std::vector<gateRect> draw (Circuit&, bool, bool, cairo_rectangle_t, double, double, double, const std::vector<Selection>&, cairo_font_face_t *, std::vector<gateRect>&);
     cairo_rectangle_t getCircuitSize (Circuit& c, double&, double&, double, cairo_font_face_t*);
 
 
@@ -156,6 +157,7 @@ private:
 
     cairo_t* cr;
     DrawOptions op;
+    bool forreal_;
 
     std::list<std::shared_ptr<DrawPrim>> drawPrims;
 
@@ -180,7 +182,7 @@ private:
     void drawSelections (const std::vector<gateRect>& , const std::vector<Selection>&);
 
 
-    std::vector<gateRect> drawCirc (Circuit&, double& , double& , bool );
+    std::vector<gateRect> drawCirc (Circuit&, double& , double& , bool, std::vector<gateRect>& );
     void drawGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     void drawUGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     gateRect drawControls (std::shared_ptr<Gate> g, const gateRect &r);

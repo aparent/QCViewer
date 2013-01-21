@@ -79,6 +79,8 @@ public:
     void insert_gate_at_front (std::shared_ptr<Gate>);
     void generate_layout_rects ();
 
+    void edit_line_label(uint32_t);
+
     std::shared_ptr<Gate> getSelectedGate ();
     void deleteSelectedGate ();
     enum Mode { NORMAL, EDIT_CONTROLS, EDIT_BREAKPOINTS };
@@ -130,6 +132,7 @@ private:
     std::vector<gateRect> columns;
     std::vector<gateRect> rects;
     std::vector<Selection> selections;
+    std::vector<gateRect> wirelabels;
 
     double scale;
     double cx, cy;
