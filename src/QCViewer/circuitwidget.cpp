@@ -269,7 +269,6 @@ bool CircuitWidget::onMotionEvent (GdkEventMotion* event)
 void CircuitWidget::check_circuit_size()
 {
     if (circuit&&size_changed) {
-        circuitDrawer.getCircuitSize (*circuit, wirestart, wireend, scale, ft_default);
         ext = circuitDrawer.getCircuitSize (*circuit, wirestart, wireend, scale, ft_default);
         size_changed = false;
     }

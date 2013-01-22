@@ -247,6 +247,7 @@ cairo_rectangle_t CircuitImage::getCircuitSize (Circuit &c, double &wirestart, d
     cairo_set_font_size(context, 18);
     {
       vector<gateRect> dummy;
+      drawCirc (c, wirestart, wireend, false, dummy);
       drawCirc (c, wirestart, wireend, false, dummy); // XXX fix up these inefficienies!!
     }
     cairoRender (context);
@@ -287,7 +288,6 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
 {
     double wirestart, wireend;
     cairo_rectangle_t ext = getCircuitSize (c,wirestart, wireend, 1.0, ft_default);
-    cout << ext.width+ext.x << " : " << op.thickness+ext.height+ext.y << endl;
     cairo_surface_t* surface = cairo_svg_surface_create (filename.c_str(), ext.width+ext.x, op.thickness+ext.height+ext.y);
     cairo_t* context = cairo_create (surface);
     renderCairo(context);
@@ -685,10 +685,14 @@ void CircuitImage::addText (string t, double x,double y)
 {
     /* Drawing the text in LaTeX mode is horribly slow when zooming.
        Only draw in the final pass. */
+    shared_ptr<DrawPrim> p;
     if(forreal_) {
-      shared_ptr<DrawPrim> p = shared_ptr<DrawPrim>(new Text(t,x,y));
-      drawPrims.push_back(p);
+      p = shared_ptr<DrawPrim>(new Text(t,x,y));
+    } else {
+      TextObject* text = textEngine.renderText(t);
+      p = shared_ptr<DrawPrim>(new Rectangle(x,y,text->getWidth(),text->getHeight(),Colour(0,0,0,1),Colour(0,0,0,1),false));
     }
+    drawPrims.push_back(p);
 }
 
 void CircuitImage::addCircle (double r, double x, double y, Colour f, Colour l)
