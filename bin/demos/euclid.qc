@@ -77,7 +77,7 @@ fred gr b2 a2
 fred gr b3 a3
 fred gr b4 a4
 fred gr b5 a5
-SUBTRACTOR r : 0 b0 a0 b1 a1 b2 a2 b3 a3 b4 a4 b5 a5 z
+SUBTRACTOR r | 0 b0 a0 b1 a1 b2 a2 b3 a3 b4 a4 b5 a5 z
 tof r b0' b1' b2' b3' b4' b5' f1
 fred gr b5 a5
 fred gr b4 a4

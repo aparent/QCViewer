@@ -246,9 +246,9 @@ cairo_rectangle_t CircuitImage::getCircuitSize (Circuit &c, double &wirestart, d
     cairo_set_font_face (context,ft_default);
     cairo_set_font_size(context, 18);
     {
-      vector<gateRect> dummy;
-      drawCirc (c, wirestart, wireend, false, dummy);
-      drawCirc (c, wirestart, wireend, false, dummy); // XXX fix up these inefficienies!!
+        vector<gateRect> dummy;
+        drawCirc (c, wirestart, wireend, false, dummy);
+        drawCirc (c, wirestart, wireend, false, dummy); // XXX fix up these inefficienies!!
     }
     cairoRender (context);
     cairo_rectangle_t ext;
@@ -267,8 +267,8 @@ void CircuitImage::savepng (Circuit &c, string filename, cairo_font_face_t * ft_
     renderCairo(cr);
     cairo_set_source_surface (cr, surface, 0, 0);
     {
-      vector<gateRect> dummy;
-      draw(c, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default, dummy);
+        vector<gateRect> dummy;
+        draw(c, false, false,  ext, wirestart, wireend, 1.0, vector<Selection>(), ft_default, dummy);
     }
     write_to_png (surface, filename);
     cairo_destroy (cr);
@@ -293,8 +293,8 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
     renderCairo(context);
     cairo_set_source_surface (context, surface, 0, 0);
     {
-      vector<gateRect> dummy;
-      draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default,dummy);
+        vector<gateRect> dummy;
+        draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default,dummy);
     }
     cairo_destroy (context);
     cairo_surface_destroy (surface);
@@ -310,8 +310,8 @@ void CircuitImage::saveps (Circuit &c, string filename,cairo_font_face_t * ft_de
     renderCairo(cr);
     cairo_set_source_surface (cr, surface, 0,0);
     {
-      vector<gateRect> dummy;
-      draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default,dummy);
+        vector<gateRect> dummy;
+        draw(c, false, false, ext, wirestart, wireend, 1.0, vector<Selection>(),ft_default,dummy);
     }
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
@@ -687,10 +687,10 @@ void CircuitImage::addText (string t, double x,double y)
        Only draw in the final pass. */
     shared_ptr<DrawPrim> p;
     if(forreal_) {
-      p = shared_ptr<DrawPrim>(new Text(t,x,y));
+        p = shared_ptr<DrawPrim>(new Text(t,x,y));
     } else {
-      TextObject* text = textEngine.renderText(t);
-      p = shared_ptr<DrawPrim>(new Rectangle(x,y,text->getWidth(),text->getHeight(),Colour(0,0,0,1),Colour(0,0,0,1),false));
+        TextObject* text = textEngine.renderText(t);
+        p = shared_ptr<DrawPrim>(new Rectangle(x,y,text->getWidth(),text->getHeight(),Colour(0,0,0,1),Colour(0,0,0,1),false));
     }
     drawPrims.push_back(p);
 }
@@ -741,7 +741,7 @@ void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r)
 {
     const double dashes[] = { 4.0, 4.0 };
     if (r->dashed) { //turn dashes on
-        cairo_set_dash (cr, dashes, 2, 0.0);
+        cairo_set_dash (context, dashes, 2, 0.0);
     }
     cairo_set_source_rgba (context, r->fill.r, r->fill.g, r->fill.b, r->fill.a);
     cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
@@ -750,7 +750,7 @@ void CircuitImage::cairoRectangle(cairo_t *context,std::shared_ptr<Rectangle> r)
     cairo_rectangle (context, r->x0, r->y0, r->width, r->height);
     cairo_stroke (context);
     if (r->dashed) { //turn dashes back off
-        cairo_set_dash (cr, dashes, 0, 0.0);
+        cairo_set_dash (context, dashes, 0, 0.0);
     }
 }
 
