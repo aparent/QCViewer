@@ -8,6 +8,9 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include "circuit.h"
+#include "circuitParser.h"
+#include "QCParserUtils.h"
 
 using namespace std;
 using namespace boost;
@@ -16,6 +19,15 @@ struct quigl_statement {
   string oper; /* operator name */
   vector<int> arguments; /* operator arguments, as indices into the labels array. */
   vector<int> controls; /* operator controls, as indices into the labels array. */
+};
+
+struct quigl_procedure {
+  string name; /* procedure name */
+  vector<string> labels; /* procedure labels (lines) */
+  vector<quigl_statement> stmts; /* procedure statements */
+
+  void load(string filename);
+  void save(string filename);
 };
 
 std::ostream & operator<<(std::ostream & ou, const quigl_statement & s) {
@@ -36,16 +48,6 @@ std::ostream & operator<<(std::ostream & ou, const quigl_statement & s) {
   ou << ")\n";
   return ou;
 }
-
-struct quigl_procedure {
-  string name; /* procedure name */
-  vector<string> labels; /* procedure labels (lines) */
-  vector<quigl_statement> stmts; /* procedure statements */
-
-  void load(string filename);
-  void save(string filename);
-};
-
 std::ostream & operator<<(std::ostream & ou, const quigl_procedure & c) {
   ou << "\"" << c.name << "\" (";
   for(std::vector<std::string>::const_iterator p = c.labels.begin(); p != c.labels.end(); ++p) {
@@ -132,9 +134,58 @@ void quigl_procedure::save(string filename) {
   //
 }
 
-int main() {
+std::shared_ptr<Circuit> circuit_from_quigl(std::string filename) {
   quigl_procedure p;
-  p.load("test.xml");
-  cout << p;
+  p.load(filename);
+
+  std::shared_ptr<Circuit> c(new Circuit());
+
+  c->setName(p.name);
+  for(auto &ln : p.labels)
+  {
+    c->addLine(ln);
+  }
+
+  for(int i=0;i<c->numLines();i++)
+  {
+    Line & l = c->getLineModify(i);
+    l.constant = l.garbage = false;
+  }
+
+  for(auto &stmt : p.stmts)
+  {
+    name_node * init_args = NULL, * init_ctrls = NULL;
+    name_node **args = &init_args, **ctrls = &init_ctrls;
+
+    for(auto &arg : stmt.arguments)
+    {
+      *args = new name_node(p.labels.at(arg), NULL);
+      args = &((*args)->next);
+    }
+
+    for(auto &ctrl : stmt.controls)
+    {
+      *ctrls = new name_node(p.labels.at(ctrl), NULL);
+      ctrls = &((*ctrls)->next);
+    }
+
+    vector<string> errors;
+    add_gate(c, stmt.oper, init_ctrls, init_args, 1, errors);
+
+    if(!errors.empty()) {
+      for(auto &e : errors)
+      {
+        cerr << e << "\n";
+      }
+      throw std::runtime_error("Errors in add_gate.");
+    }
+  }
+
+  return c;
+}
+
+int main() {
+  std::shared_ptr<Circuit> c = circuit_from_quigl("test.xml");
+  saveCircuit(c, "test.qc");
 }
 
