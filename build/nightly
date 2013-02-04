@@ -9,6 +9,11 @@ nightly="`realpath $0`"
 builddir="${nightly%/*}"
 mkdir -p "$builddir/log" || die "Couldn't create log directory."
 cd "$builddir/release"
+git clean -f -x > /dev/null 2>&1
+echo "Building documentation..."
+for i in docs docs/manual docs/poster; do
+  ( cd "$builddir/../$i" && make ) >> "$builddir/log/latex" 2>&1
+done
 echo "Building release binaries for Linux..."
 ./build > "$builddir/log/linux" 2>&1 || die "ERROR during Linux release build!"
 echo "Building release binaries for Windows..."

@@ -176,7 +176,7 @@
 
 
 % Upper part of the page
-\includegraphics{Figures/Logo.png}\\[1cm]    
+\includegraphics{Figures/iqclogo}\\[1cm]    
 
 \textsc{\LARGE University of Waterloo}\\[1.5cm]
 
@@ -228,37 +228,35 @@ In this section, we'll go through the creation and execution of a simple circuit
 Circuit for EPR Pair.
 \end{center}
 
-From the Circuit menu \includegraphics{Figures/CreateCircuit/New.png} select \em New \em. A dialog box asking how many qubits you wish to have in your circuit appears. 
+\newpage
+From the Circuit menu select \em New \em. A dialog box asking how many qubits you wish to have in your circuit appears. 
 
 \begin{center}
-\includegraphics{Figures/CreateCircuit/NumberOfQubits.png}\\
-Dialog box asking for number of qubits.
+\includegraphics{Figures/CreateCircuit/NumberOfQubits.png}
 \end{center}
 
 The circuit in this example uses 2 qubits so you may enter ``2'' here. We are then presented with our template circuit.
-
 \begin{center}
 \includegraphics[scale=.7]{Figures/CreateCircuit/TemplateCircuit}\\
 Template circuit for 2 qubits.
 \end{center}
+\hspace{1em}
 
-We may then make use of the gate palette to place the desired gates onto our circuit. In this case we first need a Hadamard gate. Simply click and drag the \includegraphics{Figures/Gates/Hadamard.png} graphic onto the template. Next follow this action by placing the \includegraphics{Figures/Gates/Mod2.png} graphic to the bottom right of the recently placed Hadamard gate. This should yield a circuit resembling the following
+We may then make use of the gate palette to place the desired gates onto our circuit. In this case we first need a Hadamard gate. Simply click and drag the \raisebox{-3mm}{\includegraphics{Figures/Gates/Hadamard.png}} graphic onto the template. Next follow this action by placing the \raisebox{-3mm}{\includegraphics{Figures/Gates/Mod2.png}} graphic to the bottom right of the recently placed Hadamard gate. This should yield a circuit resembling the following:
 
 \begin{center}
 \includegraphics[scale=.7]{Figures/CreateCircuit/EPRCircuit2}
 \end{center}
 
-Next, we wish to add a control to complete our CNOT gate on the right. This can be accomplished by simply clicking on the \includegraphics[scale=0.60]{Figures/CreateCircuit/CNOT} in our main cavas. This modifies the menu on the right and adds a \em Properties \em portion. 
+Next, we wish to add a control to complete our CNOT gate on the right. This can be accomplished by simply clicking on the \raisebox{-2.5mm}{\includegraphics[scale=0.60]{Figures/CreateCircuit/CNOT}} in our main canvas. This modifies the menu on the left and adds a \em Properties \em portion. 
 
 \begin{center}
 \includegraphics{Figures/CreateCircuit/Properties.png}
 \end{center}
 
-By selecting the \em Edit Controls \em option under the \em Properties \em menu, the mouse cursor is changed to \includegraphics[scale=0.5]{Figures/CreateCircuit/Cursor.png}. You may now click where you wish to place this control on the circuit. This completes our EPR circuit. 
+By selecting the \em Edit Controls \em option under the \em Properties \em menu, the mouse cursor is changed to \raisebox{-1mm}{\includegraphics[scale=0.5]{Figures/CreateCircuit/Cursor.png}}. You may now click the line where you wish to place this control on the circuit. This completes our EPR circuit. 
 
 \subsection{Circuit Simulation}\label{sub:CircuitSimulation}
-Now that we have created the circuit, we can simulate the behavior of this circuit given a particular state. Since we are dealing with a circuit consisting of two wires, the dimensionality of our quantum system must abide by this dimensionality as well.
-
 To load a particular quantum state, click the \includegraphics[scale=0.60]{Figures/Navigation/LoadState.png} icon to prompt the following dialog box to appear.
 
 \begin{center}
@@ -266,17 +264,19 @@ To load a particular quantum state, click the \includegraphics[scale=0.60]{Figur
 \end{center}
 
 To specify a particular state to enter, the ket formalism is represented by prefixing the 
-state with \verb+|+  and terminating the state with the less than symbol \verb+>+. 
-For instance, if we chose our input state to be $\ket{00}$, this is equivalent to 
-inputting \verb+|00>+. Once we input our state, it is loaded as input into our circuit. 
-By selecting \includegraphics[scale=0.60]{Figures/Navigation/DisplayState.png} 
-the state of the qubits are displayed below.
+state with \verb+|+  and terminating the state with the symbol \verb+>+. The number of
+bits in the input state must match the number of qubits in the circuit.
+
+For example, if we chose our input state to be $\ket{00}$, this is equivalent to 
+inputting \verb+|00>+. By selecting
+\raisebox{-3mm}{\includegraphics[scale=0.60]{Figures/Navigation/DisplayState.png}}
+the state of the qubits is displayed below.
 
 \begin{center}
 \includegraphics{Figures/CreateCircuit/DisplayState.png}
 \end{center}
 
-In order to observe the progression of our state through the circuit step by step, we manipulate the \includegraphics[scale=0.60]{Figures/Navigation/Step.png} button. Using this button highlights the current gate the qubits are interacting with, and display the corresponding states through \em Display State \em. Running the entire course of the circuit can also be done by simply using the \includegraphics[scale=0.60]{Figures/Navigation/Run.png} button. By using the reset \includegraphics[scale=0.60]{Figures/Navigation/Reset.png} button, one may reset the configuration back to its initial state.
+In order to observe the progression of our state through the circuit step by step, press the \raisebox{-2.5mm}{\includegraphics[scale=0.60]{Figures/Navigation/Step.png}} button. Using this button highlights the current gate the qubits are interacting with, and display the corresponding states through \em Display State \em. Running the entire course of the circuit can also be done by simply using the \includegraphics[scale=0.60]{Figures/Navigation/Run.png} button. By using the reset \includegraphics[scale=0.60]{Figures/Navigation/Reset.png} button, one may reset the configuration back to its initial state.
 
 \subsubsection{Example: Grover}
 

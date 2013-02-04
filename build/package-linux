@@ -20,6 +20,12 @@ workdir=`mktemp -d`
 
 mkdir "$workdir/QCViewer-$ver"
 
+# Copy documentation
+mkdir "$workdir/QCViewer-$ver/docs"
+for i in `find ../docs -name '*.tex'`; do
+  cp `dirname "$i"`/`basename "$i" .tex`.pdf "$workdir/QCViewer-$ver/docs/`basename "$i" .tex`.pdf" > /dev/null 2>&1
+done
+
 cp -r ../bin/* "$workdir/QCViewer-$ver"/ || die "Couldn't copy QCViewer binaries!"
 
 # Remove non-Linux executables, if they exist.
