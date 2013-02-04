@@ -29,9 +29,12 @@ Authors: Alex Parent
 #include <QCLib/circuitImage.h>
 #include <cairo-ft.h>
 #include <QCLib/gates/UGateLookup.h>
+#include <QCLib/text.h>
 #include <string>
 
 using namespace std;
+
+extern TextEngine textEngine;
 
 int main (int argc, char *argv[])
 {
@@ -42,6 +45,7 @@ int main (int argc, char *argv[])
     FT_Init_FreeType( &library );
     FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
     cairo_font_face_t * ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+    g_type_init();
     CircuitImage drawer;
 
     if (argc > 0) {
@@ -62,6 +66,11 @@ int main (int argc, char *argv[])
     } else {
         cout << "No circuit file provided" << endl;
         return 0;
+    }
+    if (argc>4) {
+      if(string(argv[4]).compare("-latex") == 0) {
+        textEngine.setMode(TEXT_LATEX);
+      }
     }
     if (argc>3) {
         if (string(argv[2]).compare("-svg") == 0) {
