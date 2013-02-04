@@ -521,11 +521,14 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
     stringstream ss;
     if (textEngine.getMode() == TEXT_LATEX) {
         ss << g->getLatexName();
+        if (g->getLoopCount() > 1) {
+            ss << " \\times" << g->getLoopCount();
+        }
     } else {
         ss << g->getDrawName();
-    }
-    if (g->getLoopCount() > 1) {
-        ss << " x" << g->getLoopCount();
+        if (g->getLoopCount() > 1) {
+            ss << " x" << g->getLoopCount();
+        }
     }
     vector<Control> dummy;
     minmaxWire (dummy, g->targets, minw, maxw); // only the targets
@@ -631,7 +634,11 @@ void CircuitImage::drawSubCircBox(shared_ptr<Subcircuit> s, gateRect &r)
     stringstream ss;
     ss << s->getName();
     if (s->getLoopCount() > 1) {
-        ss << " x" << s->getLoopCount();
+        if (textEngine.getMode() == TEXT_LATEX) {
+            ss << " \\times" << s->getLoopCount();
+        } else {
+            ss << " x" << s->getLoopCount();
+        }
         if (s->simState->simulating) {
             ss << " " << s->simState->loop << "/" << s->getLoopCount();
         }
