@@ -563,7 +563,7 @@ gateRect CircuitImage::drawCU (shared_ptr<Gate> g, uint32_t xc)
 void CircuitImage::drawSubcirc(shared_ptr<Subcircuit> s, double &xcurr,double &maxX, vector <gateRect> &rects)
 {
     gateRect r;
-    if (s->expand) {
+    if (s->expand && s->numGates() > 0) {
         r = drawExp(s,xcurr);
     } else {
         r = drawCU(static_pointer_cast<Gate>(s),xcurr);
