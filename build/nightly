@@ -9,9 +9,13 @@ nightly="`realpath $0`"
 builddir="${nightly%/*}"
 mkdir -p "$builddir/log" || die "Couldn't create log directory."
 cd "$builddir/release"
-git clean -f -x > /dev/null 2>&1
+if [ "`whoami`" == "qcbuild" ]; then
+  git clean -f -x > /dev/null 2>&1
+else
+  git clean -f -X > /dev/null 2>&1
+fi
 echo "Building documentation..."
-for i in docs docs/manual docs/poster; do
+for i in docs docs/manual docs/poster docs/slides; do
   ( cd "$builddir/../$i" && make ) >> "$builddir/log/latex" 2>&1
 done
 echo "Building release binaries for Linux..."
