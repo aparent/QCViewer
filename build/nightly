@@ -11,6 +11,7 @@ mkdir -p "$builddir/log" || die "Couldn't create log directory."
 cd "$builddir/release"
 if [ "`whoami`" == "qcbuild" ]; then
   git clean -f -x > /dev/null 2>&1
+  git reset --hard
 else
   git clean -f -X > /dev/null 2>&1
 fi
