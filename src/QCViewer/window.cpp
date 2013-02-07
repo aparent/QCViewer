@@ -219,27 +219,32 @@ void QCViewer::on_menu_file_open_circuit ()
 
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
-        vector<string> errors = c.load (dialog.get_filename ());
-        if (!errors.empty()) {
-            string error_message;
-            for ( unsigned int i = 0; i < errors.size(); i++) {
-                error_message += errors.at(i) + "\n";
-            }
-            Gtk::MessageDialog dialog(*this, "Error");
-            dialog.set_secondary_text(error_message);
-            dialog.run();
-        }
-        selections.clear ();
-        c.set_drawparallel (drawparallel);
-        c.set_drawarch (drawarch);
-        c.set_scale (1);
-        btn_editcontrols.set_active (false);
-        btn_editcontrols.set_active (false);
-        std::stringstream ss;
-        ss << "Gates: " << c.get_num_gates() <<" | Depth: "<< c.get_depth() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
-        m_statusbar.push(ss.str());
-        c.reset ();
+        open_circuit(dialog.get_filename ());
     }
+}
+
+void QCViewer::open_circuit(const std::string& filename)
+{
+    vector<string> errors = c.load (filename);
+    if (!errors.empty()) {
+        string error_message;
+        for ( unsigned int i = 0; i < errors.size(); i++) {
+            error_message += errors.at(i) + "\n";
+        }
+        Gtk::MessageDialog dialog(*this, "Error");
+        dialog.set_secondary_text(error_message);
+        dialog.run();
+    }
+    selections.clear ();
+    c.set_drawparallel (drawparallel);
+    c.set_drawarch (drawarch);
+    c.set_scale (1);
+    btn_editcontrols.set_active (false);
+    btn_editcontrols.set_active (false);
+    std::stringstream ss;
+    ss << "Gates: " << c.get_num_gates() <<" | Depth: "<< c.get_depth() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
+    m_statusbar.push(ss.str());
+    c.reset ();
 }
 
 void QCViewer::on_menu_file_open_arch ()

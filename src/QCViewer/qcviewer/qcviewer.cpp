@@ -39,6 +39,7 @@ struct Options
 {
     QCVOptions qcvOptions;
     bool exit;
+    std::string circuitFile;
 
     Options() : exit(false) {}
 };
@@ -56,6 +57,8 @@ int main (int ac, char *av[])
     UGateSetup();
     window = new QCViewer(ops.qcvOptions);
     window->set_default_size (800,600);
+    if (!ops.circuitFile.empty())
+        window->open_circuit(ops.circuitFile);
     std::cerr << "Running window\n";
 
     Gtk::Main::run(*window);
@@ -77,14 +80,26 @@ Options handleOptions(int ac,char *av[])
     ("version", "prints out the version")
     ;
 
+    //Options parsed from the command line and not shown in help message
+    po::options_description cmdHidden("Hidden CmdLine Options");
+    cmdHidden.add_options()
+    ("input-file", po::value<std::string>(), "circuit file to open")
+    ;
+    po::positional_options_description p;
+    p.add("input-file", 1);
+
     //Options parsed from the config file
     po::options_description config("Config");
     config.add_options()
     ("draw.dotradius", po::value<double>(&Op.qcvOptions.draw.dotradius)->default_value(10.0), "The Radius of the control dot.")
     ;
 
+    po::options_description cmdOptions;
+    cmdOptions.add(cmd).add(cmdHidden);
+
     po::variables_map vm;
-    po::store(po::parse_command_line(ac, av, cmd), vm);
+    po::store(po::command_line_parser(ac, av).
+              options(cmdOptions).positional(p).run(), vm);
     po::store(po::parse_config_file<char>("QCV.cfg", config), vm);
     po::notify(vm);
 
@@ -95,6 +110,9 @@ Options handleOptions(int ac,char *av[])
     if (vm.count("version")) {
         std::cout << QCV_NAME << " " << QCV_VERSION << std::endl;
         Op.exit = true;
+    }
+    if (vm.count("input-file")) {
+        Op.circuitFile = vm["input-file"].as<std::string>();
     }
 
     return Op;
