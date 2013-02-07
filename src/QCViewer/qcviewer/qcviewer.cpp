@@ -35,16 +35,26 @@ Authors: Alex Parent, Jacob Parker
 
 QCViewer* window;
 
-QCVOptions handleOptions(int,char*[]);
+struct Options
+{
+    QCVOptions qcvOptions;
+    bool exit;
+
+    Options() : exit(false) {}
+};
+
+Options handleOptions(int,char*[]);
 
 int main (int ac, char *av[])
 {
     srand((unsigned)time(NULL));
     g_type_init();
     Gtk::Main kit(ac, av);
-    QCVOptions ops = handleOptions(ac, av);
+    Options ops = handleOptions(ac, av);
+    if (ops.exit)
+        return EXIT_SUCCESS;
     UGateSetup();
-    window = new QCViewer(ops);
+    window = new QCViewer(ops.qcvOptions);
     window->set_default_size (800,600);
     std::cerr << "Running window\n";
 
@@ -54,11 +64,11 @@ int main (int ac, char *av[])
 }
 
 
-QCVOptions handleOptions(int ac,char *av[])
+Options handleOptions(int ac,char *av[])
 {
     namespace po = boost::program_options;
 
-    QCVOptions QCVOp;
+    Options Op;
 
     //Options parsed from the command line
     po::options_description cmd("CmdLine Options");
@@ -70,7 +80,7 @@ QCVOptions handleOptions(int ac,char *av[])
     //Options parsed from the config file
     po::options_description config("Config");
     config.add_options()
-    ("draw.dotradius", po::value<double>(&QCVOp.draw.dotradius)->default_value(10.0), "The Radius of the control dot.")
+    ("draw.dotradius", po::value<double>(&Op.qcvOptions.draw.dotradius)->default_value(10.0), "The Radius of the control dot.")
     ;
 
     po::variables_map vm;
@@ -80,10 +90,12 @@ QCVOptions handleOptions(int ac,char *av[])
 
     if (vm.count("help")) {
         std::cout << cmd << std::endl;
+        Op.exit = true;
     }
     if (vm.count("version")) {
         std::cout << QCV_NAME << " " << QCV_VERSION << std::endl;
+        Op.exit = true;
     }
 
-    return QCVOp;
+    return Op;
 }
