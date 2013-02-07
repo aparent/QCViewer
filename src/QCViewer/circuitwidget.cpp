@@ -230,7 +230,9 @@ void CircuitWidget::edit_line_label (uint32_t line)
     Gtk::Dialog enterLabel("Enter Label");
     enterLabel.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     enterLabel.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    enterLabel.set_default_response(Gtk::RESPONSE_OK);
     Gtk::Entry labelEntry;
+    labelEntry.set_activates_default();
     labelEntry.set_max_length(5000);
     labelEntry.show();
     enterLabel.get_vbox()->pack_start(labelEntry,Gtk::PACK_SHRINK);

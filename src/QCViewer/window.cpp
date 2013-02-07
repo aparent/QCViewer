@@ -375,7 +375,9 @@ void QCViewer::on_menu_new ()
     Gtk::Dialog newdlg ("Number of qubits");
     newdlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     newdlg.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    newdlg.set_default_response(Gtk::RESPONSE_OK);
     Gtk::Entry num_qubits;
+    num_qubits.set_activates_default();
     num_qubits.set_max_length (4);
     num_qubits.show();
     newdlg.get_vbox()->pack_start(num_qubits,Gtk::PACK_SHRINK);
@@ -403,7 +405,9 @@ void QCViewer::on_menu_load_state ()
     Gtk::Dialog enterState("Enter State");
     enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     enterState.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    enterState.set_default_response(Gtk::RESPONSE_OK);
     Gtk::Entry stateEntry;
+    stateEntry.set_activates_default();
     stateEntry.set_max_length(5000);
     stateEntry.show();
     enterState.get_vbox()->pack_start(stateEntry,Gtk::PACK_SHRINK);
