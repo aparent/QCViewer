@@ -182,7 +182,7 @@ private:
     void drawSelections (const std::vector<gateRect>& , const std::vector<Selection>&);
 
 
-    std::vector<gateRect> drawCirc (Circuit&, double& , double& , bool, std::vector<gateRect>& );
+    std::vector<gateRect> drawCirc (Circuit&, bool, double& , double& , bool, std::vector<gateRect>& );
     void drawGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     void drawUGate(std::shared_ptr<Gate> g,double &xcurr,double &maxX, std::vector <gateRect> &rects);
     gateRect drawControls (std::shared_ptr<Gate> g, const gateRect &r);
