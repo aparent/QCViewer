@@ -162,7 +162,6 @@ public:
         }
       }
     }
-    printf("res: %u by %u\n", res.rows, res.cols);
     return res;
   }
   Matrix & operator*=(const Matrix & rhs) {
