@@ -121,6 +121,16 @@ public:
     }
     return t;
   }
+  Matrix & identity(const T & unit) {
+    m.clear();
+    for(u32 i=0; i<cols && i<rows; i++)
+    {
+      idcon<T> row;
+      row.insert(std::pair<int, T>(i, unit));
+      m.insert(std::pair<int, idcon<T>>(i, row));
+    }
+    return *this;
+  }
   Matrix operator*(const Matrix & rhs) const {
     if(cols != rhs.rows) {
       throw std::runtime_error("Matrix dimensions must agree");
