@@ -59,7 +59,7 @@ std::ostream & operator<<(std::ostream & ou, const quigl_procedure & c)
         }
     }
     ou << "):\n";
-    for(auto & p : c.stmts) {
+for(auto & p : c.stmts) {
         ou << p;
     }
     return ou;
