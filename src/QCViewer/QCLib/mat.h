@@ -219,6 +219,9 @@ public:
     res.rows = rows*rhs.rows;
     return res;
   }
+  Matrix & operator%=(const Matrix & rhs) {
+    return (*this = *this % rhs);
+  }
   std::string toString() {
     std::stringstream ss;
     s64 lrow = -1, lcol;
