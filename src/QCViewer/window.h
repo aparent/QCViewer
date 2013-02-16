@@ -52,6 +52,7 @@ public:
 
     void set_selection (std::vector<Selection>);
     void load_state (State* s);
+    void open_circuit(const std::string& filename);
 protected:
     void dummy(const Glib::RefPtr<Gdk::DragContext>&, Gtk::SelectionData&, guint, guint);
     void setup_gate_button (Gtk::Button*, GateIcon*);

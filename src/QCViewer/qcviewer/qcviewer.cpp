@@ -35,17 +35,30 @@ Authors: Alex Parent, Jacob Parker
 
 QCViewer* window;
 
-QCVOptions handleOptions(int,char*[]);
+struct Options
+{
+    QCVOptions qcvOptions;
+    bool exit;
+    std::string circuitFile;
+
+    Options() : exit(false) {}
+};
+
+Options handleOptions(int,char*[]);
 
 int main (int ac, char *av[])
 {
     srand((unsigned)time(NULL));
     g_type_init();
     Gtk::Main kit(ac, av);
-    QCVOptions ops = handleOptions(ac, av);
+    Options ops = handleOptions(ac, av);
+    if (ops.exit)
+        return EXIT_SUCCESS;
     UGateSetup();
-    window = new QCViewer(ops);
+    window = new QCViewer(ops.qcvOptions);
     window->set_default_size (800,600);
+    if (!ops.circuitFile.empty())
+        window->open_circuit(ops.circuitFile);
     std::cerr << "Running window\n";
 
     Gtk::Main::run(*window);
@@ -54,11 +67,11 @@ int main (int ac, char *av[])
 }
 
 
-QCVOptions handleOptions(int ac,char *av[])
+Options handleOptions(int ac,char *av[])
 {
     namespace po = boost::program_options;
 
-    QCVOptions QCVOp;
+    Options Op;
 
     //Options parsed from the command line
     po::options_description cmd("CmdLine Options");
@@ -67,23 +80,40 @@ QCVOptions handleOptions(int ac,char *av[])
     ("version", "prints out the version")
     ;
 
+    //Options parsed from the command line and not shown in help message
+    po::options_description cmdHidden("Hidden CmdLine Options");
+    cmdHidden.add_options()
+    ("input-file", po::value<std::string>(), "circuit file to open")
+    ;
+    po::positional_options_description p;
+    p.add("input-file", 1);
+
     //Options parsed from the config file
     po::options_description config("Config");
     config.add_options()
-    ("draw.dotradius", po::value<double>(&QCVOp.draw.dotradius)->default_value(10.0), "The Radius of the control dot.")
+    ("draw.dotradius", po::value<double>(&Op.qcvOptions.draw.dotradius)->default_value(10.0), "The Radius of the control dot.")
     ;
 
+    po::options_description cmdOptions;
+    cmdOptions.add(cmd).add(cmdHidden);
+
     po::variables_map vm;
-    po::store(po::parse_command_line(ac, av, cmd), vm);
+    po::store(po::command_line_parser(ac, av).
+              options(cmdOptions).positional(p).run(), vm);
     po::store(po::parse_config_file<char>("QCV.cfg", config), vm);
     po::notify(vm);
 
     if (vm.count("help")) {
         std::cout << cmd << std::endl;
+        Op.exit = true;
     }
     if (vm.count("version")) {
         std::cout << QCV_NAME << " " << QCV_VERSION << std::endl;
+        Op.exit = true;
+    }
+    if (vm.count("input-file")) {
+        Op.circuitFile = vm["input-file"].as<std::string>();
     }
 
-    return QCVOp;
+    return Op;
 }

@@ -219,27 +219,32 @@ void QCViewer::on_menu_file_open_circuit ()
 
     int result = dialog.run();
     if (result == Gtk::RESPONSE_OK) {
-        vector<string> errors = c.load (dialog.get_filename ());
-        if (!errors.empty()) {
-            string error_message;
-            for ( unsigned int i = 0; i < errors.size(); i++) {
-                error_message += errors.at(i) + "\n";
-            }
-            Gtk::MessageDialog dialog(*this, "Error");
-            dialog.set_secondary_text(error_message);
-            dialog.run();
-        }
-        selections.clear ();
-        c.set_drawparallel (drawparallel);
-        c.set_drawarch (drawarch);
-        c.set_scale (1);
-        btn_editcontrols.set_active (false);
-        btn_editcontrols.set_active (false);
-        std::stringstream ss;
-        ss << "Gates: " << c.get_num_gates() <<" | Depth: "<< c.get_depth() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
-        m_statusbar.push(ss.str());
-        c.reset ();
+        open_circuit(dialog.get_filename ());
     }
+}
+
+void QCViewer::open_circuit(const std::string& filename)
+{
+    vector<string> errors = c.load (filename);
+    if (!errors.empty()) {
+        string error_message;
+        for ( unsigned int i = 0; i < errors.size(); i++) {
+            error_message += errors.at(i) + "\n";
+        }
+        Gtk::MessageDialog dialog(*this, "Error");
+        dialog.set_secondary_text(error_message);
+        dialog.run();
+    }
+    selections.clear ();
+    c.set_drawparallel (drawparallel);
+    c.set_drawarch (drawarch);
+    c.set_scale (1);
+    btn_editcontrols.set_active (false);
+    btn_editcontrols.set_active (false);
+    std::stringstream ss;
+    ss << "Gates: " << c.get_num_gates() <<" | Depth: "<< c.get_depth() <<" | T-Count: " << c.get_gate_count ("T") << " | Qbits: " << c.get_num_lines();
+    m_statusbar.push(ss.str());
+    c.reset ();
 }
 
 void QCViewer::on_menu_file_open_arch ()
@@ -370,7 +375,9 @@ void QCViewer::on_menu_new ()
     Gtk::Dialog newdlg ("Number of qubits");
     newdlg.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     newdlg.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    newdlg.set_default_response(Gtk::RESPONSE_OK);
     Gtk::Entry num_qubits;
+    num_qubits.set_activates_default();
     num_qubits.set_max_length (4);
     num_qubits.show();
     newdlg.get_vbox()->pack_start(num_qubits,Gtk::PACK_SHRINK);
@@ -398,7 +405,9 @@ void QCViewer::on_menu_load_state ()
     Gtk::Dialog enterState("Enter State");
     enterState.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     enterState.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    enterState.set_default_response(Gtk::RESPONSE_OK);
     Gtk::Entry stateEntry;
+    stateEntry.set_activates_default();
     stateEntry.set_max_length(5000);
     stateEntry.show();
     enterState.get_vbox()->pack_start(stateEntry,Gtk::PACK_SHRINK);
@@ -604,7 +613,8 @@ void QCViewer::setup_menu_actions()
                           sigc::mem_fun(*this, &QCViewer::on_menu_file_open_arch));
 
     m_refActionGroup->add(Gtk::Action::create("DiagramSave", Gtk::Stock::SAVE, "_Save Picture",
-                          "Save the circuit diagram to an image file"));
+                          "Save the circuit diagram to an image file"),
+                          Gtk::AccelKey(0, (Gdk::ModifierType)0));
     m_refActionGroup->add(Gtk::Action::create("CircuitSave", Gtk::Stock::SAVE, "Save", "Save circuit"),
                           sigc::mem_fun(*this, &QCViewer::on_menu_save_circuit));
     m_refActionGroup->add(Gtk::Action::create("ArchSave", Gtk::Stock::SAVE, "Save", "Save architecture"),

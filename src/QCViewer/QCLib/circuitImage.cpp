@@ -65,7 +65,7 @@ vector<gateRect> CircuitImage::draw (Circuit &c, bool drawArch, bool drawParalle
     drawPrims.clear();
 
     vector<gateRect> rects;
-    rects = drawCirc (c, wirestart, wireend, true, wirelabels);
+    rects = drawCirc (c, true, wirestart, wireend, true, wirelabels);
     drawbase (c, ext.width+ext.x, ext.height+ext.y+op.thickness, wirestart, wireend);
     if (drawParallel) {
         drawParallelSectionMarkings (rects, c.numLines(), c.getParallel());
@@ -111,7 +111,7 @@ void CircuitImage::drawbase (Circuit &c, double w, double h, double wirestart, d
     drawPrims.push_front(r);
 }
 
-vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &wireend, bool forreal, vector<gateRect> & wirelabels)
+vector<gateRect> CircuitImage::drawCirc (Circuit &c, bool wireknown, double &wirestart, double &wireend, bool forreal, vector<gateRect> & wirelabels)
 {
     vector <gateRect> rects;
 
@@ -126,22 +126,21 @@ vector<gateRect> CircuitImage::drawCirc (Circuit &c, double &wirestart, double &
         for (uint32_t i = 0; i < c.numLines(); i++) {
             string label = c.getLine(i).getInputLabel();
             TextObject* text = textEngine.renderText(label);
-            double x = 0, y = 0;
-            if (forreal) {
-                x = wirestart - text->getWidth();
-                y = wireToY(i) - (text->getHeight()/2.0 + text->getY());
+            if (wireknown) {
+                double x = wirestart - text->getWidth();
+                double y = wireToY(i) - (text->getHeight()/2.0 + text->getY());
+                addText(label,x,y);
+                gateRect g;
+                g.x0 = x;
+                g.y0 = y;
+                g.width = text->getWidth();
+                g.height = text->getHeight();
+                wirelabels.push_back(g);
             }
-            addText(label,x,y);
-            gateRect g;
-            g.x0 = x;
-            g.y0 = y;
-            g.width = text->getWidth();
-            g.height = text->getHeight();
-            wirelabels.push_back(g);
             xinit = max (xinit, text->getWidth());
         }
     }
-    if (!forreal) wirestart = xinit;
+    if (!wireknown) wirestart = xinit;
     // gates
     double xcurr = xinit+2.0*op.gatePad;
     uint32_t mingw, maxgw;
@@ -247,8 +246,8 @@ cairo_rectangle_t CircuitImage::getCircuitSize (Circuit &c, double &wirestart, d
     cairo_set_font_size(context, 18);
     {
         vector<gateRect> dummy;
-        drawCirc (c, wirestart, wireend, false, dummy);
-        drawCirc (c, wirestart, wireend, false, dummy); // XXX fix up these inefficienies!!
+        drawCirc (c, false, wirestart, wireend, false, dummy);
+        drawCirc (c, true, wirestart, wireend, false, dummy); // XXX fix up these inefficienies!!
     }
     cairoRender (context);
     cairo_rectangle_t ext;
@@ -262,9 +261,10 @@ void CircuitImage::savepng (Circuit &c, string filename, cairo_font_face_t * ft_
 {
     double wirestart, wireend;
     cairo_rectangle_t ext = getCircuitSize (c, wirestart, wireend, 1.0,ft_default);
-    cairo_surface_t* surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width+ext.x, op.thickness+ext.height+ext.y);
+    cairo_surface_t* surface = cairo_image_surface_create (CAIRO_FORMAT_RGB24, ext.width, op.thickness+ext.height);
     cairo_t* cr = cairo_create (surface);
     renderCairo(cr);
+    cairo_translate(cr, -ext.x, -ext.y);
     cairo_set_source_surface (cr, surface, 0, 0);
     {
         vector<gateRect> dummy;
@@ -288,9 +288,10 @@ void CircuitImage::savesvg (Circuit &c, string filename, cairo_font_face_t * ft_
 {
     double wirestart, wireend;
     cairo_rectangle_t ext = getCircuitSize (c,wirestart, wireend, 1.0, ft_default);
-    cairo_surface_t* surface = cairo_svg_surface_create (filename.c_str(), ext.width+ext.x, op.thickness+ext.height+ext.y);
+    cairo_surface_t* surface = cairo_svg_surface_create (filename.c_str(), ext.width, op.thickness+ext.height);
     cairo_t* context = cairo_create (surface);
     renderCairo(context);
+    cairo_translate(cr, -ext.x, -ext.y);
     cairo_set_source_surface (context, surface, 0, 0);
     {
         vector<gateRect> dummy;
@@ -308,6 +309,7 @@ void CircuitImage::saveps (Circuit &c, string filename,cairo_font_face_t * ft_de
     cairo_surface_t* surface = make_ps_surface (filename, ext);
     cairo_t* cr = cairo_create(surface);
     renderCairo(cr);
+    cairo_translate(cr, -ext.x, -ext.y);
     cairo_set_source_surface (cr, surface, 0,0);
     {
         vector<gateRect> dummy;
@@ -319,7 +321,7 @@ void CircuitImage::saveps (Circuit &c, string filename,cairo_font_face_t * ft_de
 
 cairo_surface_t* CircuitImage::make_ps_surface (string file, cairo_rectangle_t ext) const
 {
-    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width+ext.x, op.thickness+ext.height+ext.y);
+    cairo_surface_t *img_surface = cairo_ps_surface_create (file.c_str(), ext.width, op.thickness+ext.height);
     cairo_ps_surface_set_eps (img_surface, true);
     return img_surface;
 }
