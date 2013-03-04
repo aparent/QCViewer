@@ -153,7 +153,7 @@ LatexTextObject::LatexTextObject(std::string text)
       } catch(boost::filesystem::filesystem_error & e) {
         throw err;
       }
-      std::wstring tex_path_w = localtex.native();
+      auto tex_path_w = localtex.native();
       tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
       if(systemb(tex_path.c_str(), "--version")) {
         throw err;
@@ -348,7 +348,7 @@ void TextEngine::endBatch()
               } catch(boost::filesystem::filesystem_error & e) {
                 throw err;
               }
-              std::wstring tex_path_w = localtex.native();
+              auto tex_path_w = localtex.native();
               tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
               if(systemb(tex_path.c_str(), "--version")) {
                 throw err;
