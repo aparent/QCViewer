@@ -34,6 +34,7 @@ done
 
 cp -r $BINDEPS/*  "$workdir/QCViewer-$ver"/ || die "Couldn't copy dependencies!"
 cp -r ../bin/* "$workdir/QCViewer-$ver"/ || die "Couldn't copy QCViewer binaries!"
+mv "$workdir/QCViewer-$ver/"*.exe "$workdir/QCViewer-$ver/bin/" || die "Couldn't move QCViewer binaries into bin!"
 
 # Remove non-Windows executables, if they exist.
 rm -f "$workdir/QCViewer-$ver"/{qcviewer,qcimage}
