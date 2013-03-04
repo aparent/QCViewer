@@ -1,6 +1,5 @@
 if [ "`hostname`" == "high-fructose-corn-syrup" ]; then
-  export LD_LIBRARY_PATH=/scratch/m4burns/gcc-4.7.2/lib:/scratch/m4burns/gcc-4.7.2/lib64:$LD_LIBRARY_PATH
-  export CXX=/scratch/m4burns/gcc-4.7.2/bin/g++
-  export CC=/scratch/m4burns/gcc-4.7.2/bin/gcc
-  export BOOST_ROOT=/scratch/m4burns/boost_1_52_0
+  export CXX=/usr/bin/g++
+  export CC=/usr/bin/gcc
+  export BOOST_ROOT=/scratch/m4burns/boost_1_53_0
 fi
