@@ -108,10 +108,8 @@ int systemb(const char * cmd, const char * args)
                       FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(),
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                       (LPTSTR) &err, 0, NULL);
-        std::string errs = "CreateProcess: ";
-        errs += err;
+        std::cout << "CreateProcess: " << err << std::endl;
         LocalFree(err);
-        throw errs;
     }
 
     return !res;
@@ -146,8 +144,20 @@ LatexTextObject::LatexTextObject(std::string text)
         "  \\end{preview}\n"
         "\\end{document}";
 
-    if(systemb("pdflatex", "--version")) {
-        throw "Cannot find LaTeX installation.";
+    std::string tex_path = "pdflatex";
+    if(systemb(tex_path.c_str(), "--version")) {
+      boost::filesystem::path localtex;
+      std::string err = "Couldn't find LaTeX installation.";
+      try {
+        localtex = boost::filesystem::canonical(boost::filesystem::path("./miktex/miktex/bin/pdflatex.exe"));
+      } catch(boost::filesystem::filesystem_error & e) {
+        throw err;
+      }
+      std::wstring tex_path_w = localtex.native();
+      tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
+      if(systemb(tex_path.c_str(), "--version")) {
+        throw err;
+      }
     }
 
     /* Get a temporary working directory. */
@@ -183,7 +193,7 @@ LatexTextObject::LatexTextObject(std::string text)
     fprintf(texf, tmpl, text.c_str());
     fclose(texf);
 
-    if(systemb("pdflatex", "-interaction=nonstopmode QCV.tex")) {
+    if(systemb(tex_path.c_str(), "-interaction=nonstopmode QCV.tex")) {
         boost::filesystem::current_path(oldwd);
         std::string msg = "Failed to render \"" + text + "\"";
         throw msg;
@@ -329,8 +339,20 @@ void TextEngine::endBatch()
             }
             latexs << "\\end{document}";
 
-            if(systemb("pdflatex", "--version")) {
-                throw "Cannot find LaTeX installation.";
+            std::string tex_path = "pdflatex";
+            if(systemb(tex_path.c_str(), "--version")) {
+              boost::filesystem::path localtex;
+              std::string err = "Couldn't find LaTeX installation.";
+              try {
+                localtex = boost::filesystem::canonical(boost::filesystem::path("./miktex/miktex/bin/pdflatex.exe"));
+              } catch(boost::filesystem::filesystem_error & e) {
+                throw err;
+              }
+              std::wstring tex_path_w = localtex.native();
+              tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
+              if(systemb(tex_path.c_str(), "--version")) {
+                throw err;
+              }
             }
 
             /* Get a temporary working directory. */
@@ -366,7 +388,7 @@ void TextEngine::endBatch()
             fputs(latexs.str().c_str(), texf);
             fclose(texf);
 
-            if(systemb("pdflatex", "-interaction=nonstopmode QCV.tex")) {
+            if(systemb(tex_path.c_str(), "-interaction=nonstopmode QCV.tex")) {
                 boost::filesystem::current_path(oldwd);
                 std::string msg = "Failed to render.";
                 throw msg;
