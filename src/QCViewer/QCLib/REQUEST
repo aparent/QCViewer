@@ -1,0 +1,5 @@
+vadym:
+- state preparation, measurement, classical feedback?
+- "temporary" qubits (long term)
+- gates sharing same controls (many-target CNOT)
+- Do above in pre-render pass (find parallel CNOT gates and pack into multi-target CNOT)

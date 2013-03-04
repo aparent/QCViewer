@@ -29,6 +29,8 @@ public:
     /* Construction, assignment, access, mutation. */
     Matrix(u32 r, u32 c, T z) : rows(r), cols(c), zero(z) {};
     Matrix(const Matrix & u) : m(u.m), rows(u.rows), cols(u.cols), zero(u.zero) {};
+    u32 numRows() { return rows; }
+    u32 numCols() { return cols; }
     Matrix & operator=(const Matrix & rhs) {
         if(this != &rhs) {
             rows = rhs.rows;
@@ -58,6 +60,14 @@ public:
         m[i][j] = v;
         return *this;
     }
+    Matrix & map_nonzero(std::function<T (const T&)> op) {
+      for (auto & row : m) {
+        for(auto & ent : row.second) {
+          ent.second = op(ent.second);
+        }
+      }
+      return *this;
+    }
     /* Arithmetic. */
     Matrix & direct_op(const Matrix & rhs, std::function<T (const T&, const T&)> op) {
         if(cols != rhs.cols || rows != rhs.rows) {
@@ -66,7 +76,7 @@ public:
         typename idcon<idcon<T>>::iterator lrow;
         typename idcon<idcon<T>>::const_iterator rrow;
         for(lrow = m.begin(), rrow = rhs.m.cbegin();
-                lrow != m.end() || rrow != rhs.m.cend();) {
+                rrow != rhs.m.cend();) {
             if(lrow == m.end() || (lrow->first > rrow->first)) {
                 lrow = m.insert(lrow, *rrow);
 for (auto & nv : lrow->second) {
@@ -74,22 +84,18 @@ for (auto & nv : lrow->second) {
                 }
                 if(lrow != m.end()) ++lrow;
                 ++rrow;
-            } else if(rrow == rhs.m.cend()) {
-                break;
             } else if(lrow->first < rrow->first) {
                 ++lrow;
             } else {
                 typename idcon<T>::iterator le;
                 typename idcon<T>::const_iterator re;
                 for(le = lrow->second.begin(), re = rrow->second.cbegin();
-                        le != lrow->second.end() || re != rrow->second.cend();) {
+                        re != rrow->second.cend();) {
                     if(le == lrow->second.end() || (le->first > re->first)) {
                         le = lrow->second.insert(le, *re);
                         le->second = op(zero, le->second);
                         if(le != lrow->second.end()) ++le;
                         ++re;
-                    } else if(re == rrow->second.cend()) {
-                        break;
                     } else if(le->first < re->first) {
                         ++le;
                     } else {
@@ -113,6 +119,12 @@ for (auto & nv : lrow->second) {
         return direct_op(rhs, [](const T & l, const T & r) {
             return l - r;
         });
+    }
+    Matrix operator+(const Matrix & rhs) const {
+      return (Matrix(*this) += rhs);
+    }
+    Matrix operator-(const Matrix & rhs) const {
+      return (Matrix(*this) -= rhs);
     }
     Matrix transpose() const {
         Matrix<T> t(cols,rows,zero);
