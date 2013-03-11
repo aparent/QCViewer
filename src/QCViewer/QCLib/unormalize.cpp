@@ -62,10 +62,15 @@ shared_ptr<Circuit> circ_flatten(shared_ptr<Circuit> in)
 static swaplist remove_id_swaps(const swaplist & swaps)
 {
   swaplist out;
+  pair<u32, u32> prev (0,0);
   for(auto & p : swaps)
   {
-    if(p.first != p.second) {
+    if(p.first != p.second &&
+        ((p.first != prev.first || p.second != prev.second) &&
+         (p.second != prev.first || p.first != prev.second)))
+    {
       out.push_back(p);
+      prev = p;
     }
   }
   return out;
@@ -134,7 +139,7 @@ shared_ptr<Circuit> circ_unormalize(shared_ptr<Circuit> c)
     if(new_gate->targets.empty()) {
       throw std::runtime_error("unormalize: Gate has no targets.");
     }
-    
+
     swaplist swaps;
     u32 min_target = UINT_MAX;
     for(auto & p : new_gate->targets)
