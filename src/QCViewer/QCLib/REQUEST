@@ -3,3 +3,8 @@ vadym:
 - "temporary" qubits (long term)
 - gates sharing same controls (many-target CNOT)
 - Do above in pre-render pass (find parallel CNOT gates and pack into multi-target CNOT)
+
+-----
+- Matt and Vadym have code for doing symbolic arithmetic over Z[1/sqrt(2), i].
+   (Consider using it).
+

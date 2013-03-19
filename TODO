@@ -1,7 +1,23 @@
-Bugs
-1. editing targets
-2. prettyness
-3. subcircuits
-Features
-1. Density matrix
-2. lazy eval
+TODO
+----
+
+Short term:
+  - Symbolic representation of elements in Z[1/sqrt(2), i]. Potentially reuse Vadym's code for sqct.
+  - UI-triggered MATLAB output of whole-circuit unitary and unitary for selection.
+  - UI-triggered color-coded rendering of circuit and selection unitary.
+  - Finish update of documentation, replacing figures and screen captures.
+  - Set up and begin maintaining regular builds for Mac OS X.
+  - More stringent checks in cmake file.
+  - Finish updating user guide.
+
+Medium term:
+  - Implement grouping of like-named wires into 'buses' as per discussion with Andrei Lapets.
+  - Fix remaining rendering bugs in various edge cases.
+  - Implement visual drag-and-drop: Show gate placement as gate is being dragged over circuit.
+  - Implement dragging of existing gates from point to point in circuit.
+  - Review all code, attempt to clean up crashes.
+  - Finish inline code documentation.
+
+Long term:
+  - Implement abstract drawing features as per discussion with Martin.
+  - Design/implement measurement and classical feedback features.
