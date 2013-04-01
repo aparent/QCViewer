@@ -1,3 +1,5 @@
+#ifndef _QC_MAT_H_
+#define _QC_MAT_H_
 #include <map>
 #include <string>
 #include <sstream>
@@ -10,8 +12,8 @@
 template<typename T>
 class Matrix
 {
-    typedef uint32_t u32;
-    typedef int64_t  s64;
+    using u32 = uint32_t;
+    using s64 = int64_t;
 
     template<typename U>
     using idcon = std::map<u32, U>;
@@ -194,6 +196,7 @@ for(auto & ent : row.second) {
     template <typename V>
     friend Matrix<V> operator*(const V & lhs, const Matrix<V> & rhs);
 
+    /* Add rows to the bottom. */
     Matrix & vappend(const Matrix & other) {
         if(cols != other.cols) {
             throw std::runtime_error("Matrix dimensions must agree");
@@ -204,6 +207,7 @@ for(auto & orow : other.m) {
         rows += other.rows;
         return *this;
     }
+    /* Add columns to the right end. */
     Matrix & happend(const Matrix & other) {
         if(rows != other.rows) {
             throw std::runtime_error("Matrix dimensions must agree");
@@ -243,6 +247,18 @@ for(auto & ent : lrow.second) {
     Matrix & operator%=(const Matrix & rhs) {
         return (*this = *this % rhs);
     }
+    /* Frobenius norm squared given conjugate operation. */
+    T frob_norm2(std::function<T (const T&)> conj_op) const {
+      T res = zero;
+      Matrix<T> mmc = transpose().map_nonzero(conj_op);
+      mmc = mmc * *this;
+
+      for(u32 i = 0; i < mmc.numRows();i++) {
+        res += mmc.get(i,i);
+      }
+      return res;
+    }
+    /* Show matrix contents. Intended for debugging. */
     std::string toString() {
         std::stringstream ss;
         s64 lrow = -1, lcol;
@@ -291,3 +307,4 @@ std::ostream & operator<<(std::ostream & s, const Matrix<V>& mat)
     return (s << mat.toString());
 }
 
+#endif

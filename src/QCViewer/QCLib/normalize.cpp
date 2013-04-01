@@ -1,3 +1,4 @@
+#include "normalize.h"
 #include "circuit.h"
 #include "gate.h"
 #include "utility.h"
@@ -16,12 +17,10 @@
 
 using namespace std;
 
-typedef uint32_t u32;
-typedef int32_t s32;
-typedef int64_t s64;
-using swaplist = vector<pair<u32, u32>>;
+using s64 = int64_t;
+using u32 = uint32_t;
 
-static void subcirc_flatten(shared_ptr<Subcircuit> sub, shared_ptr<Circuit> accum)
+void CircuitNormalizer::subcirc_flatten(shared_ptr<Subcircuit> sub, shared_ptr<Circuit> accum)
 {
   for(u32 t=0;t<sub->getLoopCount();t++)
   {
@@ -38,13 +37,14 @@ static void subcirc_flatten(shared_ptr<Subcircuit> sub, shared_ptr<Circuit> accu
   }
 }
 
-shared_ptr<Circuit> circ_flatten(shared_ptr<Circuit> in)
+shared_ptr<Circuit> CircuitNormalizer::circ_flatten(shared_ptr<Circuit> in)
 {
   shared_ptr<Circuit> accum = shared_ptr<Circuit>(new Circuit());
   accum->setName(in->getName());
   for(u32 i=0;i<in->numLines();i++) {
     accum->addLine("");
     accum->getLineModify(i) = in->getLine(i);
+    cerr << "Added line: " << in->getLine(i).lineName << "\n";
   }
   for(u32 i=0;i<in->numGates();i++)
   {
@@ -59,9 +59,10 @@ shared_ptr<Circuit> circ_flatten(shared_ptr<Circuit> in)
   return accum;
 }
 
-static swaplist remove_id_swaps(const swaplist & swaps)
+CircuitNormalizer::swaplist
+CircuitNormalizer::remove_id_swaps(const CircuitNormalizer::swaplist & swaps)
 {
-  swaplist out;
+  CircuitNormalizer::swaplist out;
   pair<u32, u32> prev (0,0);
   for(auto & p : swaps)
   {
@@ -76,9 +77,10 @@ static swaplist remove_id_swaps(const swaplist & swaps)
   return out;
 }
 
-static swaplist unit_swaps(const swaplist & swaps)
+CircuitNormalizer::swaplist
+CircuitNormalizer::unit_swaps(const CircuitNormalizer::swaplist & swaps)
 {
-  swaplist out;
+  CircuitNormalizer::swaplist out;
   for(auto & p : swaps)
   {
     u32 start, end;
@@ -101,31 +103,52 @@ static swaplist unit_swaps(const swaplist & swaps)
   return out;
 }
 
-static void swaps_to_circ(shared_ptr<Circuit> c, swaplist & swaps)
+void CircuitNormalizer::swaps_to_circ(shared_ptr<Circuit> c,
+                                      CircuitNormalizer::swaplist & swaps,
+                                      bool useCNOT)
 {
   for(auto & p : swaps)
   {
-    shared_ptr<Gate> g = shared_ptr<Gate>(new UGate("F"));
-    g->drawType = Gate::FRED;
-    g->targets.push_back(p.first);
-    g->targets.push_back(p.second);
-    c->addGate(g);
+    if(useCNOT) {
+      shared_ptr<Gate> g = shared_ptr<Gate>(new UGate("X"));
+      g->drawType = Gate::NOT;
+      g->controls.push_back(Control(p.first,false));
+      g->targets.push_back(p.second);
+      c->addGate(g);
+      g = shared_ptr<Gate>(new UGate("X"));
+      g->drawType = Gate::NOT;
+      g->targets.push_back(p.first);
+      g->controls.push_back(Control(p.second,false));
+      c->addGate(g);
+      g = shared_ptr<Gate>(new UGate("X"));
+      g->drawType = Gate::NOT;
+      g->controls.push_back(Control(p.first,false));
+      g->targets.push_back(p.second);
+      c->addGate(g);
+    } else {
+      shared_ptr<Gate> g = shared_ptr<Gate>(new UGate("F"));
+      g->drawType = Gate::FRED;
+      g->targets.push_back(p.first);
+      g->targets.push_back(p.second);
+      c->addGate(g);
+    }
   }
 }
 
-static void nots_to_circ(shared_ptr<Circuit> c, vector<u32> nots)
+void CircuitNormalizer::nots_to_circ(shared_ptr<Circuit> c, vector<u32> nots)
 {
   for(auto & p : nots)
   {
-    shared_ptr<Gate> g = shared_ptr<Gate>(new UGate("NOT"));
+    shared_ptr<Gate> g = shared_ptr<Gate>(new UGate("X"));
     g->drawType = Gate::NOT;
     g->targets.push_back(p);
     c->addGate(g);
   }
 }
 
-shared_ptr<Circuit> circ_unormalize(shared_ptr<Circuit> c)
+shared_ptr<Circuit> CircuitNormalizer::normalize(shared_ptr<Circuit> c, bool useCNOT)
 {
+  c = circ_flatten(c);
   shared_ptr<Circuit> out = shared_ptr<Circuit>(new Circuit());
   out->setName(c->getName());
   for(u32 i=0;i<c->numLines();i++) {
@@ -140,7 +163,7 @@ shared_ptr<Circuit> circ_unormalize(shared_ptr<Circuit> c)
       throw std::runtime_error("unormalize: Gate has no targets.");
     }
 
-    swaplist swaps;
+    CircuitNormalizer::swaplist swaps;
     u32 min_target = UINT_MAX;
     for(auto & p : new_gate->targets)
     {
@@ -187,7 +210,7 @@ shared_ptr<Circuit> circ_unormalize(shared_ptr<Circuit> c)
     }
 
     swaps = unit_swaps(remove_id_swaps(swaps));
-    swaps_to_circ(out, swaps);
+    swaps_to_circ(out, swaps, useCNOT);
     nots_to_circ(out, nots);
     for(u32 t=0;t<new_gate->getLoopCount();t++)
     {
@@ -195,30 +218,7 @@ shared_ptr<Circuit> circ_unormalize(shared_ptr<Circuit> c)
     }
     nots_to_circ(out, nots);
     reverse(swaps.begin(),swaps.end());
-    swaps_to_circ(out, swaps);
+    swaps_to_circ(out, swaps, useCNOT);
   }
   return out;
 }
-
-/*
-int main(int argc, char ** argv) {
-  UGateSetup();
-  string basename = argv[1];
-  vector<string> error_log;
-  shared_ptr<Circuit> c = parseCircuit(basename,error_log);
-  if(!c) {
-    cout << "Could not load circuit:\n";
-    for(auto & s : error_log) {
-      cout << s;
-    }
-  }
-
-  shared_ptr<Circuit> flat = circ_flatten(c);
-  saveCircuit(flat,basename + "_flattened");
-  shared_ptr<Circuit> normal = circ_unormalize(flat);
-  saveCircuit(normal,basename + "_normalized");
-
-  return 0;
-}
-*/
-
