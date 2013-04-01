@@ -139,13 +139,6 @@ UnitaryCompiler<T>::getMatrixForCircuit(shared_ptr<Circuit> c)
 
     for(s64 i = c_n->numGates()-1; i >= 0; i--) {
         shared_ptr<Gate> g = c_n->getGate(i);
-        for(auto i : g->targets) {
-            cout << " " << i;
-        }
-        for(auto & p : g->controls) {
-            cout << " " << p.wire << "(" << p.polarity << ")";
-        }
-        cout << endl;
 
         u32 g_start = UINT_MAX, g_end, top_dim, bot_dim, bu_dim, ctl_dim;
         if(g->controls.size() > 0) {

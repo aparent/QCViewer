@@ -42,7 +42,6 @@ shared_ptr<Circuit> CircuitNormalizer::circ_flatten(shared_ptr<Circuit> in)
     for(u32 i=0; i<in->numLines(); i++) {
         accum->addLine("");
         accum->getLineModify(i) = in->getLine(i);
-        cerr << "Added line: " << in->getLine(i).lineName << "\n";
     }
     for(u32 i=0; i<in->numGates(); i++) {
         shared_ptr<Gate> new_gate = in->getGate(i)->clone();
