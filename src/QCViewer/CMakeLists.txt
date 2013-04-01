@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file(GLOB QCLIB_SRC_FILES "QCLib/*.cpp" "QCLib/gates/*.cpp")
 file(GLOB QCVIEWER_SRC_FILES "*.cpp")
 
-LIST(APPEND QCLIB_SRC_FILES 
+LIST(APPEND QCLIB_SRC_FILES
 	diracLexer.cpp
 	diracParser.cpp
 	QCParser.cpp
@@ -48,8 +48,10 @@ add_custom_command (
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/QCLib/gates/GateParser.y
 )
 
+set(MPFR_LIBS "-lmpfr")
+
 set(Boost_USE_STATIC_LIBS ON)
-FIND_PACKAGE(Boost REQUIRED COMPONENTS system program_options filesystem)
+FIND_PACKAGE(Boost 1.52.0 REQUIRED COMPONENTS system program_options filesystem)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 set(Boost_USE_STATIC_LIBS ON)
 
@@ -67,9 +69,9 @@ add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp
 add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp)
 
 target_link_libraries(qcviewer qc)
-target_link_libraries(qcviewer ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES})
+target_link_libraries(qcviewer ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES} ${MPFR_LIBS})
 target_link_libraries(qcimage qc)
-target_link_libraries(qcimage ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES})
+target_link_libraries(qcimage ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES} ${MPFR_LIBS})
 
 install(TARGETS qcviewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
 install(TARGETS qcimage DESTINATION ${QCViewer_SOURCE_DIR}/../bin)

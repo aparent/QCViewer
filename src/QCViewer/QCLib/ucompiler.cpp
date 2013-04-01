@@ -43,6 +43,10 @@ static bool is_unitary(comp_mat & m) {
   return (a1n.real() < uc_hpr_epsilon && a2n.real() < uc_hpr_epsilon);
 }
 
+CompGateLibrary::CompGateLibrary() { }
+
+CompGateLibrary::~CompGateLibrary() { }
+
 Matrix<uc_hpr_complex> CompGateLibrary::getMatrixForGate(std::shared_ptr<Gate> g) {
   u32 bu_dim = 1 << g->targets.size();
 
@@ -107,6 +111,7 @@ Matrix<uc_hpr_complex> CompGateLibrary::getMatrixForGate(std::shared_ptr<Gate> g
   } else {
     throw std::runtime_error("Couldn't get unitary for gate!");
   }
+  return base_unitary;
 }
 
 template<typename T>
@@ -174,7 +179,7 @@ UnitaryCompiler<T>::getMatrixForCircuit(shared_ptr<Circuit> c)
     Matrix<T> ctl_pad(ctl_dim,bu_dim,zero);
     ctl_u.happend(ctl_pad).vappend(ctl_pad.transpose().happend(base_unitary));
 
-    comp_mat final_u = ((top_i % ctl_u) % bot_i);
+    Matrix<T> final_u = ((top_i % ctl_u) % bot_i);
 
     accum *= final_u;
   }
@@ -182,20 +187,6 @@ UnitaryCompiler<T>::getMatrixForCircuit(shared_ptr<Circuit> c)
   return accum;
 }
 
-/*
-int main(int argc, char ** argv) {
-  UGateSetup();
-  vector<string> error_log;
-  shared_ptr<Circuit> c = parseCircuit(argv[1],error_log);
-  if(!c) {
-    cout << "Could not load circuit:\n";
-    for(auto & s : error_log) {
-      cout << s;
-    }
-  }
+template class UnitaryCompiler<uc_hpr_complex>;
+template class UnitaryCompiler<uc_ring>;
 
-  comp_mat m = comp_matrix_for_circuit(c);
-  cout << m.toString();
-  return 0;
-}
-*/

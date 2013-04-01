@@ -80,6 +80,7 @@ inline void toComplex( const long_arr4& v, int de, double& re, double& im)
 
 inline void toComplex( const mpz_arr4& val, int de, double& re, double& im)
 {
+    (void) val; (void) de; (void) re; (void) im;
     assert( !"Not implemented" );
     throw std::exception();
 }
@@ -302,6 +303,12 @@ ring_int<T> ring_int<T>::operator *(const ring_int<T>& y) const
                 v[1]* y.v[0] + v[0]* y.v[1] - v[3]* y.v[2] - v[2]* y.v[3],
                 v[2]* y.v[0] + v[1]* y.v[1] + v[0]* y.v[2] - v[3]* y.v[3],
                 v[3]* y.v[0] + v[2]* y.v[1] + v[1]* y.v[2] + v[0]* y.v[3] );
+}
+
+template < class T >
+ring_int<T> ring_int<T>::operator *=(const ring_int<T>& y)
+{
+  return *this = *this * y;
 }
 
 template < class T >
@@ -545,24 +552,20 @@ int ring_int<T>::gde2 ( ring_int<T>::pr_type a )
 template < class T >
 int ring_int<T>::isGde1(ring_int<T>::pr_type a, ring_int<T>::pr_type b)
 {
-    if( b % 2 == 1 && a % 2 == 0 )
-        return true;
-    return false;
+    return ( b % 2 == 1 && a % 2 == 0 );
 }
 
 template < class T >
 int ring_int<T>::isGde0(ring_int<T>::pr_type a, ring_int<T>::pr_type b)
 {
-    if( a % 2 == 1 )
-        return true;
-    return false;
+    (void) b;
+    return ( a % 2 == 1 );
 }
 
 template < class T >
 int ring_int<T>::isGde2(ring_int<T>::pr_type a, ring_int<T>::pr_type b)
 {
-    if( b % 2 == 0 && a % 2 == 0 && (a >> 1) % 2 == 1 )
-        return true;
+    return ( b % 2 == 0 && a % 2 == 0 && (a >> 1) % 2 == 1 );
 }
 
 template < class T >
@@ -688,7 +691,6 @@ ring_int_real<T>::ring_int_real(ring_int_real<T>::int_type a, ring_int_real<T>::
 template < class T >
 int ring_int_real<T>::gde() const
 {
-    int g = 0;
     if( base::v[0] == 0 && base::v[1] == 0 )
         return std::numeric_limits<int>::max();
 

@@ -92,6 +92,7 @@ struct ring_int
     ring_int operator -() const;
     /// \brief Ring multiplication
     ring_int operator *(const ring_int& y) const;
+    ring_int operator *=(const ring_int& y);
     /// \brief Integer division of all integer coefficients by e
     ring_int operator /( int_type e) const;
     /// \brief Integer division of all integer coefficients by e
@@ -187,6 +188,22 @@ struct ring_int
 protected:
     /// \brief Stores integer coefficients of the ring integer
     int_type v[4];
+};
+
+/// \brief Represents real integers in the ring.
+template < class TInt >
+struct ring_int_real : public ring_int<TInt>
+{
+    /// \brief Basic type
+    typedef ring_int<TInt> base;
+    /// \brief Type of underlying ring
+    typedef TInt int_type;
+    /// \brief Sets value to \f$0\f$
+    ring_int_real() = default;
+    /// \brief Sets value to \f$a+\sqrt{2}b\f$
+    ring_int_real ( int_type a, int_type b );
+    /// \brief Fast algorithm for computation of gde. See discussion in Section 5 of http://arxiv.org/abs/1206.5236
+    int gde() const;
 };
 
 #endif // RINT_OPT_PROOF_H
