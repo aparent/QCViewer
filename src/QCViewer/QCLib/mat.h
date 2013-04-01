@@ -31,8 +31,12 @@ public:
     /* Construction, assignment, access, mutation. */
     Matrix(u32 r, u32 c, T z) : rows(r), cols(c), zero(z) {};
     Matrix(const Matrix & u) : m(u.m), rows(u.rows), cols(u.cols), zero(u.zero) {};
-    u32 numRows() { return rows; }
-    u32 numCols() { return cols; }
+    u32 numRows() {
+        return rows;
+    }
+    u32 numCols() {
+        return cols;
+    }
     Matrix & operator=(const Matrix & rhs) {
         if(this != &rhs) {
             rows = rhs.rows;
@@ -63,12 +67,12 @@ public:
         return *this;
     }
     Matrix & map_nonzero(std::function<T (const T&)> op) {
-      for (auto & row : m) {
-        for(auto & ent : row.second) {
-          ent.second = op(ent.second);
+        for (auto & row : m) {
+            for(auto & ent : row.second) {
+                ent.second = op(ent.second);
+            }
         }
-      }
-      return *this;
+        return *this;
     }
     /* Arithmetic. */
     Matrix & direct_op(const Matrix & rhs, std::function<T (const T&, const T&)> op) {
@@ -81,7 +85,7 @@ public:
                 rrow != rhs.m.cend();) {
             if(lrow == m.end() || (lrow->first > rrow->first)) {
                 lrow = m.insert(lrow, *rrow);
-for (auto & nv : lrow->second) {
+                for (auto & nv : lrow->second) {
                     nv.second = op(zero, nv.second);
                 }
                 if(lrow != m.end()) ++lrow;
@@ -123,15 +127,15 @@ for (auto & nv : lrow->second) {
         });
     }
     Matrix operator+(const Matrix & rhs) const {
-      return (Matrix(*this) += rhs);
+        return (Matrix(*this) += rhs);
     }
     Matrix operator-(const Matrix & rhs) const {
-      return (Matrix(*this) -= rhs);
+        return (Matrix(*this) -= rhs);
     }
     Matrix transpose() const {
         Matrix<T> t(cols,rows,zero);
-for(auto & row : m) {
-for(auto & e : row.second) {
+        for(auto & row : m) {
+            for(auto & e : row.second) {
                 t.set(e.first, row.first, e.second);
             }
         }
@@ -153,8 +157,8 @@ for(auto & e : row.second) {
         Matrix<T> res(rows, rhs.cols, zero);
         const Matrix<T> rhst = rhs.transpose();
         bool nonzero;
-for(auto & lrow : m) {
-for(auto & rcol : rhst.m) {
+        for(auto & lrow : m) {
+            for(auto & rcol : rhst.m) {
                 typename idcon<T>::const_iterator le,re;
                 nonzero = false;
                 T accum = zero;
@@ -182,8 +186,8 @@ for(auto & rcol : rhst.m) {
         return (*this = *this * rhs);
     }
     Matrix & operator*=(const T & rhs) {
-for(auto & row : m) {
-for(auto & ent : row.second) {
+        for(auto & row : m) {
+            for(auto & ent : row.second) {
                 ent.second *= rhs;
             }
         }
@@ -201,7 +205,7 @@ for(auto & ent : row.second) {
         if(cols != other.cols) {
             throw std::runtime_error("Matrix dimensions must agree");
         }
-for(auto & orow : other.m) {
+        for(auto & orow : other.m) {
             m.insert(std::pair<u32, idcon<T>>(orow.first + rows, orow.second));
         }
         rows += other.rows;
@@ -212,12 +216,12 @@ for(auto & orow : other.m) {
         if(rows != other.rows) {
             throw std::runtime_error("Matrix dimensions must agree");
         }
-for(auto & orow : other.m) {
+        for(auto & orow : other.m) {
             typename idcon<idcon<T>>::iterator lrow = m.find(orow.first);
             if(lrow == m.end()) {
                 lrow = m.insert(std::pair<u32, idcon<T>>(orow.first, idcon<T>())).first;
             }
-for(auto & ent : orow.second) {
+            for(auto & ent : orow.second) {
                 lrow->second.insert(std::pair<u32, T>(ent.first + cols, ent.second));
             }
         }
@@ -228,12 +232,12 @@ for(auto & ent : orow.second) {
     Matrix operator%(const Matrix & rhs) const {
         Matrix<T> res(0, cols*rhs.cols, zero);
         s64 lastrow = -1;
-for(auto & lrow : m) {
+        for(auto & lrow : m) {
             res.rows += (lrow.first - lastrow - 1)*rhs.rows;
             lastrow = lrow.first;
             Matrix<T> accum = Matrix<T>(rhs.rows, 0, zero);
             s64 lastcol = -1;
-for(auto & ent : lrow.second) {
+            for(auto & ent : lrow.second) {
                 accum.cols += (ent.first - lastcol - 1)*rhs.cols;
                 lastcol = ent.first;
                 accum.happend(rhs * ent.second);
@@ -249,20 +253,20 @@ for(auto & ent : lrow.second) {
     }
     /* Frobenius norm squared given conjugate operation. */
     T frob_norm2(std::function<T (const T&)> conj_op) const {
-      T res = zero;
-      Matrix<T> mmc = transpose().map_nonzero(conj_op);
-      mmc = mmc * *this;
+        T res = zero;
+        Matrix<T> mmc = transpose().map_nonzero(conj_op);
+        mmc = mmc * *this;
 
-      for(u32 i = 0; i < mmc.numRows();i++) {
-        res += mmc.get(i,i);
-      }
-      return res;
+        for(u32 i = 0; i < mmc.numRows(); i++) {
+            res += mmc.get(i,i);
+        }
+        return res;
     }
     /* Show matrix contents. Intended for debugging. */
     std::string toString() {
         std::stringstream ss;
         s64 lrow = -1, lcol;
-for(auto & row : m) {
+        for(auto & row : m) {
             for(; lrow+1 < row.first; lrow++) {
                 for(u32 j=0; j<cols; j++) {
                     ss << zero << ((j+1 < cols) ? "\t" : "");
@@ -271,7 +275,7 @@ for(auto & row : m) {
             }
             lrow = row.first;
             lcol = -1;
-for(auto & e : row.second) {
+            for(auto & e : row.second) {
                 for(; lcol+1 < e.first; lcol++) {
                     ss << zero << ((lcol+1 < cols) ? "\t" : "");
                 }

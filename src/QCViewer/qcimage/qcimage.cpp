@@ -68,9 +68,9 @@ int main (int argc, char *argv[])
         return 0;
     }
     if (argc>4) {
-      if(string(argv[4]).compare("-latex") == 0) {
-        textEngine.setMode(TEXT_LATEX);
-      }
+        if(string(argv[4]).compare("-latex") == 0) {
+            textEngine.setMode(TEXT_LATEX);
+        }
     }
     if (argc>3) {
         if (string(argv[2]).compare("-svg") == 0) {

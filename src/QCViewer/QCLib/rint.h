@@ -30,16 +30,14 @@ std::complex<double> canonical( const std::complex<double>& val, int& w_power, b
 
 /// \brief Specifies type of product of two elements of type T
 template< class T>
-struct product_type
-{
+struct product_type {
     /// \brief Product type
     typedef T pr_type;
 };
 
 /// \brief Specifies that procut of two int number must be of type long
 template<>
-struct product_type<int>
-{
+struct product_type<int> {
     /// \brief Product type
     typedef long int pr_type;
 };
@@ -54,8 +52,7 @@ struct ring_int_real;
 /// \tparam TInt Defines the underlying ring to use ( int, long int, arbitrary precision integers -- mpz_class )
 /// \note Precompiled for Tint in {int, long int, mpz_class, resring <8>}
 template < class TInt = long int >
-struct ring_int
-{
+struct ring_int {
     /// \brief Type used for high precision floating point data
     typedef hprHelpers::hpr_real mpclass;
     /// \brief Type of underlying ring
@@ -133,7 +130,7 @@ struct ring_int
     pr_type ipQxx() const;
     /// \brief Computes absolute value squared
     ring_int_real< pr_type > abs2() const;
-     /// \brief Computes Chebyshev distance between integer coordinates
+    /// \brief Computes Chebyshev distance between integer coordinates
     int_type max_dist(const ring_int& y) const;
 
     /// \brief Returns \f$ e^{ i \frac{\pi}{4} k } \f$
@@ -192,8 +189,7 @@ protected:
 
 /// \brief Represents real integers in the ring.
 template < class TInt >
-struct ring_int_real : public ring_int<TInt>
-{
+struct ring_int_real : public ring_int<TInt> {
     /// \brief Basic type
     typedef ring_int<TInt> base;
     /// \brief Type of underlying ring

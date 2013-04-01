@@ -146,18 +146,18 @@ LatexTextObject::LatexTextObject(std::string text)
 
     std::string tex_path = "pdflatex";
     if(systemb(tex_path.c_str(), "--version")) {
-      boost::filesystem::path localtex;
-      std::string err = "Couldn't find LaTeX installation.";
-      try {
-        localtex = boost::filesystem::canonical(boost::filesystem::path("./miktex/miktex/bin/pdflatex.exe"));
-      } catch(boost::filesystem::filesystem_error & e) {
-        throw err;
-      }
-      auto tex_path_w = localtex.native();
-      tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
-      if(systemb(tex_path.c_str(), "--version")) {
-        throw err;
-      }
+        boost::filesystem::path localtex;
+        std::string err = "Couldn't find LaTeX installation.";
+        try {
+            localtex = boost::filesystem::canonical(boost::filesystem::path("./miktex/miktex/bin/pdflatex.exe"));
+        } catch(boost::filesystem::filesystem_error & e) {
+            throw err;
+        }
+        auto tex_path_w = localtex.native();
+        tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
+        if(systemb(tex_path.c_str(), "--version")) {
+            throw err;
+        }
     }
 
     /* Get a temporary working directory. */
@@ -341,18 +341,18 @@ void TextEngine::endBatch()
 
             std::string tex_path = "pdflatex";
             if(systemb(tex_path.c_str(), "--version")) {
-              boost::filesystem::path localtex;
-              std::string err = "Couldn't find LaTeX installation.";
-              try {
-                localtex = boost::filesystem::canonical(boost::filesystem::path("./miktex/miktex/bin/pdflatex.exe"));
-              } catch(boost::filesystem::filesystem_error & e) {
-                throw err;
-              }
-              auto tex_path_w = localtex.native();
-              tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
-              if(systemb(tex_path.c_str(), "--version")) {
-                throw err;
-              }
+                boost::filesystem::path localtex;
+                std::string err = "Couldn't find LaTeX installation.";
+                try {
+                    localtex = boost::filesystem::canonical(boost::filesystem::path("./miktex/miktex/bin/pdflatex.exe"));
+                } catch(boost::filesystem::filesystem_error & e) {
+                    throw err;
+                }
+                auto tex_path_w = localtex.native();
+                tex_path = std::string(tex_path_w.begin(),tex_path_w.end()); // XXX Windows uses wide characters in paths???
+                if(systemb(tex_path.c_str(), "--version")) {
+                    throw err;
+                }
             }
 
             /* Get a temporary working directory. */

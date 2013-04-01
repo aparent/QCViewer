@@ -44,15 +44,13 @@ std::complex<mpclass> toHprComplex( const int_arr4& val, int de);
 std::complex<mpclass> toHprComplex( const long_arr4& val, int de);
 
 /// \brief Precomuted powers of \f$ \frac{1}{\sqrt{2}} \f$
-struct PrecDenom
-{
+struct PrecDenom {
     static const int max_val = 1000;
     double sqrt2inv[max_val];
-    PrecDenom()
-    {
-       sqrt2inv[0] = 1.0;
-       for( int i = 1; i < max_val; ++i )
-           sqrt2inv[i] = sqrt2inv[i-1] * SQRT2_2;
+    PrecDenom() {
+        sqrt2inv[0] = 1.0;
+        for( int i = 1; i < max_val; ++i )
+            sqrt2inv[i] = sqrt2inv[i-1] * SQRT2_2;
     }
 };
 
@@ -80,7 +78,10 @@ inline void toComplex( const long_arr4& v, int de, double& re, double& im)
 
 inline void toComplex( const mpz_arr4& val, int de, double& re, double& im)
 {
-    (void) val; (void) de; (void) re; (void) im;
+    (void) val;
+    (void) de;
+    (void) re;
+    (void) im;
     assert( !"Not implemented" );
     throw std::exception();
 }
@@ -101,15 +102,13 @@ std::complex<double> toComplex( const mpz_arr4& val, int de)
     mpz_class denom(1);
     double arr[4];
     denom <<= denom_power2;
-    for( int i = 0; i < 4; ++i )
-    {
+    for( int i = 0; i < 4; ++i ) {
         mpq_class af(val[i],denom);
         af.canonicalize();
         arr[i] = af.get_d();
     }
 
-    if( mul_by_sqrt_2 ) // need to divide by sqrt2 once more
-    {
+    if( mul_by_sqrt_2 ) { // need to divide by sqrt2 once more
         for( int i =0; i < 4; ++i )
             arr[i] *= SQRT2_2;
     }
@@ -128,15 +127,13 @@ std::complex<mpclass> toHprComplex( const mpz_arr4& val, int de)
     mpz_class denom(1);
     mpclass arr[4] = { mpclass(0.0),mpclass(0.0),mpclass(0.0),mpclass(0.0)};
     denom <<= denom_power2;
-    for( int i = 0; i < 4; ++i )
-    {
+    for( int i = 0; i < 4; ++i ) {
         mpclass dn = denom.get_str();
         mpclass v = val[i].get_str();
         arr[i] =  v / dn;
     }
 
-    if( mul_by_sqrt_2 ) // need to divide by sqrt2 once more
-    {
+    if( mul_by_sqrt_2 ) { // need to divide by sqrt2 once more
         for( int i =0; i < 4; ++i )
             arr[i] *= sqrt2ov2;
     }
@@ -161,10 +158,10 @@ std::complex<mpclass> toHprComplex( const long_arr4& val, int de)
 
 int sde( int denom_exponent, int gde )
 {
-  if ( gde != std::numeric_limits<int>::max() )
-    return  denom_exponent - gde;
-  else
-    return gde;
+    if ( gde != std::numeric_limits<int>::max() )
+        return  denom_exponent - gde;
+    else
+        return gde;
 }
 
 template < class T >
@@ -221,8 +218,7 @@ ring_int<T> ring_int<T>::canonical() const
     double res = ar - PI_4 * omega_power;
     ring_int<T> r( *this );
     r.mul_eq_w( -omega_power );
-    if( res >= PI_8 )
-    {
+    if( res >= PI_8 ) {
         r.mul_eq_w(-1);
         r.conjugate_eq();
     }
@@ -245,14 +241,12 @@ std::complex<double> canonical( const std::complex<double>& val, int &w_power, b
     auto r = val * wp.toComplex(0);
     static std::complex< double> winv ( SQRT2, - SQRT2);
 
-    if( res >= PI_8 )
-    {
+    if( res >= PI_8 ) {
         r *= winv;
         r = std::conj( r );
         conj = true;
         w_power += 1;
-    }
-    else
+    } else
         conj = false;
     return r;
 }
@@ -260,20 +254,29 @@ std::complex<double> canonical( const std::complex<double>& val, int &w_power, b
 template < class T >
 void ring_int<T>::set( int_type a, int_type b, int_type c, int_type d)
 {
-    v[0]=a; v[1]=b; v[2]=c; v[3]=d;
+    v[0]=a;
+    v[1]=b;
+    v[2]=c;
+    v[3]=d;
 }
 
 template < class T >
 ring_int<T>& ring_int<T>::operator +=(const ring_int& y)
 {
-    v[0]+=y.v[0]; v[1]+=y.v[1]; v[2]+=y.v[2]; v[3]+=y.v[3];
+    v[0]+=y.v[0];
+    v[1]+=y.v[1];
+    v[2]+=y.v[2];
+    v[3]+=y.v[3];
     return *this;
 }
 
 template < class T >
 ring_int<T>& ring_int<T>::operator -=(const ring_int& y)
 {
-    v[0]-=y.v[0]; v[1]-=y.v[1]; v[2]-=y.v[2]; v[3]-=y.v[3];
+    v[0]-=y.v[0];
+    v[1]-=y.v[1];
+    v[2]-=y.v[2];
+    v[3]-=y.v[3];
     return *this;
 }
 
@@ -300,15 +303,15 @@ template < class T >
 ring_int<T> ring_int<T>::operator *(const ring_int<T>& y) const
 {
     return ring_int(v[0]* y.v[0] - v[3]* y.v[1] - v[2]* y.v[2] - v[1]* y.v[3],
-                v[1]* y.v[0] + v[0]* y.v[1] - v[3]* y.v[2] - v[2]* y.v[3],
-                v[2]* y.v[0] + v[1]* y.v[1] + v[0]* y.v[2] - v[3]* y.v[3],
-                v[3]* y.v[0] + v[2]* y.v[1] + v[1]* y.v[2] + v[0]* y.v[3] );
+                    v[1]* y.v[0] + v[0]* y.v[1] - v[3]* y.v[2] - v[2]* y.v[3],
+                    v[2]* y.v[0] + v[1]* y.v[1] + v[0]* y.v[2] - v[3]* y.v[3],
+                    v[3]* y.v[0] + v[2]* y.v[1] + v[1]* y.v[2] + v[0]* y.v[3] );
 }
 
 template < class T >
 ring_int<T> ring_int<T>::operator *=(const ring_int<T>& y)
 {
-  return *this = *this * y;
+    return *this = *this * y;
 }
 
 template < class T >
@@ -320,21 +323,27 @@ ring_int<T> ring_int<T>::operator /( int_type a) const
 template < class T >
 ring_int<T>& ring_int<T>::operator /=( int_type a)
 {
-    v[0] /= a ; v[1] /= a; v[2] /= a, v[3] /= a ;
+    v[0] /= a ;
+    v[1] /= a;
+    v[2] /= a, v[3] /= a ;
     return *this;
 }
 
 template < class T >
 ring_int<T>& ring_int<T>::operator <<=( long a )
 {
-    v[0] <<= a ; v[1] <<= a; v[2] <<= a, v[3] <<= a ;
+    v[0] <<= a ;
+    v[1] <<= a;
+    v[2] <<= a, v[3] <<= a ;
     return *this;
 }
 
 template < class T >
 ring_int<T> &ring_int<T>::operator >>=( long a )
 {
-    v[0] >>= a ; v[1] >>= a; v[2] >>= a, v[3] >>= a ;
+    v[0] >>= a ;
+    v[1] >>= a;
+    v[2] >>= a, v[3] >>= a ;
     return *this;
 }
 
@@ -411,8 +420,7 @@ int ring_int<T>::gde() const
     for( int i = 0; i < 4; ++i )
         gde2_min = std::min( gde2_min, gde2(v[i]) );
 
-    if( gde2_min != std::numeric_limits<int>::max() ) // at leas one entry is not 0
-    {
+    if( gde2_min != std::numeric_limits<int>::max() ) { // at leas one entry is not 0
         int_type div = 1;
         div <<= gde2_min; // 2^gde2_min
         ring_int<T> y = x / div * sqrt2();
@@ -435,8 +443,7 @@ void ring_int<T>::div_eq_sqrt2( int n )
     int n2 = n / 2;
     x >>= n2;
 
-    if( n % 2 == 1 )
-    {
+    if( n % 2 == 1 ) {
         mul_eq_sqrt2();
         x >>= 1;
     }
@@ -452,16 +459,17 @@ void ring_int<T>::div_eq_sqrt2()
 template < class T >
 void ring_int<T>::div_eq_2()
 {
-    v[0]>>=1;  v[1]>>=1;
-    v[2]>>=1;  v[3]>>=1;
+    v[0]>>=1;
+    v[1]>>=1;
+    v[2]>>=1;
+    v[3]>>=1;
 }
 
 template < class T >
 void ring_int<T>::mul_eq_w(int k)
 {
     k = ( k % 8 + 16 ) % 8;
-    switch( k )
-    {
+    switch( k ) {
     case 0:
         break;
     case 1:
@@ -493,8 +501,7 @@ template < class T >
 void ring_int<T>::mul_w(int k, ring_int<T>& out ) const
 {
     k = ( k % 8 + 16 ) % 8;
-    switch( k )
-    {
+    switch( k ) {
     case 0:
         out.set(v[0], v[1], v[2],v[3] );
         break;
@@ -541,8 +548,7 @@ int ring_int<T>::gde2 ( ring_int<T>::pr_type a )
         return std::numeric_limits<int>::max();
 
     int res = 0;
-    while( is_div_2(a) )
-    {
+    while( is_div_2(a) ) {
         res ++ ;
         a /= 2;
     }
@@ -571,15 +577,13 @@ int ring_int<T>::isGde2(ring_int<T>::pr_type a, ring_int<T>::pr_type b)
 template < class T >
 bool ring_int<T>::is_compl(const ring_int<T> &v) const
 {
-    if( ipQxx() + v.ipQxx() == 0 )
-    {
+    if( ipQxx() + v.ipQxx() == 0 ) {
         int_type ssq = ipxx() + v.ipxx();
         int g2 = gde2( ssq );
         int_type val = 1;
         val <<= g2;
         return ssq == val;
-    }
-    else
+    } else
         return false;
 }
 
@@ -607,8 +611,7 @@ ring_int<T> ring_int<T>::omega( int power)
 {
     power = ( power % 8 + 16 ) % 8;
     int k = 1;
-    if( power >= 4 )
-    {
+    if( power >= 4 ) {
         k = -1;
         power -= 4;
     }
@@ -621,7 +624,10 @@ template < class T >
 typename ring_int<T>::pr_type ring_int<T>::ipQxx() const
 {
     typedef typename ring_int<T>::pr_type tp;
-    tp a = v[0]; tp b = v[1]; tp c = v[2]; tp d = v[3];
+    tp a = v[0];
+    tp b = v[1];
+    tp c = v[2];
+    tp d = v[3];
     return a*b + b*c + c*d - a*d;
 }
 
@@ -629,7 +635,10 @@ template < class T >
 typename ring_int<T>::pr_type ring_int<T>::ipxx() const
 {
     typedef typename ring_int<T>::pr_type tp;
-    tp a = v[0]; tp b = v[1]; tp c = v[2]; tp d = v[3];
+    tp a = v[0];
+    tp b = v[1];
+    tp c = v[2];
+    tp d = v[3];
     return a*a + b*b + c*c + d*d;
 }
 
@@ -643,8 +652,7 @@ template < class T >
 typename ring_int<T>::int_type ring_int<T>::max_dist(const ring_int<T> &y) const
 {
     int_type md = 0;
-    for( int i = 0; i < 4; ++i )
-    {
+    for( int i = 0; i < 4; ++i ) {
         int_type d = abs( y.v[i] - v[i] );
         if( d > md ) md = d;
     }
@@ -654,8 +662,7 @@ typename ring_int<T>::int_type ring_int<T>::max_dist(const ring_int<T> &y) const
 template < class T >
 int ring_int<T>::le( const ring_int<T>& y ) const
 {
-    for( int i = 0; i < 4; ++i )
-    {
+    for( int i = 0; i < 4; ++i ) {
         if( v[i] > y.v[i] )
             return -1;
         else if( v[i] < y.v[i] )

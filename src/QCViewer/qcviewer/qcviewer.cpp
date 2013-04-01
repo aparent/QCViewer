@@ -35,8 +35,7 @@ Authors: Alex Parent, Jacob Parker
 
 QCViewer* window;
 
-struct Options
-{
+struct Options {
     QCVOptions qcvOptions;
     bool exit;
     std::string circuitFile;

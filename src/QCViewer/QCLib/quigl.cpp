@@ -59,7 +59,7 @@ std::ostream & operator<<(std::ostream & ou, const quigl_procedure & c)
         }
     }
     ou << "):\n";
-for(auto & p : c.stmts) {
+    for(auto & p : c.stmts) {
         ou << p;
     }
     return ou;
@@ -77,7 +77,7 @@ void quigl_procedure::load(string filename)
     {
         string label_list = pt.get<string>("program.procedure.<xmlattr>.quantum");
         tokenizer<> label_tok(label_list);
-for(auto & p : label_tok) {
+        for(auto & p : label_tok) {
             labels.push_back(p);
         }
     }
@@ -85,14 +85,14 @@ for(auto & p : label_tok) {
     map<string, int> label_lookup;
     {
         int i = 0;
-for(auto & p : labels) {
+        for(auto & p : labels) {
             label_lookup[p] = i++;
         }
     }
 
-for(ptree::value_type &ctrl : pt.get_child("program.procedure.body")) {
+    for(ptree::value_type &ctrl : pt.get_child("program.procedure.body")) {
         quigl_statement stmt;
-for(ptree::value_type &t : ctrl.second) {
+        for(ptree::value_type &t : ctrl.second) {
             if(t.first == "control") {
                 string var = t.second.get_child("variable").data();
                 auto it = label_lookup.find(var);
@@ -101,11 +101,11 @@ for(ptree::value_type &t : ctrl.second) {
                 }
                 stmt.controls.push_back(it->second);
             } else if(t.first == "body") {
-for(ptree::value_type &op : t.second.get_child("statement")) {
+                for(ptree::value_type &op : t.second.get_child("statement")) {
                     if(op.first == "operator") {
                         stmt.oper = op.second.data();
                     } else if(op.first == "arguments") {
-for(ptree::value_type &arg : op.second) {
+                        for(ptree::value_type &arg : op.second) {
                             if(arg.first == "variable") {
                                 string var = arg.second.data();
                                 auto it = label_lookup.find(var);
@@ -142,7 +142,7 @@ std::shared_ptr<Circuit> circuit_from_quigl(std::string filename)
     std::shared_ptr<Circuit> c(new Circuit());
 
     c->setName(p.name);
-for(auto &ln : p.labels) {
+    for(auto &ln : p.labels) {
         c->addLine(ln);
     }
 
@@ -151,16 +151,16 @@ for(auto &ln : p.labels) {
         l.constant = l.garbage = false;
     }
 
-for(auto &stmt : p.stmts) {
+    for(auto &stmt : p.stmts) {
         name_node * init_args = NULL, * init_ctrls = NULL;
         name_node **args = &init_args, **ctrls = &init_ctrls;
 
-for(auto &arg : stmt.arguments) {
+        for(auto &arg : stmt.arguments) {
             *args = new name_node(p.labels.at(arg), NULL);
             args = &((*args)->next);
         }
 
-for(auto &ctrl : stmt.controls) {
+        for(auto &ctrl : stmt.controls) {
             *ctrls = new name_node(p.labels.at(ctrl), NULL);
             ctrls = &((*ctrls)->next);
         }
@@ -169,7 +169,7 @@ for(auto &ctrl : stmt.controls) {
         add_gate(c, stmt.oper, init_ctrls, init_args, 1, errors);
 
         if(!errors.empty()) {
-for(auto &e : errors) {
+            for(auto &e : errors) {
                 cerr << e << "\n";
             }
             throw std::runtime_error("Errors in add_gate.");
