@@ -6,4 +6,4 @@ if [ "$1" == "win32" ]; then
 else
   cmake -DCMAKE_BUILD_TYPE=debug ../../src
 fi
-VERBOSE=1 make -j4 install
+make -j4 install
