@@ -9,7 +9,8 @@
 %\usepackage{times}\usefonttheme{professionalfonts}  % times is obsolete
 \usefonttheme[onlymath]{serif}
 \boldmath
-\usepackage[orientation=landscape,size=a0,scale=1.4,debug]{beamerposter}                       % e.g. for DIN-A0 poster
+\usepackage[orientation=landscape,size=a0,scale=1.4]{beamerposter}                       % e.g. for DIN-A0 poster
+%\usepackage[orientation=landscape,size=a0,scale=1.4,debug]{beamerposter}                       % e.g. for DIN-A0 poster
 %\usepackage[orientation=portrait,size=a1,scale=1.4,grid,debug]{beamerposter}                  % e.g. for DIN-A1 poster, with optional grid and debug output
 %\usepackage[size=custom,width=200,height=120,scale=2,debug]{beamerposter}                     % e.g. for custom size poster
 %\usepackage[orientation=portrait,size=a0,scale=1.0,printer=rwth-glossy-uv.df]{beamerposter}   % e.g. for DIN-A0 poster with rwth-glossy-uv printer check
@@ -25,7 +26,7 @@
     \begin{columns}
         \begin{column}{.33\textwidth}
         \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
-        \begin{minipage}[T]{.95\textwidth}
+        \begin{minipage}[c][0.95\textheight][s]{0.95\columnwidth}
             % Overview Section
             \begin{block}{\large Overview}
 	            QCViewer is a tool for displaying, editing, and simulating quantum circuits. 
@@ -35,6 +36,7 @@
                     \includegraphics{figures/QCViewerGUI.png}
                 \end{center}
             \end{block}
+            \vfill
             % Motivation Section
             \begin{block}{\large Motivation}
                 In creating \textcolor{blue}{QCViewer}, our goal was to develop a convenient tool that would be useful to the quantum computing community for both research and educational purposes. 
@@ -52,7 +54,7 @@
 
         \begin{column}{.33\textwidth}
         \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
-        \begin{minipage}[T]{.95\textwidth}
+        \begin{minipage}[c][0.95\textheight][s]{0.95\columnwidth}
             % Circuit Design Section    
             \begin{block}{\large Circuit Design}
                 Circuits can be designed on screen with drag and drop or by writing a ".qc" circuit file. 
@@ -80,6 +82,7 @@
 		            \caption{The above circuit of Grovers with the iteration and sub-circuits unrolled.}
 		        \end{figure}
             \end{block}
+            \vfill
             % References Section
             \begin{block}{\large References}
 		    \begin{thebibliography}{9}
@@ -93,13 +96,14 @@
                 }
 		    \end{thebibliography}
             \end{block}
+            \vfill
         \end{minipage}
         \end{beamercolorbox}
         \end{column}
 
         \begin{column}{.33\textwidth}
         \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
-        \begin{minipage}[T]{.95\textwidth}
+        \begin{minipage}[c][0.95\textheight][s]{0.95\columnwidth}
             % Circuit Simulation Section
             \begin{block}{\large Circuit Simulation}
                 Our circuit simulator is state-vector based.
@@ -115,6 +119,7 @@
 		            \caption{Grover circuit and corresponding text.}
 		        \end{figure}
             \end{block}
+            \vfill
             % Acknowledgments Section
             \begin{block}{\large Acknowledgments}
                 \begin{center}
