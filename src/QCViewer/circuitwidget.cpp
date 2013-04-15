@@ -227,6 +227,8 @@ void CircuitWidget::edit_line_label (uint32_t line)
     if(!circuit) {
         return;
     }
+    Line & l = circuit->getLineModify(line % circuit->numLines());
+
     Gtk::Dialog enterLabel("Enter Label");
     enterLabel.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     enterLabel.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
@@ -234,16 +236,15 @@ void CircuitWidget::edit_line_label (uint32_t line)
     Gtk::Entry labelEntry;
     labelEntry.set_activates_default();
     labelEntry.set_max_length(5000);
+    labelEntry.set_text((line >= circuit->numLines()) ? l.outLabel.c_str() : l.lineName.c_str());
     labelEntry.show();
     enterLabel.get_vbox()->pack_start(labelEntry,Gtk::PACK_SHRINK);
     int result = enterLabel.run();
     if (result == Gtk::RESPONSE_OK
             && std::string(labelEntry.get_text()) != "") {
         if(line >= circuit->numLines()) {
-            Line & l = circuit->getLineModify(line - circuit->numLines());
             l.outLabel = labelEntry.get_text();
         } else {
-            Line & l = circuit->getLineModify(line);
             l.lineName = labelEntry.get_text();
             l.constant = false;
         }
