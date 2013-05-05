@@ -21,3 +21,14 @@ Medium term:
 Long term:
   - Implement abstract drawing features as per discussion with Martin.
   - Design/implement measurement and classical feedback features.
+
+New fix suggestions:
+  - Not needing to hold down the mouse & drag for adding gates would be nice
+  - Moving existing gates in a diagram
+  - Save should be under File, and not Circuit
+  - Save dialog should open to the directory of the previous save command
+  - Save and Save As... should be distinct commands
+  - When you save a .qc file, .eps, .png, .svg, etc you should auto-append the file extension
+    (to prevent accidentally overwriting your saved qc with a png)
+  - Modal dialog should appear asking to confirm overwriting an existing file during save
+  - Hotkeys for adding gates to a diagram would be sweet
