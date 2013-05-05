@@ -2,6 +2,7 @@ TODO
 ----
 
 Short term:
+  - Consolidate QCLib code and separate circuit datastructure into circuitkit.
   - Symbolic representation of elements in Z[1/sqrt(2), i]. Potentially reuse Vadym's code for sqct.
   - UI-triggered MATLAB output of whole-circuit unitary and unitary for selection.
   - UI-triggered color-coded rendering of circuit and selection unitary.
