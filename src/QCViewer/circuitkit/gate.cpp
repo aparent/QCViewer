@@ -36,47 +36,14 @@ Control::Control(int setWire, bool setPol) : wire(setWire), polarity (setPol) {}
 
 Gate::Gate()
 {
-    breakpoint = false;
-    colbreak = false;
     ctrls = false;
-    loop_count = 0;
-    drawType = DEFAULT;
 }
 
 Gate::~Gate() {}
 
-void Gate::setLoopCount(unsigned int loops)
-{
-    loop_count = loops;
-}
-
-unsigned int Gate::getLoopCount() const
-{
-    return loop_count;
-}
-
 unsigned int Gate::getNumGates() const
 {
     return 1;
-}
-
-void minmaxWire (const vector<Control> &ctrl, const vector<unsigned int> &targ, unsigned int &minw, unsigned int &maxw)
-{
-    if (!targ.empty()) {
-        maxw = minw = targ.at(0);
-    } else if (!ctrl.empty()) {
-        maxw = minw = ctrl.at(0).wire;
-    } else {
-        maxw = minw = 0;
-    }
-    for (unsigned int i = 0; i < targ.size (); i++) {
-        minw = min (minw, targ[i]);
-        maxw = max (maxw, targ[i]);
-    }
-    for (unsigned int i = 0; i < ctrl.size (); i++) {
-        minw = min (minw, ctrl[i].wire);
-        maxw = max (maxw, ctrl[i].wire);
-    }
 }
 
 gateMatrix::~gateMatrix()

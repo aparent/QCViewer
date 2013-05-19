@@ -48,13 +48,14 @@ public:
     ~Circuit ();
 
     //! Returns the circuit name
-    std::string getName();
+    std::string getName() const;
 
     //! Sets the circuit name
     void setName(std::string);
 
-    //! Get root subcircuit
+    //! Get root subcircuit and attributes
     std::shared_ptr<Subcircuit> getRootSubcircuit();
+    const GateAttributes & getRootSubcircuitAttributes() const;
 
     //! Clear the circuit
     void clear();
@@ -72,22 +73,23 @@ public:
     void readQCBuffer(std::string data);
 
     //! Write circuit to a file as Quigl
-    void writeQuiglFile(std::string filename);
+    void writeQuiglFile(std::string filename) const;
 
     //! Write circuit to a file as .qc
-    void writeQCFile(std::string filename);
+    void writeQCFile(std::string filename) const;
 
     //! Write circuit to a buffer as Quigl-formatted data
-    void writeQuiglBuffer(std::string & data);
+    void writeQuiglBuffer(std::string & data) const;
 
     //! Write circuit to a buffer as .qc-formatted data
-    void writeQCBuffer(std::string & data);
+    void writeQCBuffer(std::string & data) const;
 
 private:
     std::string name;
 
-    //! Root subcircuit
+    //! Root subcircuit and attributes
     std::shared_ptr<Subcircuit> root;
+    GateAttributes root_attr;
 
     //! Mapping of names to circuits storing subcircuits that might appear in this circuit
     std::map<std::string,std::shared_ptr<Subcircuit>> subcircuits;

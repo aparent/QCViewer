@@ -33,7 +33,7 @@ Authors: Alex Parent, Marc Burns
 #include <map>
 
 /*!
-  \brief Defines a line in a circuit
+  \brief Defines a line in a subcircuit
 */
 struct Line
 {
@@ -92,10 +92,10 @@ public:
     ///@{
 
     //! Appends gate newGate to the end of the circuit
-    void addGate(std::shared_ptr<Gate> newGate);
+    void addGate(std::shared_ptr<Gate> newGate, const GateAttributes & newAttr);
 
     //! Inserts gate newGate before the gate at position pos
-    void addGate(std::shared_ptr<Gate> newGate, unsigned int pos);
+    void addGate(std::shared_ptr<Gate> newGate, const GateAttributes & newAttr, unsigned int pos);
 
     /*!
     	\brief Replaces gate at position pos by gate newGate
@@ -104,7 +104,7 @@ public:
 
     	Use this to replace a gate in the the circuit.
     */
-    void setGate(std::shared_ptr<Gate> newGate, unsigned int pos);
+    void setGate(std::shared_ptr<Gate> newGate, const GateAttributes & newAttr, unsigned int pos);
 
     //! Removes gate at position pos
     void removeGate (unsigned int pos);
@@ -112,8 +112,8 @@ public:
     //! Swaps gates at positions a and b
     void swapGate (unsigned int a, unsigned int b);
 
-    //! Returns gate at position pos
-    std::shared_ptr<Gate> getGate(int pos) const;
+    //! Returns a copy of gate at position pos
+    std::pair<std::shared_ptr<Gate>, GateAttributes> getGate(int pos) const;
 
     //! Returns the number of gates counting subcircuits as 1 gate
     unsigned int numGates() const;
@@ -136,21 +136,10 @@ public:
 
     ///@}
 
-    //! Returns a std::vector of ints specifying the last gate in each parallel block.
-    std::vector<int> getParallel() const;
-
-    /*!
-      \brief Returns a std::vector of ints specifying the last gate in each
-             parallel block (greedy algorithm).
-    */
-    std::vector<unsigned int> getGreedyParallel ();
-
 private:
     std::string name;
-    std::vector <std::shared_ptr<Gate>>           gates;
+    std::vector <std::pair<std::shared_ptr<Gate>, GateAttributes>> gates;
     std::vector <Line>            lines;
-    std::vector <unsigned int> breakpoints;
-    std::vector <unsigned int>    columns;
     std::vector<unsigned int> lineMap;
 };
 

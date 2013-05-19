@@ -26,24 +26,15 @@ Authors: Alex Parent, Marc Burns
 
 
 #include "subcircuit.h"
-#include "simulate.h"
 
 using namespace std;
 
-Subcircuit::Subcircuit(shared_ptr<Circuit> n_circ, const vector <unsigned int>& n_linemap, unsigned int loops) : Gate()
-{
-    drawType = DEFAULT;
-    circ = n_circ;
-    lineMap = n_linemap;
-    loop_count = loops;
-    expand = false;
-    unroll = false;
-    ctrls = false;
-    simState = shared_ptr<SimState>(new SimState());
-}
+Subcircuit::Subcircuit() : Gate()
+{ }
 
 shared_ptr<Gate> Subcircuit::clone() const
 {
+  // XXX
     Subcircuit *g  = new Subcircuit(circ,lineMap,loop_count);
     g->controls = controls;
     g->targets = targets;
@@ -59,16 +50,6 @@ string Subcircuit::getName() const
     return "NULL";
 }
 
-std::string Subcircuit::getDrawName()
-{
-    return getName();
-}
-
-std::string Subcircuit::getLatexName()
-{
-    return getName();
-}
-
 void Subcircuit::setName(string n_name)
 {
     circ->setName(n_name);
@@ -77,22 +58,6 @@ void Subcircuit::setName(string n_name)
 unsigned int Subcircuit::getNumGates() const
 {
     return circ->totalGates();
-}
-
-State Subcircuit::applyToBasis(index_t in) const
-{
-    State s = State(1,in);
-    s = applySubcirc (s);
-    return s;
-}
-
-State Subcircuit::applySubcirc(const State& in) const
-{
-    State s = in;
-    for (unsigned int i = 0; i < circ->numGates(); i++) {
-        s = ApplyGate(s,getGate(i));
-    }
-    return s;
 }
 
 shared_ptr<Gate> Subcircuit::getGate(int pos) const
@@ -118,66 +83,122 @@ unsigned int Subcircuit::numGates() const
     return circ->numGates();
 }
 
-vector<unsigned int> Subcircuit::getGreedyParallel() const  //Returns a vector of ints specifying the last gate in each parallel block.
+void Subcircuit::swapGate (unsigned int i, unsigned int j)
 {
-    return circ->getGreedyParallel();
+    swap(gates[i],gates[j]);
 }
 
-
-shared_ptr<Circuit> Subcircuit::getCircuit()
+void Subcircuit::addGate(shared_ptr<Gate> newGate)
 {
-    return circ;
+    gates.push_back(newGate);
 }
 
-bool Subcircuit::step (State& state)
+void Subcircuit::addGate(std::shared_ptr<Gate> newGate, unsigned int pos)
 {
-    simState->simulating = true;
-    if (simState->gate < numGates () ) {
-        shared_ptr<Gate> g = getGate(simState->gate);
-        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
-        bool bp = false;
-        if (g->breakpoint) {
-            bp = true;
-        }
-        if ( !s || !s->expand ) {
-            state = ApplyGate(state,g);
-            simState->gate++;
-        } else {
-            if ( !s->step(state)) {
-                simState->gate++;
-                step(state);
-            }
-        }
-        if (bp) {
-            return false;
-        }
-        if (s && s->simState->simulating) {
-            return false;
-        }
-        return true;
+    gates.insert(gates.begin()+pos, newGate);
+}
+
+void Subcircuit::setGate(std::shared_ptr<Gate> newGate, unsigned int pos)
+{
+    gates.at(pos) = newGate;
+}
+
+void Subcircuit::removeGate (unsigned int pos)
+{
+    gates.erase (gates.begin () + pos);
+}
+
+std::shared_ptr<Gate> Subcircuit::getGate(int pos) const
+{
+    return gates.at(pos);
+}
+
+unsigned int Subcircuit::numGates() const
+{
+    return gates.size();
+}
+
+unsigned int Subcircuit::totalGates() const
+{
+    unsigned int numGates = 0;
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        numGates += gates.at(i)->getNumGates();
     }
-    if (simState->loop < getLoopCount()) {
-        simState->gate = 0;
-        simState->nextGate = true;
-        simState->loop++;
-        step(state);
-        return true;
-    }
-    reset();
-    return false;
+    return numGates;
 }
 
-void Subcircuit::reset ()
+unsigned int Subcircuit::gateCount(string gateName)
 {
-    simState->gate = 0;
-    simState->loop = 1;
-    simState->nextGate = true;
-    simState->simulating = false;
-    for ( unsigned int i = 0; i < numGates(); i++ ) {
-        shared_ptr<Gate> g = getGate(i);
-        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);
+    unsigned int numGates = 0;
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
         if (s) {
-            s->reset();
+            numGates += s->getCircuit()->gateCount(gateName);
+        } else if (gates.at(i)->getName().compare(gateName) == 0) {
+            numGates++;
         }
     }
+    return numGates;
 }
+
+unsigned int Subcircuit::depth()
+{
+  // XXX replace with simpler algorithm
+    unsigned int depth = 0;
+    for(unsigned int i = 0; i < gates.size(); i++) {
+        shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
+        if (s) {
+            depth += s->getCircuit()->depth()-1;
+        }
+    }
+    depth += getParallel().size() + 1;
+    return depth;
+}
+
+unsigned int Subcircuit::numLines() const
+{
+    return lines.size();
+}
+
+const Line& Subcircuit::getLine(int pos) const
+{
+    return lines.at(pos);
+}
+
+Line& Subcircuit::getLineModify(int pos)
+{
+    return lines.at(pos);
+}
+
+void Subcircuit::addLine(string lineName)
+{
+    lines.push_back(Line(lineName));
+}
+
+Line::Line(string name)
+{
+    lineName  = name;
+    garbage   = true;
+    constant  = true;
+    initValue = 0;
+}
+
+string Line::getInputLabel() const
+{
+    if (constant) {
+        return intToString(initValue);
+    }
+    return lineName;
+}
+
+string Line::getOutputLabel() const
+{
+    if (garbage) {
+        return "Garbage";
+    }
+    if (outLabel.compare("")==0) {
+        return lineName;
+    }
+    return outLabel;
+}
+
