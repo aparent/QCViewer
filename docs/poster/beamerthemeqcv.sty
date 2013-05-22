@@ -7,7 +7,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\setbeamercolor{headline}{fg=tabutter,bg=black}
+\definecolor{headerred}{RGB}{4,0,3}
+\setbeamercolor{headline}{fg=tabutter,bg=headerred}
 \setbeamercolor{footline}{fg=tabutter, bg=ta3gray}
 \setbeamerfont{footline}{size=\large,series=\tt}
 \setbeamercolor{separation line}{bg=ta2orange}
@@ -54,30 +55,33 @@
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setbeamertemplate{headline}{  
+\setbeamertemplate{headline}{
   \leavevmode
 
   \begin{beamercolorbox}[wd=\paperwidth]{headline}
     \begin{columns}[T]
-      \begin{column}{.12\paperwidth}
+      \begin{column}{.15\paperwidth}
       \end{column}
       \begin{column}{.6\paperwidth}
         \vskip4ex
         \raggedleft
         \usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
         \usebeamercolor{author in headline}{\color{fg}\large{\insertauthor}\\[1ex]}
-        \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[1ex]}     
+        \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[1ex]}
       \end{column}
-      \begin{column}{.15\paperwidth}
-        \vskip4ex
-        \begin{center}
-          \includegraphics[width=0.7\linewidth]{figures/IQC_Logo.png}
-        \end{center}
+      \begin{column}{.04\paperwidth}
       \end{column}
       \begin{column}{.10\paperwidth}
+        \vskip5.5ex
+        \begin{center}
+          \includegraphics[width=\linewidth]{figures/iqclogo.eps}
+        \end{center}
+      \end{column}
+      \begin{column}{.12\paperwidth}
         \vskip4ex
         \begin{center}
-          \includegraphics[width=0.4\linewidth]{figures/Waterloo_Logo.png}
+          % XXX vectorize
+          \includegraphics[width=0.35\linewidth]{figures/uwlogo-bw-08.eps}
         \end{center}
         \vskip2ex
       \end{column}
@@ -92,17 +96,17 @@
   \end{beamercolorbox}
 }
 
-%  \setbeamertemplate{headline}{  
+%  \setbeamertemplate{headline}{
 %    \leavevmode
 %    \begin{beamercolorbox}[sep=0.5cm,wd=.8\paperwidth]{headline}
 %      \usebeamercolor{title in headline}{\raggedleft\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
 %      \usebeamercolor{author in headline}{\raggedleft\color{fg}\large{\insertauthor}\\[1ex]}
-%      \usebeamercolor{institute in headline}{\raggedleft\color{fg}\large{\insertinstitute}\\[1ex]}     
+%      \usebeamercolor{institute in headline}{\raggedleft\color{fg}\large{\insertinstitute}\\[1ex]}
 %    \end{beamercolorbox}%
 %    \begin{beamercolorbox}[wd=.2\paperwidth]{logo in headline}
 %      \centering
 %      \LARGE{LOGO}
-%    \end{beamercolorbox}  
+%    \end{beamercolorbox}
 
 
 %}
@@ -112,7 +116,7 @@
   \begin{beamercolorbox}[wd=\paperwidth]{upper separation line foot}
     \rule{0pt}{3pt}
   \end{beamercolorbox}
-  
+
   \leavevmode%
   \begin{beamercolorbox}[ht=4ex,leftskip=1em,rightskip=1em]{author in head/foot}%
     \texttt{http://qcirc.iqc.uwaterloo.ca/}
@@ -145,8 +149,8 @@
 \setbeamerfont{itemize/enumerate subsubbody}{size=\normalsize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-PDF-mode: t
 %%% TeX-master: "poster-surf"
-%%% End: 
+%%% End:
