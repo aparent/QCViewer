@@ -27,24 +27,93 @@ Authors: Alex Parent, Jacob Parker
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <vector>
 #include <cstring>
+#include <vector>
 #include <memory>
 #include <set>
-#include <regex>
+#include <deque>
 #include <algorithm>
+#include <numeric>
+#include <exception>
 #include "circuit.h"
 #include "subcircuit.h"
 #include "gate.h"
 #include "circuitParser.h"
 
+class linemapper {
+public:
+  linemapper(std::shared_ptr<Circuit> c) : circ(c) {
+    std::set<std::string> names;
+    for(unsigned int i = 0; i < circ->numLines(); ++i) {
+      std::string line = circ->getLine(i).getInputLabel();
+      if(!valid_varname(line) ||
+         (names.find(line) != names.end()))
+      {
+        use_lines = false;
+        return;
+      }
+      names.insert(line);
+    }
+    use_lines = true;
+  }
+  bool valid_varname(std::string n) {
+    return ((n.length() > 0) &&
+            (((n[0] >= 'a') && (n[0] <= 'z')) ||
+             ((n[0] >= 'A') && (n[0] <= 'Z'))) &&
+            std::accumulate(n.begin()+1, n.end(), true,
+                            [](const bool & v, const char & c) {
+                              return v &&
+                                     (((c >= 'a') && (c <= 'z')) ||
+                                      ((c >= 'A') && (c <= 'Z')) ||
+                                      ((c >= '0') && (c <= '9')));
+                            }));
+  }
+  std::string map(int index) {
+    std::string res;
+    if(use_lines) {
+      res = circ->getLine(index).getInputLabel();
+      if(!res.compare(0,4,"FREE")) {
+        res += "_";
+      }
+    } else {
+      std::stringstream ss;
+      ss << "a" << index;
+      res = ss.str();
+    }
+    return res;
+  }
+private:
+  std::shared_ptr<Circuit> circ;
+  bool use_lines;
+};
+
 class indenter {
 public:
+  indenter() : indent(0) {};
   indenter & operator()(int x) {
     indent += x;
     return *this;
   }
-  static int indent;
+  int indent;
+private:
+  indenter(const indenter & other) { (void)other; }
+};
+
+struct writectx {
+  writectx(std::ostream & os) : out(os) {};
+  void pushmap(std::shared_ptr<Circuit> c) {
+    maps.push_front(linemapper(c));
+  }
+  void popmap() {
+    maps.pop_front();
+  }
+  std::string map(int index) {
+    return maps.front().map(index);
+  }
+
+  std::ostream & out;
+  indenter ind;
+  std::deque<linemapper> maps;
 };
 
 std::ostream & operator<<(std::ostream & os, indenter & ind) {
@@ -52,25 +121,6 @@ std::ostream & operator<<(std::ostream & os, indenter & ind) {
     os << "\t";
   }
   return os;
-}
-
-indenter ind;
-int indenter::indent = 0;
-
-std::string varname(std::shared_ptr<Circuit> circ, int index) {
-/*  std::set<std::string> names;
-  std::regex valid_check("[a-z]*");
-  for(unsigned int i = 0; i < circ->numLines(); ++i) {
-    std::string line = circ->getLine(i).getInputLabel();
-    if(!std::regex_match(line, valid_check) ||
-        (names.find(line) != names.end()))
-    {*/
-      std::stringstream ss;
-      ss << "a" << index;
-      return ss.str();
-    /*}
-  }
-  return circ->getLine(index).getInputLabel();*/
 }
 
 std::string gatename(std::shared_ptr<Gate> g) {
@@ -93,141 +143,142 @@ std::string gatename(std::shared_ptr<Gate> g) {
   }
 }
 
-void writeLooped(std::function<void()> gen, unsigned int times, std::ostream & out) {
+void writeLooped(std::function<void()> gen, unsigned int times, writectx & w) {
   if(times > 1) {
-    out << ind(1) << "<statement>\n";
-    out << ind(1) << "<repeat>\n";
-    out << ind(1) << "<variable><name>FREE</name></variable>\n";
-    out << ind(0) << "<times><integer>" << times << "</integer></times>\n";
-    out << ind(0) << "<block>\n";
+    w.out << w.ind(1) << "<statement>\n";
+    w.out << w.ind(1) << "<repeat>\n";
+    w.out << w.ind(1) << "<variable><name>FREE</name></variable>\n";
+    w.out << w.ind(0) << "<times><integer>" << times << "</integer></times>\n";
+    w.out << w.ind(0) << "<block>\n";
   }
   gen();
   if(times > 1) {
-    out << ind(0) << "</block>\n";
-    out << ind(-1) << "</repeat>\n";
-    out << ind(-1) << "</statement>\n";
-    ind(-1);
+    w.out << w.ind(0) << "</block>\n";
+    w.out << w.ind(-1) << "</repeat>\n";
+    w.out << w.ind(-1) << "</statement>\n";
+    w.ind(-1);
   }
 }
 
-void writeControlled(std::shared_ptr<Circuit> circ, std::function<void()> gen,
-                     std::vector<Control> & c, std::ostream & out) {
+void writeControlled(std::function<void()> gen, std::vector<Control> & c, writectx & w) {
   std::vector<Control> pos, neg;
   std::copy_if(c.begin(), c.end(), std::back_inserter(pos), [](Control & c){ return !c.polarity; });
   std::copy_if(c.begin(), c.end(), std::back_inserter(neg), [](Control & c){ return c.polarity; });
   if(!pos.empty()) {
-    out << ind(1) << "<statement>\n";
-    out << ind(1) << "<control>\n";
-    out << ind(1) << "<quantum>\n";
-    ind(1);
+    w.out << w.ind(1) << "<statement>\n";
+    w.out << w.ind(1) << "<control>\n";
+    w.out << w.ind(1) << "<quantum>\n";
+    w.ind(1);
     for(auto & ctl : pos) {
-      out << ind(0) << "<qurange><variable><name>" << varname(circ, ctl.wire)
-          << "</name></variable></qurange>\n";
+      w.out << w.ind(0) << "<qurange><variable><name>" << w.map(ctl.wire)
+            << "</name></variable></qurange>\n";
     }
-    out << ind(-1) << "</quantum>\n";
-    out << ind(0) << "<block>\n";
+    w.out << w.ind(-1) << "</quantum>\n";
+    w.out << w.ind(0) << "<block>\n";
   }
   if(!neg.empty()) {
-    out << ind(1) << "<statement>\n";
-    out << ind(1) << "<controlnot>\n";
-    out << ind(1) << "<quantum>\n";
-    ind(1);
+    w.out << w.ind(1) << "<statement>\n";
+    w.out << w.ind(1) << "<controlnot>\n";
+    w.out << w.ind(1) << "<quantum>\n";
+    w.ind(1);
     for(auto & ctl : neg) {
-      out << ind(0) << "<qurange><variable><name>" << varname(circ, ctl.wire)
-          << "</name></variable></qurange>\n";
+      w.out << w.ind(0) << "<qurange><variable><name>" << w.map(ctl.wire)
+            << "</name></variable></qurange>\n";
     }
-    out << ind(-1) << "</quantum>\n";
-    out << ind(0) << "<block>\n";
+    w.out << w.ind(-1) << "</quantum>\n";
+    w.out << w.ind(0) << "<block>\n";
   }
   gen();
   if(!neg.empty()) {
-    out << ind(0) << "</block>\n";
-    out << ind(-1) << "</controlnot>\n";
-    out << ind(-1) << "</statement>\n";
-    ind(-1);
+    w.out << w.ind(0) << "</block>\n";
+    w.out << w.ind(-1) << "</controlnot>\n";
+    w.out << w.ind(-1) << "</statement>\n";
+    w.ind(-1);
   }
   if(!pos.empty()) {
-    out << ind(0) << "</block>\n";
-    out << ind(-1) << "</control>\n";
-    out << ind(-1) << "</statement>\n";
-    ind(-1);
+    w.out << w.ind(0) << "</block>\n";
+    w.out << w.ind(-1) << "</control>\n";
+    w.out << w.ind(-1) << "</statement>\n";
+    w.ind(-1);
   }
 }
 
-void writeGate(std::shared_ptr<Circuit> circ, std::shared_ptr<Gate> g, std::ostream & out) {
+void writeGate(std::shared_ptr<Gate> g, writectx & w) {
   auto gen = [&]() {
     auto genloop = [&] {
       std::shared_ptr<Subcircuit> subcirc = std::dynamic_pointer_cast<Subcircuit>(g);
-      out << ind(1) << "<statement>\n";
+      w.out << w.ind(1) << "<statement>\n";
       if(subcirc) {
-        out << ind(1) << "<call>\n";
+        w.out << w.ind(1) << "<call>\n";
       } else {
-        out << ind(1) << "<gate>\n";
+        w.out << w.ind(1) << "<gate>\n";
       }
-      out << ind(1) << "<name>" << gatename(g) << "</name>\n";
-      out << ind(0) << "<quantum>\n";
-      ind(1);
+      w.out << w.ind(1) << "<name>" << gatename(g) << "</name>\n";
+      w.out << w.ind(0) << "<quantum>\n";
+      w.ind(1);
       for(auto t : g->targets) {
-          out << ind(0) << "<qurange><variable><name>" << varname(circ, t)
-              << "</name></variable></qurange>\n";
+          w.out << w.ind(0) << "<qurange><variable><name>" << w.map(t)
+                << "</name></variable></qurange>\n";
       }
-      out << ind(-1) << "</quantum>\n";
+      w.out << w.ind(-1) << "</quantum>\n";
       if(subcirc) {
-        out << ind(-1) << "</call>\n";
+        w.out << w.ind(-1) << "</call>\n";
       } else {
-        out << ind(-1) << "</gate>\n";
+        w.out << w.ind(-1) << "</gate>\n";
       }
-      out << ind(-1) << "</statement>\n";
-      ind(-1);
+      w.out << w.ind(-1) << "</statement>\n";
+      w.ind(-1);
     };
-    writeLooped(genloop, g->getLoopCount(), out);
+    writeLooped(genloop, g->getLoopCount(), w);
   };
-  writeControlled(circ, gen, g->controls, out);
+  writeControlled(gen, g->controls, w);
 }
 
-void writeGateSeq(std::shared_ptr<Circuit> circ, std::ostream & out) {
+void writeGateSeq(std::shared_ptr<Circuit> circ, writectx & w) {
   for(unsigned int i = 0; i < circ->numGates(); ++i) {
-    writeGate(circ, circ->getGate(i), out);
+    writeGate(circ->getGate(i), w);
   }
 }
 
-void writeSubcircuit(std::string name, std::shared_ptr<Circuit> circ, std::ostream & out) {
-  out << ind(1) << "<statement>\n";
-  out << ind(1) << "<procedure>\n";
-  out << ind(1) << "<name>" << name << "</name>\n";
-  out << ind(0) << "<quantum>\n";
-  ind(1);
+void writeSubcircuit(std::string name, std::shared_ptr<Circuit> circ, writectx & w) {
+  w.pushmap(circ);
+  w.out << w.ind(1) << "<statement>\n";
+  w.out << w.ind(1) << "<procedure>\n";
+  w.out << w.ind(1) << "<name>" << name << "</name>\n";
+  w.out << w.ind(0) << "<quantum>\n";
+  w.ind(1);
   for(unsigned int i = 0; i < circ->numLines(); ++i) {
-    out << ind(0) << "<variable><name>" << varname(circ, i)
-        << "</name></variable>\n";
+    w.out << w.ind(0) << "<variable><name>" << w.map(i)
+          << "</name></variable>\n";
   }
-  out << ind(-1) << "</quantum>\n";
-  out << ind(0) << "<block>\n";
-  writeGateSeq(circ, out);
-  out << ind(0) << "</block>\n";
-  out << ind(-1) << "</procedure>\n";
-  out << ind(-1) << "</statement>\n";
-  ind(-1);
+  w.out << w.ind(-1) << "</quantum>\n";
+  w.out << w.ind(0) << "<block>\n";
+  writeGateSeq(circ, w);
+  w.out << w.ind(0) << "</block>\n";
+  w.out << w.ind(-1) << "</procedure>\n";
+  w.out << w.ind(-1) << "</statement>\n";
+  w.ind(-1);
+  w.popmap();
 }
 
-void writeLineAlloc(std::shared_ptr<Circuit> circ, std::ostream & out) {
+void writeLineAlloc(std::shared_ptr<Circuit> circ, writectx & w) {
   for(unsigned int i = 0; i < circ->numLines(); ++i) {
-    out << ind(1) << "<statement>\n";
-    out << ind(1) << "<assignment>\n";
-    out << ind(1) << "<variable><name>" << varname(circ, i)
-        << "</name></variable>\n";
-    out << ind(0) << "<value>\n";
-    out << ind(1) << "<qurange>\n";
-    out << ind(1) << "<wire>\n";
-    out << ind(1) << "<quantity>\n";
-    out << ind(1) << "<integer>1</integer>\n";
-    out << ind(-1) << "</quantity>\n";
-    out << ind(-1) << "</wire>\n";
-    out << ind(-1) << "</qurange>\n";
-    out << ind(-1) << "</value>\n";
-    out << ind(-1) << "</assignment>\n";
-    out << ind(-1) << "</statement>\n";
-    ind(-1);
+    w.out << w.ind(1) << "<statement>\n";
+    w.out << w.ind(1) << "<assignment>\n";
+    w.out << w.ind(1) << "<variable><name>" << w.map(i)
+          << "</name></variable>\n";
+    w.out << w.ind(0) << "<value>\n";
+    w.out << w.ind(1) << "<qurange>\n";
+    w.out << w.ind(1) << "<wire>\n";
+    w.out << w.ind(1) << "<quantity>\n";
+    w.out << w.ind(1) << "<integer>1</integer>\n";
+    w.out << w.ind(-1) << "</quantity>\n";
+    w.out << w.ind(-1) << "</wire>\n";
+    w.out << w.ind(-1) << "</qurange>\n";
+    w.out << w.ind(-1) << "</value>\n";
+    w.out << w.ind(-1) << "</assignment>\n";
+    w.out << w.ind(-1) << "</statement>\n";
+    w.ind(-1);
   }
 }
 
@@ -238,16 +289,19 @@ void convert(std::shared_ptr<Circuit> circ, std::ostream & out) {
       << "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
       << "         xsi:schemaLocation=\"http://torque.bbn.com/ns/QuIGL ../xsd/QuIGL.xsd\">\n";
 
+  writectx w(out);
+  w.pushmap(circ);
+
   /* Write all subcircuits */
   for(auto sub : circ->subcircuits) {
-    writeSubcircuit(sub.first, sub.second, out);
+    writeSubcircuit(sub.first, sub.second, w);
   }
 
   /* Write line allocation */
-  writeLineAlloc(circ, out);
+  writeLineAlloc(circ, w);
 
   /* Write gates */
-  writeGateSeq(circ, out);
+  writeGateSeq(circ, w);
 
   /* Write footer */
   out << "</circuit>\n";
@@ -301,8 +355,6 @@ int main(int argc, char * argv[]) {
         }
         convert(circ, out);
       }
-    } catch(std::regex_error & e) {
-      std::cerr << "Regex error: " << e.what() << "\n";
     } catch(std::exception & e) {
       std::cerr << "Exception: " << e.what() << "\n";
       return 1;
