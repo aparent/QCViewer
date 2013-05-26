@@ -310,7 +310,7 @@ void convert(std::shared_ptr<Circuit> circ, std::ostream & out) {
 int main(int argc, char * argv[]) {
   std::shared_ptr<Circuit> circ;
 
-  std::string usage = "Usage: qcqg [circuit.qc] [circuit.xml]\n";
+  std::string usage = "Usage: qc2quigl [circuit.qc] [circuit.xml]\n";
   if(argc != 3) {
     std::cerr << usage;
     return 1;

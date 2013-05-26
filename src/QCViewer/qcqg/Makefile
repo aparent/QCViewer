@@ -4,7 +4,7 @@ CIRCUITKIT_OBJS=QCParser.o QCLexer.o circuit.o subcircuit.o gate.o QCParserUtils
 								gates/GateParser.o gates/GateLexer.o gates/RGate.o gates/UGate.o \
 								gates/UGateLookup.o utility.o qcqg.o
 
-all: a.out
+all: qc2quigl
 
 %.cpp: %.l
 	flex $^
@@ -19,9 +19,9 @@ all: a.out
 
 gates/GateLexer.o: gates/GateParser.cpp
 
-a.out: $(CIRCUITKIT_OBJS)
+qc2quigl: $(CIRCUITKIT_OBJS)
 	$(CXX) $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f *.o gates/*.o QCParser.cpp QCLexer.cpp gates/GateParser.cpp gates/GateLexer.cpp a.out
+	rm -f *.o gates/*.o QCParser.cpp QCLexer.cpp gates/GateParser.cpp gates/GateLexer.cpp qc2quigl
 
