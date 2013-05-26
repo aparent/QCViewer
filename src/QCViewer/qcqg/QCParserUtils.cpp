@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent
+Authors: Alex Parent, Marc Burns
 ---------------------------------------------------------------------*/
 
 #include "QCParserUtils.h"
@@ -373,6 +373,8 @@ void link_subcircs(std::shared_ptr<Circuit> circ)
 
 void remove_bad_gates(std::shared_ptr<Circuit> c, vector<string>& error_log )
 {
+    (void)c;
+    (void)error_log;
     /*for (unsigned int i = 0; i < c->numGates(); i++) {
         shared_ptr<Gate> g = c->getGate(i);
         shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(g);

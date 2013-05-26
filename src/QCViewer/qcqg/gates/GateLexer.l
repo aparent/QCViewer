@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------
 QCViewer
-Copyright (C) 2011  Alex Parent and The University of Waterloo, 
+Copyright (C) 2011  Alex Parent and The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
 This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-QCViewer is a trademark of the of the The University of Waterloo, 
+QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jacob Parker
+Authors: Alex Parent, Jacob Parker, Marc Burns
 ---------------------------------------------------------------------*/
 
 %option noyywrap
@@ -61,11 +61,11 @@ comment #.*
 ")"                 return TOKEN(RPAREN);
 ","                 return TOKEN(COMMA);
 "\n"                return TOKEN(NEWLINE);
-"NAME"              BEGIN(TEXT); return TOKEN(NAME); 
-"DRAWNAME"          BEGIN(TEXT); return TOKEN(DRAWNAME); 
-"LATEXNAME"         BEGIN(TEXT); return TOKEN(LATEXNAME); 
-"SYMBOL"            BEGIN(TEXT); return TOKEN(SYMBOL); 
-"COST"              return TOKEN(COST); 
+"NAME"              BEGIN(TEXT); return TOKEN(NAME);
+"DRAWNAME"          BEGIN(TEXT); return TOKEN(DRAWNAME);
+"LATEXNAME"         BEGIN(TEXT); return TOKEN(LATEXNAME);
+"SYMBOL"            BEGIN(TEXT); return TOKEN(SYMBOL);
+"COST"              return TOKEN(COST);
 <TEXT>{word}        BEGIN(INITIAL); SAVE_TOKEN; return WORD;
 <TEXT>\"            BEGIN(QUOTE);
 <QUOTE>{quote}      SAVE_TOKEN; return WORD;

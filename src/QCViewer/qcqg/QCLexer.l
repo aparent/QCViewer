@@ -1,4 +1,3 @@
-
 /*--------------------------------------------------------------------
 QCViewer
 Copyright (C) 2011  Alex Parent and The University of Waterloo,
@@ -22,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
-Authors: Alex Parent, Jacob Parker
+Authors: Alex Parent, Jacob Parker, Marc Burns
 ---------------------------------------------------------------------*/
 
 %option noyywrap
