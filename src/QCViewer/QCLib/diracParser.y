@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------
 QCViewer
-Copyright (C) 2011  Alex Parent and The University of Waterloo, 
+Copyright (C) 2011  Alex Parent and The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
 This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-QCViewer is a trademark of the of the The University of Waterloo, 
+QCViewer is a trademark of the of the The University of Waterloo,
 Institute for Quantum Computing, Quantum Circuits Group
 
 Authors: Alex Parent, Jacob Parker
@@ -84,7 +84,8 @@ parseNode *parseDirac(string input){
   char *in = (char*)malloc(input.length() + 1);
   strcpy(in,input.c_str());
   yy_scan_string(in);
-  yyparse ();
+  final = NULL;
+  yyparse();
   return final;
 }
 
