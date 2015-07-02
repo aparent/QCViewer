@@ -488,11 +488,10 @@ gateRect CircuitImage::drawNOT (double xc, double yc, double radius)
 {
     // Draw black border
     Colour black = Colour(0,0,0,1);
-    Colour white = Colour(1,1,1,1);
+    Colour white = Colour(1,1,1,0);
     addCircle (radius, xc, yc, white, black);
 
-    // Draw cross
-    addLine(xc-radius, yc, xc+radius, yc, L_COLOUR);
+    // Draw cross - No need to draw x line since this will be on a line anyway
     addLine(xc, yc-radius, xc, yc+radius, L_COLOUR);
 
     gateRect r;
