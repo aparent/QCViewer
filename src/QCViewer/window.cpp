@@ -188,6 +188,7 @@ void QCViewer::on_menu_about ()
     authors.push_back("Jacob Parker <j3parker@uwaterloo.ca>");
     authors.push_back("Marc Burns <m4burns@uwaterloo.ca>");
     Gtk::AboutDialog dialog;
+    dialog.set_comments("Thanks to Dmitri Maslov for helpful discussion regarding features.");
     dialog.set_version(QCV_VERSION);
     dialog.set_program_name(QCV_NAME);
     dialog.set_website(QCV_WEBSITE);
