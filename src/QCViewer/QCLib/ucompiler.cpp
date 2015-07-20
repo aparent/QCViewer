@@ -30,7 +30,9 @@ static const hprHelpers::hpr_real uc_hpr_epsilon = hprHelpers::hpr_real("1e-100"
 static const float_type uc_lpr_epsilon = 1e-30;
 static const uc_hpr_complex uc_hpr_zero = uc_hpr_complex(0,0);
 
-static bool is_unitary(comp_mat & m)
+// not currently used
+//
+/* static bool is_unitary(comp_mat & m)
 {
     auto conj = [](const uc_hpr_complex & e) {
         return std::conj(e);
@@ -44,7 +46,7 @@ static bool is_unitary(comp_mat & m)
     uc_hpr_complex a2n = (mc * m - I).frob_norm2(conj);
 
     return (a1n.real() < uc_hpr_epsilon && a2n.real() < uc_hpr_epsilon);
-}
+} */
 
 CompGateLibrary::CompGateLibrary() { }
 

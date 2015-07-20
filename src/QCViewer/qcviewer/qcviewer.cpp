@@ -48,7 +48,6 @@ Options handleOptions(int,char*[]);
 int main (int ac, char *av[])
 {
     srand((unsigned)time(NULL));
-    g_type_init();
     Gtk::Main kit(ac, av);
     Options ops = handleOptions(ac, av);
     if (ops.exit)

@@ -1,6 +1,6 @@
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -std=gnu++0x")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -pg -Wall -Wextra -pedantic -std=gnu++0x")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -pedantic -std=gnu++0x -s")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Werror -pedantic -std=gnu++0x -s")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -49,17 +49,26 @@ add_custom_command (
 )
 
 set(MPFR_LIBS "-lmpfr")
+set(LCMS_LIBS "-llcms2")
 
 set(Boost_USE_STATIC_LIBS ON)
 FIND_PACKAGE(Boost 1.52.0 REQUIRED COMPONENTS system program_options filesystem)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 set(Boost_USE_STATIC_LIBS ON)
 
+FIND_PACKAGE(Poppler REQUIRED)
+LINK_DIRECTORIES(${Poppler_LIBRARY_DIR})
+include_directories(${Poppler_INCLUDE_DIR})
+
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+
+message(STATUS "gtkmm: ${GTKMM_LIBRARY_DIRS}")
 include_directories(${GTKMM_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GTKMM_LIBRARY_DIRS})
+
 include_directories(${Freetype_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Freetype_LIBRARY_DIRS})
+
 include_directories( ${QCViewer_SOURCE_DIR}/QCLib)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -69,9 +78,9 @@ add_executable (qcviewer WIN32 ${CMAKE_CURRENT_SOURCE_DIR}/qcviewer/qcviewer.cpp
 add_executable (qcimage ${CMAKE_CURRENT_SOURCE_DIR}/qcimage/qcimage.cpp)
 
 target_link_libraries(qcviewer qc)
-target_link_libraries(qcviewer ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES} ${MPFR_LIBS})
+target_link_libraries(qcviewer ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES} ${MPFR_LIBS} ${LCMS_LIBS})
 target_link_libraries(qcimage qc)
-target_link_libraries(qcimage ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES} ${MPFR_LIBS})
+target_link_libraries(qcimage ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GTKMM_LIBRARIES} ${MPFR_LIBS} ${LCMS_LIBS})
 
 install(TARGETS qcviewer DESTINATION ${QCViewer_SOURCE_DIR}/../bin)
 install(TARGETS qcimage DESTINATION ${QCViewer_SOURCE_DIR}/../bin)

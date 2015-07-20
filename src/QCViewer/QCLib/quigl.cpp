@@ -146,7 +146,7 @@ std::shared_ptr<Circuit> circuit_from_quigl(std::string filename)
         c->addLine(ln);
     }
 
-    for(int i=0; i<c->numLines(); i++) {
+    for(unsigned int i=0; i<c->numLines(); i++) {
         Line & l = c->getLineModify(i);
         l.constant = l.garbage = false;
     }

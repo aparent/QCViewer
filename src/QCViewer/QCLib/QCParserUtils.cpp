@@ -263,6 +263,7 @@ void addRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *names,
     } else if (gateName=="RZ") {
         rot_type = RGate::Z;
     } else {
+        rot_type = RGate::Z;
         cout << "Bad R-Gate type. See: " << __FILE__ << __LINE__ << endl;
     }
     shared_ptr<Gate> g = shared_ptr<Gate>(new RGate(rot, rot_type));
@@ -292,6 +293,7 @@ void addFracRGate (std::shared_ptr<Circuit> circ, string gateName, name_node *na
     } else if (gateName=="RZ") {
         rot_type = RGate::Z;
     } else {
+        rot_type = RGate::Z;
         cout << "Bad R-Gate type. See: " << __FILE__ << __LINE__ << endl;
     }
     shared_ptr<Gate> g = shared_ptr<Gate>(new RGate(rot_type,numer,denom));

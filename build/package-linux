@@ -3,7 +3,7 @@
 # tarball.
 
 # The directory containing binary dependencies for QCViewer.
-BINDEPS=/scratch/m4burns/qcdist
+BINDEPS=/home/aparent/QViewer-Deps/qcdist
 
 function die {
   u=$?

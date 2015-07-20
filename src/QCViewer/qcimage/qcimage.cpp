@@ -45,7 +45,6 @@ int main (int argc, char *argv[])
     FT_Init_FreeType( &library );
     FT_New_Face( library, "data/fonts/cmbx12.ttf", 0, &ft_face );
     cairo_font_face_t * ft_default = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
-    g_type_init();
     CircuitImage drawer;
 
     if (argc > 0) {

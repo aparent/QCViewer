@@ -3,7 +3,7 @@
 # self-contained zip file.
 
 # The directory containing binary dependencies for QCViewer.
-BINDEPS=/scratch/m4burns/qcdist
+BINDEPS=/home/aparent/QCViewer-Deps/qcdist
 
 function die {
   u=$?
@@ -34,10 +34,11 @@ done
 
 cp -r $BINDEPS/*  "$workdir/QCViewer-$ver"/ || die "Couldn't copy dependencies!"
 cp -r ../bin/* "$workdir/QCViewer-$ver"/ || die "Couldn't copy QCViewer binaries!"
-mv "$workdir/QCViewer-$ver/"*.exe "$workdir/QCViewer-$ver/bin/" || die "Couldn't move QCViewer binaries into bin!"
+#mv "$workdir/QCViewer-$ver/"*.exe "$workdir/QCViewer-$ver/" || die "Couldn't move QCViewer binaries into bin!"
 
 # Remove non-Windows executables, if they exist.
-rm -f "$workdir/QCViewer-$ver"/{qcviewer,qcimage}
+# Also remove qcimage as it does not need to be packaged with the windows build
+rm -f "$workdir/QCViewer-$ver"/{qcviewer,qcimage,qcimage.exe}
 
 mkdir -p packages || die "Couldn't create packages directory!"
 destarc="`realpath packages`/${destname}.zip"
