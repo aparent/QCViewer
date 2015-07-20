@@ -31,7 +31,7 @@ Authors: Alex Parent, Jacob Parker
 //This file contains #defines for general infomation about the program like version numbers
 
 #define QCV_NAME "QCViewer"
-#define QCV_VERSION "1.2"
-#define QCV_WEBSITE "http://qcirc.iqc.uwaterloo.ca"
+#define QCV_VERSION "1.3"
+#define QCV_WEBSITE "https://github.com/aparent/QCViewer"
 
 #endif

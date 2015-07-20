@@ -15,8 +15,10 @@ for i in docs docs/manual docs/poster docs/slides; do
   ( cd "$builddir/../$i" && make ) >> "$builddir/log/latex" 2>&1
 done
 echo "Building release binaries for Linux..."
+./clean
 ./build > "$builddir/log/linux" 2>&1 || die "ERROR during Linux release build!"
 echo "Building release binaries for Windows..."
+./clean
 ./build win32 > "$builddir/log/windows" 2>&1 || die "ERROR during Windows release build!"
 
 for i in qcviewer qcimage qcviewer.exe qcimage.exe; do
