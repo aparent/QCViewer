@@ -99,7 +99,8 @@ private:
     {
     public:
         Line(double nx1,double ny1,double nx2, double ny2, Colour c)
-            : x1(nx1), x2(nx2), y1(ny1), y2(ny2), colour(c) {
+            : x1(nx1), x2(nx2), y1(ny1), y2(ny2), colour(c)
+        {
             type = LINE;
         }
         double x1,x2,y1,y2;
@@ -110,7 +111,8 @@ private:
     {
     public:
         Triangle(double nx0,double ny0,double nx1,double ny1,double nx2,double ny2, Colour c)
-            : x0(nx0), x1(nx1), x2(nx2),y0(ny0), y1(ny1), y2(ny2), colour(c) {
+            : x0(nx0), x1(nx1), x2(nx2),y0(ny0), y1(ny1), y2(ny2), colour(c)
+        {
             type = TRIANGLE;
         }
         double x0,x1,x2,y0,y1,y2;
@@ -121,7 +123,8 @@ private:
     {
     public:
         Rectangle(double nx0,double ny0,double nwidth, double nheight, Colour f, Colour o, bool ndashed = false)
-            : x0(nx0), y0(ny0), height(nheight), width(nwidth), fill(f), outline(o) {
+            : x0(nx0), y0(ny0), height(nheight), width(nwidth), fill(f), outline(o)
+        {
             type = RECTANGLE;
             dashed = ndashed;
         }
@@ -135,7 +138,8 @@ private:
     {
     public:
         Text(std::string s, double x0, double y0)
-            : text(s), x(x0), y(y0) {
+            : text(s), x(x0), y(y0)
+        {
             type = TEXT;
         }
         std::string text;
@@ -146,7 +150,8 @@ private:
     {
     public:
         Circle(double r0, double x0, double y0, Colour f, Colour l)
-            : r(r0), x(x0), y(y0), fill(f), outline(l) {
+            : r(r0), x(x0), y(y0), fill(f), outline(l)
+        {
             type = CIRCLE;
         }
         double r;

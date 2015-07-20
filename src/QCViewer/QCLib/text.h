@@ -18,19 +18,24 @@ public:
     TextObject() : width(0), height(0), x(0), y(0) { };
     virtual ~TextObject() {};
     virtual void draw(cairo_t* cr, double x, double y) = 0;
-    virtual bool isBatch() {
+    virtual bool isBatch()
+    {
         return batch;
     }
-    double getWidth() {
+    double getWidth()
+    {
         return width;
     }
-    double getHeight() {
+    double getHeight()
+    {
         return height;
     }
-    double getX() {
+    double getX()
+    {
         return x;
     }
-    double getY() {
+    double getY()
+    {
         return y;
     }
     std::string contents;
@@ -47,7 +52,8 @@ public:
 
     TextObject* renderText(std::string text);
     void setMode(TextMode m);
-    TextMode getMode() {
+    TextMode getMode()
+    {
         return mode;
     }
     void beginBatch();

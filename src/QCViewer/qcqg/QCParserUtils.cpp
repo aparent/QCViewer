@@ -118,7 +118,7 @@ void add_outlabels (std::shared_ptr<Circuit> circ, name_node *names)
 
 void add_constants (std::shared_ptr<Circuit> circ, name_node *names)
 {
-  (void)circ;
+    (void)circ;
     //while(names) {
     //circ->getLineModify(findLine(circ,names->name)).initValue = atoi((names->name).c_str()); //TODO:FIXME
     //names = names->next;

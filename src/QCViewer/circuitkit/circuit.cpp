@@ -36,8 +36,8 @@ using namespace std;
 
 Circuit::Circuit()
 {
-  root = shared_ptr<Subcircuit>(new Subcircuit());
-  root_attr = GateAttributes();
+    root = shared_ptr<Subcircuit>(new Subcircuit());
+    root_attr = GateAttributes();
 }
 
 Circuit::~Circuit ()
@@ -45,7 +45,7 @@ Circuit::~Circuit ()
 
 string Circuit::getName() const
 {
-  return name;
+    return name;
 }
 
 void Circuit::setName(string n_name)
@@ -55,19 +55,19 @@ void Circuit::setName(string n_name)
 
 std::shared_ptr<Subcircuit> Circuit::getRootSubcircuit()
 {
-  return root;
+    return root;
 }
 
 const GateAttributes & Circuit::getRootSubcircuitAttributes()
 {
-  return root_attr;
+    return root_attr;
 }
 
 void Circuit::clear()
 {
-  root = shared_ptr<Subcircuit>(new Subcircuit());
-  root_attr = GateAttributes();
-  subcircuits.clear();
+    root = shared_ptr<Subcircuit>(new Subcircuit());
+    root_attr = GateAttributes();
+    subcircuits.clear();
 }
 
 void Circuit::readQuiglFile(std::string filename)

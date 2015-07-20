@@ -47,7 +47,8 @@ std::complex<mpclass> toHprComplex( const long_arr4& val, int de);
 struct PrecDenom {
     static const int max_val = 1000;
     double sqrt2inv[max_val];
-    PrecDenom() {
+    PrecDenom()
+    {
         sqrt2inv[0] = 1.0;
         for( int i = 1; i < max_val; ++i )
             sqrt2inv[i] = sqrt2inv[i-1] * SQRT2_2;

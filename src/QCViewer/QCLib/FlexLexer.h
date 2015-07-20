@@ -80,7 +80,8 @@ extern "C++" {
         virtual int yylex() = 0;
 
         // Call yylex with new input/output sources.
-        int yylex( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0 ) {
+        int yylex( FLEX_STD istream* new_in, FLEX_STD ostream* new_out = 0 )
+        {
             switch_streams( new_in, new_out );
             return yylex();
         }
@@ -88,7 +89,7 @@ extern "C++" {
         // Switch to new input/output streams.  A nil stream pointer
         // indicates "keep the current one".
         virtual void switch_streams( FLEX_STD istream* new_in = 0,
-                                     FLEX_STD ostream* new_out = 0 ) = 0;
+        FLEX_STD ostream* new_out = 0 ) = 0;
 
         int lineno() const		{
             return yylineno;
@@ -97,7 +98,8 @@ extern "C++" {
         int debug() const		{
             return yy_flex_debug;
         }
-        void set_debug( int flag )	{
+        void set_debug( int flag )
+        {
             yy_flex_debug = flag;
         }
 

@@ -31,13 +31,16 @@ public:
     /* Construction, assignment, access, mutation. */
     Matrix(u32 r, u32 c, T z) : rows(r), cols(c), zero(z) {};
     Matrix(const Matrix & u) : m(u.m), rows(u.rows), cols(u.cols), zero(u.zero) {};
-    u32 numRows() {
+    u32 numRows()
+    {
         return rows;
     }
-    u32 numCols() {
+    u32 numCols()
+    {
         return cols;
     }
-    Matrix & operator=(const Matrix & rhs) {
+    Matrix & operator=(const Matrix & rhs)
+    {
         if(this != &rhs) {
             rows = rhs.rows;
             cols = rhs.cols;
@@ -46,7 +49,8 @@ public:
         }
         return *this;
     }
-    const T & get(u32 i, u32 j) const {
+    const T & get(u32 i, u32 j) const
+    {
         if(i >= rows || j >= cols) {
             throw std::runtime_error("Out-of-bounds Matrix::get()");
         }
@@ -59,14 +63,16 @@ public:
             return zero;
         }
     }
-    Matrix & set(u32 i, u32 j, const T & v) {
+    Matrix & set(u32 i, u32 j, const T & v)
+    {
         if(i >= rows || j >= cols) {
             throw std::runtime_error("Out-of-bounds Matrix::set()");
         }
         m[i][j] = v;
         return *this;
     }
-    Matrix & map_nonzero(std::function<T (const T&)> op) {
+    Matrix & map_nonzero(std::function<T (const T&)> op)
+    {
         for (auto & row : m) {
             for(auto & ent : row.second) {
                 ent.second = op(ent.second);
@@ -75,7 +81,8 @@ public:
         return *this;
     }
     /* Arithmetic. */
-    Matrix & direct_op(const Matrix & rhs, std::function<T (const T&, const T&)> op) {
+    Matrix & direct_op(const Matrix & rhs, std::function<T (const T&, const T&)> op)
+    {
         if(cols != rhs.cols || rows != rhs.rows) {
             throw std::runtime_error("Matrix dimensions must agree");
         }
@@ -116,23 +123,28 @@ public:
         }
         return *this;
     }
-    Matrix & operator+=(const Matrix & rhs) {
+    Matrix & operator+=(const Matrix & rhs)
+    {
         return direct_op(rhs, [](const T & l, const T & r) {
             return l + r;
         });
     }
-    Matrix & operator-=(const Matrix & rhs) {
+    Matrix & operator-=(const Matrix & rhs)
+    {
         return direct_op(rhs, [](const T & l, const T & r) {
             return l - r;
         });
     }
-    Matrix operator+(const Matrix & rhs) const {
+    Matrix operator+(const Matrix & rhs) const
+    {
         return (Matrix(*this) += rhs);
     }
-    Matrix operator-(const Matrix & rhs) const {
+    Matrix operator-(const Matrix & rhs) const
+    {
         return (Matrix(*this) -= rhs);
     }
-    Matrix transpose() const {
+    Matrix transpose() const
+    {
         Matrix<T> t(cols,rows,zero);
         for(auto & row : m) {
             for(auto & e : row.second) {
@@ -141,7 +153,8 @@ public:
         }
         return t;
     }
-    Matrix & identity(const T & unit) {
+    Matrix & identity(const T & unit)
+    {
         m.clear();
         for(u32 i=0; i<cols && i<rows; i++) {
             idcon<T> row;
@@ -150,7 +163,8 @@ public:
         }
         return *this;
     }
-    Matrix operator*(const Matrix & rhs) const {
+    Matrix operator*(const Matrix & rhs) const
+    {
         if(cols != rhs.rows) {
             throw std::runtime_error("Matrix dimensions must agree");
         }
@@ -182,10 +196,12 @@ public:
         }
         return res;
     }
-    Matrix & operator*=(const Matrix & rhs) {
+    Matrix & operator*=(const Matrix & rhs)
+    {
         return (*this = *this * rhs);
     }
-    Matrix & operator*=(const T & rhs) {
+    Matrix & operator*=(const T & rhs)
+    {
         for(auto & row : m) {
             for(auto & ent : row.second) {
                 ent.second *= rhs;
@@ -193,7 +209,8 @@ public:
         }
         return *this;
     }
-    Matrix operator*(const T & rhs) const {
+    Matrix operator*(const T & rhs) const
+    {
         return (Matrix<T>(*this) *= rhs);
     }
     /* Scalar multiplication from left. */
@@ -201,7 +218,8 @@ public:
     friend Matrix<V> operator*(const V & lhs, const Matrix<V> & rhs);
 
     /* Add rows to the bottom. */
-    Matrix & vappend(const Matrix & other) {
+    Matrix & vappend(const Matrix & other)
+    {
         if(cols != other.cols) {
             throw std::runtime_error("Matrix dimensions must agree");
         }
@@ -212,7 +230,8 @@ public:
         return *this;
     }
     /* Add columns to the right end. */
-    Matrix & happend(const Matrix & other) {
+    Matrix & happend(const Matrix & other)
+    {
         if(rows != other.rows) {
             throw std::runtime_error("Matrix dimensions must agree");
         }
@@ -229,7 +248,8 @@ public:
         return *this;
     }
     /* Kronecker product. */
-    Matrix operator%(const Matrix & rhs) const {
+    Matrix operator%(const Matrix & rhs) const
+    {
         Matrix<T> res(0, cols*rhs.cols, zero);
         s64 lastrow = -1;
         for(auto & lrow : m) {
@@ -248,14 +268,16 @@ public:
         res.rows = rows*rhs.rows;
         return res;
     }
-    Matrix & operator%=(const Matrix & rhs) {
+    Matrix & operator%=(const Matrix & rhs)
+    {
         return (*this = *this % rhs);
     }
     /* Frobenius norm squared given conjugate operation. */
-    T frob_norm2(std::function<T (const T&)> conj_op) const {
+    T frob_norm2(std::function<T (const T&)> conj_op) const
+    {
         T res = zero;
         Matrix<T> mmc = transpose().map_nonzero(conj_op);
-        mmc = mmc * *this;
+        mmc = mmc **this;
 
         for(u32 i = 0; i < mmc.numRows(); i++) {
             res += mmc.get(i,i);
@@ -263,7 +285,8 @@ public:
         return res;
     }
     /* Show matrix contents. Intended for debugging. */
-    std::string toString() {
+    std::string toString()
+    {
         std::stringstream ss;
         s64 lrow = -1, lcol;
         for(auto & row : m) {

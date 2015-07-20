@@ -64,8 +64,8 @@ public:
 };
 
 struct GateAttributes {
-  GateAttributes();
-  int loop_count;
+    GateAttributes();
+    int loop_count;
 };
 
 //A gate matrix struct for UGate

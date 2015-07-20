@@ -35,8 +35,7 @@ Authors: Alex Parent, Marc Burns
 /*!
   \brief Defines a line in a subcircuit
 */
-struct Line
-{
+struct Line {
     Line (std::string);
     std::string getInputLabel () const;
     std::string getOutputLabel() const;

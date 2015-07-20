@@ -34,7 +34,7 @@ Subcircuit::Subcircuit() : Gate()
 
 shared_ptr<Gate> Subcircuit::clone() const
 {
-  // XXX
+    // XXX
     Subcircuit *g  = new Subcircuit(circ,lineMap,loop_count);
     g->controls = controls;
     g->targets = targets;
@@ -143,7 +143,7 @@ unsigned int Subcircuit::gateCount(string gateName)
 
 unsigned int Subcircuit::depth()
 {
-  // XXX replace with simpler algorithm
+    // XXX replace with simpler algorithm
     unsigned int depth = 0;
     for(unsigned int i = 0; i < gates.size(); i++) {
         shared_ptr<Subcircuit> s = dynamic_pointer_cast<Subcircuit>(gates.at(i));
