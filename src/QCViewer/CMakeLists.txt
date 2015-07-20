@@ -49,7 +49,11 @@ add_custom_command (
 )
 
 set(MPFR_LIBS "-lmpfr")
-set(LCMS_LIBS "-llcms2")
+
+if(WIN32)
+  set(LCMS_LIBS "-llcms2")
+endif(WIN32)
+
 
 set(Boost_USE_STATIC_LIBS ON)
 FIND_PACKAGE(Boost 1.52.0 REQUIRED COMPONENTS system program_options filesystem)

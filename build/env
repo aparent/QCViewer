@@ -1,5 +1,0 @@
-if [ "`hostname`" == "high-fructose-corn-syrup" ]; then
-  export CXX=/usr/bin/g++
-  export CC=/usr/bin/gcc
-  export BOOST_ROOT=/scratch/m4burns/boost_1_53_0
-fi

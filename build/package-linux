@@ -2,8 +2,7 @@
 # This script packages the Linux build of QCViewer into a
 # tarball.
 
-# The directory containing binary dependencies for QCViewer.
-BINDEPS=/home/aparent/QViewer-Deps/qcdist
+BINDEPS=/home/aparent/QCViewer-Deps/qcdist
 
 function die {
   u=$?
@@ -12,8 +11,8 @@ function die {
 }
 
 # Assume we are in the build directory.
-
 ver=`git describe --tags --abbrev=0`
+echo $ver
 destname="QCViewer-${ver}-`date +%Y-%m-%d`"
 workdir=`mktemp -d`
 [ -d "$workdir" ] || die "Couldn't create a temporary directory."
