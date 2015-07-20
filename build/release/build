@@ -1,7 +1,6 @@
 #!/bin/bash
 rm -f CMakeCache.txt
 if [ "$1" == "win32" ]; then
-  . ../cross/setup
   cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_TOOLCHAIN_FILE=/home/aparent/QCViewer-Deps/mxe/usr/i686-w64-mingw32.static/share/cmake/mxe-conf.cmake ../../src
 else
   cmake -DCMAKE_BUILD_TYPE=release ../../src

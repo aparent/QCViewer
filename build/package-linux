@@ -12,7 +12,6 @@ function die {
 
 # Assume we are in the build directory.
 ver=`git describe --tags --abbrev=0`
-echo $ver
 destname="QCViewer-${ver}-`date +%Y-%m-%d`"
 workdir=`mktemp -d`
 [ -d "$workdir" ] || die "Couldn't create a temporary directory."
