@@ -1,1 +1,0 @@
-clang++ -std=c++0x `pkg-config --libs --cflags gtkmm-2.4` -include stdint.h *.cpp -o viewer 2>&1
