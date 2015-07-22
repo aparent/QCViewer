@@ -181,11 +181,11 @@ State RGate::ApplyU (index_t bits) const
         float_type cosr = cos (M_PI*rot);
         float_type sinr = sin (M_PI*rot);
         if (GetRegister (bits, targets.at (0))) {
-            answer = State (complex<float_type>(sinr,0),BuildBitString(bits,0));
+            answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
             answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
         } else {
-            answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
-            answer += State (complex<float_type>(sinr,0),BuildBitString(bits,1));
+            answer = State (complex<float_type>(cosr,0),BuildBitString(bits,0));
+            answer += State (complex<float_type>(0,-sinr),BuildBitString(bits,1));
         }
     }
     break;
@@ -193,11 +193,11 @@ State RGate::ApplyU (index_t bits) const
         float_type cosr = cos (M_PI*rot);
         float_type sinr = sin (M_PI*rot);
         if (GetRegister (bits, targets.at (0))) {
-            answer = State (complex<float_type>(0,-sinr),BuildBitString(bits,0));
+            answer = State (complex<float_type>(-sinr,0),BuildBitString(bits,0));
             answer += State (complex<float_type>(cosr,0),BuildBitString(bits,1));
         } else {
-            answer = State (complex<float_type>(-cosr,0),BuildBitString(bits,0));
-            answer += State (complex<float_type>(0,sinr),BuildBitString(bits,1));
+            answer = State (complex<float_type>(cosr,0),BuildBitString(bits,0));
+            answer += State (complex<float_type>(sinr,0),BuildBitString(bits,1));
         }
     }
     break;
